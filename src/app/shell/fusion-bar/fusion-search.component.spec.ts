@@ -25,6 +25,18 @@ describe('FusionSearchComponent op-hybrid', () => {
     el.remove();
   });
 
+  it('the clear slot takes no room while the field is empty, so no blank stands at the field\'s end', () => {
+    const { fixture, el, engine } = setup();
+    document.body.appendChild(el);
+    const slot = el.querySelector('.xslot') as HTMLElement;
+    expect(slot.getBoundingClientRect().width).toBe(0);
+    engine.setInput('aegis');
+    fixture.detectChanges();
+    expect(slot.getBoundingClientRect().width).toBeGreaterThan(0);
+    expect(slot.querySelector('button.clear')).not.toBeNull();
+    el.remove();
+  });
+
   it('a click into the field, ↓ or Ctrl+K opens the panel with suggestions', () => {
     const { fixture, el, field, cmp } = setup();
     field.click();

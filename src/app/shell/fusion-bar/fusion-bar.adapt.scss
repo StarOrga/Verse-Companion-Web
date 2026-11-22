@@ -77,11 +77,10 @@
   .search {
     min-width: 140px;
   }
-  // Collapsed to its magnifier button: it takes only its own width, at the bar's end.
+  // Collapsed: the field-shaped open button takes the bar's whole width (filter button aside).
   .search.bottom:not(.open) {
-    flex: 0 0 auto;
+    flex: 1 1 auto;
     min-width: 0;
-    margin-left: auto;
   }
   .fbtn {
     margin-left: var(--sc-space-1);
@@ -154,14 +153,36 @@
   height: var(--_cap-h);
 }
 
+// The kind switch as the path's last step (desktop/tablet; the phone hides the plate).
+.ks-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+// The chip's chevron and padding, mirrored in the invisible copy that decides the fold.
+.trail-measure li.ks {
+  padding: 0 18px 0 var(--sc-space-2);
+}
+.trail li.ks {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+.kindsw svg {
+  width: 14px;
+  height: 14px;
+}
+
 @media (pointer: coarse) {
   .tok-x {
     width: 32px;
     height: 32px;
   }
-  .kindsw,
   .fbtn {
     min-height: 40px;
+  }
+  // On the path's line under the brand: as tall as the plate's second line allows.
+  .kindsw {
+    height: 28px;
   }
 }
 
