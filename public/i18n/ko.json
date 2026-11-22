@@ -3596,7 +3596,10 @@
           "fixed": "…이(가) 수정됐나요?",
           "next": "다음은 언제 나오나요?",
           "nextThis": "이 패치는 언제 나오나요?",
-          "nextPast": "그다음에는 무엇이 나왔나요?"
+          "nextPast": "그다음에는 무엇이 나왔나요?",
+          "first": "이 패치의 첫걸음",
+          "community": "커뮤니티",
+          "urteil": "내 평가"
         },
         "noteOf": "{{version}}의 변경 사항 · Alpha {{line}}의 일부",
         "wholeLine": "{{line}} 패치 전체 보기",
@@ -3615,7 +3618,8 @@
           "verify": "패치 직후 충돌이 나면 버그를 제보하기 전에 런처에서 \"Verify\"를 실행하세요.",
           "repair": "캐릭터가 멈추거나 장비가 사라졌다면 RSI 계정에서 Character Repair를 실행한 뒤 다시 로그인하세요.",
           "known": "제보하기 전에 알려진 문제를 훑어보세요. 새로 생긴 버그 대부분은 이미 올라와 있어요."
-        }
+        },
+        "nextTitle": "다음 메이저 패치 준비하기"
       },
       "contents": {
         "inNotes": "릴리스 노트 내용",
@@ -3623,7 +3627,11 @@
         "less": "접기",
         "leftover": "로드맵 카드가 없는 노트의 추가 항목 ({{n}})",
         "noRoadmap": "이 패치의 로드맵 데이터가 없어요. 노트 \"{{title}}\"의 내용이에요:",
-        "ofNote": "“{{title}}”의 변경 사항:"
+        "ofNote": "“{{title}}”의 변경 사항:",
+        "fixedTitle": "수정됨",
+        "knownTitle": "알려진 문제",
+        "gallery": "이 패치의 이미지",
+        "moreLines": "{{n}}개 더 보기"
       },
       "fixed": {
         "placeholder": "이 패치에서 검색 … 예: quantum drive",
@@ -3776,6 +3784,56 @@
       "sinceDays": "{{days}}일째",
       "toBoard": "패치 센터",
       "toNotes": "패치 노트 읽기"
+    },
+    "patchBoard": {
+      "switch": {
+        "aria": "채널 선택",
+        "live": "Live",
+        "ptu": "PTU",
+        "liveHint": "Live 플레이어에게 중요한 것",
+        "ptuHint": "테스트 빌드: 모든 빌드를 하나하나"
+      },
+      "unread": "읽지 않음",
+      "newForYou": "새로 올라왔어요",
+      "readFull": "전체 읽기",
+      "markRead": "읽음",
+      "readOn": "{{date}}에 읽음",
+      "readEarlier": "이전에 읽음",
+      "readAgain": "다시 읽기",
+      "now": {
+        "title": "방금 Live에 나왔어요",
+        "since": "{{date}}부터",
+        "none": "아직 피드에 Live 패치가 없어요."
+      },
+      "next": {
+        "title": "다음 Live",
+        "none": "아직 다음 패치가 알려지지 않았어요.",
+        "testing": "{{ring}} 테스트 중",
+        "noDate": "공식 날짜 없음",
+        "announced": "{{date}} 예정으로 발표됨",
+        "estimate": "추정 {{when}}"
+      },
+      "allAbout": "{{line}}의 모든 것",
+      "close": "닫기",
+      "noDate": "날짜 없음",
+      "roadmap": {
+        "aria": "로드맵 상태",
+        "committed": "확정",
+        "tentative": "가능",
+        "released": "제공됨"
+      },
+      "status": {
+        "next": "다음 차례"
+      },
+      "daysLive": "Live {{n}}일째",
+      "earlier": "이전 업데이트 {{n}}개",
+      "earlierHide": "이전 업데이트 숨기기",
+      "ptu": {
+        "newest": "최신 테스트 빌드",
+        "aria": "테스트 빌드, 최신순",
+        "empty": "지금은 피드에 테스트 빌드가 없어요.",
+        "wave": "{{stage}} · 웨이브 {{n}}"
+      }
     }
   },
   "stability": {
@@ -4852,7 +4910,7 @@
     },
     "disclaimerTitle": "팬 사이트 안내",
     "rsiLink": "공식 Star Citizen 사이트: robertsspaceindustries.com",
-    "noticeOriginal": "이 사이트는 비공식 Star Citizen 팬 사이트이며, Cloud Imperium 계열 회사와 관련이 없어요. 이 사이트의 운영자나 사용자가 작성하지 않은 모든 콘텐츠는 각 소유자의 재산이에요.",
+    "noticeOriginal": "This is an unofficial Star Citizen fan site, not affiliated with the Cloud Imperium group of companies. All content on this site not authored by its host or users are property of their respective owners.",
     "noticeOriginalLabel": "원문(영어)",
     "trademarksOriginal": "Star Citizen®, Roberts Space Industries® 및 Cloud Imperium®은 Cloud Imperium Rights LLC의 등록 상표예요."
   },

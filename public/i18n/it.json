@@ -3596,7 +3596,10 @@
           "fixed": "Hanno sistemato …?",
           "next": "Quando arriva la prossima?",
           "nextThis": "Quando arriva questa patch?",
-          "nextPast": "Cosa è venuto dopo?"
+          "nextPast": "Cosa è venuto dopo?",
+          "first": "Primi passi in questa patch",
+          "community": "Community",
+          "urteil": "Il tuo verdetto"
         },
         "noteOf": "Modifiche in {{version}} · parte di Alpha {{line}}",
         "wholeLine": "Vedi l'intera patch {{line}}",
@@ -3615,7 +3618,8 @@
           "verify": "Crash subito dopo una patch: esegui \"Verify\" nel launcher prima di segnalare un bug.",
           "repair": "Personaggio bloccato o equipaggiamento mancante: esegui Character Repair nel tuo account RSI, poi accedi di nuovo.",
           "known": "Dai un'occhiata ai problemi noti prima di segnalare: la maggior parte dei bug recenti è già elencata."
-        }
+        },
+        "nextTitle": "Prepararsi alla prossima patch principale"
       },
       "contents": {
         "inNotes": "Nelle note di rilascio",
@@ -3623,7 +3627,11 @@
         "less": "Comprimi",
         "leftover": "Altri punti della nota senza scheda roadmap ({{n}})",
         "noRoadmap": "Nessun dato roadmap per questa patch — ecco la nota \"{{title}}\":",
-        "ofNote": "Le modifiche da “{{title}}”:"
+        "ofNote": "Le modifiche da “{{title}}”:",
+        "fixedTitle": "Risolti",
+        "knownTitle": "Problemi noti",
+        "gallery": "Immagini di questa patch",
+        "moreLines": "Mostra altri {{n}}"
       },
       "fixed": {
         "placeholder": "Cerca in questa patch … es. quantum drive",
@@ -3776,6 +3784,56 @@
       "sinceDays": "Da {{days}} giorni",
       "toBoard": "Patch Central",
       "toNotes": "Leggi le patch notes"
+    },
+    "patchBoard": {
+      "switch": {
+        "aria": "Scegli il canale",
+        "live": "Live",
+        "ptu": "PTU",
+        "liveHint": "Ciò che conta per chi gioca su Live",
+        "ptuHint": "Build di test: ogni singola build"
+      },
+      "unread": "Non letto",
+      "newForYou": "Nuovo per te",
+      "readFull": "Leggi tutto",
+      "markRead": "Letto",
+      "readOn": "letto il {{date}}",
+      "readEarlier": "letto in precedenza",
+      "readAgain": "Rileggi",
+      "now": {
+        "title": "Appena arrivata su Live",
+        "since": "Dal {{date}}",
+        "none": "Ancora nessuna patch Live nel feed."
+      },
+      "next": {
+        "title": "Prossima su Live",
+        "none": "Nessuna prossima patch nota per ora.",
+        "testing": "In test su {{ring}}",
+        "noDate": "Nessuna data ufficiale",
+        "announced": "Annunciata per il {{date}}",
+        "estimate": "Stima: {{when}}"
+      },
+      "allAbout": "Tutto su {{line}}",
+      "close": "Chiudi",
+      "noDate": "Senza data",
+      "roadmap": {
+        "aria": "Stato della roadmap",
+        "committed": "Confermato",
+        "tentative": "Possibile",
+        "released": "Consegnato"
+      },
+      "status": {
+        "next": "In arrivo"
+      },
+      "daysLive": "{{n}} giorni su Live",
+      "earlier": "{{n}} aggiornamenti precedenti",
+      "earlierHide": "Nascondi aggiornamenti precedenti",
+      "ptu": {
+        "newest": "Build di test più recente",
+        "aria": "Build di test, dalla più recente",
+        "empty": "Al momento nessuna build di test nel feed.",
+        "wave": "{{stage}} · ondata {{n}}"
+      }
     }
   },
   "stability": {
@@ -4852,7 +4910,7 @@
     },
     "disclaimerTitle": "Avviso sul sito fan",
     "rsiLink": "Sito ufficiale di Star Citizen: robertsspaceindustries.com",
-    "noticeOriginal": "Questo è un sito fan non ufficiale di Star Citizen, non affiliato al gruppo di società Cloud Imperium. Tutti i contenuti di questo sito non creati dal gestore o dagli utenti sono di proprietà dei rispettivi titolari.",
+    "noticeOriginal": "This is an unofficial Star Citizen fan site, not affiliated with the Cloud Imperium group of companies. All content on this site not authored by its host or users are property of their respective owners.",
     "noticeOriginalLabel": "Testo originale (inglese)",
     "trademarksOriginal": "Star Citizen®, Roberts Space Industries® e Cloud Imperium® sono marchi registrati di Cloud Imperium Rights LLC"
   },

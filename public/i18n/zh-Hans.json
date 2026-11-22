@@ -2,7 +2,7 @@
   "notFoundPage": {
     "srTitle": "404 – 页面未找到",
     "title": "目的地不在地图上",
-    "lead": "此地址无法访问:",
+    "lead": "此地址无法访问：",
     "didYouMean": "你是不是想找",
     "home": "返回首页"
   },
@@ -101,45 +101,45 @@
   },
   "auth": {
     "previewLocked": {
-      "body": "在此处无法登录——预览会覆盖应用向你显示的内容,即使登录成功也一样。请先通过顶部横幅退出预览。"
+      "body": "在此处无法登录——预览会覆盖应用向你显示的内容，即使登录成功也一样。请先通过顶部横幅退出预览。"
     },
     "tagline": "你通往 Verse 的终端",
     "email": "邮箱",
     "password": "密码",
     "signIn": "登录",
-    "forgotPassword": "忘记密码?",
+    "forgotPassword": "忘记密码？",
     "reset": {
       "title": "重置密码",
-      "hint": "请输入你的邮箱地址。我们会发送一个链接给你,用于设置新密码——我们绝不会替你设定密码。",
+      "hint": "请输入你的邮箱地址。我们会发送一个链接给你，用于设置新密码——我们绝不会替你设定密码。",
       "send": "发送链接",
       "sending": "发送中…",
-      "sent": "如果该地址对应有账号,一封带链接的邮件已在路上。该链接会直接带你前往设置密码的页面。"
+      "sent": "如果该地址对应有账号，一封带链接的邮件已在路上。该链接会直接带你前往设置密码的页面。"
     },
     "setPassword": {
       "title": "设置密码",
       "inviteTitle": "欢迎登舰",
       "checking": "请稍候…",
       "lead": "在此设置你的新密码。之后你将使用邮箱地址和此密码登录。",
-      "inviteLead": "你的申请已通过——你的访问权限已生效。你还没有密码:现在就自己设置一个,这样随时都能再次进入。",
+      "inviteLead": "你的申请已通过——你的访问权限已生效。你还没有密码：现在就自己设置一个，这样随时都能再次进入。",
       "newPassword": "新密码",
       "repeatPassword": "重复密码",
       "rule": "至少 {{min}} 个字符。只有你自己知道——我们不会分配密码。",
       "submit": "保存密码",
       "saving": "保存中…",
       "saved": "密码已保存。",
-      "savedLead": "密码已保存。从现在起,你可以用邮箱地址和此密码登录。",
+      "savedLead": "密码已保存。从现在起，你可以用邮箱地址和此密码登录。",
       "continue": "继续前往应用",
-      "expired": "此链接已过期或已被使用。请输入你的邮箱地址,我们会给你发送一个新链接。",
+      "expired": "此链接已过期或已被使用。请输入你的邮箱地址，我们会给你发送一个新链接。",
       "sendLink": "发送新链接",
       "sending": "发送中…",
-      "resent": "如果该地址对应有账号,一封带新链接的邮件已在路上。"
+      "resent": "如果该地址对应有账号，一封带新链接的邮件已在路上。"
     },
     "or": "或",
     "continueGoogle": "使用 Google 继续",
     "continueDiscord": "使用 Discord 继续",
     "inviteOnly": "仅限受邀访问。请联系管理员邀请你。",
     "deniedInvite": "此账号尚未被邀请。本站仅限受邀访问——请联系管理员给你发送邀请。",
-    "deniedSignup": "此账号尚未获批。仅限受邀访问——请先申请访问权限,然后再重新登录。",
+    "deniedSignup": "此账号尚未获批。仅限受邀访问——请先申请访问权限，然后再重新登录。",
     "unavailable": {
       "title": "无法验证你的访问权限",
       "body": "刚才无法加载你的个人资料——通常是登录后的短暂故障。你仍处于登录状态。",
@@ -150,7 +150,7 @@
     "landing": {
       "appName": "Verse Companion",
       "join": "加入俱乐部。",
-      "pitch": "Companion 是一个私人圈子——仅限受邀访问。你已经在 Verse 中飞行并想加入?提交申请,管理员会查看。",
+      "pitch": "Companion 是一个私人圈子——仅限受邀访问。你已经在 Verse 中飞行并想加入？提交申请，管理员会查看。",
       "perks": {
         "hangar": "你的机库、装配方案和角色集中在一处",
         "codex": "Codex:舰船、组件和游戏内真实数值",
@@ -168,14 +168,14 @@
     },
     "apply": {
       "title": "申请访问权限",
-      "hint": "简单说说你是谁——你的请求会直接发送给管理员。无需账号,无需密码。",
-      "handle": "RSI 昵称(可选)",
+      "hint": "简单说说你是谁——你的请求会直接发送给管理员。无需账号，无需密码。",
+      "handle": "RSI 昵称（可选）",
       "handlePlaceholder": "例如 CitizenKane",
-      "message": "留言(可选)",
-      "messagePlaceholder": "你是怎么知道我们的,你开什么舰?",
+      "message": "留言（可选）",
+      "messagePlaceholder": "你是怎么知道我们的，你开什么舰？",
       "send": "发送申请",
       "sending": "发送中…",
-      "sent": "谢谢!你的请求已送达。如果管理员通过,你会在此地址收到一封邀请邮件。",
+      "sent": "谢谢！你的请求已送达。如果管理员通过，你会在此地址收到一封邀请邮件。",
       "rateLimited": "目前收到的请求非常多。请一小时后再试。"
     },
     "suspended": {
@@ -204,7 +204,7 @@
     "phaseBadge": "Alpha",
     "badge": "制图师徽章",
     "accountMenu": "账号菜单",
-    "profilePicture": "头像(账号菜单)",
+    "profilePicture": "头像（账号菜单）",
     "adminOnly": "仅管理员",
     "adminMenu": "管理员",
     "telemetry": "遥测",
@@ -3435,7 +3435,7 @@
         "deltaSlower": "比中位数慢 {{n}} 天",
         "deltaSame": "与中位数持平",
         "barDays": "Alpha {{version}}:{{n}} 天",
-        "chartAria": "{{title}}:当前 {{latest}} {{unit}},基于 {{n}} 个数据点的中位数为 {{median}} {{unit}}",
+        "chartAria": "{{title}}：当前 {{latest}} {{unit}}，基于 {{n}} 个数据点的中位数为 {{median}} {{unit}}",
         "unit": {
           "days": "天"
         },
@@ -3445,13 +3445,13 @@
           "sub": "从首个测试版本到正式上线的天数"
         },
         "cadence": {
-          "title": "更新节奏(主线版本)",
+          "title": "更新节奏（主线版本）",
           "short": "节奏",
           "sub": "两次 LIVE 正式发布之间的天数"
         },
         "median": "历史中位数",
         "subCadence": {
-          "title": "更新节奏(子补丁)",
+          "title": "更新节奏（子补丁）",
           "short": "子补丁",
           "sub": "PTU 或 LIVE 中两次子补丁之间的天数"
         },
@@ -3465,13 +3465,13 @@
       "ptuRelease": {
         "title": "{{version}} 何时登陆 LIVE?",
         "infoLabel": "日期是如何得出的",
-        "infoEstimate": "我们的估算:该版本的首个测试版本时间,加上以往版本从首个 PTU 版本到 LIVE 所用时间的中位数。这是推算结果,并非承诺。",
+        "infoEstimate": "我们的估算：该版本的首个测试版本时间，加上以往版本从首个 PTU 版本到 LIVE 所用时间的中位数。这是推算结果，并非承诺。",
         "infoOfficial": "官方日期：RSI 在其状态页面上安排的 LIVE 部署时间，一旦那里有计划就会显示。RSI 不会在补丁说明中给出具体日期。",
         "estimate": "我们的估算",
         "estimateBasis": "已测试 {{days}} 天 · PTU → LIVE 中位数 {{median}} 天(n = {{n}})",
-        "noEstimate": "数据不足,暂时无法估算",
+        "noEstimate": "数据不足，暂时无法估算",
         "official": "官方(RSI)",
-        "source": "来源:RSI 状态页面,{{title}}",
+        "source": "来源：RSI 状态页面，{{title}}",
         "noOfficial": "暂无官方日期",
         "statusLink": "请查看 RSI 状态页面",
         "openNotes": "查看 {{version}} 中的变更",
@@ -3480,7 +3480,7 @@
       "forecast": {
         "title": "预计时间表",
         "short": "时间表",
-        "sub": "根据更新节奏得出的中位数估算,并非官方日期",
+        "sub": "根据更新节奏得出的中位数估算，并非官方日期",
         "row": {
           "ptu": "下一个 PTU",
           "live": "下一个 LIVE 补丁",
@@ -3596,7 +3596,10 @@
           "fixed": "他们修复了……吗？",
           "next": "下一个什么时候来？",
           "nextThis": "这个补丁什么时候上线？",
-          "nextPast": "之后发生了什么？"
+          "nextPast": "之后发生了什么？",
+          "first": "这个补丁的第一步",
+          "community": "社区",
+          "urteil": "你的评价"
         },
         "noteOf": "{{version}} 中的变更 · Alpha {{line}} 的一部分",
         "wholeLine": "查看完整的 {{line}} 补丁",
@@ -3615,7 +3618,8 @@
           "verify": "补丁后立即崩溃：报告 Bug 前，请先在启动器中运行“Verify”。",
           "repair": "角色卡住或装备丢失：请在 RSI 账号中运行 Character Repair，然后重新登录。",
           "known": "报告前先浏览一下已知问题——大多数新 Bug 已经列在那里。"
-        }
+        },
+        "nextTitle": "为下一个大型补丁做准备"
       },
       "contents": {
         "inNotes": "在发行说明中",
@@ -3623,7 +3627,11 @@
         "less": "收起",
         "leftover": "说明中没有路线图卡片的其他要点（{{n}}）",
         "noRoadmap": "此补丁没有路线图数据——这是说明“{{title}}”：",
-        "ofNote": "来自“{{title}}”的变更："
+        "ofNote": "来自“{{title}}”的变更：",
+        "fixedTitle": "已修复",
+        "knownTitle": "已知问题",
+        "gallery": "这个补丁的图片",
+        "moreLines": "再显示 {{n}} 条"
       },
       "fixed": {
         "placeholder": "在此补丁中搜索……例如 quantum drive",
@@ -3658,10 +3666,10 @@
           "leadUsual": "通常会是"
         },
         "span": {
-          "leadTime": "测试 → 正式服:{{days}} 天",
-          "cadence": "正式服 → 正式服:{{days}} 天"
+          "leadTime": "测试 → 正式服：{{days}} 天",
+          "cadence": "正式服 → 正式服：{{days}} 天"
         },
-        "charts": "详细图表(PTU → 正式服 · 节奏 · 子补丁 · 时间表)",
+        "charts": "详细图表（PTU → 正式服 · 节奏 · 子补丁 · 时间表）",
         "status": {
           "live": "Alpha {{line}} 已上线 {{days}} 天——通常 {{median}} 天后会有下一个。",
           "testing": "Alpha {{line}} 已测试 {{days}} 天——通常 {{median}} 天后上线正式服。",
@@ -3669,14 +3677,14 @@
           "over": "CIG 比通常节奏晚了 {{n}} 天。"
         },
         "legend": {
-          "real": "正式服周期(有据可查)",
-          "usual": "通常节奏(中位数)",
+          "real": "正式服周期（有据可查）",
+          "usual": "通常节奏（中位数）",
           "over": "超出节奏",
           "lead": "测试阶段(PTU)"
         },
         "fact": {
-          "lead": "测试 → 正式服:{{days}} 天",
-          "cadence": "上一周期正式服 → 正式服:{{days}} 天",
+          "lead": "测试 → 正式服：{{days}} 天",
+          "cadence": "上一周期正式服 → 正式服：{{days}} 天",
           "usual": "通常 {{median}} 天(n = {{n}})",
           "later": "比通常晚 {{n}} 天",
           "earlier": "比通常早 {{n}} 天",
@@ -3684,12 +3692,12 @@
           "hotfix": "自上线以来 {{n}} 次热修复",
           "hotfixLast": "最近一次 {{date}}"
         },
-        "infoLabel": "这些数字从何而来?"
+        "infoLabel": "这些数字从何而来？"
       },
       "monitor": {
-        "title": "下一个补丁什么时候来?",
-        "infoLabel": "这个估算从何而来?",
-        "infoBasis": "依据:{{n}} 个已测量周期的中位数 {{median}} 天。",
+        "title": "下一个补丁什么时候来？",
+        "infoLabel": "这个估算从何而来？",
+        "infoBasis": "依据：{{n}} 个已测量周期的中位数 {{median}} 天。",
         "over": "超出 {{n}} 天",
         "tile": {
           "live": "正式服",
@@ -3776,6 +3784,56 @@
       "sinceDays": "已持续 {{days}} 天",
       "toBoard": "补丁中心",
       "toNotes": "阅读补丁说明"
+    },
+    "patchBoard": {
+      "switch": {
+        "aria": "选择渠道",
+        "live": "Live",
+        "ptu": "PTU",
+        "liveHint": "Live 玩家关心的内容",
+        "ptuHint": "测试构建：每一个构建都列出"
+      },
+      "unread": "未读",
+      "newForYou": "你的新内容",
+      "readFull": "阅读全文",
+      "markRead": "已读",
+      "readOn": "已于 {{date}} 阅读",
+      "readEarlier": "之前已读",
+      "readAgain": "再读一遍",
+      "now": {
+        "title": "刚刚登陆 Live",
+        "since": "自 {{date}} 起",
+        "none": "Feed 中还没有 Live 补丁。"
+      },
+      "next": {
+        "title": "Live 上的下一个",
+        "none": "尚不知道下一个补丁。",
+        "testing": "正在 {{ring}} 测试中",
+        "noDate": "无官方日期",
+        "announced": "已公布为 {{date}}",
+        "estimate": "估算：{{when}}"
+      },
+      "allAbout": "关于 {{line}} 的一切",
+      "close": "关闭",
+      "noDate": "无日期",
+      "roadmap": {
+        "aria": "路线图状态",
+        "committed": "已确认",
+        "tentative": "可能",
+        "released": "已交付"
+      },
+      "status": {
+        "next": "即将到来"
+      },
+      "daysLive": "已上线 {{n}} 天",
+      "earlier": "{{n}} 条更早的更新",
+      "earlierHide": "隐藏更早的更新",
+      "ptu": {
+        "newest": "最新测试构建",
+        "aria": "测试构建，最新的在前",
+        "empty": "目前 Feed 中没有测试构建。",
+        "wave": "{{stage}} · 第 {{n}} 批"
+      }
     }
   },
   "stability": {
@@ -3897,7 +3955,7 @@
     },
     "prompts": {
       "reenable": "要重新启用数据包“{{name}}”吗？",
-      "delete": "要永久删除数据包“{{name}}”吗?\n\n此操作无法撤销。",
+      "delete": "要永久删除数据包“{{name}}”吗？\n此操作无法撤销。",
       "disableTitle": "要停用数据包“{{name}}”吗？",
       "reasonLabel": "原因（可选）",
       "deleteTitle": "删除数据包？",
@@ -3997,7 +4055,7 @@
     },
     "locale": {
       "title": "语言与地区",
-      "hint": "语言决定翻译和完整的月份名称;地区决定日期字段的顺序和时间制式。“自动”会沿用浏览器报告的设置。",
+      "hint": "语言决定翻译和完整的月份名称；地区决定日期字段的顺序和时间制式。“自动”会沿用浏览器报告的设置。",
       "auto": "自动",
       "detected": "自动检测到：{{value}}",
       "preview": "示例",
@@ -4126,37 +4184,37 @@
   },
   "admin": {
     "title": "管理 · 用户管理",
-    "subtitle": "只有管理员可以更改角色。最后一名管理员无法被降级,请先提升另一名管理员。",
+    "subtitle": "只有管理员可以更改角色。最后一名管理员无法被降级，请先提升另一名管理员。",
     "lastAdmin": "最后一名管理员",
-    "lastAdminTip": "更改此角色之前,请先提升另一名管理员,否则系统将没有任何管理员。",
+    "lastAdminTip": "更改此角色之前，请先提升另一名管理员，否则系统将没有任何管理员。",
     "protected": "受保护",
-    "protectedTip": "受保护的创始人账号。角色、审批和删除已在数据库中锁定,只能在服务器端(service_role)解除,无法通过管理界面解除。",
+    "protectedTip": "受保护的创始人账号。角色、审批和删除已在数据库中锁定，只能在服务器端(service_role)解除，无法通过管理界面解除。",
     "register": {
       "title": "注册",
-      "subtitle": "将邮箱加入白名单并设置其首次登录的角色。若账号已存在,则立即批准;邀请邮件为可选项。",
+      "subtitle": "将邮箱加入白名单并设置其首次登录的角色。若账号已存在，则立即批准；邀请邮件为可选项。",
       "emailPlaceholder": "person@example.com",
       "sendInvite": "发送邀请邮件",
       "send": "注册",
       "sending": "正在注册…",
       "status": {
         "allowlisted": "{{email}} 已加入白名单。",
-        "approved_existing": "{{email}} 已有账号,已批准。",
+        "approved_existing": "{{email}} 已有账号，已批准。",
         "invited": "{{email}} 已加入白名单并已邀请。"
       },
       "unknownError": "注册失败。",
       "err": {
-        "method_not_allowed": "请求被拒绝(方法错误)。",
-        "server_misconfigured": "服务器配置有误,请检查 Edge Function 的密钥。",
-        "unauthorized": "你的会话已过期,请重新登录。",
+        "method_not_allowed": "请求被拒绝（方法错误）。",
+        "server_misconfigured": "服务器配置有误，请检查 Edge Function 的密钥。",
+        "unauthorized": "你的会话已过期，请重新登录。",
         "forbidden": "只有管理员可以注册用户。",
-        "invalid_json": "无法读取请求,请重试。",
+        "invalid_json": "无法读取请求，请重试。",
         "invalid_email": "这不是有效的邮箱地址。",
         "invalid_role": "该角色不存在。",
         "allowlist_write_failed": "无法将该邮箱加入白名单。",
-        "user_lookup_failed": "白名单已更新,但查找现有账号失败。",
-        "invite_failed": "该邮箱已在白名单中,但邀请邮件发送失败。",
-        "role_assign_failed": "已邀请,但无法设置角色。",
-        "existing_account_not_updated": "该邮箱已在白名单中,但现有账号未被更改,很可能是受保护的管理员。",
+        "user_lookup_failed": "白名单已更新，但查找现有账号失败。",
+        "invite_failed": "该邮箱已在白名单中，但邀请邮件发送失败。",
+        "role_assign_failed": "已邀请，但无法设置角色。",
+        "existing_account_not_updated": "该邮箱已在白名单中，但现有账号未被更改，很可能是受保护的管理员。",
         "user_exists": "此邮箱已注册。白名单仍已更新。"
       },
       "open": "邀请他人"
@@ -4164,24 +4222,24 @@
     "share": {
       "button": "复制分享链接",
       "copied": "分享链接已复制到剪贴板。",
-      "copyFailed": "无法复制链接,请手动复制。"
+      "copyFailed": "无法复制链接，请手动复制。"
     },
     "people": {
       "unapproved": "未批准",
-      "unapprovedTip": "此账号为自行注册,从未获批,无法访问应用。",
+      "unapprovedTip": "此账号为自行注册，从未获批，无法访问应用。",
       "approve": "批准",
-      "approveTitle": "批准账号?",
-      "approveConfirm": "批准 {{email}}?该账号将以查看者身份获得应用访问权限,之后可再分配更高角色。",
+      "approveTitle": "批准账号？",
+      "approveConfirm": "批准 {{email}}？该账号将以查看者身份获得应用访问权限，之后可再分配更高角色。",
       "unapprovedOne": "{{n}} 个账号未获批准",
       "unapprovedMany": "{{n}} 个账号未获批准",
       "title": "人员",
-      "subtitle": "账号和尚未使用的邀请合并显示在同一列表中。该邮箱一旦登录,对应的邀请就会从列表中消失。",
+      "subtitle": "账号和尚未使用的邀请合并显示在同一列表中。该邮箱一旦登录，对应的邀请就会从列表中消失。",
       "invitedPill": "已邀请",
       "invitedTitle": "已预注册登录——尚无账号使用此邮箱。",
       "withdraw": "撤回邀请",
       "withdrawTitle": "仅撤销预注册——已加入的账号不受影响。",
-      "withdrawConfirm": "撤回对 {{email}} 的邀请?该邮箱将失去预注册的访问权限,且不会通知任何人。",
-      "withdrawConfirmTitle": "撤回邀请?"
+      "withdrawConfirm": "撤回对 {{email}} 的邀请？该邮箱将失去预注册的访问权限，且不会通知任何人。",
+      "withdrawConfirmTitle": "撤回邀请？"
     },
     "col": {
       "user": "用户",
@@ -4202,20 +4260,20 @@
     "errorTitle": "操作失败",
     "loading": "正在加载用户…",
     "delete": {
-      "confirmSelf": "你的账号({{email}})将被永久删除,你的上传内容和合集也会一并删除,之后你将被登出。确定吗?",
-      "confirmOther": "确定永久删除 {{email}} 吗?其上传内容和合集也会一并删除,此操作无法撤销。",
+      "confirmSelf": "你的账号({{email}})将被永久删除，你的上传内容和合集也会一并删除，之后你将被登出。确定吗？",
+      "confirmOther": "确定永久删除 {{email}} 吗？其上传内容和合集也会一并删除，此操作无法撤销。",
       "failed": "删除失败",
-      "title": "删除账号?",
+      "title": "删除账号？",
       "err": {
-        "protected_admin": "此账号受保护,无法修改或删除。",
+        "protected_admin": "此账号受保护，无法修改或删除。",
         "cannot_delete_last_admin": "无法删除最后一位管理员。",
-        "user_not_found": "该账号不存在(或已被删除)。",
+        "user_not_found": "该账号不存在（或已被删除）。",
         "forbidden": "只有管理员可以删除账号。",
-        "unauthorized": "你的会话已过期,请重新登录。",
-        "invalid_body": "请求不完整,请刷新页面后重试。",
+        "unauthorized": "你的会话已过期，请重新登录。",
+        "invalid_body": "请求不完整，请刷新页面后重试。",
         "delete_failed": "无法删除该账号。",
         "server_misconfigured": "服务器配置有误——请检查 Edge Function 的密钥。",
-        "method_not_allowed": "请求被拒绝(方法错误)。"
+        "method_not_allowed": "请求被拒绝（方法错误）。"
       }
     },
     "tokens": {
@@ -4228,10 +4286,10 @@
       "connections": {
         "title": "连接",
         "comingSoon": "即将推出",
-        "mockNote": "预览:与 SC 应用的关联尚未实现。上方状态仅为占位显示,并非真实连接。",
+        "mockNote": "预览：与 SC 应用的关联尚未实现。上方状态仅为占位显示，并非真实连接。",
         "scApp": {
           "name": "Verse Companion 应用",
-          "desc": "将桌面应用直接关联到你的账号,以便自动归属上传和数据。"
+          "desc": "将桌面应用直接关联到你的账号，以便自动归属上传和数据。"
         }
       },
       "newToken": "新建令牌",
@@ -4249,7 +4307,7 @@
       "neverUsed": "从未",
       "revoke": "撤销",
       "revoking": "正在撤销…",
-      "revokeConfirm": "确定撤销令牌“{{name}}”吗?此操作无法撤销,使用该令牌的客户端将立即收到 401。",
+      "revokeConfirm": "确定撤销令牌“{{name}}”吗？此操作无法撤销，使用该令牌的客户端将立即收到 401。",
       "revokeSuccess": "令牌已撤销。",
       "revokeError": "撤销失败",
       "dialog": {
@@ -4266,9 +4324,9 @@
         "patch:read": "读取 /v1/patch",
         "ships:read": "读取 /v1/ships",
         "components:read": "读取 /v1/components",
-        "keybinds:read": "读取 /v1/keybinds(按键绑定 + 分类)",
-        "*:read": "快捷方式:所有读取端点",
-        "admin:tokens": "管理令牌(仍需管理员角色)"
+        "keybinds:read": "读取 /v1/keybinds（按键绑定 + 分类）",
+        "*:read": "快捷方式：所有读取端点",
+        "admin:tokens": "管理令牌（仍需管理员角色）"
       },
       "reveal": {
         "title": "你的新令牌",
@@ -4278,7 +4336,7 @@
         "ack": "我已保存",
         "tokenLabel": "明文令牌"
       },
-      "revokeTitle": "撤销令牌?",
+      "revokeTitle": "撤销令牌？",
       "eyebrow": "API 令牌"
     },
     "filter": {
@@ -4290,21 +4348,21 @@
     },
     "requests": {
       "title": "访问申请",
-      "subtitle": "来自落地页的申请。接受后会像“+”后面的邀请表单一样注册该邮箱,并发送一封邀请邮件,邮件链接直接通向让对方自行设置密码的页面。我们从不代为设定密码。",
+      "subtitle": "来自落地页的申请。接受后会像“+”后面的邀请表单一样注册该邮箱，并发送一封邀请邮件，邮件链接直接通向让对方自行设置密码的页面。我们从不代为设定密码。",
       "empty": "暂无待处理的申请。",
       "accept": "接受",
       "decline": "拒绝",
-      "declineConfirm": "拒绝 {{email}} 的申请?对方不会收到通知。",
-      "accepted": "已接受 {{email}},并完成注册和邀请。",
-      "acceptedNoMail": "已接受并批准 {{email}}。未发送邀请邮件——该邮箱已有账号,对方直接登录即可。建议你亲自通知对方。",
+      "declineConfirm": "拒绝 {{email}} 的申请？对方不会收到通知。",
+      "accepted": "已接受 {{email}}，并完成注册和邀请。",
+      "acceptedNoMail": "已接受并批准 {{email}}。未发送邀请邮件——该邮箱已有账号，对方直接登录即可。建议你亲自通知对方。",
       "declined": "已拒绝 {{email}} 的申请。",
       "allowlisted": "已在允许列表中",
       "joined": "已有账号",
-      "declineTitle": "拒绝申请?"
+      "declineTitle": "拒绝申请？"
     },
     "reports": {
       "title": "可疑账号",
-      "subtitle": "存在未处理举报的账号,被举报最多的排在最前。",
+      "subtitle": "存在未处理举报的账号，被举报最多的排在最前。",
       "count": "{{count}} 条举报",
       "by": "由 {{name}} 举报"
     },
@@ -4320,7 +4378,7 @@
       "suspendedPill": "已封禁",
       "warnReason": "警告内容",
       "suspendReason": "封禁原因",
-      "reasonPlaceholder": "发生了什么?此文字将显示给受影响的用户。",
+      "reasonPlaceholder": "发生了什么？此文字将显示给受影响的用户。",
       "reasonVisible": "此文字将原样显示给受影响的用户。",
       "duration": "时长",
       "durations": {
@@ -4332,35 +4390,35 @@
       "indefinite": "永久",
       "flash": {
         "warned": "警告已发送。",
-        "suspended": "账号已封禁,访问权限即刻被阻止。",
+        "suspended": "账号已封禁，访问权限即刻被阻止。",
         "unsuspended": "封禁已解除。",
         "reviewed": "举报已标记为已处理。",
         "dismissed": "举报已驳回。"
       },
       "error": {
-        "protected": "无法对此账号进行管理操作(你自己的账号、管理员或受保护账号)。",
+        "protected": "无法对此账号进行管理操作（你自己的账号、管理员或受保护账号）。",
         "invalidTarget": "选择无效。",
         "userNotFound": "未找到账号。",
         "reasonRequired": "请填写原因。",
         "reasonTooLong": "文字过长。",
         "invalidDuration": "时长无效。",
         "forbidden": "你没有执行此操作的权限。",
-        "generic": "操作未成功,请重试。"
+        "generic": "操作未成功，请重试。"
       }
     },
     "silhouettes": {
       "title": "Holotable 轮廓",
       "subtitle": "当前版本的轮廓覆盖率。",
-      "build": "当前版本:{{channel}} {{patch}}({{build}})",
+      "build": "当前版本：{{channel}} {{patch}}({{build}})",
       "total": "舰船总数",
       "withSilhouette": "有轮廓",
       "withAnchors": "有锚点",
       "without": "无轮廓",
-      "withoutTip": "此版本中上传器未提供轮廓的舰体。Holotable 会为它们显示占位图;其卡片优先使用解包得到的预览图标,否则使用 RSI 商店图片——若图片都无法加载则显示通用图标。后两者具体采用哪个,由浏览器决定。",
+      "withoutTip": "此版本中上传器未提供轮廓的舰体。Holotable 会为它们显示占位图；其卡片优先使用解包得到的预览图标，否则使用 RSI 商店图片——若图片都无法加载则显示通用图标。后两者具体采用哪个，由浏览器决定。",
       "barLabel": "{{pct}}% 有轮廓",
-      "fallbackSplit": "无轮廓:{{icon}} 有预览图标,{{none}} 使用 RSI 图片或图标",
+      "fallbackSplit": "无轮廓：{{icon}} 有预览图标，{{none}} 使用 RSI 图片或图标",
       "missingToggle": "显示 {{count}} 个无轮廓的舰体",
-      "reasonSplit": "原因:{{no_mesh}} 无网格,{{convert_failed}} 转换失败,{{empty}} 为空,{{unexplained}} 未记录原因",
+      "reasonSplit": "原因：{{no_mesh}} 无网格，{{convert_failed}} 转换失败，{{empty}} 为空，{{unexplained}} 未记录原因",
       "reason": {
         "no_mesh": "无网格",
         "convert_failed": "转换失败",
@@ -4368,10 +4426,10 @@
         "none": "未记录原因"
       },
       "reasonTip": {
-        "no_mesh": "记录中未指定 .cga/.cgf 几何体,或该文件不在归档中。",
+        "no_mesh": "记录中未指定 .cga/.cgf 几何体，或该文件不在归档中。",
         "convert_failed": "cgf-converter 或读取 glb 失败。",
-        "empty": "已转换,但没有三角面或无法描出轮廓。",
-        "none": "上传器未报告此舰体的原因——可能是上传器 0.68.0 之前的版本,或轮廓步骤未运行。"
+        "empty": "已转换，但没有三角面或无法描出轮廓。",
+        "none": "上传器未报告此舰体的原因——可能是上传器 0.68.0 之前的版本，或轮廓步骤未运行。"
       },
       "noBuild": "没有当前版本——暂无可统计的内容。",
       "retry": "重试"
@@ -4379,7 +4437,7 @@
     "translations": {
       "eyebrow": "管理员",
       "title": "AI 翻译",
-      "subtitle": "由 Claude 翻译游戏文本:开关、上限、语言、任务和术语表。",
+      "subtitle": "由 Claude 翻译游戏文本：开关、上限、语言、任务和术语表。",
       "tabs": {
         "overview": "概览",
         "cards": "闪卡",
@@ -4394,7 +4452,7 @@
       "saved": "已保存。",
       "switch": {
         "label": "Claude API 翻译",
-        "hint": "从下次数据上传起生效。仅自动翻译增量(相对上一版本新增或变更的文本)。"
+        "hint": "从下次数据上传起生效。仅自动翻译增量（相对上一版本新增或变更的文本）。"
       },
       "caps": {
         "upload": "单次上传上限(USD)",
@@ -4411,26 +4469,26 @@
         "revoke": "撤销",
         "fullRun": "开始完整运行",
         "fullRunOpen": "完整运行进行中——见任务",
-        "fullRunGap": "仅翻译缺失的 {{missing}} 条文本(约 {{pct}}%)。CIG 或翻译记忆库已有的内容不产生费用。",
-        "fullRunUnmeasured": "翻译 CIG 和翻译记忆库尚未覆盖的全部内容。事先的估算免费,并会测量覆盖率。",
+        "fullRunGap": "仅翻译缺失的 {{missing}} 条文本（约 {{pct}}%）。CIG 或翻译记忆库已有的内容不产生费用。",
+        "fullRunUnmeasured": "翻译 CIG 和翻译记忆库尚未覆盖的全部内容。事先的估算免费，并会测量覆盖率。",
         "coverage": {
           "label": "{{lang}} 覆盖率",
           "value": "{{pct}}%",
-          "detail": "{{total}} 条文本中已翻译 {{covered}} 条(来自 CIG 或翻译记忆库)。最近一次任务时间:{{at}}",
+          "detail": "{{total}} 条文本中已翻译 {{covered}} 条（来自 CIG 或翻译记忆库）。最近一次任务时间：{{at}}",
           "unknown": "覆盖率未知",
           "unknownHint": "将在该语言的首个任务中测量。"
         },
         "approveTitle": "批准 {{lang}}?",
-        "approveText": "此后新上传的内容也会被翻译成 {{lang}}(仅增量)。",
-        "revokeTitle": "撤销对 {{lang}} 的批准?",
+        "approveText": "此后新上传的内容也会被翻译成 {{lang}}（仅增量）。",
+        "revokeTitle": "撤销对 {{lang}} 的批准？",
         "revokeText": "新上传的内容将不再翻译成 {{lang}}。已有翻译保留。"
       },
       "fullRun": {
-        "title": "批准 {{lang}} 的完整运行?",
-        "text": "约花费 {{usd}} $({{count}} 条文本)——所有尚未翻译的文本都会被翻译。完整运行不受单次上传费用上限限制。",
+        "title": "批准 {{lang}} 的完整运行？",
+        "text": "约花费 {{usd}} $（{{count}} 条文本）——所有尚未翻译的文本都会被翻译。完整运行不受单次上传费用上限限制。",
         "confirm": "批准并付费",
-        "startTitle": "为 {{lang}} 创建完整运行?",
-        "startText": "任务会先进行估算,免费且需要几分钟。之后它会带着费用和文本数量在任务列表中等待你的批准。",
+        "startTitle": "为 {{lang}} 创建完整运行？",
+        "startText": "任务会先进行估算，免费且需要几分钟。之后它会带着费用和文本数量在任务列表中等待你的批准。",
         "startConfirm": "创建并估算"
       },
       "jobs": {
@@ -4439,19 +4497,19 @@
         "noBuild": "没有当前版本。",
         "approve": "批准",
         "cancel": "取消",
-        "cancelTitle": "取消 {{lang}} 的任务?",
-        "cancelText": "任务将被终止;已产生的费用保留。",
+        "cancelTitle": "取消 {{lang}} 的任务？",
+        "cancelText": "任务将被终止；已产生的费用保留。",
         "progress": "{{pct}}%",
         "hold": {
           "full": "完整运行需经你批准后才会开始。",
           "upload_cap": "估算超出单次上传上限。",
           "monthly_cap": "此任务将使本月超出月度上限。",
-          "overrun": "第一批次组的费用比估算高出 {{pct}}%。估算已修正,其余部分需经你批准后才会开始。"
+          "overrun": "第一批次组的费用比估算高出 {{pct}}%。估算已修正，其余部分需经你批准后才会开始。"
         },
         "capped": {
-          "job_budget": "已达到任务预算:{{texts}} 条文本未获得第二次尝试,将保持未翻译状态。",
-          "monthly_cap": "已达到每月上限:{{texts}} 条文本未获得第二次尝试,将保持未翻译状态。",
-          "judge": "已达到预算:已跳过评审抽样。"
+          "job_budget": "已达到任务预算：{{texts}} 条文本未获得第二次尝试，将保持未翻译状态。",
+          "monthly_cap": "已达到每月上限：{{texts}} 条文本未获得第二次尝试，将保持未翻译状态。",
+          "judge": "已达到预算：已跳过评审抽样。"
         },
         "cols": {
           "build": "Build",
@@ -4485,7 +4543,7 @@
       "jobErrors": {
         "unknown": "翻译任务出现未知错误。",
         "base_build_missing": "缺少对比用的 Build。",
-        "conflict": "该任务已被并行修改,请重新加载。",
+        "conflict": "该任务已被并行修改，请重新加载。",
         "english_missing": "缺少英文源文本。",
         "job_not_found": "未找到任务。",
         "lang_unknown": "未知语言。",
@@ -4497,18 +4555,18 @@
         "results_missing": "缺少结果。",
         "r2_not_configured": "存储 (R2) 尚未配置。",
         "internal": "翻译流水线发生内部错误。",
-        "worker_limit": "该任务连续多次超出 Worker 的 CPU 或内存限制,已被停止。",
+        "worker_limit": "该任务连续多次超出 Worker 的 CPU 或内存限制，已被停止。",
         "no_live_build": "当前没有 LIVE Build。",
         "source_not_permitted": "此来源的许可尚未明确。",
-        "source_unknown": "该来源不存在(或已不存在)。",
+        "source_unknown": "该来源不存在（或已不存在）。",
         "nothing_to_do": "没有需要翻译的内容。",
         "phase_unknown": "该任务处于未知步骤。",
-        "job_cleanup_pending": "上一个任务仍在清理中,请一分钟后重试。",
-        "resubmit_limit": "创建批次多次未收到响应。任务已停止,以免同一批次被重复计费。请在 Anthropic 控制台中检查是否有孤立的批次。"
+        "job_cleanup_pending": "上一个任务仍在清理中，请一分钟后重试。",
+        "resubmit_limit": "创建批次多次未收到响应。任务已停止，以免同一批次被重复计费。请在 Anthropic 控制台中检查是否有孤立的批次。"
       },
       "glossary": {
         "title": "术语表",
-        "search": "搜索(原文或译文)",
+        "search": "搜索（原文或译文）",
         "lang": "语言",
         "origin": "来源",
         "category": "类别",
@@ -4527,12 +4585,12 @@
         "historyEmpty": "暂无更改。",
         "deleted": "已删除",
         "undo": "撤销",
-        "undoTitle": "撤销此更改?",
+        "undoTitle": "撤销此更改？",
         "undoText": "该条目将恢复为“{{term}}”。",
         "empty": "没有符合这些筛选条件的条目。",
         "prev": "上一页",
         "next": "下一页",
-        "pageOf": "第 {{page}} 页,共 {{pages}} 页",
+        "pageOf": "第 {{page}} 页，共 {{pages}} 页",
         "origins": {
           "cig": "CIG",
           "ai": "AI",
@@ -4549,24 +4607,24 @@
       },
       "cards": {
         "title": "闪卡",
-        "intro": "仅在 AI 无法判断时使用:一个问题,一个答案。最重要的卡片排在最前。",
+        "intro": "仅在 AI 无法判断时使用：一个问题，一个答案。最重要的卡片排在最前。",
         "lang": "语言",
-        "goal": "每日目标:{{done}} / {{goal}} 张卡片",
+        "goal": "每日目标：{{done}} / {{goal}} 张卡片",
         "goalLabel": "每日目标进度",
         "streak": "连续 {{days}} 天",
         "open": "{{count}} 张待处理",
         "skippedBefore": "已跳过",
         "fresh": "当前补丁",
         "spread": "影响 {{count}} 条字符串",
-        "choose": "哪个翻译更好?",
+        "choose": "哪个翻译更好？",
         "option": {
           "a": "选项 A",
           "b": "选项 B"
         },
         "bothWrong": "两者都不对——自己填写",
-        "ownText": "你的文本(将作为管理员修正采用)",
-        "note": "给 AI 的备注提示(可选)",
-        "saveRule": "保存为规则(全局适用)",
+        "ownText": "你的文本（将作为管理员修正采用）",
+        "note": "给 AI 的备注提示（可选）",
+        "saveRule": "保存为规则（全局适用）",
         "submit": "保存答案",
         "skip": "跳过",
         "kinds": {
@@ -4582,7 +4640,7 @@
           "neighbours": "相邻行",
           "research": "调研"
         },
-        "thanks": "谢谢,已保存。",
+        "thanks": "谢谢，已保存。",
         "impact": "此答案统一了 {{count}} 条字符串。",
         "points": "+{{points}} 分",
         "next": "下一张卡片",
@@ -4598,18 +4656,18 @@
         "title": "来源",
         "intro": "翻译所依据的社区语言包。请仅在许可明确后再导入。",
         "syncAll": "立即同步",
-        "syncTitle": "同步所有来源?",
-        "syncText": "检查每个启用的来源是否有更改,并为有更改的来源在后台启动导入。",
+        "syncTitle": "同步所有来源？",
+        "syncText": "检查每个启用的来源是否有更改，并为有更改的来源在后台启动导入。",
         "import": "导入种子数据",
-        "importTitle": "导入 {{name}} 的种子数据?",
+        "importTitle": "导入 {{name}} 的种子数据？",
         "importText": "{{lang}} 语言包将在后台检查并纳入翻译基础。CIG 的行保持不变。",
-        "importLocked": "仅在许可明确后才可操作(已授权或已允许)。",
-        "importStarted": "{{name}}:导入已开始。导入在后台运行,进度请在“后台任务”中查看。",
-        "synced": "同步完成:已检查 {{checked}} 个,已启动 {{changed}} 个导入,{{errors}} 个错误。",
+        "importLocked": "仅在许可明确后才可操作（已授权或已允许）。",
+        "importStarted": "{{name}}：导入已开始。导入在后台运行，进度请在“后台任务”中查看。",
+        "synced": "同步完成：已检查 {{checked}} 个，已启动 {{changed}} 个导入，{{errors}} 个错误。",
         "learn": "学习",
-        "learnTitle": "开始 {{lang}} 的学习步骤?",
+        "learnTitle": "开始 {{lang}} 的学习步骤？",
         "learnText": "根据现有文本为 {{lang}} 推导术语、风格和卡片。可能产生费用。",
-        "learnStarted": "{{lang}} 的学习步骤已开始。它在后台运行,进度请在“后台任务”中查看。",
+        "learnStarted": "{{lang}} 的学习步骤已开始。它在后台运行，进度请在“后台任务”中查看。",
         "draft": "创建申请草稿",
         "drafted": "已为 {{name}} 创建草稿——见“申请”。",
         "empty": "尚未登记任何来源。",
@@ -4676,8 +4734,8 @@
       },
       "outreach": {
         "title": "向维护者的申请",
-        "noAutoSend": "此处不会自动发送任何内容。草稿需由受保护的管理员批准,文本由你手动复制并发送,之后再标记为已发送。",
-        "intro": "草稿由各许可类型的模板生成,会说明我们使用什么内容以及如何署名。",
+        "noAutoSend": "此处不会自动发送任何内容。草稿需由受保护的管理员批准，文本由你手动复制并发送，之后再标记为已发送。",
+        "intro": "草稿由各许可类型的模板生成，会说明我们使用什么内容以及如何署名。",
         "empty": "没有草稿。可在“来源”下为每个来源创建一份。",
         "subject": "主题",
         "body": "文本",
@@ -4703,24 +4761,24 @@
         "save": "保存草稿",
         "approve": "批准",
         "approveLocked": "只有受保护的管理员可以批准申请。",
-        "approveTitle": "批准发给 {{name}} 的申请?",
+        "approveTitle": "批准发给 {{name}} 的申请？",
         "approveText": "批准不会发送任何内容。之后可复制文本并手动发送。",
         "approved": "已批准。未发送任何内容。",
         "copy": "复制文本",
         "copied": "文本已复制到剪贴板。",
         "markSent": "标记为已发送",
-        "markSentTitle": "标记为已发送?",
+        "markSentTitle": "标记为已发送？",
         "markSentText": "你已自行把消息发给 {{name}}。此处仅作记录。",
         "recordAnswer": "记录答复",
         "answerText": "维护者的答复",
         "decision": "决定",
         "saveAnswer": "保存答复",
-        "answerRecorded": "答复:",
+        "answerRecorded": "答复：",
         "cancel": "取消"
       },
       "alerts": {
         "title": "提示",
-        "intro": "CIG 更改了某一行的原文或其自己的译文,而该行有管理员修正。请检查修正是否仍然适用。",
+        "intro": "CIG 更改了某一行的原文或其自己的译文，而该行有管理员修正。请检查修正是否仍然适用。",
         "emptyTitle": "没有待处理的提示",
         "empty": "所有管理员修正仍与当前原文一致。",
         "enOld": "修改前的英文",
@@ -4851,9 +4909,9 @@
       "news": "新内容"
     },
     "disclaimerTitle": "粉丝网站声明",
-    "rsiLink": "Star Citizen 官方网站:robertsspaceindustries.com",
-    "noticeOriginal": "这是一个非官方的 Star Citizen 粉丝网站,与 Cloud Imperium 集团旗下公司无任何关联。本站上非由站点所有者或用户创作的所有内容,均归其各自所有者所有。",
-    "noticeOriginalLabel": "原始措辞(英文)",
+    "rsiLink": "Star Citizen 官方网站：robertsspaceindustries.com",
+    "noticeOriginal": "This is an unofficial Star Citizen fan site, not affiliated with the Cloud Imperium group of companies. All content on this site not authored by its host or users are property of their respective owners.",
+    "noticeOriginalLabel": "原始措辞（英文）",
     "trademarksOriginal": "Star Citizen®、Roberts Space Industries® 和 Cloud Imperium® 是 Cloud Imperium Rights LLC 的注册商标"
   },
   "legal": {
@@ -4989,7 +5047,7 @@
   },
   "hangar": {
     "title": "我的机库",
-    "subtitle": "你的个人舰队:舰船配置、组件装配和角色套装——基于 Codex 中的实时游戏数据构建。",
+    "subtitle": "你的个人舰队：舰船配置、组件装配和角色套装——基于 Codex 中的实时游戏数据构建。",
     "counts": {
       "owned": "已拥有",
       "wishlist": "愿望单"
@@ -5045,7 +5103,7 @@
       "rename": "重命名",
       "cancel": "取消",
       "share": "分享",
-      "deleteConfirm": "确定永久删除?",
+      "deleteConfirm": "确定永久删除？",
       "roleLabel": "角色"
     },
     "detail": {
@@ -5058,7 +5116,7 @@
       "notes": "备注",
       "notesPlaceholder": "关于这艘舰船的备注…",
       "removeConfirm": {
-        "title": "要将 {{name}} 从机库中移除吗?",
+        "title": "要将 {{name}} 从机库中移除吗？",
         "bodyNone": "此操作无法撤销。",
         "bodyOne": "这艘舰船的配置也会一并删除。此操作无法撤销。",
         "bodyMany": "这艘舰船的 {{count}} 个配置也会一并删除。此操作无法撤销。"
@@ -5066,16 +5124,16 @@
     },
     "configs": {
       "title": "配置",
-      "namePlaceholder": "例如:PvP 配装…",
+      "namePlaceholder": "例如：PvP 配装…",
       "create": "创建",
-      "empty": "还没有配置——起个名字并选择角色,即可开始自定义装配。",
+      "empty": "还没有配置——起个名字并选择角色，即可开始自定义装配。",
       "activate": "设为当前",
       "saveLoadout": "保存装配",
       "discard": "放弃",
       "delete": "删除",
       "roleLabel": "角色",
       "deleteConfirm": {
-        "title": "要删除配置“{{name}}”吗?",
+        "title": "要删除配置“{{name}}”吗？",
         "body": "此操作无法撤销。"
       }
     },
@@ -5083,7 +5141,7 @@
       "title": "标准组件",
       "subtitle": "来自实时游戏数据 (P4K) 的这艘舰船的出厂配置——即默认随船附带的组件。",
       "count": "{{count}} 个组件",
-      "empty": "在当前目录版本中,没有记录这艘舰船的标准组件。"
+      "empty": "在当前目录版本中，没有记录这艘舰船的标准组件。"
     },
     "stats": {
       "title": "装配统计",
@@ -5092,7 +5150,7 @@
       "quantumRange": "量子航程",
       "assigned": "物品",
       "ofPorts": "共 {{count}} 个端口",
-      "note": "根据此目录版本中提取的组件数据计算;未收录物品的数值缺失——数据仅为近似值。"
+      "note": "根据此目录版本中提取的组件数据计算；未收录物品的数值缺失——数据仅为近似值。"
     },
     "compStat": {
       "jumpRange": "跳跃航程",
@@ -5106,36 +5164,36 @@
       "empty": "空",
       "change": "更换",
       "reset": "原装",
-      "createConfigFirst": "请先在上方创建一个配置,再开始编辑装配。"
+      "createConfigFirst": "请先在上方创建一个配置，再开始编辑装配。"
     },
     "picker": {
       "loading": "加载中…"
     },
     "teaser": {
       "title": "你的个人机库",
-      "subtitle": "请登录以构建你的舰队——免费,Alpha 期间需邀请。",
+      "subtitle": "请登录以构建你的舰队——免费，Alpha 期间需邀请。",
       "save": {
         "title": "保存你的舰船",
-        "text": "把整支舰队集中在一处:已拥有的舰船和愿望单,可自定义名称和备注。"
+        "text": "把整支舰队集中在一处：已拥有的舰船和愿望单，可自定义名称和备注。"
       },
       "overview": {
         "title": "舰队概览",
-        "text": "置顶旗舰、数量统计,并可快速进入每艘舰船的详情页。"
+        "text": "置顶旗舰、数量统计，并可快速进入每艘舰船的详情页。"
       },
       "loadouts": {
         "title": "测试装配",
-        "text": "更换舰船上的组件和武器,在花费任何 aUEC 之前先查看属性变化。"
+        "text": "更换舰船上的组件和武器，在花费任何 aUEC 之前先查看属性变化。"
       },
       "compare": {
         "title": "对比",
-        "text": "将舰船和组件并排置顶,对比最关键的数据。"
+        "text": "将舰船和组件并排置顶，对比最关键的数据。"
       },
       "cta": "登录以打开你的机库"
     },
     "import": {
       "open": "导入…",
       "title": "从导出文件导入",
-      "hint": "将 Hangar Transfer Format 的 JSON 导出文件拖到这里(例如来自 HangarXPLOR 浏览器扩展——导出由你自己操作,我们绝不会索取 RSI 账号凭据)。条目会与 Codex 进行匹配,只有你确认的行才会被添加。",
+      "hint": "将 Hangar Transfer Format 的 JSON 导出文件拖到这里（例如来自 HangarXPLOR 浏览器扩展——导出由你自己操作，我们绝不会索取 RSI 账号凭据）。条目会与 Codex 进行匹配，只有你确认的行才会被添加。",
       "pickFile": "选择文件",
       "parsing": "读取中…",
       "dropHint": "或将 .json 文件拖放到这里",
@@ -5144,7 +5202,7 @@
       "matched": "{{total}} 个条目中有 {{matched}} 个已匹配到目录",
       "chooseOther": "选择其他文件",
       "exact": "匹配",
-      "fuzzy": "最佳猜测:{{name}}",
+      "fuzzy": "最佳猜测：{{name}}",
       "noMatch": "无目录匹配",
       "confirm": "导入 {{count}} 艘飞船",
       "importing": "导入中…",
@@ -5180,7 +5238,7 @@
       "adopt": "创建副本",
       "adopting": "正在创建副本…",
       "adoptHint": "添加到你自己的机库",
-      "adoptError": "操作未成功,请重试。",
+      "adoptError": "操作未成功，请重试。",
       "loginToAdopt": "登录以创建副本",
       "aboutCta": "什么是 Verse Companion?",
       "unavailable": {
@@ -5206,15 +5264,15 @@
     "loading": "正在加载遥测数据…",
     "errorTitle": "错误",
     "retry": "重试",
-    "unavailable": "无法获取 PostHog 的数据。这些卡片只显示无需 PostHog 即可得知的信息;这并不代表一切正常。",
+    "unavailable": "无法获取 PostHog 的数据。这些卡片只显示无需 PostHog 即可得知的信息；这并不代表一切正常。",
     "cardUnavailable": "暂无数据。",
     "status": {
       "attention": "有 {{n}} 件事需要关注",
       "attentionOne": "有 1 件事需要关注",
-      "calm": "一切平静,无需处理",
-      "blind": "信息不完整,无法连接 PostHog",
+      "calm": "一切平静，无需处理",
+      "blind": "信息不完整，无法连接 PostHog",
       "since": "自你上次访问({{date}})以来",
-      "firstVisit": "首次访问,回顾最近 7 天"
+      "firstVisit": "首次访问，回顾最近 7 天"
     },
     "level": {
       "ok": "正常",
@@ -5239,8 +5297,8 @@
       "desktopInstalls": "活跃安装数"
     },
     "forecast": "预测 {{value}}",
-    "barLabel": "已用 {{pct}}%,本月已过 {{month}}%",
-    "sparkLabel": "每日活跃用户,最近 7 天",
+    "barLabel": "已用 {{pct}}%，本月已过 {{month}}%",
+    "sparkLabel": "每日活跃用户，最近 7 天",
     "badge": {
       "web": "网页",
       "server": "服务器",
@@ -5282,26 +5340,26 @@
   "adminFeedback": {
     "title": "反馈看板",
     "deployLag": "部署待完成",
-    "deployLagHint": "已合并,但生产环境尚未包含此更改。Vercel 部署完成后即会出现。",
-    "subtitle": "写下可以改进的地方——夜间例行任务会接手未处理的条目,完成发布,并在这里标记。",
+    "deployLagHint": "已合并，但生产环境尚未包含此更改。Vercel 部署完成后即会出现。",
+    "subtitle": "写下可以改进的地方——夜间例行任务会接手未处理的条目，完成发布，并在这里标记。",
     "heartbeat": {
       "online": "开发电脑在线",
       "offline": "开发电脑离线",
       "unknown": "开发电脑状态未知",
       "onlineTitle": "开发电脑在线——反馈例行任务于{{time}}报到。新主题正在处理中。",
-      "offlineTitle": "开发电脑离线——反馈例行任务上次于{{time}}报到。可能是电脑关机、Claude 未运行或额度用尽;新主题要等它恢复后才会处理。",
+      "offlineTitle": "开发电脑离线——反馈例行任务上次于{{time}}报到。可能是电脑关机、Claude 未运行或额度用尽；新主题要等它恢复后才会处理。",
       "unknownTitle": "状态未知——尚未收到反馈例行任务的任何信号。",
       "running": "开发电脑正在工作",
       "paused": "例行任务已暂停",
-      "runningTitle": "开发电脑在线——反馈例行任务正在工作(最近一次心跳:{{time}})。",
-      "pausedTitle": "例行任务已暂停——使用额度几乎用尽,最近一次心跳:{{time}}。新主题要等窗口重新空闲后才会处理。",
+      "runningTitle": "开发电脑在线——反馈例行任务正在工作（最近一次心跳：{{time}}）。",
+      "pausedTitle": "例行任务已暂停——使用额度几乎用尽，最近一次心跳：{{time}}。新主题要等窗口重新空闲后才会处理。",
       "availability": "例行任务仅在开发电脑开机且 Claude 打开时运行——它重新上线后会立即处理新主题。",
       "note": {
-        "queueEmpty": "上次运行:没有待处理项",
-        "work": "上次运行:接手了 {{n}} 个主题",
-        "shipped": "上次运行:已发布 {{n}} 项",
-        "claimed": "上次运行:{{n}} 个主题处理中",
-        "pausedUsageLimit": "已暂停:使用额度几乎用尽",
+        "queueEmpty": "上次运行：没有待处理项",
+        "work": "上次运行：接手了 {{n}} 个主题",
+        "shipped": "上次运行：已发布 {{n}} 项",
+        "claimed": "上次运行：{{n}} 个主题处理中",
+        "pausedUsageLimit": "已暂停：使用额度几乎用尽",
         "skipCadence": "仅心跳——不在工作时段内",
         "gateError": "预检失败——例行任务以完整模式运行",
         "running": "当前有一次运行正在进行"
@@ -5313,10 +5371,10 @@
     "errorTitle": "错误",
     "you": "你",
     "noAccount": "无账号",
-    "aiSenderTitle": "AI(由反馈例行任务自动创建)",
+    "aiSenderTitle": "AI（由反馈例行任务自动创建）",
     "shipRef": "查看更改",
     "issueRef": "查看 Issue",
-    "topicNumber": "主题 #{{n}}——固定编号,可供你引用",
+    "topicNumber": "主题 #{{n}}——固定编号，可供你引用",
     "search": {
       "label": "搜索反馈",
       "placeholder": "搜索…主题、整个讨论串或 #编号",
@@ -5330,12 +5388,12 @@
       "yesterday": "昨天"
     },
     "delete": "删除",
-    "deleteConfirm": "删除这条消息吗?此操作无法撤销。",
+    "deleteConfirm": "删除这条消息吗？此操作无法撤销。",
     "issue": {
       "mark": "创建 Issue",
       "pill": "已请求创建 Issue",
       "undo": "撤销",
-      "requestBody": "请**不要自行实现**这个主题,而是为它创建一个 GitHub Issue。然后设置 `status = issue_created`,并将 Issue 链接填入 `ship_ref`——之后该主题会像其他结果一样进入验收流程。"
+      "requestBody": "请**不要自行实现**这个主题，而是为它创建一个 GitHub Issue。然后设置 `status = issue_created`，并将 Issue 链接填入 `ship_ref`——之后该主题会像其他结果一样进入验收流程。"
     },
     "status": {
       "open": "待办",
@@ -5354,10 +5412,10 @@
       "reply": "回复",
       "replyPlaceholderNo": "回复 #{{no}} —「{{title}}」",
       "replyPlaceholderTopic": "回复「{{title}}」",
-      "reopenHint": "回复将重新打开这个已归档的主题——它会回到待办状态,例行任务会再次接手。"
+      "reopenHint": "回复将重新打开这个已归档的主题——它会回到待办状态，例行任务会再次接手。"
     },
     "compose": {
-      "placeholder": "哪里可以做得更好?支持 Markdown。",
+      "placeholder": "哪里可以做得更好？支持 Markdown。",
       "send": "发送",
       "newTopic": "新主题",
       "complex": "复杂",
@@ -5371,17 +5429,17 @@
       "draftFailed": "草稿未保存——请检查网络连接",
       "sendKey": "⏎",
       "sendKeyCtrl": "Ctrl+⏎",
-      "attachNotCached": "图片无法缓存——重新加载后会丢失,但仍会随消息一起发送。",
+      "attachNotCached": "图片无法缓存——重新加载后会丢失，但仍会随消息一起发送。",
       "attachmentsLabel": "附件",
       "dropHere": "将图片拖放到此处",
       "imageError": "无法处理该图片。",
       "tooManyImages": "每条消息最多 {{max}} 张图片。",
-      "uploadError": "图片上传失败,请重试。",
+      "uploadError": "图片上传失败，请重试。",
       "captureError": "无法截取此页面的截图。",
       "imagesOnly": "这里只能添加图片附件。",
       "fileTooLarge": "文件过大——每个附件最大 {{max}} MB。",
       "charCount": "{{used}} / {{max}} 个字符",
-      "charLimit": "已达到字数上限:每条消息最多 {{max}} 个字符。",
+      "charLimit": "已达到字数上限：每条消息最多 {{max}} 个字符。",
       "dictate": "语音输入({{key}})",
       "dictateStop": "结束语音输入({{key}})",
       "dictateUnsupported": "此浏览器不支持语音输入——请使用 Chrome、Edge 或 Safari。",
@@ -5397,18 +5455,18 @@
       "shippedLabel": "已交付",
       "raisedLabel": "新收到",
       "medianLabel": "交付中位时长",
-      "prevWeek": "上周:{{value}}",
+      "prevWeek": "上周：{{value}}",
       "medianHint": "来自 {{count}} 项交付 · 上周 {{prev}}",
       "medianHintNone": "本周尚无交付 · 上周 {{prev}}",
-      "shippedAria": "本周已完成 {{value}} 项,上周 {{prev}} 项",
-      "raisedAria": "本周新增 {{value}} 个主题,上周 {{prev}} 个",
-      "medianAria": "本周交付中位时长 {{value}},上周 {{prev}}",
+      "shippedAria": "本周已完成 {{value}} 项，上周 {{prev}} 项",
+      "raisedAria": "本周新增 {{value}} 个主题，上周 {{prev}} 个",
+      "medianAria": "本周交付中位时长 {{value}}，上周 {{prev}}",
       "verdictDown": "完成数比新增数多 {{count}}——积压正在减少。",
       "verdictUp": "新增数比完成数多 {{count}}——积压正在增加。",
       "verdictEven": "本周新增与完成数量持平。",
-      "verdictIdle": "本周至今没有新增,也没有交付。",
+      "verdictIdle": "本周至今没有新增，也没有交付。",
       "loadTitle": "当前看板",
-      "loadSub": "此刻的状态——不含时间范围,也不是预测。",
+      "loadSub": "此刻的状态——不含时间范围，也不是预测。",
       "loadWaiting": "等你处理",
       "loadWaitingAsk": "{{count}} 个提问",
       "loadWaitingReview": "{{count}} 个待验收",
@@ -5420,14 +5478,14 @@
       "loadTodoHint": "等待例行任务的下一次运行",
       "loadTodoAnswered": "{{count}} 个已回答的提问",
       "loadTodoContinuation": "{{count}} 个后续跟进",
-      "oldest": "最早的未完成主题:{{days}} 天",
+      "oldest": "最早的未完成主题：{{days}} 天",
       "oldestNone": "没有未完成的主题。",
       "throughputTitle": "吞吐量",
       "throughputSub": "已交付与新增对比 · 最近 {{weeks}} 周",
       "throughputFrom": "{{weeks}} 周前",
       "throughputNow": "本周",
-      "throughputWeek": "自 {{date}} 起的一周:新增 {{raised}} 个,完成 {{count}} 个",
-      "throughputAria": "最近 {{weeks}} 周:新增 {{raised}} 个主题,完成 {{shipped}} 个,最高单周 {{max}} 项交付,本周 {{current}} 项。",
+      "throughputWeek": "自 {{date}} 起的一周：新增 {{raised}} 个，完成 {{count}} 个",
+      "throughputAria": "最近 {{weeks}} 周：新增 {{raised}} 个主题，完成 {{shipped}} 个，最高单周 {{max}} 项交付，本周 {{current}} 项。",
       "legendRaised": "新增",
       "legendShipped": "已完成",
       "paceMedian": "交付中位时长",
@@ -5439,22 +5497,22 @@
       "unitHours": "{{value}} 小时",
       "unitDays": "{{value}} 天",
       "lifecycleTitle": "生命周期",
-      "lifecycleTeaser": "参考:每个阶段、分支和终态及其当前数量。它不会逐周变化——因此默认折叠。",
-      "lifecycleIntro": "一个主题从左到右的路径:处理、中间产生并回到处理中的提问,以及最后经你验收后的两个终态之一。",
-      "lifecycleNote": "数字表示当前处于该阶段的主题数量——没有流转历史,因此没有累计计数。",
+      "lifecycleTeaser": "参考：每个阶段、分支和终态及其当前数量。它不会逐周变化——因此默认折叠。",
+      "lifecycleIntro": "一个主题从左到右的路径：处理、中间产生并回到处理中的提问，以及最后经你验收后的两个终态之一。",
+      "lifecycleNote": "数字表示当前处于该阶段的主题数量——没有流转历史，因此没有累计计数。",
       "lifecycleBranch": "分支",
       "lifecycleOutcome": "终态——二选一",
       "stageNow": "当前处于此阶段的主题",
       "flow": {
         "pickup": "例行任务接手最早的主题",
-        "green": "构建 + 测试通过,PR 已合并",
+        "green": "构建 + 测试通过，PR 已合并",
         "question": "需要决策——例行任务在对话中提问",
         "answered": "你在对话中回答",
-        "reaper": "认领已失效(> 30 分钟无 PR)——回收器重新打开",
-        "hold": "红色或敏感内容(认证、RLS、密钥、破坏性迁移)",
+        "reaper": "认领已失效（> 30 分钟无 PR）——回收器重新打开",
+        "hold": "红色或敏感内容（认证、RLS、密钥、破坏性迁移）",
         "holdTarget": "PR 等待审核",
         "continue": "交付后你回复——继续跟进",
-        "toReview": "构建 + 测试通过,PR 已合并",
+        "toReview": "构建 + 测试通过，PR 已合并",
         "toReviewIssue": "已转为 GitHub Issue",
         "accepted": "由你验收",
         "reopened": "你继续对话",
@@ -5462,30 +5520,30 @@
         "authorAnswered": "用户回答"
       },
       "fact": {
-        "oldest": "最早的未完成主题:{{days}} 天",
+        "oldest": "最早的未完成主题：{{days}} 天",
         "answered": "其中 {{count}} 个已回答的提问",
         "continuation": "其中 {{count}} 个交付后的跟进",
         "reopened": "其中 {{count}} 个被回收器重新打开",
-        "working": "{{count}} 个正在实现(尚无 PR)",
+        "working": "{{count}} 个正在实现（尚无 PR）",
         "hold": "{{count}} 个审核挂起——PR 等待你合并",
         "terminalAtRest": "静止的终态——你的回复会开启新一轮",
         "pendingContinuation": "{{count}} 个有新回复——将被再次接手",
         "awaiting": "等待你的回答",
-        "issueTerminal": "终态——在 GitHub Issue 上继续跟进;例行任务不会再处理它",
-        "rejectedLegacy": "终态(旧状态)——例行任务从不设置它",
-        "reviewShipped": "{{count}} 个已交付,等待你验收",
+        "issueTerminal": "终态——在 GitHub Issue 上继续跟进；例行任务不会再处理它",
+        "rejectedLegacy": "终态（旧状态）——例行任务从不设置它",
+        "reviewShipped": "{{count}} 个已交付，等待你验收",
         "reviewIssues": "{{count}} 个已转为 Issue,等待你验收",
         "reviewWhy": "只有你的验收才能结束主题——否则它会回到处理循环",
         "doneTerminal": "终态——已验收并关闭",
-        "declinedTerminal": "终态——有意不实现,并向用户发送了理由"
+        "declinedTerminal": "终态——有意不实现，并向用户发送了理由"
       }
     },
     "userTopic": {
       "release": "发布给例行任务",
       "channelTitle": "面向用户的渠道",
-      "channelHint": "这里的所有内容用户都能看到。上方的对话(管理员 ↔ 例行任务)则看不到。",
-      "seesStatus": "用户看到的内容:",
-      "asQuestion": "作为提问发送给用户(主题会暂停,直到用户回答)",
+      "channelHint": "这里的所有内容用户都能看到。上方的对话（管理员 ↔ 例行任务）则看不到。",
+      "seesStatus": "用户看到的内容：",
+      "asQuestion": "作为提问发送给用户（主题会暂停，直到用户回答）",
       "messagePlaceholder": "给用户的消息…",
       "messageSend": "发送给用户",
       "questionSend": "作为提问发送",
@@ -5495,7 +5553,7 @@
     },
     "decline": {
       "mark": "不实现并删除",
-      "placeholder": "为什么不会实现?用户会看到这段文字。",
+      "placeholder": "为什么不会实现？用户会看到这段文字。",
       "confirm": "不实现",
       "cancel": "取消",
       "noteRequired": "请填写理由——用户会看到。",
@@ -5507,15 +5565,15 @@
         },
         "alreadyShipped": {
           "label": "已实现",
-          "text": "这个现在已经实现并上线了。欢迎查看当前版本——如果仍有问题,请重新提交。"
+          "text": "这个现在已经实现并上线了。欢迎查看当前版本——如果仍有问题，请重新提交。"
         },
         "notReproducible": {
           "label": "无法复现",
-          "text": "我们无法复现这个问题。如果再次出现,请再报告一次,并附上你的操作步骤、发生时间,以及(如果可以)截图。"
+          "text": "我们无法复现这个问题。如果再次出现，请再报告一次，并附上你的操作步骤、发生时间，以及（如果可以）截图。"
         },
         "tooLittleInfo": {
           "label": "信息不足",
-          "text": "这里的信息太少,我们无从着手。请再描述一下你做了什么、发生了什么,以及你期望的结果。"
+          "text": "这里的信息太少，我们无从着手。请再描述一下你做了什么、发生了什么，以及你期望的结果。"
         },
         "offRoadmap": {
           "label": "不符合方向",
@@ -5523,12 +5581,12 @@
         },
         "noise": {
           "label": "无可处理的反馈",
-          "text": "抱歉,这条内容我们无法处理——其中没有可以着手的线索。"
+          "text": "抱歉，这条内容我们无法处理——其中没有可以着手的线索。"
         }
       }
     },
     "review": {
-      "hint": "在线上应用中查看结果。如果没问题,主题就完成了。如果不对,直接回复即可——你的回复会重新打开主题,并作为任务说明回到例行任务的队列。",
+      "hint": "在线上应用中查看结果。如果没问题，主题就完成了。如果不对，直接回复即可——你的回复会重新打开主题，并作为任务说明回到例行任务的队列。",
       "accept": "已验收"
     },
     "sourceFilter": {
@@ -5546,13 +5604,13 @@
       "newCount": "{{count}} 个新",
       "moreDays": "再显示 {{count}} 天",
       "view": "查看",
-      "viewTitle": "在应用中查看:{{area}}",
+      "viewTitle": "在应用中查看：{{area}}",
       "openTopic": "打开主题",
       "progress": "进度",
       "backToStream": "返回列表流",
       "collapseBand": "折叠{{band}}",
       "expandBand": "展开{{band}}",
-      "progressHint": "进度:本周的进展、等你处理的事项和吞吐量"
+      "progressHint": "进度：本周的进展、等你处理的事项和吞吐量"
     },
     "turn": {
       "admin": "轮到你了",
@@ -5575,7 +5633,7 @@
       "declined": "未实现",
       "rejected": "已驳回",
       "loop": "跟进修改",
-      "pathLabel": "状态:{{station}}",
+      "pathLabel": "状态：{{station}}",
       "step": {
         "contract": "已提交 · 待发布",
         "doing": "已交付实现",
@@ -5596,7 +5654,7 @@
     },
     "sheet": {
       "close": "返回列表",
-      "showOneMore": "再显示 1 条(中间还有 {{count}} 条)",
+      "showOneMore": "再显示 1 条（中间还有 {{count}} 条）",
       "hideBetween": "隐藏中间的消息",
       "readMore": "显示更多",
       "readLess": "显示更少",
@@ -5605,12 +5663,12 @@
     "filters": {
       "title": "筛选",
       "open": "筛选",
-      "who": "谁?",
+      "who": "谁？",
       "whoAll": "所有人",
       "whoMine": "我的主题",
       "whoOthers": "其他管理员",
       "whoUsers": "用户反馈",
-      "where": "在哪里?",
+      "where": "在哪里？",
       "whereAll": "任意位置",
       "area": "区域",
       "areaAll": "所有区域",
@@ -5622,13 +5680,13 @@
       "viewInApp": "在应用中查看",
       "more": "更多操作"
     },
-    "deleteTitle": "删除消息?",
+    "deleteTitle": "删除消息？",
     "threadsStale": "无法加载回复——部分卡片的归类可能已过期。",
     "guard": {
       "name": "PostHog 守卫",
-      "title": "PostHog 守卫(自动创建)",
+      "title": "PostHog 守卫（自动创建）",
       "serviceName": "服务守卫",
-      "serviceTitle": "服务守卫(自动创建,每小时检查一次服务)"
+      "serviceTitle": "服务守卫（自动创建，每小时检查一次服务）"
     }
   },
   "feedbackFab": {
@@ -5798,13 +5856,13 @@
   "consent": {
     "banner": {
       "title": "浏览器存储",
-      "text": "本应用不会设置 Cookie。它会在此浏览器中存储你的登录会话和语言(必需);只有在你允许的情况下,才会存储新闻筛选和收藏等便利性偏好设置,以及匿名使用统计。你可以随时在设置中更改。",
+      "text": "本应用不会设置 Cookie。它会在此浏览器中存储你的登录会话和语言（必需）；只有在你允许的情况下，才会存储新闻筛选和收藏等便利性偏好设置，以及匿名使用统计。你可以随时在设置中更改。",
       "acceptAll": "全部允许",
       "essentialOnly": "仅必要项"
     },
     "settings": {
       "title": "浏览器存储与隐私",
-      "hint": "本应用不会设置 Cookie。以下所有内容都保存在此浏览器的 localStorage 中。匿名使用统计默认关闭,仅在你同意后才会收集。",
+      "hint": "本应用不会设置 Cookie。以下所有内容都保存在此浏览器的 localStorage 中。匿名使用统计默认关闭，仅在你同意后才会收集。",
       "alwaysOn": "始终启用",
       "on": "已允许",
       "off": "关闭",
@@ -5814,11 +5872,11 @@
       },
       "preferences": {
         "label": "偏好设置",
-        "desc": "新闻频道筛选、收藏及类似的便利性状态。关闭后,已存储的值将被删除。"
+        "desc": "新闻频道筛选、收藏及类似的便利性状态。关闭后，已存储的值将被删除。"
       },
       "statistics": {
         "label": "统计",
-        "desc": "匿名使用统计和匿名错误报告(PostHog,欧盟服务器),用于了解哪些区域被使用以及哪里出了问题。默认关闭。登录后,你仅以假名 ID 及你的角色出现——绝不会包含姓名或电子邮件;发生错误的会话可能会被录制,且所有输入内容均已遮蔽。关闭后,已存储的值将被删除。"
+        "desc": "匿名使用统计和匿名错误报告（PostHog,欧盟服务器），用于了解哪些区域被使用以及哪里出了问题。默认关闭。登录后，你仅以假名 ID 及你的角色出现——绝不会包含姓名或电子邮件；发生错误的会话可能会被录制，且所有输入内容均已遮蔽。关闭后，已存储的值将被删除。"
       }
     }
   },
@@ -5985,11 +6043,11 @@
       "connected": "桌面应用已连接",
       "expired": "连接已过期——超过 30 天未联系",
       "never": "桌面应用尚未连接",
-      "since": "· 上次在线:{{days}} 天前",
-      "today": "· 上次在线:今天"
+      "since": "· 上次在线：{{days}} 天前",
+      "today": "· 上次在线：今天"
     },
-    "fallback": "下载(最新版)",
-    "prerelease": "这里始终是稳定版。使用 Verse Companion 账号登录后,可在应用内选择 Beta 和 Alpha——可用的通道取决于你的角色。"
+    "fallback": "下载（最新版）",
+    "prerelease": "这里始终是稳定版。使用 Verse Companion 账号登录后，可在应用内选择 Beta 和 Alpha——可用的通道取决于你的角色。"
   },
   "appPanel": {
     "version": "当前已发布的版本",
@@ -6187,8 +6245,8 @@
     "retry": "重试",
     "loading": "正在打开概念页面…",
     "forbidden": "此概念页面仅管理员可访问。",
-    "notFound": "此概念页面不存在(或已不存在)。",
-    "error": "无法加载概念页面,请稍后再试。"
+    "notFound": "此概念页面不存在（或已不存在）。",
+    "error": "无法加载概念页面，请稍后再试。"
   },
   "errors": {
     "offline": "你似乎处于离线状态。网络恢复后请重试。",
@@ -6200,7 +6258,7 @@
     "guessMade": "你已经猜过这张星图了——只有一次机会。",
     "guessInvalid": "该选项不属于这张星图。",
     "guessUnavailable": "此补丁没有需要识别的星图。",
-    "sessionExpired": "你的会话已过期,请重新登录。",
+    "sessionExpired": "你的会话已过期，请重新登录。",
     "forbidden": "你没有权限执行此操作。",
     "notFound": "此内容不存在或已被删除。",
     "rateLimit": "请求过多——请稍等片刻。",
@@ -7568,7 +7626,7 @@
   "verse": {
     "crumb": "Verse",
     "toast": {
-      "lit": "星星已点亮:{{task}}",
+      "lit": "星星已点亮：{{task}}",
       "count": "{{lit}} / {{total}}",
       "remaining": "再点亮 {{n}} 颗即可获得 4K 壁纸",
       "close": "关闭",
@@ -7601,7 +7659,7 @@
       "link": "链接"
     },
     "status": {
-      "aria": "补丁状态:{{line}}",
+      "aria": "补丁状态：{{line}}",
       "live": "正式服",
       "ptu": "PTU {{line}}",
       "since": "已上线 {{n}} 天",
@@ -7671,15 +7729,15 @@
       "patches": {
         "title": "补丁新闻",
         "topic": "补丁",
-        "hook": "{{next}} 何时上线,又会带来哪些变化",
-        "hookNoLine": "下一个补丁何时上线,又会带来哪些变化",
+        "hook": "{{next}} 何时上线，又会带来哪些变化",
+        "hookNoLine": "下一个补丁何时上线，又会带来哪些变化",
         "stat": "{{n}} 条新说明",
-        "teaser": "下一个补丁何时上线,又会带来哪些变化"
+        "teaser": "下一个补丁何时上线，又会带来哪些变化"
       },
       "gallery": {
         "title": "图库",
         "topic": "图库",
-        "hook": "哪一张会成为你的新桌面?",
+        "hook": "哪一张会成为你的新桌面？",
         "stat": "{{n}} 张新壁纸",
         "teaser": "浏览、分享并为 Starscape 壁纸投票"
       }
@@ -7696,11 +7754,11 @@
           "value": "{{n}} 天"
         },
         "cadence": {
-          "label": "主要补丁间隔(中位数)",
+          "label": "主要补丁间隔（中位数）",
           "value": "{{n}} 天"
         },
         "subCadence": {
-          "label": "热修复间隔(中位数)",
+          "label": "热修复间隔（中位数）",
           "value": "{{n}} 天"
         },
         "stable": {
@@ -7710,7 +7768,7 @@
       },
       "ready": {
         "title": "{{line}} 的飞行前检查",
-        "titleRenamed": "{{line}} 的飞行前检查(原 {{former}})",
+        "titleRenamed": "{{line}} 的飞行前检查（原 {{former}}）",
         "progress": "已完成 {{done}}/{{total}}",
         "step": {
           "notes": "已阅读补丁说明",
@@ -7720,18 +7778,18 @@
         }
       },
       "comet": {
-        "title": "补丁预测投票:{{line}} 何时正式上线?",
+        "title": "补丁预测投票：{{line}} 何时正式上线？",
         "hint": "投下你的一票——之后即可查看社区中位数。",
         "label": "你预测的 LIVE 日期",
         "submit": "提交预测",
-        "yours": "你的预测:{{date}}",
-        "median": "社区中位数:{{date}}({{n}} 条预测)",
+        "yours": "你的预测：{{date}}",
+        "median": "社区中位数：{{date}}（{{n}} 条预测）",
         "heading": "补丁预测",
         "crowd": "社区的预测分布",
         "cta": "提交你的预测",
-        "mine": "你的预测:{{date}}",
+        "mine": "你的预测：{{date}}",
         "count": "{{n}} 条预测",
-        "release": "发布日期:{{date}}",
+        "release": "发布日期：{{date}}",
         "stripAria": "社区中位数 {{date}},{{n}} 条预测",
         "you": "你的预测",
         "medianShort": "中位数 {{date}}",
@@ -7743,7 +7801,7 @@
       "connected": "Starscape 已连接",
       "share": "分享图库",
       "heroTitle": "Starscape 把图库带到你的桌面",
-      "heroBody": "桌面应用会自动在图库中轮换你的壁纸,并显示你赢得的星图。"
+      "heroBody": "桌面应用会自动在图库中轮换你的壁纸，并显示你赢得的星图。"
     },
     "hub": {
       "brand": "Verse Companion",
@@ -8348,7 +8406,7 @@
       },
       "telemetry": {
         "title": "遥测",
-        "text": "当下最重要的信息:配额、错误、服务、用量与成本一目了然。"
+        "text": "当下最重要的信息：配额、错误、服务、用量与成本一目了然。"
       },
       "feedback": {
         "title": "反馈",
@@ -8377,7 +8435,7 @@
     "aria": "下载应用",
     "scc": {
       "name": "Verse Companion App",
-      "desc": "游戏旁的好帮手:实时信息、悬浮窗和按键绑定,无需 Alt-Tab 切换。"
+      "desc": "游戏旁的好帮手：实时信息、悬浮窗和按键绑定，无需 Alt-Tab 切换。"
     },
     "starscape": {
       "name": "Starscape",
@@ -8385,7 +8443,7 @@
     },
     "uploader": {
       "name": "Verse Data Uploader",
-      "desc": "读取你的 Star Citizen 安装目录,用飞船、数值和 3D 模型填充 Codex。"
+      "desc": "读取你的 Star Citizen 安装目录，用飞船、数值和 3D 模型填充 Codex。"
     },
     "footer": "这里下载的是稳定版。登录后在应用中选择 Beta 和 Alpha——你能看到哪些渠道取决于你的角色。"
   },
@@ -8407,15 +8465,15 @@
     "hub": {
       "eyebrow": "应用",
       "title": "应用",
-      "subtitle": "在网站之外运行的所有工具:Verse Data Uploader、Starscape 和浏览器扩展。",
+      "subtitle": "在网站之外运行的所有工具：Verse Data Uploader、Starscape 和浏览器扩展。",
       "breadcrumbAria": "应用",
       "uploader": {
         "name": "Verse Data Uploader",
-        "desc": "读取你的 Star Citizen 安装目录,并将数据上传到 Codex。"
+        "desc": "读取你的 Star Citizen 安装目录，并将数据上传到 Codex。"
       },
       "starscape": {
         "name": "Starscape",
-        "desc": "桌面应用:将 Verse 图库变成动态壁纸。"
+        "desc": "桌面应用：将 Verse 图库变成动态壁纸。"
       },
       "extension": {
         "name": "浏览器扩展",
@@ -9312,7 +9370,7 @@
   "adminEvents": {
     "eyebrow": "管理",
     "title": "活动数据表",
-    "subtitle": "置信度低于 80 % 的字段会保持未知,直到你批准或手动设置。",
+    "subtitle": "置信度低于 80 % 的字段会保持未知，直到你批准或手动设置。",
     "retry": "重试",
     "listAria": "活动",
     "pending": "{{n}} 个待处理",
@@ -9322,7 +9380,7 @@
     "reextract": "重新评估",
     "backfill": "评估缺失项",
     "backfillProgress": "已写入 {{n}} 个数据表…",
-    "backfillDone": "完成:已写入 {{n}} 个数据表。",
+    "backfillDone": "完成：已写入 {{n}} 个数据表。",
     "col": {
       "field": "字段",
       "value": "值",
@@ -9387,7 +9445,7 @@
   "pwa": {
     "card": {
       "title": "获取应用",
-      "benefit": "全屏显示,启动更快,直接从主屏幕打开。",
+      "benefit": "全屏显示，启动更快，直接从主屏幕打开。",
       "install": "安装",
       "later": "稍后"
     },

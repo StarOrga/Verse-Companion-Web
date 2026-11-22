@@ -2,7 +2,7 @@
   "notFoundPage": {
     "srTitle": "404 – ページが見つかりません",
     "title": "マップの外です",
-    "lead": "このアドレスには何もありません:",
+    "lead": "このアドレスには何もありません：",
     "didYouMean": "もしかして",
     "home": "ホームページに戻る"
   },
@@ -20,7 +20,7 @@
       "signInAs": "{{account}} としてサインイン"
     },
     "switch": {
-      "title": "アカウントを切り替えますか?",
+      "title": "アカウントを切り替えますか？",
       "message": "このデバイスは {{current}} としてサインインしています。続行すると、代わりに {{target}} としてサインインします。",
       "confirm": "アカウントを切り替える"
     },
@@ -46,7 +46,7 @@
     "expires": "コードの有効期間は1分で、1回のみ使えます。",
     "retry": "新しいコードを作成",
     "connected": "スマートフォンが接続されました",
-    "connectedDevice": "接続済み: {{device}}",
+    "connectedDevice": "接続済み：{{device}}",
     "devices": "接続済みのスマートフォン",
     "noDevice": "不明なデバイス",
     "expired": "コードの有効期限が切れました。",
@@ -107,7 +107,7 @@
     "email": "メールアドレス",
     "password": "パスワード",
     "signIn": "サインイン",
-    "forgotPassword": "パスワードをお忘れですか?",
+    "forgotPassword": "パスワードをお忘れですか？",
     "reset": {
       "title": "パスワードをリセット",
       "hint": "メールアドレスを入力してください。新しいパスワードを設定するためのリンクをお送りします。パスワードをこちらで決めることはありません。",
@@ -169,13 +169,13 @@
     "apply": {
       "title": "アクセスを申請",
       "hint": "あなたについて簡単に教えてください。申請は管理者に直接届きます。アカウントもパスワードも不要です。",
-      "handle": "RSIハンドル(任意)",
-      "handlePlaceholder": "例: CitizenKane",
-      "message": "メッセージ(任意)",
-      "messagePlaceholder": "どこで私たちを知りましたか?どの艦に乗っていますか?",
+      "handle": "RSIハンドル（任意）",
+      "handlePlaceholder": "例：CitizenKane",
+      "message": "メッセージ（任意）",
+      "messagePlaceholder": "どこで私たちを知りましたか？どの艦に乗っていますか？",
       "send": "申請を送信",
       "sending": "送信中…",
-      "sent": "ありがとうございます!申請が届きました。管理者が承認すると、このアドレスに招待メールが届きます。",
+      "sent": "ありがとうございます！申請が届きました。管理者が承認すると、このアドレスに招待メールが届きます。",
       "rateLimited": "現在、申請が殺到しています。1時間後にもう一度お試しください。"
     },
     "suspended": {
@@ -204,7 +204,7 @@
     "phaseBadge": "アルファ",
     "badge": "カートグラファーバッジ",
     "accountMenu": "アカウントメニュー",
-    "profilePicture": "プロフィール画像(アカウントメニュー)",
+    "profilePicture": "プロフィール画像（アカウントメニュー）",
     "adminOnly": "管理者のみ",
     "adminMenu": "管理者",
     "telemetry": "テレメトリ",
@@ -235,16 +235,16 @@
   "impersonation": {
     "banner": {
       "aria": "ロールのプレビュー中",
-      "viewingAs": "プレビュー中のロール: {{role}}",
-      "realRole": "実際のロール: {{role}}",
+      "viewingAs": "プレビュー中のロール：{{role}}",
+      "realRole": "実際のロール：{{role}}",
       "exit": "プレビューを終了",
       "fidelity": {
-        "anon": "忠実なプレビュー: アプリは実際にサインアウト状態なので、訪問者に見えるものとまったく同じ表示です。",
-        "viewer": "UIとルーティングのみのプレビューです。データは引き続きあなたの実際の権限で取得されるため、ビューアー限定のデータ制限(空のリスト、RLSによる拒否)はここでは再現されません。",
+        "anon": "忠実なプレビュー：アプリは実際にサインアウト状態なので、訪問者に見えるものとまったく同じ表示です。",
+        "viewer": "UIとルーティングのみのプレビューです。データは引き続きあなたの実際の権限で取得されるため、ビューアー限定のデータ制限（空のリスト、RLSによる拒否）はここでは再現されません。",
         "collaborator": "UIとルーティングのみのプレビューです。データは引き続きあなたの実際の権限で取得されるため、コラボレーター限定のデータ制限はここでは再現されません。"
       }
     },
-    "enterFailed": "プレビューを切り替えられませんでした。ブラウザが変更をブロックしました(プライベートブラウズまたはストレージ容量不足)。再読み込みは行われていません。",
+    "enterFailed": "プレビューを切り替えられませんでした。ブラウザが変更をブロックしました（プライベートブラウズまたはストレージ容量不足）。再読み込みは行われていません。",
     "enterFailedDismiss": "閉じる"
   },
   "codex": {
@@ -322,8 +322,8 @@
       },
       "patch": {
         "archive": "アーセナルに{{count}}件のレコード",
-        "extracted": "取得日: {{date}}",
-        "build": "ビルド「{{build}}」(プレースホルダー)"
+        "extracted": "取得日：{{date}}",
+        "build": "ビルド「{{build}}」（プレースホルダー）"
       },
       "me": {
         "eyebrow": "搭乗中",
@@ -376,8 +376,8 @@
       "holo": {
         "label": "ホロテーブル",
         "rotation": "カテゴリを選択",
-        "next": "クリック: 再開",
-        "hold": "クリック: 固定",
+        "next": "クリック：再開",
+        "hold": "クリック：固定",
         "loading": "ホロテーブルを読み込み中…",
         "empty": "このパッチのエントリはまだありません。",
         "newIn": "新着",
@@ -409,8 +409,8 @@
           "weapons": "武器",
           "shield": "シールド",
           "quantum": "量子ドライブ",
-          "power": "出力(セグメント)",
-          "cooler": "冷却(毎秒)"
+          "power": "出力（セグメント）",
+          "cooler": "冷却（毎秒）"
         }
       },
       "overview": {
@@ -437,7 +437,7 @@
           "name": "{{name}}は飛行可能です。",
           "announced": "発表済みの船は{{announced}}隻、うち{{count}}隻が飛行可能です。",
           "s1": "すべての船のすべてがわかる。",
-          "s2": "あなたに合う船は?",
+          "s2": "あなたに合う船は？",
           "s3": "あらゆる船体、数値、塗装を網羅。",
           "s4": "まず比較して、それから飛ぼう。"
         },
@@ -520,7 +520,7 @@
         "announced": "発表済み",
         "onTable": "テーブル上",
         "categories": "カテゴリ",
-        "openPage": "ページを開く: {{name}}",
+        "openPage": "ページを開く：{{name}}",
         "more": "+ 新規・更新{{count}}件",
         "moreDiscover": "+ 他{{count}}件",
         "all": "すべての{{category}}",
@@ -606,7 +606,7 @@
       },
       "rsiLink": "robertsspaceindustries.comで見る",
       "noData": {
-        "title": "数値がないのはなぜですか?",
+        "title": "数値がないのはなぜですか？",
         "body": "Codexはライブビルドのデータから作成されます。この船がゲームに実装されるまでは抽出できるものがありません。実装されれば、自動的に完全なCodexエントリが作成されます。",
         "browse": "発表済みの船をすべて見る"
       },
@@ -627,12 +627,12 @@
       "staleUploadLink": "Verse Data Uploader を開く"
     },
     "search": {
-      "didYouMean": "もしかして:",
-      "placeholder": "このリストを絞り込む – 名前またはクラス(例: Gladius、AEGS_*)…",
+      "didYouMean": "もしかして：",
+      "placeholder": "このリストを絞り込む – 名前またはクラス（例：Gladius、AEGS_*）…",
       "listFilterLabel": "このリストを絞り込む",
       "clear": "検索をクリア",
-      "upcomingHint": "ゲームデータにはありませんが、RSI が発表済みです: {{names}}",
-      "alsoIn": "こちらにもあります:",
+      "upcomingHint": "ゲームデータにはありませんが、RSI が発表済みです：{{names}}",
+      "alsoIn": "こちらにもあります：",
       "upcomingLink": "近日登場の船で見る",
       "bar": {
         "label": "Codex を検索",
@@ -826,8 +826,8 @@
         "sustainedDps": "継続DPS",
         "penetration": "貫通力",
         "powerDraw": "消費電力",
-        "emOnline": "EM(オンライン時)",
-        "irOnline": "IR(オンライン時)",
+        "emOnline": "EM（オンライン時）",
+        "irOnline": "IR（オンライン時）",
         "hp": "HP",
         "distortionPool": "ディストーションプール",
         "distortionRegen": "ディストーション回復",
@@ -850,9 +850,9 @@
         "cmRadius": "クラウド半径",
         "cmCloudLifetime": "クラウド持続時間",
         "cmLifetime": "作動時間",
-        "shipIr": "船: IR",
-        "shipEm": "船: EM",
-        "shipCs": "船: 断面積",
+        "shipIr": "船：IR",
+        "shipEm": "船：EM",
+        "shipCs": "船：断面積",
         "cmNeedIr": "IR への推奨",
         "cmNeedEm": "EM への推奨",
         "cmNeedCs": "断面積への推奨",
@@ -869,7 +869,7 @@
         "aiming": "SCItemAimableComponentParams",
         "missing": "オーバークロック修正値のみ、すべて 1.0",
         "countermeasure": "AmmoParams.projectileParams.typeParams · weaponParams.ammoCapacity",
-        "cmRecommend": "目安: 船のシグネチャ ÷ 発射ごとのシグネチャ を切り捨てて +1 — それで初めて、発射が船を確実に上回ります。船の値はリアルタイムで計算されます: 現在のロードアウトと電力設定で稼働中の全コンポーネント(クーラー、パワープラント、シールド、量子ドライブなど)の IR/EM 放出量の合計に、アーマーのシグナル係数を掛けたものです。"
+        "cmRecommend": "目安：船のシグネチャ ÷ 発射ごとのシグネチャ を切り捨てて +1 — それで初めて、発射が船を確実に上回ります。船の値はリアルタイムで計算されます：現在のロードアウトと電力設定で稼働中の全コンポーネント（クーラー、パワープラント、シールド、量子ドライブなど）の IR/EM 放出量の合計に、アーマーのシグナル係数を掛けたものです。"
       },
       "value": {
         "none": "0 = なし",
@@ -913,13 +913,13 @@
       "inHangar": "ハンガーにあります",
       "foldedOne": "+ファイルバリアント1件",
       "foldedMany": "+ファイルバリアント{{count}}件",
-      "foldedTitle": "ゲームファイルにはこの項目とほぼ同一のレコードが複数あるため、1枚のカードにまとめて表示しています: {{names}}",
+      "foldedTitle": "ゲームファイルにはこの項目とほぼ同一のレコードが複数あるため、1枚のカードにまとめて表示しています：{{names}}",
       "skinsOne": "+スキン1件",
       "skinsMany": "+スキン{{count}}件",
-      "skinsTitle": "この武器の塗装はすべて1枚のカードにまとめています。項目内で切り替えられます: {{names}}",
+      "skinsTitle": "この武器の塗装はすべて1枚のカードにまとめています。項目内で切り替えられます：{{names}}",
       "editionsOne": "+バリアント1件",
       "editionsMany": "+バリアント{{count}}件",
-      "editionsTitle": "ゲームファイルにはこの船体が重複レコードや販促エディションなどで複数登録されています。1枚のカードにまとめているので、項目内で切り替えてください: {{names}}",
+      "editionsTitle": "ゲームファイルにはこの船体が重複レコードや販促エディションなどで複数登録されています。1枚のカードにまとめているので、項目内で切り替えてください：{{names}}",
       "addToHangar": "ハンガーに追加",
       "addToHangarFailed": "ハンガーに追加できませんでした。もう一度お試しください。"
     },
@@ -959,12 +959,12 @@
         "detailHide": "詳細 ▴",
         "allValues": "すべての値 ▾",
         "allValuesHide": "すべての値 ▴",
-        "journalChanged": "変更: {{label}}",
+        "journalChanged": "変更：{{label}}",
         "undo": "元に戻す",
         "detailsShow": "詳細 ▾",
         "detailsHide": "詳細 ▴",
         "sound": "UIサウンド",
-        "mobileTabsSetting": "テーブル/データタブ(モバイル)",
+        "mobileTabsSetting": "テーブル/データタブ（モバイル）",
         "tabTable": "テーブル",
         "tabData": "データ",
         "perspective": {
@@ -1033,7 +1033,7 @@
         "statsAria": "船の値",
         "statsClose": "値を閉じる",
         "sheetHandle": "値シート",
-        "sheetHandleAria": "値シート(ドラッグまたはタップで高さを変更)",
+        "sheetHandleAria": "値シート（ドラッグまたはタップで高さを変更）",
         "previewFitted": "搭載先",
         "previewBuy": "購入場所",
         "previewAlternatives": "代替品",
@@ -1112,7 +1112,7 @@
           "reExtractPendingYes": "はい"
         },
         "forkGuard": {
-          "title": "オーナーになりますか?",
+          "title": "オーナーになりますか？",
           "body": "この変更により、ロードアウトは元のものから分離されます。元に戻すことはできません。",
           "confirm": "オーナーになる"
         },
@@ -1138,7 +1138,7 @@
       },
       "share": {
         "copyLink": "リンクをコピー",
-        "followedBy": "管理: {{owner}}",
+        "followedBy": "管理：{{owner}}",
         "followedSince": "{{date}}時点",
         "refresh": "更新",
         "refreshing": "更新中…",
@@ -1147,7 +1147,7 @@
         "revoke": "共有を停止",
         "revokeNote": "すでにこのリンクをフォローしている受信者は、構成が削除されるまで接続されたままです。",
         "errorGeneric": "うまくいきませんでした。もう一度お試しください。",
-        "copyLinkHint": "この表示のアドレスをコピーします(ホロテーブルや未保存のハードポイント変更も含みます)。",
+        "copyLinkHint": "この表示のアドレスをコピーします（ホロテーブルや未保存のハードポイント変更も含みます）。",
         "unsavedHint": "未保存の変更{{n}}件は、コピーしたリンクにのみ含まれ、ハンガーのリンクには含まれません。",
         "signInHint": "ハンガー構成を専用リンクとして共有するには、サインインしてください。",
         "notInHangarHint": "この船はまだハンガーにありません。先に追加すると、構成を共有できます。",
@@ -1162,7 +1162,7 @@
         "activeLinks": "有効なリンク({{n}})",
         "readOnlyHint": "これは共有されたロードアウトです。コピーを作成すると、自分用のリンクを共有できます。",
         "revokeConfirm": {
-          "title": "このリンクの共有を停止しますか?",
+          "title": "このリンクの共有を停止しますか？",
           "body": "このリンクからロードアウトのコピーを作成することはできなくなります。すでに追従している受信者は接続されたままです。"
         }
       },
@@ -1190,7 +1190,7 @@
       },
       "card": {
         "rank": "{{m}}件中{{n}}位",
-        "overallTip": "総合: グループの{{pct}}%より優秀",
+        "overallTip": "総合：グループの{{pct}}%より優秀",
         "compareWith": "比較対象",
         "scopeOff": "{{name}} · データなし",
         "shapeAria": "ランキングの表示方法",
@@ -1235,7 +1235,7 @@
           "aUEC": "aUEC",
           "wish": "ウィッシュリストに追加",
           "wished": "ウィッシュリストに登録済み",
-          "wishedFrom": "出典: {{source}}",
+          "wishedFrom": "出典：{{source}}",
           "undo": "元に戻す",
           "wishError": "エントリを追加できませんでした。",
           "signIn": "保存するにはサインインしてください。",
@@ -1245,34 +1245,34 @@
           "wikeloNoData": "必要なパーツはまだCodexデータにありません。",
           "wikeloHave": "{{need}}個中{{have}}個を所持",
           "wikeloSource": "Wikelo交換",
-          "attribution": "価格: UEX Corp · Wikelo: Codex交換データ"
+          "attribution": "価格：UEX Corp · Wikelo: Codex交換データ"
         }
       },
       "hangar": {
         "loadouts": "ロードアウト",
         "werk": "工場仕様",
-        "werkChanged": "未保存の交換: {{n}}",
+        "werkChanged": "未保存の交換：{{n}}",
         "diffOne": "1個のパーツが工場仕様と異なる",
         "diffMany": "{{n}}個のパーツが工場仕様と異なる",
         "diffNone": "工場仕様と同じ",
         "selectedAria": "{{name}}の操作",
         "removeExemplar": "個体を削除",
-        "removeTitle": "「{{name}}」を削除しますか?",
+        "removeTitle": "「{{name}}」を削除しますか？",
         "removeBody": "ロードアウト「{{name}}」が削除されます。船はハンガーに残ります。",
         "copy": "この個体をコピー",
-        "copyName": "{{name}}(コピー)",
+        "copyName": "{{name}}（コピー）",
         "newFromWerk": "工場仕様から新しい個体を作成",
         "saveWerk": "個体としてハンガーに追加",
         "saveBuild": "改造を個体として保存",
         "anotherCopy": "{{name}}をもう1機ハンガーに追加",
         "nameTitle": "個体名",
         "nameLabel": "名前",
-        "nameSuggested": "候補: 「{{name}}」— そのまま使うか、好きな名前を入力してください。",
+        "nameSuggested": "候補：「{{name}}」— そのまま使うか、好きな名前を入力してください。",
         "autosavedOne": "保存済み · 1件の変更",
         "autosavedMany": "保存済み · {{n}}件の変更",
         "wishWithOne": "この改造をウィッシュリストへ · 交換パーツ1個",
         "wishWithMany": "この改造をウィッシュリストへ · 交換パーツ{{n}}個",
-        "wishName": "ウィッシュリスト: {{name}}",
+        "wishName": "ウィッシュリスト：{{name}}",
         "wishLoadoutUnavailable": "ウィッシュリストに入っていますが、ロードアウトはまだそこに保存できません。"
       },
       "partType": {
@@ -1391,7 +1391,7 @@
           "radar": "レーダー",
           "fuelTank": "燃料タンク",
           "maintenance": "メンテナンスポイント",
-          "turret": "タレット(アクセス)",
+          "turret": "タレット（アクセス）",
           "computer": "コンピューター",
           "bed": "ベッド",
           "head": "トイレ・シャワー",
@@ -1427,7 +1427,7 @@
         "sideInner": "内部",
         "scopeDeck": "{{deck}} · {{n}}個の要素",
         "scopeShip": "船全体 · {{decks}}デッキに{{n}}個の要素",
-        "othersOff": "その他(非表示)",
+        "othersOff": "その他（非表示）",
         "roomsOfDeck": "部屋 · {{n}}",
         "overview": "概要",
         "inRoom": "部屋の中",
@@ -1467,7 +1467,7 @@
           "radar": "レーダー",
           "fuelTank": "燃料タンク",
           "maintenance": "メンテナンスポイント",
-          "turret": "タレット(アクセス)",
+          "turret": "タレット（アクセス）",
           "computer": "コンピューター",
           "bed": "ベッド",
           "head": "トイレ・シャワー",
@@ -1492,7 +1492,7 @@
       "noBuild": "カタログビルドはまだ公開されていません。",
       "partial": "このビルドにはこのカテゴリの代表的な一部のみが含まれています。表示されている件数は読み込まれた内容を反映しています。",
       "resetAll": "検索とフィルターをリセット",
-      "foundElsewhere": "「{{term}}」に一致する{{kind}}はありません。見つかった場所:"
+      "foundElsewhere": "「{{term}}」に一致する{{kind}}はありません。見つかった場所："
     },
     "error": {
       "title": "Codexを読み込めませんでした",
@@ -1519,7 +1519,7 @@
         },
         "hint": {
           "ui": "お使いの言語のアクション名",
-          "en": "英語の原文のアクション名(ゲーム内と同じ)"
+          "en": "英語の原文のアクション名（ゲーム内と同じ）"
         }
       },
       "count": "{{total}}件中{{shown}}件のアクション",
@@ -1549,7 +1549,7 @@
         "enter": "カテゴリを割り当て",
         "exit": "割り当てを終了",
         "active": "割り当てモード有効",
-        "help": "行をクリックして選択し(カテゴリ見出しならグループ全体)、下でレイヤーを選んで「割り当て」を押してください。",
+        "help": "行をクリックして選択し（カテゴリ見出しならグループ全体）、下でレイヤーを選んで「割り当て」を押してください。",
         "progress": "{{total}}件中{{assigned}}件のアクションを割り当て済み",
         "filter": "フィルター",
         "filters": {
@@ -1758,9 +1758,9 @@
       "nShipsOfRole": "同じ役割の船 {{n}} 隻",
       "compare": {
         "label": "比較対象",
-        "info": "各軸は 0(中心)から、選択した比較対象の船の中の最高値(外周)までです。リングはその 33 %、67 %、100 % を示します。青はこの船、破線は比較対象の船の中央値です。青い線は比較より優れていること、黄色は劣っていることを示します。",
+        "info": "各軸は 0（中心）から、選択した比較対象の船の中の最高値（外周）までです。リングはその 33 %、67 %、100 % を示します。青はこの船、破線は比較対象の船の中央値です。青い線は比較より優れていること、黄色は劣っていることを示します。",
         "axisDelta": "比較より {{d}} ポイント",
-        "infoHolo": "各軸は 0(中心)から、選択したグループの95パーセンタイル(外周)までです。中央値は同じスケール上にあり、それより強い値は外周で止まります。"
+        "infoHolo": "各軸は 0（中心）から、選択したグループの95パーセンタイル（外周）までです。中央値は同じスケール上にあり、それより強い値は外周で止まります。"
       },
       "class": {
         "combat": "戦闘艦",
@@ -1783,10 +1783,10 @@
       "group": {
         "of": "すべての{{name}}",
         "smallHint": "このグループには船が {{n}} 隻しかないため、比較は大まかです。",
-        "ofRole": "役割: {{name}}"
+        "ofRole": "役割：{{name}}"
       },
-      "noMiningData": "採掘・サルベージ性能: データなし",
-      "rimNote": "外側 = グループ最高値(95 %)に近い値で、それより強い値はそこで止まります。平方根スケール: 小さい値も見えるようにしており、リングは 33 % と 67 % を示します。",
+      "noMiningData": "採掘・サルベージ性能：データなし",
+      "rimNote": "外側 = グループ最高値(95 %)に近い値で、それより強い値はそこで止まります。平方根スケール：小さい値も見えるようにしており、リングは 33 % と 67 % を示します。",
       "betterThan": "{{n}} % より優れている",
       "rimLabel": "スケール"
     },
@@ -1857,7 +1857,7 @@
       "usedInBlueprints": "ブループリントでの使用",
       "usedInBlueprintsHint": "このアイテムを材料として必要とするクラフトレシピ。",
       "compatCount": "互換アイテム {{count}} 件",
-      "loadoutEmpty": "空(標準)",
+      "loadoutEmpty": "空（標準）",
       "viewOnRsi": "RSI で見る",
       "notFound": "現在のビルドにエントリが見つかりません。",
       "loadingStage": "船のホロデッキを読み込み中",
@@ -1878,7 +1878,7 @@
       "quantumFuel": "量子燃料",
       "fuelCapacity": "水素燃料",
       "hardpointExplainer": "ハードポイントとは船体上の取り付け位置のことです。武器、シールド、クーラー、スラスター、量子ドライブはすべてここに装着され、同じタイプとサイズの別のアイテムに交換できます。以下は、出荷時にこの船が搭載しているものです。",
-      "loadoutExplainerLabel": "ハードポイントとは?",
+      "loadoutExplainerLabel": "ハードポイントとは？",
       "craftedFrom": "クラフト素材",
       "craftedFromHint": "ゲームのクラフトデータに基づく、このアイテムの製造コストです。",
       "noIngredients": "このビルドでは、このブループリントに素材が記載されていません。",
@@ -1904,12 +1904,12 @@
       "heroSwitchTo3d": "3D ビューに切り替え",
       "heroSwitchTo2d": "2D 画像に戻す",
       "holoOverlay": {
-        "label": "3D ビュー: {{name}}",
+        "label": "3D ビュー：{{name}}",
         "fullscreen": "フルスクリーン",
         "exitFullscreen": "フルスクリーンを終了"
       },
       "partPopup": {
-        "label": "コンポーネント: {{name}}",
+        "label": "コンポーネント：{{name}}",
         "eyebrow": "コンポーネント",
         "noValues": "このコンポーネントの値は不明です。"
       },
@@ -1944,13 +1944,13 @@
       "minimum": "最低必要量 {{n}} セグメント",
       "toggleOff": "{{group}} — 電力を遮断",
       "toggleOn": "{{group}} — 電力を復旧",
-      "overBudget": "リアクター過負荷: {{total}} セグメント中 {{used}} を使用中",
+      "overBudget": "リアクター過負荷：{{total}} セグメント中 {{used}} を使用中",
       "demandLine": "{{items}} モジュールの需要 {{demand}} seg · 割り当て {{allocated}} seg",
       "belowMinimum": "最低必要量 {{min}} seg を下回っています — このグループは機能しません。",
       "pinned": "手動で設定済み — 「オート」「ステルス」「リセット」で解除されます。",
       "pip": {
-        "level": "{{group}}: レベル {{n}} / {{m}}",
-        "topOff": "{{group}}: レベル {{n}} / {{m}} — クリックでグループを遮断"
+        "level": "{{group}}：レベル {{n}} / {{m}}",
+        "topOff": "{{group}}：レベル {{n}} / {{m}} — クリックでグループを遮断"
       },
       "draftNote": "遮断したグループと固定したレベルは下書きのままで、ハンガーには書き込まれません。",
       "position": {
@@ -1959,8 +1959,8 @@
         "center": "下中央",
         "right": "右下",
         "inline": "ページ内に配置",
-        "edgeLeft": "画面左端に固定(スクロールに追従)",
-        "edgeRight": "画面右端に固定(スクロールに追従)",
+        "edgeLeft": "画面左端に固定（スクロールに追従）",
+        "edgeRight": "画面右端に固定（スクロールに追従）",
         "analysis": "分析列内",
         "slotGroup": "分析列に配置",
         "slotUp": "分析列内で上へ移動",
@@ -2021,11 +2021,11 @@
         "stealth": "ステルス",
         "auto": "オート",
         "reset": "リセット",
-        "stealthHint": "最低EMシグネチャ: 武器、シールド、量子、トラクター、レーダー、生命維持をオフ、ドライブは最小限、クーラーは冷却が100%未満に収まる範囲のみ。"
+        "stealthHint": "最低EMシグネチャ：武器、シールド、量子、トラクター、レーダー、生命維持をオフ、ドライブは最小限、クーラーは冷却が100%未満に収まる範囲のみ。"
       },
       "gap": {
         "noReactorData": "このビルドにはリアクターデータがありません — 抽出データに含まれるまで電力予算は空のままです。",
-        "reExtractPending": "このカタログビルドにはまだ電力値がありません(モジュール単位も予算も)。次回のカタログアップロード(抽出スキーマ3)で追加されます。",
+        "reExtractPending": "このカタログビルドにはまだ電力値がありません（モジュール単位も予算も）。次回のカタログアップロード（抽出スキーマ3）で追加されます。",
         "noChannelInMode": "このグループには、この飛行モードでのチャンネルがありません。",
         "noCoolingData": "このビルドにはクーラーデータがありません — 冷却負荷は空のままです。",
         "noCoolantDraw": "コンポーネントの冷却剤消費量がゲームデータに記載されていないため、冷却負荷は空のままです。",
@@ -2053,10 +2053,10 @@
       "close": "閉じる",
       "typeFilter": "アイテムタイプ",
       "filterAll": "すべて",
-      "appliesToOne": "このスロットのみ対象: {{port}}",
+      "appliesToOne": "このスロットのみ対象：{{port}}",
       "appliesToMany": "同一の {{count}} 個のハードポイントすべてに適用",
       "sortHint": "列をクリックで並べ替え、Ctrlクリックで第2ソートを追加。",
-      "installedNone": "ベイは空(標準)",
+      "installedNone": "ベイは空（標準）",
       "pickHere": "選択してください",
       "fitInferred": "このベイは空の状態で出荷されます。リストは同じ船の同一で装備済みのベイから取得したもので、このハードポイント自体のデータではありません。",
       "clearSlot": "スロットを空にする"
@@ -2069,7 +2069,7 @@
       "saveErrorGeneric": "現在ロードアウトを保存できません — 下書きは保持されています。もう一度お試しください。",
       "revert": "標準に戻す",
       "resetAll": "ロードアウト全体を標準に戻す",
-      "resetAllTitle": "ロードアウト全体をリセットしますか?",
+      "resetAllTitle": "ロードアウト全体をリセットしますか？",
       "resetAllBody": "このロードアウトへの {{n}} 件の変更がすべて失われ、各スロットが標準パーツに戻ります。",
       "resetAllConfirm": "リセット",
       "defaultConfigName": "Codexロードアウト",
@@ -2108,7 +2108,7 @@
       "close": "閉じる",
       "noCommon": "この組み合わせには比較できる値がありません。",
       "diffOnly": "差異のみ",
-      "mixedKind": "同種のみ比較可能: トレイにはすでに {{kind}} のエントリがあります。別のものを比較するにはクリアしてください。"
+      "mixedKind": "同種のみ比較可能：トレイにはすでに {{kind}} のエントリがあります。別のものを比較するにはクリアしてください。"
     },
     "portCategory": {
       "weapons": "武器",
@@ -2123,8 +2123,8 @@
     },
     "picker": {
       "title": "コンポーネントを選択 — {{port}} · S{{size}}",
-      "installed": "装備中: {{name}}",
-      "searchPlaceholder": "検索 … 名前、メーカー、ダメージタイプ",
+      "installed": "装備中：{{name}}",
+      "searchPlaceholder": "検索… 名前、メーカー、ダメージタイプ",
       "searchLabel": "コンポーネントを検索",
       "compareWith": "比較対象",
       "deltaAgainst": "Δ の基準",
@@ -2136,8 +2136,8 @@
       "columnsUnavailable": "ゲームデータにありません",
       "dashCell": "—",
       "dashCellTitle": "このクラスには該当しません",
-      "dashNote": "弾薬と拡散は「—」と表示されます: エネルギー武器にはマガジンがなく、拡散はゲーム上、他の値への補正としてのみ示されるためです。",
-      "footerMissing": "ゲームデータにありません: {{fields}}",
+      "dashNote": "弾薬と拡散は「—」と表示されます：エネルギー武器にはマガジンがなく、拡散はゲーム上、他の値への補正としてのみ示されるためです。",
+      "footerMissing": "ゲームデータにありません：{{fields}}",
       "pickRow": "{{name}} を装備",
       "openDetail": "{{name}} の詳細を開く",
       "scope": {
@@ -2275,7 +2275,7 @@
       "hint": "下のハードポイントを指すと、船体上の位置がマーカーで表示されます。",
       "approximate": "範囲は概算",
       "viewTop": "上面図",
-      "viewSide": "側面図(右舷)",
+      "viewSide": "側面図（右舷）",
       "viewTopAria": "ハードポイントマーカー{{count}}個付きの船体上面図",
       "viewSideAria": "ハードポイントマーカー{{count}}個付きの船体側面図",
       "nose": "機首",
@@ -2285,7 +2285,7 @@
       "title": "デッキ図",
       "hint": "上から見た図で、機首が上です。部屋を指すと名前が表示されます。",
       "switchAria": "デッキを選択",
-      "aria": "{{deck}}: デッキ図、部屋数: {{count}}",
+      "aria": "{{deck}}：デッキ図、部屋数：{{count}}",
       "nose": "機首",
       "readoutIdle": "部屋が選択されていません",
       "roomsAria": "{{deck}}の部屋",
@@ -2361,7 +2361,7 @@
       "minPower": "最小電力",
       "coolantDraw": "冷却消費",
       "coolingRate": "冷却出力",
-      "aimAssistRange": "射程(エイムアシスト)",
+      "aimAssistRange": "射程（エイムアシスト）",
       "radarSensitivity": "感度(IR/EM/CS)",
       "pingCooldown": "ピングのクールダウン",
       "emSignature": "EMシグネチャ",
@@ -2392,14 +2392,14 @@
       "add": "プレッジリンクを追加",
       "edit": "プレッジリンクを編集",
       "label": "RSI公式プレッジリンク",
-      "hint": "本アプリのカタログには、すべての船に信頼できるRSIストアのスラッグがあるわけではありません。公式のプレッジページを貼り付けると、汎用のRSIリンクが置き換わります(あなたにのみ適用)。",
+      "hint": "本アプリのカタログには、すべての船に信頼できるRSIストアのスラッグがあるわけではありません。公式のプレッジページを貼り付けると、汎用のRSIリンクが置き換わります（あなたにのみ適用）。",
       "placeholder": "https://robertsspaceindustries.com/en/pledge/ships/nomad/Nomad",
       "save": "リンクを保存",
       "remove": "削除",
       "cancel": "キャンセル",
       "saved": "保存しました。このリンクはあなただけに表示されます。",
       "error": {
-        "invalidUrl": "RSI公式のプレッジ船リンクのみ使用できます。例: https://robertsspaceindustries.com/en/pledge/ships/nomad/Nomad",
+        "invalidUrl": "RSI公式のプレッジ船リンクのみ使用できます。例：https://robertsspaceindustries.com/en/pledge/ships/nomad/Nomad",
         "rateLimited": "短時間の変更が多すぎます。数分後にもう一度お試しください。",
         "forbidden": "この操作を行う権限がありません。",
         "saveFailed": "リンクを保存できませんでした。もう一度お試しください。"
@@ -2426,7 +2426,7 @@
       "fixedTag": "変更不可",
       "countermeasures": "カウンターメジャー",
       "shieldsNote": "このブロックの各ベイは、最初から空のものも含め、すべて交換可能なシールドジェネレーターです。シールド制御モジュールは固定システムにあり、単独のシールドではなく、ゲーム内で交換できません。",
-      "countermeasuresNote": "ランチャーはゲーム内で変更できないため、このブロックは参照専用です。デコイは熱追尾ミサイルをそらし、ノイズ(チャフ)はレーダー誘導ミサイルを惑わせます。必要な数はランチャーの情報シート(ⓘ)で確認できます。1回の発射ごとのシグネチャを船自身のものと比較しています。",
+      "countermeasuresNote": "ランチャーはゲーム内で変更できないため、このブロックは参照専用です。デコイは熱追尾ミサイルをそらし、ノイズ（チャフ）はレーダー誘導ミサイルを惑わせます。必要な数はランチャーの情報シート(ⓘ)で確認できます。1回の発射ごとのシグネチャを船自身のものと比較しています。",
       "infoLabel": "このブロックについて",
       "splitRows": "個別",
       "groupRows": "まとめて",
@@ -2460,7 +2460,7 @@
       }
     },
     "summary": {
-      "alphaDamage": "アルファダメージ(全武器)",
+      "alphaDamage": "アルファダメージ（全武器）",
       "dps": "継続DPS",
       "weaponMounts": "武器マウント",
       "ordnanceMounts": "ミサイルマウント",
@@ -2532,12 +2532,12 @@
       "quantumRange": "量子航行距離",
       "spool": "スプール時間",
       "ir": "IRシグネチャ",
-      "emIdle": "EMシグネチャ(アイドル、モデル)",
-      "emLoad": "EMシグネチャ(現在の配分、モデル)",
-      "emMax": "EMシグネチャ(最大、モデル)",
-      "emQuantum": "EMシグネチャ(量子、モデル)",
-      "modelHint": "ゲームの値ではなく当方のモデルです: コンポーネントごとのEM = 公称値 × 割り当て ÷ 全セグメント。リアクターのEMは消費電力に従い、船体アーマー係数を乗じます。出典: ゲームデータのコンポーネント値。",
-      "modelNote": "IRとEMはゲームの値ではなく当方独自のモデルです: コンポーネントごとのEM = 公称値 × 割り当て ÷ 全セグメント。リアクターのEMは消費電力に従い、船体アーマー係数を乗じます。アイドル = すべて最小、シールドと量子ドライブはオフ。最大 = すべて最大、シールドはオン。量子 = シールドオフ、量子ドライブオン。IRはクーラーのみ対象で、スラスターは除外しています(スロットルに依存するため)。出典: ゲームデータのコンポーネント値。",
+      "emIdle": "EMシグネチャ（アイドル、モデル）",
+      "emLoad": "EMシグネチャ（現在の配分、モデル）",
+      "emMax": "EMシグネチャ（最大、モデル）",
+      "emQuantum": "EMシグネチャ（量子、モデル）",
+      "modelHint": "ゲームの値ではなく当方のモデルです：コンポーネントごとのEM = 公称値 × 割り当て ÷ 全セグメント。リアクターのEMは消費電力に従い、船体アーマー係数を乗じます。出典：ゲームデータのコンポーネント値。",
+      "modelNote": "IRとEMはゲームの値ではなく当方独自のモデルです：コンポーネントごとのEM = 公称値 × 割り当て ÷ 全セグメント。リアクターのEMは消費電力に従い、船体アーマー係数を乗じます。アイドル = すべて最小、シールドと量子ドライブはオフ。最大 = すべて最大、シールドはオン。量子 = シールドオフ、量子ドライブオン。IRはクーラーのみ対象で、スラスターは除外しています（スロットルに依存するため）。出典：ゲームデータのコンポーネント値。",
       "crossSection": "断面積",
       "boost": "ブースト速度",
       "armor": "アーマー",
@@ -2571,10 +2571,10 @@
         "armorHp": "アーマー",
         "quantumSpeed": "Q速度",
         "spool": "スプール",
-        "emIdle": "EM(アイドル、モデル)",
-        "emLoad": "EM(現在、モデル)",
-        "emMax": "EM(最大、モデル)",
-        "emQuantum": "EM(量子、モデル)"
+        "emIdle": "EM（アイドル、モデル）",
+        "emLoad": "EM（現在、モデル）",
+        "emMax": "EM（最大、モデル）",
+        "emQuantum": "EM（量子、モデル）"
       }
     },
     "damageChannel": {
@@ -2589,7 +2589,7 @@
       "readHint": "展開して読む",
       "offensive": {
         "title": "攻撃",
-        "weapons": "武器({{count}}基搭載)",
+        "weapons": "武器（{{count}}基搭載）",
         "colWeapon": "武器",
         "colSize": "サイズ",
         "colAlpha": "アルファ",
@@ -2599,8 +2599,8 @@
         "effectiveRange": "有効射程",
         "projectileSpeed": "弾速 m/s",
         "longestGunNote": "射程は最も短い武器に制限されます。最も遠くまで届くのは{{name}}です。",
-        "mixedRangeWarning": "射程がまちまち: 少なくとも1つの武器が他より明らかに遠くまで届きます。",
-        "missiles": "ミサイル({{count}}発の弾頭)",
+        "mixedRangeWarning": "射程がまちまち：少なくとも1つの武器が他より明らかに遠くまで届きます。",
+        "missiles": "ミサイル（{{count}}発の弾頭）",
         "salvoDamage": "サルボダメージ",
         "lockTime": "ロックオン時間",
         "range": "射程",
@@ -2625,16 +2625,16 @@
         "regen": "回復",
         "fullIn": "満タンまで",
         "regenDelay": "遅延",
-        "downedDelay": "遅延(ダウン時)",
+        "downedDelay": "遅延（ダウン時）",
         "mixedGeneratorNote": "異なるシールドジェネレーターが複数装着されています。上の合計値は集計したもので、遅延は最も強力なものに基づきます。",
         "resistance": "シールド耐性",
         "hull": "船体とアーマー",
         "armorPhysical": "物理軽減",
         "armorEnergy": "エネルギー軽減",
         "armorDistortion": "ディストーション軽減",
-        "armorPenetration": "貫通軽減(基本)",
-        "armorDeflectionPhysical": "偏向(物理)",
-        "armorDeflectionEnergy": "偏向(エネルギー)",
+        "armorPenetration": "貫通軽減（基本）",
+        "armorDeflectionPhysical": "偏向（物理）",
+        "armorDeflectionEnergy": "偏向（エネルギー）",
         "noArmorData": "この船の抽出データにはアーマーの数値がありません。ここには船体構造のみ表示されます。",
         "effectiveHp": "実効総HP",
         "effectiveHpGap": "船体HPとシールドHPの両方が抽出データにある場合のみ算出できます。"
@@ -2644,7 +2644,7 @@
         "flightPerformance": "飛行性能",
         "mass": "質量",
         "systems": "システム",
-        "signature": "シグネチャ(フルロード時)",
+        "signature": "シグネチャ（フルロード時）",
         "hull": "船体",
         "massEquipmentNote": "船体質量は抽出データにありません。装備質量のみ計算できます。",
         "crossSectionNote": "船体由来で、変更できません。"
@@ -2656,7 +2656,7 @@
       "hullMass": "船体質量",
       "armorHp": "アーマーHP",
       "reverseSpeed": "後退速度",
-      "dimensions": "寸法(長さ×幅×高さ)",
+      "dimensions": "寸法（長さ×幅×高さ）",
       "decks": "デッキ",
       "decksDerived": "床の高さから算出",
       "crew": "クルー",
@@ -2702,7 +2702,7 @@
     "set": {
       "back": "← Codexに戻る",
       "backToHangar": "← ハンガーに戻る",
-      "flowHint": "スロットをタップすると(アーマーは人型の周り、武器は下のバー)、アーセナルから装備を選べます。",
+      "flowHint": "スロットをタップすると（アーマーは人型の周り、武器は下のバー）、アーセナルから装備を選べます。",
       "signInHint": "サインインすると、セットの表示と編集ができます。",
       "noSets": "まだセットを作成していません。",
       "createInHangar": "ハンガーでセットを作成 →",
@@ -2787,11 +2787,11 @@
       "damagedRegenDelay": "被弾後の回復遅延",
       "decayRatio": "減衰率",
       "reserveDrainRate": "リザーブ消費率",
-      "stunMaxAlphaRatio": "スタン: 最大アルファ比",
-      "stunMinAlphaRatio": "スタン: 最小アルファ比",
-      "stunMaxTime": "スタン: 最大持続時間",
-      "stunMinTime": "スタン: 最小持続時間",
-      "splineDriveSpeed": "ルートジャンプ: 速度",
+      "stunMaxAlphaRatio": "スタン：最大アルファ比",
+      "stunMinAlphaRatio": "スタン：最小アルファ比",
+      "stunMaxTime": "スタン：最大持続時間",
+      "stunMinTime": "スタン：最小持続時間",
+      "splineDriveSpeed": "ルートジャンプ：速度",
       "driveSpeed": "ドライブ速度",
       "engageSpeed": "始動速度",
       "spoolUpTime": "スプールアップ時間",
@@ -2805,16 +2805,16 @@
       "interdictionTime": "妨害時間",
       "rampUpHeat": "ランプアップ時の熱",
       "duration": "持続時間",
-      "splineEngageSpeed": "ルートジャンプ: 始動速度",
-      "splineSpoolUpTime": "ルートジャンプ: スプールアップ時間",
-      "splineCooldownTime": "ルートジャンプ: クールダウン",
-      "splineCalibrationRate": "ルートジャンプ: キャリブレーション率",
-      "splineAccelStageOne": "ルートジャンプ: 加速段階1",
-      "splineAccelStageTwo": "ルートジャンプ: 加速段階2",
-      "splineInterdictionTime": "ルートジャンプ: 妨害時間",
-      "splineCalibrationDelay": "ルートジャンプ: キャリブレーション遅延",
-      "splineCalibrationMax": "ルートジャンプ: キャリブレーション必要量 最大",
-      "splineCalibrationMin": "ルートジャンプ: キャリブレーション必要量 最小",
+      "splineEngageSpeed": "ルートジャンプ：始動速度",
+      "splineSpoolUpTime": "ルートジャンプ：スプールアップ時間",
+      "splineCooldownTime": "ルートジャンプ：クールダウン",
+      "splineCalibrationRate": "ルートジャンプ：キャリブレーション率",
+      "splineAccelStageOne": "ルートジャンプ：加速段階1",
+      "splineAccelStageTwo": "ルートジャンプ：加速段階2",
+      "splineInterdictionTime": "ルートジャンプ：妨害時間",
+      "splineCalibrationDelay": "ルートジャンプ：キャリブレーション遅延",
+      "splineCalibrationMax": "ルートジャンプ：キャリブレーション必要量 最大",
+      "splineCalibrationMin": "ルートジャンプ：キャリブレーション必要量 最小",
       "disconnectRange": "切断距離",
       "quantumFuel": "量子燃料必要量",
       "inFlightHeat": "飛行中の熱",
@@ -2871,13 +2871,13 @@
       "scan": "スキャン",
       "tip": {
         "all": "すべての値を均等に重み付け、特化なし。",
-        "combat": "CIGの「タンク」特化と同様: 防護とアーマークラスを重視します。",
+        "combat": "CIGの「タンク」特化と同様：防護とアーマークラスを重視します。",
         "stealth": "スキャナーでセットがどれだけ発見されにくいか。",
-        "pilot": "CIGの「パイロット」「ドライバー」特化と同様: G耐性を重視します。",
+        "pilot": "CIGの「パイロット」「ドライバー」特化と同様：G耐性を重視します。",
         "env": "セットが熱・寒さ・放射線からどれだけ守れるか。",
         "transport": "セットがどれだけの積載量をもたらすか。",
         "eva": "セットがEVA作業にどれだけ適しているか。",
-        "scan": "CIGの「トラッカー」特化と同様: 探知と追跡を重視します。"
+        "scan": "CIGの「トラッカー」特化と同様：探知と追跡を重視します。"
       },
       "disabled": {
         "noSignature": "シグネチャ値(EM/IR)はまだゲームデータにありません",
@@ -2904,7 +2904,7 @@
       "hotspotTip": "{{name}} · {{type}} · サイズ{{size}}",
       "freeSlot": "空きスロット、{{types}}を装着可能",
       "label": {
-        "aria": "選択中のスロット: {{name}}",
+        "aria": "選択中のスロット：{{name}}",
         "open": "{{name}}をCodexで開く",
         "prev": "前のスロット",
         "next": "次のスロット",
@@ -2932,12 +2932,12 @@
       "FPS_Consumable": "消耗品"
     },
     "personal": {
-      "switchGroup": "表示: 標準または自分のバリアント",
+      "switchGroup": "表示：標準または自分のバリアント",
       "codex": "Codex",
       "stock": "標準",
       "mine": "自分用",
       "mineVariant": "自分のバリアント",
-      "yourVariant": "自分のバリアント: {{name}}",
+      "yourVariant": "自分のバリアント：{{name}}",
       "variantsMenu": "この船のあなたのバリアント",
       "hqCrumb": "HQ",
       "foreignVariant": "このバリアントは他のユーザーのものです — バリアントは共有リンクで共有されます。",
@@ -2945,7 +2945,7 @@
       "openVariant": "自分のバリアントを開く",
       "inHqChip": "HQに{{n}}個",
       "usesTitle": "HQにあり",
-      "equippedOn": "装着先: {{ship}}({{variant}})",
+      "equippedOn": "装着先：{{ship}}({{variant}})",
       "inSet": "セット{{name}}に含まれる"
     },
     "browse": {
@@ -2988,9 +2988,9 @@
       "lawful": "合法",
       "unlawful": "違法",
       "variantsLabel": "バリアント",
-      "variants": "このタイトルのコントラクト: {{n}}件",
+      "variants": "このタイトルのコントラクト：{{n}}件",
       "patch": "パッチ",
-      "placeholderHint": "‹…›は、受注時にゲームが自動で入力します(場所、依頼主、ターゲット)。",
+      "placeholderHint": "‹…›は、受注時にゲームが自動で入力します（場所、依頼主、ターゲット）。",
       "notFound": "このミッションは現在のライブビルドにはありません。"
     },
     "missile": {
@@ -3032,7 +3032,7 @@
         "legendCompare": "中央値 {{group}} · 誘導兵器 {{n}}件",
         "legendAbove": "中央値より上",
         "legendBelow": "中央値より下",
-        "compareInfo": "各軸は0(中心)から、選択した武器の最大値(外周)までです。青がこの武器、破線がグループの中央値です。",
+        "compareInfo": "各軸は0（中心）から、選択した武器の最大値（外周）までです。青がこの武器、破線がグループの中央値です。",
         "note": "この武器についてゲームデータにある項目のみ比較します。",
         "gapNoData": "現在のデータには、ダメージ、速度、機動性、射程がまだ含まれていません。Verse Data Uploader 0.73.3以降でビルドをアップロードすると、比較が表示されます。",
         "gapTooFew": "ダメージ、速度、機動性、射程に差のあるミサイルが少なすぎて、順位付けできません。",
@@ -3123,8 +3123,8 @@
       "stripAria": "パッチと所持状況",
       "patch": "パッチ",
       "variant": "バリアント",
-      "variantAria": "バリアントを選択、現在: {{name}}",
-      "shown": "表示中:",
+      "variantAria": "バリアントを選択、現在：{{name}}",
+      "shown": "表示中：",
       "own": {
         "hangar": "ハンガーにあり",
         "hangarN": "ハンガーに{{n}}隻",
@@ -3139,28 +3139,28 @@
     },
     "ownCard": {
       "removeSammlung": "コレクションから削除",
-      "removeSammlungTitle": "コレクションから削除しますか?",
+      "removeSammlungTitle": "コレクションから削除しますか？",
       "removeSammlungBody": "{{name}}がコレクションから削除されます。",
       "signedOut": "サインインすると、ウィッシュリストへの追加や所持登録ができます。",
       "signIn": "サインイン",
       "removeItem": "インベントリから削除",
-      "removeTitle": "インベントリから削除しますか?",
+      "removeTitle": "インベントリから削除しますか？",
       "removeBody": "{{name}} {{n}}個が、インベントリのすべての場所から削除されます。",
       "removeConfirm": "削除",
       "inNachschub": "オペレーション「{{name}}」内",
       "noteTitle": "このアイテムのメモ"
     },
     "itemRank": {
-      "nAll": "この種類のパーツ: {{n}}点",
-      "nType": "同じタイプのパーツ: {{n}}点",
-      "nSize": "サイズ{{k}}のパーツ: {{n}}点",
+      "nAll": "この種類のパーツ：{{n}}点",
+      "nType": "同じタイプのパーツ：{{n}}点",
+      "nSize": "サイズ{{k}}のパーツ：{{n}}点",
       "verdict": "{{pct}}% — パーツ{{n}}点中で{{band}}。",
       "percentileTooltip": "この値は、比較対象の中でこのパーツがどこに位置するかを示します。50%がちょうど中央です。遅延やシグネチャは、値が小さいほど上位になります。",
       "radarAria": "パーツ{{n}}点に対する{{name}}のパーセンタイルのレーダーチャート",
       "legendCompare": "中央値 {{group}} · パーツ {{n}}点",
       "legendAbove": "中央値より上",
       "legendBelow": "中央値より下",
-      "compareInfo": "各軸は0(中心)から、選択したパーツの最良値(外周)までです。青がこのパーツ、破線がグループの中央値です。",
+      "compareInfo": "各軸は0（中心）から、選択したパーツの最良値（外周）までです。青がこのパーツ、破線がグループの中央値です。",
       "note": "このパーツについてゲームデータにある項目のみ比較します。",
       "gapTooFew": "ここで比較する値に差のあるパーツが少なすぎて、順位付けできません。",
       "gapNoCohort": "比較グループを読み込めませんでした。",
@@ -3196,11 +3196,11 @@
       "nameLabel": "名前",
       "saveConfirm": "保存",
       "remove": "「{{name}}」を削除",
-      "removeTitle": "レイアウトを削除しますか?",
+      "removeTitle": "レイアウトを削除しますか？",
       "removeMessage": "「{{name}}」をこのブラウザから削除します。",
       "removeConfirm": "削除",
       "cart": "コンポーネントをカートに追加",
-      "cartSoon": "近日公開: このロードアウトのコンポーネントをカートに入れます。",
+      "cartSoon": "近日公開：このロードアウトのコンポーネントをカートに入れます。",
       "layouts": "レイアウトを選択",
       "saveInto": "変更を「{{name}}」に保存します。",
       "pickNew": "新規",
@@ -3244,8 +3244,8 @@
     "recipesMissing": "このビルドでは、レシピの材料がまだ抽出されていません。ブループリントは一覧に表示されますが、素材リストはありません。",
     "owned": {
       "filter": "自分のみ",
-      "mark": "このブループリントを持っています: {{name}}",
-      "unmark": "所持済み – マークを外す: {{name}}"
+      "mark": "このブループリントを持っています：{{name}}",
+      "unmark": "所持済み – マークを外す：{{name}}"
     },
     "role": {
       "primary": "プライマリ",
@@ -3277,7 +3277,7 @@
     "subtitle": "徒歩用装備 — 武器とアーマー。ライブビルドからデータマイニングしたものです。",
     "bridgeLink": "FPS装備",
     "categoriesAria": "FPS装備カテゴリ",
-    "searchPlaceholder": "このリストを絞り込み – 名前またはクラス(例: Arclight、Morozov、klwe_*)…",
+    "searchPlaceholder": "このリストを絞り込み – 名前またはクラス（例：Arclight、Morozov、klwe_*）…",
     "category": {
       "weapon": "武器",
       "armor": "アーマー"
@@ -3308,13 +3308,13 @@
       "searchIn": "{{cat}}を検索"
     },
     "equip": {
-      "targetSet": "装備中: {{name}}",
+      "targetSet": "装備中：{{name}}",
       "backToSet": "セットに戻る",
       "removeFrom": "{{slot}} から外す",
       "confirmEquipped": "{{item}} を {{slot}} に装備しました",
       "confirmRemoved": "{{item}} を {{slot}} から外しました",
       "failed": "保存されませんでした。セットが変更を受け付けませんでした。もう一度お試しください。",
-      "setUnavailable": "リンク先のセットは存在しない(または削除された)か、あなたのものではありません。ここでは閲覧のみで、装備は行われません。",
+      "setUnavailable": "リンク先のセットは存在しない（または削除された）か、あなたのものではありません。ここでは閲覧のみで、装備は行われません。",
       "mySets": "マイセット",
       "browseWithout": "セットなしで閲覧を続ける",
       "onlyFitting": "「{{slot}}」に合うものだけを表示しています。",
@@ -3337,7 +3337,7 @@
       "loading": "セットを読み込み中…",
       "noSet": "まだセットがありません。",
       "noFit": "このパーツを装備できるスロットを持つセットがありません。",
-      "pickSet": "どのセットに追加しますか?",
+      "pickSet": "どのセットに追加しますか？",
       "pickSlot": "{{set}} のスロット",
       "replaces": "現在のパーツを置き換えます",
       "done": "{{item}} を {{set}} の {{slot}} に追加しました",
@@ -3435,7 +3435,7 @@
         "deltaSlower": "中央値より{{n}}日遅い",
         "deltaSame": "ちょうど中央値と同じ",
         "barDays": "Alpha {{version}}:{{n}}日",
-        "chartAria": "{{title}}:現在 {{latest}} {{unit}}、中央値 {{median}} {{unit}}({{n}}件のデータポイントより)",
+        "chartAria": "{{title}}：現在 {{latest}} {{unit}}、中央値 {{median}} {{unit}}（{{n}}件のデータポイントより）",
         "unit": {
           "days": "日"
         },
@@ -3445,13 +3445,13 @@
           "sub": "最初のテストビルドからLiveリリースまでの日数"
         },
         "cadence": {
-          "title": "パッチ周期(メインライン)",
+          "title": "パッチ周期（メインライン）",
           "short": "周期",
           "sub": "Liveリリース間の日数"
         },
         "median": "全期間の中央値",
         "subCadence": {
-          "title": "パッチ周期(サブパッチ)",
+          "title": "パッチ周期（サブパッチ）",
           "short": "サブパッチ",
           "sub": "PTUまたはLiveでのサブパッチ間の日数"
         },
@@ -3463,15 +3463,15 @@
         }
       },
       "ptuRelease": {
-        "title": "{{version}}はいつLIVEになる?",
+        "title": "{{version}}はいつLIVEになる？",
         "infoLabel": "日付の算出方法",
-        "infoEstimate": "当サイトの予測:このバージョンの最初のテストビルドに、これまでのバージョンが最初のPTUビルドからLIVEまでにかかった日数の中央値を加えたものです。推計であり、確約ではありません。",
-        "infoOfficial": "公式日付:RSIがステータスサイトで予定しているLIVEデプロイの日付です(予定された時点で表示されます)。RSIはパッチノート自体には日付を記載しません。",
+        "infoEstimate": "当サイトの予測：このバージョンの最初のテストビルドに、これまでのバージョンが最初のPTUビルドからLIVEまでにかかった日数の中央値を加えたものです。推計であり、確約ではありません。",
+        "infoOfficial": "公式日付：RSIがステータスサイトで予定しているLIVEデプロイの日付です（予定された時点で表示されます）。RSIはパッチノート自体には日付を記載しません。",
         "estimate": "当サイトの予測",
         "estimateBasis": "テスト開始から{{days}}日 · PTU → LIVE の中央値 {{median}}日(n = {{n}})",
         "noEstimate": "予測に必要なデータがまだ足りません",
         "official": "公式(RSI)",
-        "source": "ソース:RSIステータス、{{title}}",
+        "source": "ソース：RSIステータス、{{title}}",
         "noOfficial": "公式の日付はまだありません",
         "statusLink": "RSIステータスページを確認",
         "openNotes": "{{version}} の変更点を見る",
@@ -3504,7 +3504,7 @@
       },
       "search": {
         "label": "パッチ内容を検索",
-        "placeholder": "例: Orison、ホットフィックス、Quantum Drive",
+        "placeholder": "例：Orison、ホットフィックス、Quantum Drive",
         "clear": "検索をクリア",
         "noHits": "見つかりませんでした。別の表記でも該当なしです。"
       },
@@ -3529,7 +3529,7 @@
         "fullNotes": "完全版ノート ↗",
         "linkOut": "リンク ↗",
         "openOnRsi": "RSIで開く ↗",
-        "openOnRsiAria": "{{title}} をRSIで開く(新しいタブ)",
+        "openOnRsiAria": "{{title}} をRSIで開く（新しいタブ）",
         "truncated": "非常に長いノートです。続きはRSIをご覧ください。",
         "hits": "{{count}} 件",
         "points": "{{count}} ポイント"
@@ -3541,7 +3541,7 @@
         },
         "componentHint": {
           "community": "ノートとホットフィックスのスレッドへの1日あたりの新規返信数、およびIssue Councilチケット付き返信の割合とアップボート比重",
-          "service": "RSI Statusに基づく1日あたりの計画外障害時間(分、7日間)と、未解決の障害",
+          "service": "RSI Statusに基づく1日あたりの計画外障害時間（分、7日間）と、未解決の障害",
           "cig": "CIGのKnown Issues記事の未解決項目数と、7日間の増加数"
         },
         "timeline": "LIVE以降の推移",
@@ -3564,7 +3564,7 @@
         "other": "バージョンなし"
       },
       "stack": {
-        "aria": "パッチ(新しい順)",
+        "aria": "パッチ（新しい順）",
         "sinceDays": "{{n}}日間",
         "replaced": "{{date}}に",
         "liveSince": "{{date}}からLive",
@@ -3576,7 +3576,7 @@
         "inRing": "{{ring}}で実施中 · {{n}}ウェーブ · {{ago}}",
         "hotfixOne": "{{date}}にホットフィックス1件",
         "hotfixes": "ホットフィックス{{n}}件、最新は{{date}}",
-        "nextLive": "次のLiveパッチ {{when}}(推定)",
+        "nextLive": "次のLiveパッチ {{when}}（推定）",
         "notes": "ノート{{n}}件",
         "planned": "ロードマップ項目{{n}}件",
         "openDossier": "{{name}}のドシエを開く",
@@ -3592,18 +3592,21 @@
           "stabilitaet": "安定性",
           "builds": "実施中のテストビルド",
           "prepPast": "知っておくべきこと",
-          "contents": "内容は?",
-          "fixed": "…は修正された?",
-          "next": "次はいつ?",
-          "nextThis": "このパッチはいつ来る?",
-          "nextPast": "その後はどうなった?"
+          "contents": "内容は？",
+          "fixed": "…は修正された？",
+          "next": "次はいつ？",
+          "nextThis": "このパッチはいつ来る？",
+          "nextPast": "その後はどうなった？",
+          "first": "このパッチの最初の一歩",
+          "community": "コミュニティ",
+          "urteil": "あなたの評価"
         },
         "noteOf": "{{version}}での変更 · Alpha {{line}}の一部",
         "wholeLine": "{{line}}パッチ全体を見る",
         "eyebrow": "パッチ"
       },
       "prep": {
-        "source": "Spectrumの投稿(「Important Build Info」)より",
+        "source": "Spectrumの投稿（「Important Build Info」）より",
         "known": "既知の問題",
         "focus": "テストの重点項目",
         "wipe": "ワイプ",
@@ -3615,22 +3618,27 @@
           "verify": "パッチ直後にクラッシュする場合は、バグを報告する前にランチャーで「Verify」を実行してください。",
           "repair": "キャラクターが動かない、または装備が消えた場合は、RSIアカウントでCharacter Repairを実行し、再ログインしてください。",
           "known": "報告する前に既知の問題に目を通しましょう。新しい不具合の多くはすでに掲載されています。"
-        }
+        },
+        "nextTitle": "次の大型パッチへの準備"
       },
       "contents": {
         "inNotes": "リリースノートより",
         "more": "全文",
         "less": "折りたたむ",
         "leftover": "ロードマップカードのないノートの追加項目({{n}})",
-        "noRoadmap": "このパッチのロードマップデータはありません。ノート「{{title}}」はこちら:",
-        "ofNote": "「{{title}}」の変更点:"
+        "noRoadmap": "このパッチのロードマップデータはありません。ノート「{{title}}」はこちら：",
+        "ofNote": "「{{title}}」の変更点：",
+        "fixedTitle": "修正済み",
+        "knownTitle": "既知の問題",
+        "gallery": "このパッチの画像",
+        "moreLines": "さらに{{n}}件表示"
       },
       "fixed": {
-        "placeholder": "このパッチ内を検索 … 例: quantum drive",
+        "placeholder": "このパッチ内を検索… 例：quantum drive",
         "hits": "{{notes}}件のノート内で{{n}}件ヒット",
         "coverage": "{{total}}件中{{loaded}}件のノートを全文検索済み",
         "loadRest": "残りのノートを読み込んで検索",
-        "loading": "{{n}}件のノートを読み込み中 …",
+        "loading": "{{n}}件のノートを読み込み中…",
         "noHits": "読み込み済みのノートにヒットなし。タイトルは常に検索されます。",
         "allNotes": "すべてのノート({{n}})"
       },
@@ -3639,7 +3647,7 @@
         "sentenceHistory": "Alpha {{line}}は{{days}}日後の{{date}}にAlpha {{next}}に置き換えられました。通常は{{median}}日です。",
         "sentencePlanned": "周期から見て、Alpha {{line}}は{{date}}頃にLiveの見込み — {{when}}。",
         "disclaimer": "パッチ周期からの中央値による推定であり、公式の日程ではありません。",
-        "markers": "軸上のマーカー:前回のLiveパッチ、PTU開始、通常のテスト終了、Live、ホットフィックス、今日、通常の次回日程。開始、Live、目標にはラベルが付き、残りはツールチップに表示されます。",
+        "markers": "軸上のマーカー：前回のLiveパッチ、PTU開始、通常のテスト終了、Live、ホットフィックス、今日、通常の次回日程。開始、Live、目標にはラベルが付き、残りはツールチップに表示されます。",
         "planned": {
           "sentence": "Alpha {{line}}は{{quarter}}に予定されています。",
           "unknown": "Alpha {{line}}の日程はまだありません。",
@@ -3661,7 +3669,7 @@
           "leadTime": "テスト → Live:{{days}}日",
           "cadence": "Live → Live:{{days}}日"
         },
-        "charts": "詳細グラフ(PTU → Live · 周期 · サブパッチ · 日程)",
+        "charts": "詳細グラフ（PTU → Live · 周期 · サブパッチ · 日程）",
         "status": {
           "live": "Alpha {{line}}はLiveになって{{days}}日です。次のパッチまでは通常{{median}}日です。",
           "testing": "Alpha {{line}}はテスト開始から{{days}}日です。Liveまで通常{{median}}日です。",
@@ -3669,8 +3677,8 @@
           "over": "CIGは通常の周期を{{n}}日超過しています。"
         },
         "legend": {
-          "real": "Liveサイクル(裏付けあり)",
-          "usual": "通常の周期(中央値)",
+          "real": "Liveサイクル（裏付けあり）",
+          "usual": "通常の周期（中央値）",
           "over": "周期超過",
           "lead": "テスト期間(PTU)"
         },
@@ -3684,12 +3692,12 @@
           "hotfix": "Live以降ホットフィックス{{n}}件",
           "hotfixLast": "最新は{{date}}"
         },
-        "infoLabel": "この数字の出どころは?"
+        "infoLabel": "この数字の出どころは？"
       },
       "monitor": {
-        "title": "次のパッチはいつ?",
-        "infoLabel": "この推定の根拠は?",
-        "infoBasis": "根拠:測定した{{n}}サイクルの中央値{{median}}日。",
+        "title": "次のパッチはいつ？",
+        "infoLabel": "この推定の根拠は？",
+        "infoBasis": "根拠：測定した{{n}}サイクルの中央値{{median}}日。",
         "over": "{{n}}日超過",
         "tile": {
           "live": "Live",
@@ -3710,7 +3718,7 @@
         "groupCount": "ロードマップ項目{{roadmap}}件 · 箇条書き{{notes}}件",
         "moreInDossier": "ドシエにさらに{{n}}件のヒット",
         "loadRest": "残り{{n}}件のノートを読み込んで検索",
-        "loading": "ノートを読み込み中 …"
+        "loading": "ノートを読み込み中…"
       },
       "timeline": {
         "versionsOf": "{{line}}のバージョン",
@@ -3776,6 +3784,56 @@
       "sinceDays": "{{days}}日間",
       "toBoard": "パッチセンター",
       "toNotes": "パッチノートを読む"
+    },
+    "patchBoard": {
+      "switch": {
+        "aria": "チャンネルを選択",
+        "live": "Live",
+        "ptu": "PTU",
+        "liveHint": "Liveプレイヤーにとって大事なこと",
+        "ptuHint": "テストビルド：すべてのビルドを個別に"
+      },
+      "unread": "未読",
+      "newForYou": "あなたへの新着",
+      "readFull": "全文を読む",
+      "markRead": "既読",
+      "readOn": "{{date}}に既読",
+      "readEarlier": "以前に既読",
+      "readAgain": "もう一度読む",
+      "now": {
+        "title": "Liveに来たばかり",
+        "since": "{{date}}から",
+        "none": "フィードにはまだLiveパッチがありません。"
+      },
+      "next": {
+        "title": "次のLive",
+        "none": "次のパッチはまだわかっていません。",
+        "testing": "{{ring}}でテスト中",
+        "noDate": "公式の日付なし",
+        "announced": "{{date}}予定と告知済み",
+        "estimate": "予測：{{when}}"
+      },
+      "allAbout": "{{line}}のすべて",
+      "close": "閉じる",
+      "noDate": "日付なし",
+      "roadmap": {
+        "aria": "ロードマップの状況",
+        "committed": "確定",
+        "tentative": "可能性あり",
+        "released": "提供済み"
+      },
+      "status": {
+        "next": "次に予定"
+      },
+      "daysLive": "Live {{n}}日目",
+      "earlier": "以前のアップデート {{n}}件",
+      "earlierHide": "以前のアップデートを隠す",
+      "ptu": {
+        "newest": "最新のテストビルド",
+        "aria": "テストビルド（新しい順）",
+        "empty": "現在フィードにテストビルドはありません。",
+        "wave": "{{stage}}・ウェーブ{{n}}"
+      }
     }
   },
   "stability": {
@@ -3816,14 +3874,14 @@
       "asOf": "{{date}}時点",
       "day": "{{threshold}}日中{{day}}日目",
       "provisional": "評価はまだ暫定です",
-      "sources": "情報源:",
+      "sources": "情報源：",
       "src": {
         "replies": "{{threads}}スレッドで{{n}}件のフォーラム返信",
         "outage": "停止時間{{n}}分(RSI Status)",
         "kb": "Known Issues {{n}}件(CIG)",
         "votes": "コミュニティ投票{{n}}件"
       },
-      "hatched": "斜線部: 最初の{{n}}日間は、ホットフィックスで状況が変わる可能性があります。",
+      "hatched": "斜線部：最初の{{n}}日間は、ホットフィックスで状況が変わる可能性があります。",
       "dayTitle": "{{date}}: {{score}} % – {{word}}、新規返信{{velocity}}件/日",
       "ticketsHint": "公開フォーラムの返信より",
       "mentions": "言及{{count}}件"
@@ -3831,17 +3889,17 @@
     "vote": {
       "title": "コミュニティ評価",
       "loading": "評価を読み込み中…",
-      "tooFew": "投票がまだ足りません({{min}}票中{{n}}票)— 補正なし",
+      "tooFew": "投票がまだ足りません（{{min}}票中{{n}}票）— 補正なし",
       "tooFewSub": "投票を集計中です。最低数に達するまで分布は非表示です。",
-      "applied": "コミュニティ評価: {{c}}({{n}}票、幅 ± {{hw}})",
-      "split": "意見が分かれています(安定{{a}} % · 不安定{{b}} %)— 補正は半分",
+      "applied": "コミュニティ評価：{{c}}（{{n}}票、幅 ± {{hw}}）",
+      "split": "意見が分かれています（安定{{a}} % · 不安定{{b}} %）— 補正は半分",
       "splitSub": "体験が分かれています。",
       "confirmed": "確認済み — 補正なし",
       "confirmedSub": "算出された数値はコミュニティ評価の範囲内です。",
       "sum": "{{n}}票 · 補正 {{c}}",
       "yours": "あなたの判定",
-      "ask": "{{line}} は、あなたの環境でどのくらい安定していますか?",
-      "mine": "あなたの判定:",
+      "ask": "{{line}} は、あなたの環境でどのくらい安定していますか？",
+      "mine": "あなたの判定：",
       "changeFrom": "{{time}} から変更可能",
       "hint": {
         "stabil": "問題なし、切断はほぼなし",
@@ -3862,7 +3920,7 @@
     "subtitle": "Verse Data Uploader による処理済みバンドルです。アップロードはツール経由のみで、ウェブサイトからは行えません。",
     "loading": "バンドルを読み込み中…",
     "errorTitle": "バンドルを読み込めませんでした",
-    "retentionHint": "保持ルール: ビルドごとに直近3つのアップローダーバージョン、合計で最大20バンドルまで。古いものは自動的に削除されます。",
+    "retentionHint": "保持ルール：ビルドごとに直近3つのアップローダーバージョン、合計で最大20バンドルまで。古いものは自動的に削除されます。",
     "toggle": {
       "disabled": "無効化されたものを表示"
     },
@@ -3885,7 +3943,7 @@
       "lead": "優先として使用"
     },
     "diff": {
-      "title": "差分の詳細(前のビルドとの比較)",
+      "title": "差分の詳細（前のビルドとの比較）",
       "entity": "エンティティタイプ",
       "prev": "前",
       "new": "新",
@@ -3896,15 +3954,15 @@
       "noReason": "理由なし"
     },
     "prompts": {
-      "reenable": "バンドル「{{name}}」を再度有効にしますか?",
-      "delete": "バンドル「{{name}}」を完全に削除しますか?\n\nこの操作は元に戻せません。",
-      "disableTitle": "バンドル「{{name}}」を無効にしますか?",
-      "reasonLabel": "理由(任意)",
-      "deleteTitle": "バンドルを削除しますか?",
-      "disablePatchTitle": "パッチ {{name}} を無効にしますか(有効なアップロード {{count}} 件)?",
-      "reenablePatch": "パッチ {{name}} を再度有効にしますか? チャンネルごとに最新のアップロードが再び優先されます。",
-      "leadTitle": "「{{name}}」を優先として使用しますか?",
-      "leadMessage": "同じパッチ・チャンネルの他の有効なアップロードは(メモ付きで)無効化され、履歴に残ります。"
+      "reenable": "バンドル「{{name}}」を再度有効にしますか？",
+      "delete": "バンドル「{{name}}」を完全に削除しますか？\nこの操作は元に戻せません。",
+      "disableTitle": "バンドル「{{name}}」を無効にしますか？",
+      "reasonLabel": "理由（任意）",
+      "deleteTitle": "バンドルを削除しますか？",
+      "disablePatchTitle": "パッチ {{name}} を無効にしますか（有効なアップロード {{count}} 件）?",
+      "reenablePatch": "パッチ {{name}} を再度有効にしますか？チャンネルごとに最新のアップロードが再び優先されます。",
+      "leadTitle": "「{{name}}」を優先として使用しますか？",
+      "leadMessage": "同じパッチ・チャンネルの他の有効なアップロードは（メモ付きで）無効化され、履歴に残ります。"
     },
     "superseded": {
       "badge": "置き換え済み",
@@ -3913,7 +3971,7 @@
     "leading": {
       "badge": "優先",
       "tip": "Codex はこのバンドルをそのパッチとチャンネルに使用します。",
-      "reason": "優先から外れました: {{name}} が優先に選ばれました。"
+      "reason": "優先から外れました：{{name}} が優先に選ばれました。"
     }
   },
   "profile": {
@@ -3986,12 +4044,12 @@
     "username": {
       "title": "ユーザー名",
       "label": "ユーザー名",
-      "hint": "3〜20文字: 小文字 a〜z、数字 0〜9、アンダースコア (_)。",
+      "hint": "3〜20文字：小文字 a〜z、数字 0〜9、アンダースコア (_)。",
       "placeholder": "your_callsign",
       "save": "保存",
       "saving": "保存中…",
       "saved": "ユーザー名を保存しました。",
-      "errInvalid": "ユーザー名が無効です。3〜20文字(a〜z、0〜9、_)で入力してください。",
+      "errInvalid": "ユーザー名が無効です。3〜20文字（a〜z、0〜9、_）で入力してください。",
       "errTaken": "このユーザー名はすでに使われています。",
       "errGeneric": "ユーザー名を保存できませんでした。もう一度お試しください。"
     },
@@ -3999,7 +4057,7 @@
       "title": "言語と地域",
       "hint": "言語は翻訳と月名の表記を、地域は日付の順序と時刻の表記を決めます。「自動」はブラウザの設定に従います。",
       "auto": "自動",
-      "detected": "自動検出: {{value}}",
+      "detected": "自動検出：{{value}}",
       "preview": "例",
       "language": {
         "label": "言語"
@@ -4011,13 +4069,13 @@
         "de": "ドイツ語",
         "en": "英語",
         "es": "スペイン語",
-        "es-419": "スペイン語 (ラテンアメリカ)",
+        "es-419": "スペイン語（ラテンアメリカ）",
         "fr": "フランス語",
         "it": "イタリア語",
         "ja": "日本語",
         "ko": "韓国語",
         "pl": "ポーランド語",
-        "pt-BR": "ポルトガル語 (ブラジル)",
+        "pt-BR": "ポルトガル語（ブラジル）",
         "ru": "ロシア語",
         "tr": "トルコ語",
         "zh-Hans": "簡体中国語",
@@ -4094,15 +4152,15 @@
         "title": "フィードバックとベータのボタン",
         "hint": "右下のボタンです。フィードバックの送信とチームからの返信の確認ができ、その上にベータの切り替えがあります。",
         "label": "フィードバックとベータのボタンを表示",
-        "audience": "(Admin と Collaborator のみ)",
+        "audience": "（Admin と Collaborator のみ）",
         "descOn": "フィードバックボタンとベータボタンは各ページの右下に表示されます。",
         "descOff": "フィードバックボタンとベータボタンは非表示です。チームからの返信や質問も表示されません。フィードバックやベータの切り替えを開くには、ここで再びオンにしてください。"
       },
       "routineTint": {
         "label": "フィードバックのタイトルを緑/赤のみにする",
-        "audience": "(Admin のみ)",
+        "audience": "（Admin のみ）",
         "descOn": "「フィードバック」のタイトルは、ルーチンが稼働中または作業中のときは緑、何も処理されていないときは赤に光ります。あなたのアカウントにのみ適用されます。",
-        "descOff": "「フィードバック」のタイトルは4つの状態を示します: 緑は準備完了、青は作業中、黄は一時停止、赤は接続不可。"
+        "descOff": "「フィードバック」のタイトルは4つの状態を示します：緑は準備完了、青は作業中、黄は一時停止、赤は接続不可。"
       }
     },
     "danger": {
@@ -4110,7 +4168,7 @@
       "warning": "アカウントを完全に削除します。アップロードとバンドルも削除されます。元に戻せません。",
       "deleteBtn": "アカウントを削除する",
       "deleting": "削除中…",
-      "confirm": "アカウント ({{email}}) が完全に削除されます。アップロードとバンドルも削除され、その後サインアウトされます。よろしいですか?",
+      "confirm": "アカウント ({{email}}) が完全に削除されます。アップロードとバンドルも削除され、その後サインアウトされます。よろしいですか？",
       "failed": "削除に失敗しました",
       "viaAdmin": "現在、アカウントの削除は管理者が行っています。サイト情報に記載の連絡先までご連絡ください。プロフィール、ハンガー、ロードアウト、アップロードを含めてアカウントを削除します。",
       "imprintLink": "サイト情報へ",
@@ -4145,7 +4203,7 @@
       },
       "unknownError": "登録に失敗しました。",
       "err": {
-        "method_not_allowed": "リクエストが拒否されました(メソッドが正しくありません)。",
+        "method_not_allowed": "リクエストが拒否されました（メソッドが正しくありません）。",
         "server_misconfigured": "サーバーの設定が正しくありません。Edge Function のシークレットを確認してください。",
         "unauthorized": "セッションの有効期限が切れました。もう一度サインインしてください。",
         "forbidden": "ユーザーを登録できるのは Admin のみです。",
@@ -4170,18 +4228,18 @@
       "unapproved": "承認されていません",
       "unapprovedTip": "このアカウントは自分で登録され、一度も承認されていないため、アプリにアクセスできません。",
       "approve": "承認",
-      "approveTitle": "アカウントを承認しますか?",
-      "approveConfirm": "{{email}} を承認しますか?アカウントはビューアーとしてアプリにアクセスできます。上位のロールは後から割り当ててください。",
-      "unapprovedOne": "承認されていないアカウント:{{n}}件",
-      "unapprovedMany": "承認されていないアカウント:{{n}}件",
+      "approveTitle": "アカウントを承認しますか？",
+      "approveConfirm": "{{email}} を承認しますか？アカウントはビューアーとしてアプリにアクセスできます。上位のロールは後から割り当ててください。",
+      "unapprovedOne": "承認されていないアカウント：{{n}}件",
+      "unapprovedMany": "承認されていないアカウント：{{n}}件",
       "title": "メンバー",
       "subtitle": "アカウントと未使用の招待を1つのリストにまとめています。招待は、そのアドレスでサインインした時点でリストから消えます。",
       "invitedPill": "招待済み",
       "invitedTitle": "サインイン用に事前登録済みです。このアドレスを使用したアカウントはまだありません。",
       "withdraw": "招待を取り消す",
       "withdrawTitle": "事前登録を取り消すだけです。すでに参加したアカウントには影響しません。",
-      "withdrawConfirm": "{{email}} への招待を取り消しますか?このアドレスは事前登録されたアクセス権を失い、通知は誰にも送られません。",
-      "withdrawConfirmTitle": "招待を取り消しますか?"
+      "withdrawConfirm": "{{email}} への招待を取り消しますか？このアドレスは事前登録されたアクセス権を失い、通知は誰にも送られません。",
+      "withdrawConfirmTitle": "招待を取り消しますか？"
     },
     "col": {
       "user": "ユーザー",
@@ -4202,20 +4260,20 @@
     "errorTitle": "操作に失敗しました",
     "loading": "ユーザーを読み込み中…",
     "delete": {
-      "confirmSelf": "あなたのアカウント({{email}})は完全に削除されます。アップロードとバンドルも削除されます。その後サインアウトされます。よろしいですか?",
-      "confirmOther": "{{email}} を完全に削除しますか?そのユーザーのアップロードとバンドルも削除されます。この操作は元に戻せません。",
+      "confirmSelf": "あなたのアカウント({{email}})は完全に削除されます。アップロードとバンドルも削除されます。その後サインアウトされます。よろしいですか？",
+      "confirmOther": "{{email}} を完全に削除しますか？そのユーザーのアップロードとバンドルも削除されます。この操作は元に戻せません。",
       "failed": "削除に失敗しました",
-      "title": "アカウントを削除しますか?",
+      "title": "アカウントを削除しますか？",
       "err": {
         "protected_admin": "このアカウントは保護されているため、変更も削除もできません。",
         "cannot_delete_last_admin": "最後のAdminは削除できません。",
-        "user_not_found": "このアカウントは存在しません(もう存在しません)。",
+        "user_not_found": "このアカウントは存在しません（もう存在しません）。",
         "forbidden": "アカウントを削除できるのはAdminのみです。",
         "unauthorized": "セッションの有効期限が切れました。もう一度サインインしてください。",
         "invalid_body": "リクエストが不完全でした。ページを再読み込みして、もう一度お試しください。",
         "delete_failed": "アカウントを削除できませんでした。",
         "server_misconfigured": "サーバーの設定が正しくありません。Edge Functionのシークレットを確認してください。",
-        "method_not_allowed": "リクエストが拒否されました(メソッドが正しくありません)。"
+        "method_not_allowed": "リクエストが拒否されました（メソッドが正しくありません）。"
       }
     },
     "tokens": {
@@ -4228,7 +4286,7 @@
       "connections": {
         "title": "接続",
         "comingSoon": "近日公開",
-        "mockNote": "プレビュー:SCアプリとの連携はまだ実装されていません。上の状態はプレースホルダーであり、実際の接続ではありません。",
+        "mockNote": "プレビュー：SCアプリとの連携はまだ実装されていません。上の状態はプレースホルダーであり、実際の接続ではありません。",
         "scApp": {
           "name": "Verse Companion App",
           "desc": "デスクトップアプリをアカウントに直接連携すると、アップロードやデータが自動的に紐付けられます。"
@@ -4249,7 +4307,7 @@
       "neverUsed": "なし",
       "revoke": "無効化",
       "revoking": "無効化中…",
-      "revokeConfirm": "トークン「{{name}}」を無効化しますか?この操作は元に戻せません。このトークンを使用しているクライアントは、すぐに401エラーになります。",
+      "revokeConfirm": "トークン「{{name}}」を無効化しますか？この操作は元に戻せません。このトークンを使用しているクライアントは、すぐに401エラーになります。",
       "revokeSuccess": "トークンを無効化しました。",
       "revokeError": "無効化に失敗しました",
       "dialog": {
@@ -4266,9 +4324,9 @@
         "patch:read": "/v1/patch を読み取ります",
         "ships:read": "/v1/ships を読み取ります",
         "components:read": "/v1/components を読み取ります",
-        "keybinds:read": "/v1/keybinds(キー割り当て+カテゴリ)を読み取ります",
-        "*:read": "ショートカット:すべての読み取りエンドポイント",
-        "admin:tokens": "トークンを管理(Adminロールが引き続き必要)"
+        "keybinds:read": "/v1/keybinds（キー割り当て+カテゴリ）を読み取ります",
+        "*:read": "ショートカット：すべての読み取りエンドポイント",
+        "admin:tokens": "トークンを管理（Adminロールが引き続き必要）"
       },
       "reveal": {
         "title": "新しいトークン",
@@ -4278,7 +4336,7 @@
         "ack": "保存しました",
         "tokenLabel": "平文のトークン"
       },
-      "revokeTitle": "トークンを無効化しますか?",
+      "revokeTitle": "トークンを無効化しますか？",
       "eyebrow": "APIトークン"
     },
     "filter": {
@@ -4294,19 +4352,19 @@
       "empty": "未処理のリクエストはありません。",
       "accept": "承認",
       "decline": "却下",
-      "declineConfirm": "{{email}} からのリクエストを却下しますか?本人には通知されません。",
+      "declineConfirm": "{{email}} からのリクエストを却下しますか？本人には通知されません。",
       "accepted": "{{email}} を承認し、登録して招待しました。",
       "acceptedNoMail": "{{email}} を承認しました。招待メールは送信していません。このアドレスのアカウントはすでに存在するため、そのままサインインできます。直接お知らせするのがおすすめです。",
       "declined": "{{email}} からのリクエストを却下しました。",
       "allowlisted": "すでに許可リストに登録済み",
       "joined": "すでにアカウントあり",
-      "declineTitle": "リクエストを却下しますか?"
+      "declineTitle": "リクエストを却下しますか？"
     },
     "reports": {
       "title": "要注意アカウント",
       "subtitle": "未処理の報告があるアカウントです。報告の多い順に表示します。",
       "count": "報告{{count}}件",
-      "by": "報告者:{{name}}"
+      "by": "報告者：{{name}}"
     },
     "moderation": {
       "warn": "警告",
@@ -4338,7 +4396,7 @@
         "dismissed": "報告を破棄しました。"
       },
       "error": {
-        "protected": "このアカウントは管理対象外です(自分のアカウント、Admin、または保護されたアカウント)。",
+        "protected": "このアカウントは管理対象外です（自分のアカウント、Admin、または保護されたアカウント）。",
         "invalidTarget": "選択内容が無効です。",
         "userNotFound": "アカウントが見つかりません。",
         "reasonRequired": "理由を入力してください。",
@@ -4351,16 +4409,16 @@
     "silhouettes": {
       "title": "Holotableシルエット",
       "subtitle": "現在のビルドのシルエット対応状況です。",
-      "build": "現在のビルド:{{channel}} {{patch}}({{build}})",
+      "build": "現在のビルド：{{channel}} {{patch}}({{build}})",
       "total": "艦船の合計",
       "withSilhouette": "シルエットあり",
       "withAnchors": "アンカーあり",
       "without": "シルエットなし",
       "withoutTip": "アップローダーからシルエットが届いていないこのビルドの船体です。Holotableではプレースホルダーが表示されます。タイルには、抽出済みのプレビューアイコンがあればそれを、なければRSIストアの画像を使い、どちらも読み込めない場合は汎用のグリフを表示します。最後の2つのどちらになるかは、ブラウザ側で初めて決まります。",
       "barLabel": "シルエット対応率 {{pct}} %",
-      "fallbackSplit": "なし:プレビューアイコンあり {{icon}}、RSI画像またはグリフ {{none}}",
+      "fallbackSplit": "なし：プレビューアイコンあり {{icon}}、RSI画像またはグリフ {{none}}",
       "missingToggle": "シルエットのない船体{{count}}件を表示",
-      "reasonSplit": "理由:メッシュなし {{no_mesh}}、変換失敗 {{convert_failed}}、空 {{empty}}、理由未記録 {{unexplained}}",
+      "reasonSplit": "理由：メッシュなし {{no_mesh}}、変換失敗 {{convert_failed}}、空 {{empty}}、理由未記録 {{unexplained}}",
       "reason": {
         "no_mesh": "メッシュなし",
         "convert_failed": "変換失敗",
@@ -4379,7 +4437,7 @@
     "translations": {
       "eyebrow": "Admin",
       "title": "AI翻訳",
-      "subtitle": "ゲーム内テキストのClaude翻訳:スイッチ、上限、言語、ジョブ、用語集。",
+      "subtitle": "ゲーム内テキストのClaude翻訳：スイッチ、上限、言語、ジョブ、用語集。",
       "tabs": {
         "overview": "概要",
         "cards": "フラッシュカード",
@@ -4394,7 +4452,7 @@
       "saved": "保存しました。",
       "switch": {
         "label": "Claude API翻訳",
-        "hint": "次回のデータアップロードから適用されます。自動翻訳されるのは差分のみです(前のビルドと比べて新規または変更されたテキスト)。"
+        "hint": "次回のデータアップロードから適用されます。自動翻訳されるのは差分のみです（前のビルドと比べて新規または変更されたテキスト）。"
       },
       "caps": {
         "upload": "アップロードごとの上限(USD)",
@@ -4411,25 +4469,25 @@
         "revoke": "取り消す",
         "fullRun": "フル実行を開始",
         "fullRunOpen": "フル実行中 – ジョブを確認してください",
-        "fullRunGap": "不足している{{missing}}件のテキスト(約{{pct}} %)だけを翻訳します。CIGまたは翻訳メモリにすでにあるものは無料です。",
+        "fullRunGap": "不足している{{missing}}件のテキスト（約{{pct}} %）だけを翻訳します。CIGまたは翻訳メモリにすでにあるものは無料です。",
         "fullRunUnmeasured": "CIGと翻訳メモリにまだないものをすべて翻訳します。事前の見積もりは無料で、カバー率を測定します。",
         "coverage": {
           "label": "{{lang}}のカバー率",
           "value": "{{pct}} %",
-          "detail": "{{total}}件中{{covered}}件のテキストが翻訳済みです(CIGまたは翻訳メモリによる)。最新ジョブ時点:{{at}}",
+          "detail": "{{total}}件中{{covered}}件のテキストが翻訳済みです（CIGまたは翻訳メモリによる）。最新ジョブ時点：{{at}}",
           "unknown": "カバー率は不明です",
           "unknownHint": "この言語の最初のジョブで測定されます。"
         },
-        "approveTitle": "{{lang}}を承認しますか?",
-        "approveText": "今後の新しいアップロードも{{lang}}に翻訳されます(差分のみ)。",
-        "revokeTitle": "{{lang}}の承認を取り消しますか?",
+        "approveTitle": "{{lang}}を承認しますか？",
+        "approveText": "今後の新しいアップロードも{{lang}}に翻訳されます（差分のみ）。",
+        "revokeTitle": "{{lang}}の承認を取り消しますか？",
         "revokeText": "今後の新しいアップロードは{{lang}}に翻訳されなくなります。既存の翻訳は残ります。"
       },
       "fullRun": {
-        "title": "{{lang}}のフル実行を承認しますか?",
-        "text": "費用は約{{usd}} $({{count}}件のテキスト)です。これまで未翻訳のテキストがすべて翻訳されます。フル実行にはアップロードごとの費用上限は適用されません。",
+        "title": "{{lang}}のフル実行を承認しますか？",
+        "text": "費用は約{{usd}} $（{{count}}件のテキスト）です。これまで未翻訳のテキストがすべて翻訳されます。フル実行にはアップロードごとの費用上限は適用されません。",
         "confirm": "有料で承認",
-        "startTitle": "{{lang}}のフル実行を作成しますか?",
+        "startTitle": "{{lang}}のフル実行を作成しますか？",
         "startText": "ジョブはまず見積もりが行われます。無料で、数分かかります。その後、費用とテキスト数が表示され、ジョブ一覧であなたの承認を待ちます。",
         "startConfirm": "作成して見積もる"
       },
@@ -4439,7 +4497,7 @@
         "noBuild": "現在のビルドがありません。",
         "approve": "承認",
         "cancel": "キャンセル",
-        "cancelTitle": "{{lang}}のジョブをキャンセルしますか?",
+        "cancelTitle": "{{lang}}のジョブをキャンセルしますか？",
         "cancelText": "ジョブは停止されます。すでに発生した費用はそのままです。",
         "progress": "{{pct}} %",
         "hold": {
@@ -4500,7 +4558,7 @@
         "worker_limit": "ジョブがWorkerのCPUまたはメモリの上限を連続して超えたため、停止されました。",
         "no_live_build": "現在のLIVEビルドがありません。",
         "source_not_permitted": "このソースのライセンスが確定していません。",
-        "source_unknown": "ソースが存在しません(または削除されました)。",
+        "source_unknown": "ソースが存在しません（または削除されました）。",
         "nothing_to_do": "翻訳対象がありませんでした。",
         "phase_unknown": "ジョブが不明なステップにあります。",
         "job_cleanup_pending": "前のジョブをまだクリーンアップ中です。1分後にもう一度お試しください。",
@@ -4508,7 +4566,7 @@
       },
       "glossary": {
         "title": "用語集",
-        "search": "検索(原文または翻訳)",
+        "search": "検索（原文または翻訳）",
         "lang": "言語",
         "origin": "由来",
         "category": "カテゴリ",
@@ -4527,7 +4585,7 @@
         "historyEmpty": "まだ変更はありません。",
         "deleted": "削除済み",
         "undo": "元に戻す",
-        "undoTitle": "この変更を元に戻しますか?",
+        "undoTitle": "この変更を元に戻しますか？",
         "undoText": "エントリは「{{term}}」に戻ります。",
         "empty": "このフィルターに該当するエントリはありません。",
         "prev": "前へ",
@@ -4551,22 +4609,22 @@
         "title": "フラッシュカード",
         "intro": "AIが判断に迷うときだけ、質問1つ・答え1つ。重要なカードが先頭に並びます。",
         "lang": "言語",
-        "goal": "1日の目標: {{done}} / {{goal}} カード",
+        "goal": "1日の目標：{{done}} / {{goal}} カード",
         "goalLabel": "1日の目標の進捗",
-        "streak": "連続記録: {{days}} 日",
+        "streak": "連続記録：{{days}} 日",
         "open": "残り {{count}} 件",
         "skippedBefore": "スキップ",
         "fresh": "現在のパッチ",
         "spread": "{{count}} 件の文字列に影響",
-        "choose": "どちらの翻訳が良いですか?",
+        "choose": "どちらの翻訳が良いですか？",
         "option": {
           "a": "選択肢A",
           "b": "選択肢B"
         },
         "bothWrong": "どちらも違う – 自分で入力",
-        "ownText": "あなたのテキスト(管理者による修正として反映されます)",
-        "note": "AIへのヒントとしてメモ(任意)",
-        "saveRule": "ルールとして保存(すべてに適用)",
+        "ownText": "あなたのテキスト（管理者による修正として反映されます）",
+        "note": "AIへのヒントとしてメモ（任意）",
+        "saveRule": "ルールとして保存（すべてに適用）",
         "submit": "回答を保存",
         "skip": "スキップ",
         "kinds": {
@@ -4598,16 +4656,16 @@
         "title": "ソース",
         "intro": "翻訳の出発点となるコミュニティパッケージです。ライセンスが確定してからのみインポートしてください。",
         "syncAll": "今すぐ同期",
-        "syncTitle": "すべてのソースを同期しますか?",
+        "syncTitle": "すべてのソースを同期しますか？",
         "syncText": "有効なソースすべての変更を確認し、変更があるものはバックグラウンドでインポートを開始します。",
         "import": "シードをインポート",
-        "importTitle": "{{name}} のシードをインポートしますか?",
+        "importTitle": "{{name}} のシードをインポートしますか？",
         "importText": "{{lang}} のパッケージをバックグラウンドで検証し、翻訳ベースに取り込みます。CIGの行は変更されません。",
-        "importLocked": "ライセンスが確定(許諾済みまたは許可済み)してからのみ可能です。",
-        "importStarted": "{{name}}: インポートを開始しました。バックグラウンドで実行され、進捗は「バックグラウンド実行」で確認できます。",
-        "synced": "同期完了: {{checked}} 件確認、{{changed}} 件のインポートを開始、エラー {{errors}} 件。",
+        "importLocked": "ライセンスが確定（許諾済みまたは許可済み）してからのみ可能です。",
+        "importStarted": "{{name}}：インポートを開始しました。バックグラウンドで実行され、進捗は「バックグラウンド実行」で確認できます。",
+        "synced": "同期完了：{{checked}} 件確認、{{changed}} 件のインポートを開始、エラー {{errors}} 件。",
         "learn": "学習",
-        "learnTitle": "{{lang}} の学習ステップを開始しますか?",
+        "learnTitle": "{{lang}} の学習ステップを開始しますか？",
         "learnText": "既存のテキストから {{lang}} の用語・スタイル・カードを導き出します。費用がかかる場合があります。",
         "learnStarted": "{{lang}} の学習ステップを開始しました。バックグラウンドで実行され、進捗は「バックグラウンド実行」で確認できます。",
         "draft": "依頼の下書きを作成",
@@ -4703,19 +4761,19 @@
         "save": "下書きを保存",
         "approve": "承認",
         "approveLocked": "依頼を承認できるのは保護された管理者のみです。",
-        "approveTitle": "{{name}} への依頼を承認しますか?",
+        "approveTitle": "{{name}} への依頼を承認しますか？",
         "approveText": "承認しても何も送信されません。その後、テキストをコピーして手動で送信できます。",
         "approved": "承認しました。何も送信されていません。",
         "copy": "テキストをコピー",
         "copied": "テキストをクリップボードにコピーしました。",
         "markSent": "送信済みにする",
-        "markSentTitle": "送信済みにしますか?",
+        "markSentTitle": "送信済みにしますか？",
         "markSentText": "{{name}} へのメッセージはご自身で送信済みです。ここでは記録するだけです。",
         "recordAnswer": "返信を記録",
         "answerText": "メンテナーの返信",
         "decision": "判断",
         "saveAnswer": "回答を保存",
-        "answerRecorded": "返信:",
+        "answerRecorded": "返信：",
         "cancel": "キャンセル"
       },
       "alerts": {
@@ -4782,7 +4840,7 @@
     "title": "ダウンロード",
     "extension": {
       "title": "ブラウザ拡張機能",
-      "text": "RSIのハンガーをHQにインポートします(ChromeとEdge対応)。",
+      "text": "RSIのハンガーをHQにインポートします（ChromeとEdge対応）。",
       "open": "拡張機能をインストール"
     },
     "subtitle": "ローカルのStar Citizenインストール用のVerse Data Uploaderを入手しましょう。"
@@ -4851,9 +4909,9 @@
       "news": "新着情報"
     },
     "disclaimerTitle": "ファンサイトに関するお知らせ",
-    "rsiLink": "Star Citizen公式サイト: robertsspaceindustries.com",
-    "noticeOriginal": "これは非公式のStar Citizenファンサイトであり、Cloud Imperiumグループ各社とは提携していません。本サイト上のコンテンツのうち、運営者またはユーザーが作成したもの以外は、それぞれの所有者に帰属します。",
-    "noticeOriginalLabel": "原文(英語)",
+    "rsiLink": "Star Citizen公式サイト：robertsspaceindustries.com",
+    "noticeOriginal": "This is an unofficial Star Citizen fan site, not affiliated with the Cloud Imperium group of companies. All content on this site not authored by its host or users are property of their respective owners.",
+    "noticeOriginalLabel": "原文（英語）",
     "trademarksOriginal": "Star Citizen®、Roberts Space Industries®、Cloud Imperium®はCloud Imperium Rights LLCの登録商標です。"
   },
   "legal": {
@@ -4861,7 +4919,7 @@
       "title": "Verse Companionについて",
       "subtitle": "このサイトの運営者、機能、コードの公開場所についてご案内します。",
       "what": {
-        "title": "これは何ですか?",
+        "title": "これは何ですか？",
         "p1": "Verse Companionは、宇宙シミュレーションゲームStar Citizen向けの、無料かつ非営利のコンパニオンアプリです。Verseニュース、船・装備のCodex、個人用のハンガー・ロードアウトツールを備えています。",
         "p2": "ニュース、Codex、リリースノートはアカウントなしで閲覧できます。アカウントが必要なのはハンガーなどの個人向け機能のみで、現在の登録は招待制です。"
       },
@@ -4872,7 +4930,7 @@
       },
       "data": {
         "title": "あなたのデータ",
-        "p1": "Verse Companionは広告を表示せず、機能に必要なデータのみを保存します。製品分析はEUサーバー上のPostHogで行っています。詳細はプライバシーポリシーをご覧ください:",
+        "p1": "Verse Companionは広告を表示せず、機能に必要なデータのみを保存します。製品分析はEUサーバー上のPostHogで行っています。詳細はプライバシーポリシーをご覧ください：",
         "privacyLink": "プライバシーポリシー"
       },
       "affiliation": {
@@ -4881,9 +4939,9 @@
       },
       "contact": {
         "title": "お問い合わせ",
-        "p1": "メンテナーへの最も早い連絡方法:",
-        "issuesLink": "GitHub Issues(バグ、質問、フィードバック)",
-        "securityLink": "セキュリティ連絡先(security.txt、RFC 9116)"
+        "p1": "メンテナーへの最も早い連絡方法：",
+        "issuesLink": "GitHub Issues（バグ、質問、フィードバック）",
+        "securityLink": "セキュリティ連絡先（security.txt、RFC 9116）"
       },
       "new": {
         "eyebrow": "Verseの新着情報",
@@ -4893,63 +4951,63 @@
     },
     "privacy": {
       "title": "プライバシーポリシー",
-      "updated": "最終更新: 2026年11月",
+      "updated": "最終更新：2026年11月",
       "summary": {
         "title": "要点",
         "noAds": "広告も広告ネットワークも使用しません。",
         "signIn": "サインイン方法は2つだけです。メールアドレスとパスワード、またはGoogleアカウントです。Googleでのサインインは任意で、Googleにデータが送信されます。",
-        "noTracking": "広告トラッカーは使用しません。PostHog(EU)による製品分析は、許可した場合のみ動作します(初期設定はオフ)。当サイトのサーバー自体は、個人情報を含めずにエラーと実行時間のみを報告します。",
+        "noTracking": "広告トラッカーは使用しません。PostHog(EU)による製品分析は、許可した場合のみ動作します（初期設定はオフ）。当サイトのサーバー自体は、個人情報を含めずにエラーと実行時間のみを報告します。",
         "minimal": "機能に必要なデータのみを扱い、販売やマーケティング目的での共有は一切行いません。",
-        "euHosting": "アプリケーションデータはEU内(Supabase、リージョンeu-central-1 / フランクフルト)に保存されます。"
+        "euHosting": "アプリケーションデータはEU内（Supabase、リージョンeu-central-1 / フランクフルト）に保存されます。"
       },
       "hosting": {
         "title": "ホスティングとサーバーログ",
-        "p1": "このサイトはVercel Inc.(米国)から配信されています。アクセス時、Vercelはページの配信とサービス保護のため、技術上必要な範囲でIPアドレスとブラウザ情報を処理します(正当な利益、GDPR第6条第1項(f)号)。",
+        "p1": "このサイトはVercel Inc.（米国）から配信されています。アクセス時、Vercelはページの配信とサービス保護のため、技術上必要な範囲でIPアドレスとブラウザ情報を処理します(正当な利益、GDPR第6条第1項(f)号)。",
         "p2": "アプリ自体は静的なWebアプリケーションであり、個人データを伴うサーバー側のページレンダリングは行われません。"
       },
       "account": {
         "title": "アカウントとアプリケーションのデータ",
-        "p1": "アカウントが必要なのは個人向け機能(ハンガー、ロードアウト、設定、フィードバック)のみです。ニュース、Codex、リリースノートはアカウントなしで利用できます。サインイン方法は、メールアドレスとパスワード、または「Googleで続行」ボタンの2つだけです。マジックリンク、SMSコード、その他のソーシャルログインは使用しません。また、登録フォームはなく、アカウントは管理者があなたのメールアドレスに送る招待によって作成されます。",
-        "p2": "サインインのため、バックエンドプロバイダーのSupabaseがEUリージョンeu-central-1(フランクフルト)に、あなたの認証レコードを保持します。内容は、メールアドレス、パスワードでサインインする場合のソルト付きパスワードハッシュ(平文のパスワードは保存しません)、連携済みのサインイン方法、そして招待・作成・最終サインインなどのタイムスタンプです。",
-        "p3": "これに加えて、アプリがあなたのために必要とする情報を持つプロフィールレコードがあります。表示名(作成時は自動的にメールアドレスの@より前の部分)、自分で選んだユーザー名、言語とゲームチャンネルの設定、任意でRSIハンドルと旗艦、さらにロール(ビューアー、コラボレーター、管理者)とアカウントが承認済みかどうかです。ロールと承認状況によって、閲覧や操作できる内容が決まります。",
-        "p4": "あなたが作成する機能データ(ハンガーの船、ロードアウト、船リンク、保存した下書き、設定)はアカウントに紐づいて保存され、あなただけが読み取れます。これはデータベースの行レベルセキュリティで強制されています。例外は、送信したフィードバック(返信できるよう、あなたのアカウントを送信者としてメンテナーに表示されます)と、フレンドに公開する内容(「フレンドと公開範囲」を参照)です。",
+        "p1": "アカウントが必要なのは個人向け機能（ハンガー、ロードアウト、設定、フィードバック）のみです。ニュース、Codex、リリースノートはアカウントなしで利用できます。サインイン方法は、メールアドレスとパスワード、または「Googleで続行」ボタンの2つだけです。マジックリンク、SMSコード、その他のソーシャルログインは使用しません。また、登録フォームはなく、アカウントは管理者があなたのメールアドレスに送る招待によって作成されます。",
+        "p2": "サインインのため、バックエンドプロバイダーのSupabaseがEUリージョンeu-central-1（フランクフルト）に、あなたの認証レコードを保持します。内容は、メールアドレス、パスワードでサインインする場合のソルト付きパスワードハッシュ（平文のパスワードは保存しません）、連携済みのサインイン方法、そして招待・作成・最終サインインなどのタイムスタンプです。",
+        "p3": "これに加えて、アプリがあなたのために必要とする情報を持つプロフィールレコードがあります。表示名（作成時は自動的にメールアドレスの@より前の部分）、自分で選んだユーザー名、言語とゲームチャンネルの設定、任意でRSIハンドルと旗艦、さらにロール（ビューアー、コラボレーター、管理者）とアカウントが承認済みかどうかです。ロールと承認状況によって、閲覧や操作できる内容が決まります。",
+        "p4": "あなたが作成する機能データ（ハンガーの船、ロードアウト、船リンク、保存した下書き、設定）はアカウントに紐づいて保存され、あなただけが読み取れます。これはデータベースの行レベルセキュリティで強制されています。例外は、送信したフィードバック（返信できるよう、あなたのアカウントを送信者としてメンテナーに表示されます）と、フレンドに公開する内容（「フレンドと公開範囲」を参照）です。",
         "p5": "アカウントは招待制のみで利用できます。承認されていない登録はサインインページから先に進めず、データごと削除される場合があります。"
       },
       "google": {
         "title": "Googleでのサインイン",
-        "p1": "Googleでのサインインは任意で、メールとパスワードならGoogleなしでアカウントに入れます。「Googleで続行」をタップすると、アプリはGoogleのサインインページ(accounts.google.com)に移動します。これにより、Googleはあなたが Verse Companion にサインインしようとしていることと、ページ訪問のたびに送られる技術データ(IPアドレス、ブラウザ、時刻)を把握します。提供元はGoogle Ireland Limited(アイルランド)またはGoogle LLC(米国)です。",
+        "p1": "Googleでのサインインは任意で、メールとパスワードならGoogleなしでアカウントに入れます。「Googleで続行」をタップすると、アプリはGoogleのサインインページ(accounts.google.com)に移動します。これにより、Googleはあなたが Verse Companion にサインインしようとしていることと、ページ訪問のたびに送られる技術データ（IPアドレス、ブラウザ、時刻）を把握します。提供元はGoogle Ireland Limited（アイルランド）またはGoogle LLC（米国）です。",
         "p2": "サインインに成功すると、Googleから返されるデータをSupabaseがアカウントの認証レコードに保存します。Googleアカウント識別子、メールアドレス、Googleに登録された名前、Googleプロフィール画像のURLです。このうち表示されるものはほとんどありません。名前はアカウントメニューに表示されますが、自分のユーザー名を設定するまでの間のみです。プロフィール画像はアプリでは読み込まず、頭文字のみを表示します。",
-        "p3": "サインイン処理以外のデータ(ハンガー、Codex、利用データなど)がGoogleに送られることはありません。Googleがサインインデータをどう扱うかは、Googleのプライバシーポリシーに従います:",
+        "p3": "サインイン処理以外のデータ（ハンガー、Codex、利用データなど）がGoogleに送られることはありません。Googleがサインインデータをどう扱うかは、Googleのプライバシーポリシーに従います：",
         "policyLink": "Googleのプライバシーポリシー(policies.google.com/privacy)",
         "p4": "この方法の法的根拠はあなたの同意(GDPR第6条第1項(a)号)です。利用するかどうかは、サインインのたびにあなたが決めます。既存のGoogle連携を解除したい場合は、サイト情報に記載の連絡先からメンテナーにご連絡ください。"
       },
       "local": {
         "title": "Cookie、ローカルストレージ、セッション",
-        "p1": "Verse CompanionはCookieを設定しません。自社のものも、広告ネットワークのものも使いません。代わりに、ブラウザのローカルストレージを次のエントリに使用します:",
+        "p1": "Verse CompanionはCookieを設定しません。自社のものも、広告ネットワークのものも使いません。代わりに、ブラウザのローカルストレージを次のエントリに使用します：",
         "keys": {
           "session": "sc.auth — サインインセッション。Supabaseの短期間有効なアクセストークンと更新トークンです。サインインしたままの間、アプリはバックグラウンドでアクセストークンを自動更新し、サインアウトするとエントリは削除されます。ブラウザのサイトデータを消去した場合もサインアウトされます。",
           "lang": "sc.lang — 言語の選択。",
           "consent": "sc.consent — ストレージカテゴリに関するあなたの選択。訪問のたびに再度確認しないために保存します。",
           "composer": "sc.composer.sendOnEnter — フィードバック欄でEnterキーが送信になるか、改行になるか。",
-          "verseBeta": "sc.beta — 新しいβインターフェースをオン/オフにしたメニュー項目(Verse、Codex、HQ)。純粋な表示設定であり、トラッキングには使用しません。",
+          "verseBeta": "sc.beta — 新しいβインターフェースをオン/オフにしたメニュー項目（Verse、Codex、HQ）。純粋な表示設定であり、トラッキングには使用しません。",
           "preferences": "「設定」カテゴリ — ニュースのフィルター、保存した記事、お気に入りの船、最近開いた検索ページなど、利便性のための状態です。許可した場合のみ書き込まれ、同意を撤回するとそのエントリは即座に削除されます。",
           "statistics": "「統計」カテゴリ — 匿名の製品分析(PostHog)の状態。許可した場合のみ作成され、同意を撤回すると即座に削除されます。"
         },
         "p2": "Googleサインイン中は、元のページに戻れるよう、セッションストレージにエントリ(sc.oauth-redirect-qs)が一時的に追加されます。遅くともタブを閉じた時点で消えます。",
-        "p3": "デスクトップツール(Verse Data Uploader、Starscape)のいずれかを明示的に認証した場合、ブラウザはセッションのアクセストークンを、お使いのPC上でローカルに動作するプログラム(127.0.0.1)に渡します。第三者には渡さず、アドレスバー経由で渡すこともありません。",
+        "p3": "デスクトップツール（Verse Data Uploader、Starscape）のいずれかを明示的に認証した場合、ブラウザはセッションのアクセストークンを、お使いのPC上でローカルに動作するプログラム(127.0.0.1)に渡します。第三者には渡さず、アドレスバー経由で渡すこともありません。",
         "p4": "インストール可能なWebアプリ(PWA)として、Service Workerが高速な読み込みとオフライン利用のために静的ファイルをデバイスにキャッシュします。このキャッシュに個人データは含まれず、アプリのアンインストールまたはサイトデータの消去で削除できます。"
       },
       "thirdParty": {
         "title": "サードパーティのサービス",
-        "p1": "アプリは、限定された固定のサービスとのみ通信します(Content-Security-Policyによっても技術的に強制されています):",
-        "supabase": "Supabase(データベース、認証、ファイルストレージ) — EUリージョンeu-central-1(フランクフルト)。当サイトの委託を受けて、アカウントおよびアプリケーションデータを処理します。",
-        "vercel": "Vercel Inc.(ホスティング、CDN) — 静的アプリの配信。",
+        "p1": "アプリは、限定された固定のサービスとのみ通信します（Content-Security-Policyによっても技術的に強制されています）:",
+        "supabase": "Supabase（データベース、認証、ファイルストレージ）— EUリージョンeu-central-1（フランクフルト）。当サイトの委託を受けて、アカウントおよびアプリケーションデータを処理します。",
+        "vercel": "Vercel Inc.（ホスティング、CDN）— 静的アプリの配信。",
         "google": "Googleサインイン(Google Ireland Limited / Google LLC) — 自分の意思でGoogleでサインインする場合のみ。詳細は「Googleでのサインイン」の項をご覧ください。",
-        "posthog": "PostHog(製品分析とエラー診断) — EUクラウド。リクエストはこのサイト自身のアドレス(/ingest)経由で送られます。同意した後にのみ、利用イベント、ページの読み込み時間、無反応クリック、ヒートマップ、エラーが記録されます。エラーが発生したセッションは再生用に記録され、すべての入力はマスクされます。サインインしている場合、PostHogには仮名化されたID(アカウントIDのソルト付きハッシュ)とロール(ビューアー、コラボレーター、管理者)のみが見え、メールアドレスや名前は見えません。",
-        "posthogServer": "PostHog(サーバー側) — 当サイトのサーバー関数は、IPアドレス、ユーザーID、コンテンツなしでエラーと実行時間をPostHog(EUクラウド)に報告します。個人データを含まないため、これはあなたの同意に依存しません。デスクトップアプリも、事前にハッシュ化されたインストール識別子のみを使い、アカウントとは紐づけずに、クラッシュレポート(およびアプリ内で許可した場合は利用回数)を同じ経路で送信します。",
+        "posthog": "PostHog（製品分析とエラー診断）— EUクラウド。リクエストはこのサイト自身のアドレス(/ingest)経由で送られます。同意した後にのみ、利用イベント、ページの読み込み時間、無反応クリック、ヒートマップ、エラーが記録されます。エラーが発生したセッションは再生用に記録され、すべての入力はマスクされます。サインインしている場合、PostHogには仮名化されたID（アカウントIDのソルト付きハッシュ）とロール（ビューアー、コラボレーター、管理者）のみが見え、メールアドレスや名前は見えません。",
+        "posthogServer": "PostHog（サーバー側）— 当サイトのサーバー関数は、IPアドレス、ユーザーID、コンテンツなしでエラーと実行時間をPostHog（EUクラウド）に報告します。個人データを含まないため、これはあなたの同意に依存しません。デスクトップアプリも、事前にハッシュ化されたインストール識別子のみを使い、アカウントとは紐づけずに、クラッシュレポート（およびアプリ内で許可した場合は利用回数）を同じ経路で送信します。",
         "fonts": "Google Fonts — フォントファイルはGoogleのサーバーから読み込まれ、その際にGoogleがあなたのIPアドレスを確認する場合があります。",
-        "rsiMedia": "Verseニュースの画像の一部は、Roberts Space Industriesのサーバー(media.robertsspaceindustries.com、theverse.robertsspaceindustries.com)から直接読み込まれます。読み込み時にRSIにあなたのIPアドレスが見えます。",
-        "gameApis": "Star Citizenの公開データ: status.robertsspaceindustries.com と api.star-citizen.wiki(読み取り専用で、アカウントデータは送信されません)。"
+        "rsiMedia": "Verseニュースの画像の一部は、Roberts Space Industriesのサーバー（media.robertsspaceindustries.com、theverse.robertsspaceindustries.com）から直接読み込まれます。読み込み時にRSIにあなたのIPアドレスが見えます。",
+        "gameApis": "Star Citizenの公開データ：status.robertsspaceindustries.com と api.star-citizen.wiki（読み取り専用で、アカウントデータは送信されません）。"
       },
       "rights": {
         "title": "あなたの権利",
@@ -4959,9 +5017,9 @@
       },
       "social": {
         "title": "フレンドと公開範囲",
-        "p1": "フレンドとは、リクエストまたは個人用の招待リンクを通じて接続したアカウントです。招待リンクには有効期限があり、あなたが無効にすることもできます。フレンドの間は、デフォルトでハンガー、旗艦、オンラインかどうか、ソーシャルページの比較数値(たとえばVerse Companionの利用頻度)が相手に表示されます。ソーシャルページの公開範囲ポップアップで、これらを全体として、または特定のフレンドごとにオフにできます。",
-        "p2": "このため、user_presenceテーブルにはアカウントごとに、最後の訪問時刻と過去30日間のアクティビティマスク(日ごとのアクティブ有無)が保存されます。閲覧履歴は保存されません。「オンライン」とは、直近の数分以内に確認されたことを指します。",
-        "p3": "グループ(たとえばオーガナイゼーションや分隊)はあなた専用の非公開リストで、メンバーにはグループもその名前も見えません。ミッション、ロードアウト、船バリアントは、あなたが明示的に共有した相手にのみ表示されます。フレンド関係を解除すると、すべての公開は直ちに終了します。"
+        "p1": "フレンドとは、リクエストまたは個人用の招待リンクを通じて接続したアカウントです。招待リンクには有効期限があり、あなたが無効にすることもできます。フレンドの間は、デフォルトでハンガー、旗艦、オンラインかどうか、ソーシャルページの比較数値（たとえばVerse Companionの利用頻度）が相手に表示されます。ソーシャルページの公開範囲ポップアップで、これらを全体として、または特定のフレンドごとにオフにできます。",
+        "p2": "このため、user_presenceテーブルにはアカウントごとに、最後の訪問時刻と過去30日間のアクティビティマスク（日ごとのアクティブ有無）が保存されます。閲覧履歴は保存されません。「オンライン」とは、直近の数分以内に確認されたことを指します。",
+        "p3": "グループ（たとえばオーガナイゼーションや分隊）はあなた専用の非公開リストで、メンバーにはグループもその名前も見えません。ミッション、ロードアウト、船バリアントは、あなたが明示的に共有した相手にのみ表示されます。フレンド関係を解除すると、すべての公開は直ちに終了します。"
       }
     },
     "imprint": {
@@ -4989,7 +5047,7 @@
   },
   "hangar": {
     "title": "マイハンガー",
-    "subtitle": "あなた専用の艦隊:艦船の構成、コンポーネントのロードアウト、ロールセット。Codexのライブゲームデータに基づいています。",
+    "subtitle": "あなた専用の艦隊：艦船の構成、コンポーネントのロードアウト、ロールセット。Codexのライブゲームデータに基づいています。",
     "counts": {
       "owned": "所有中",
       "wishlist": "ウィッシュ"
@@ -5045,7 +5103,7 @@
       "rename": "名前を変更",
       "cancel": "キャンセル",
       "share": "共有",
-      "deleteConfirm": "完全に削除しますか?",
+      "deleteConfirm": "完全に削除しますか？",
       "roleLabel": "ロール"
     },
     "detail": {
@@ -5058,7 +5116,7 @@
       "notes": "メモ",
       "notesPlaceholder": "この艦船に関するメモ…",
       "removeConfirm": {
-        "title": "{{name}} をハンガーから削除しますか?",
+        "title": "{{name}} をハンガーから削除しますか？",
         "bodyNone": "この操作は元に戻せません。",
         "bodyOne": "この艦船の構成も一緒に削除されます。この操作は元に戻せません。",
         "bodyMany": "この艦船の {{count}} 件の構成も一緒に削除されます。この操作は元に戻せません。"
@@ -5066,7 +5124,7 @@
     },
     "configs": {
       "title": "構成",
-      "namePlaceholder": "例: PvP構成…",
+      "namePlaceholder": "例：PvP構成…",
       "create": "作成",
       "empty": "構成はまだありません。名前を付けてロールを選ぶと、ロードアウトのカスタマイズを始められます。",
       "activate": "アクティブに設定",
@@ -5075,7 +5133,7 @@
       "delete": "削除",
       "roleLabel": "ロール",
       "deleteConfirm": {
-        "title": "構成「{{name}}」を削除しますか?",
+        "title": "構成「{{name}}」を削除しますか？",
         "body": "この操作は元に戻せません。"
       }
     },
@@ -5135,7 +5193,7 @@
     "import": {
       "open": "インポート…",
       "title": "エクスポートファイルからインポート",
-      "hint": "Hangar Transfer Format のJSONエクスポート(例: ブラウザ拡張機能 HangarXPLOR のもの)をここにドロップしてください。エクスポートはご自身で実行します。RSIの認証情報をお尋ねすることはありません。エントリはCodexと照合され、確認した行だけが追加されます。",
+      "hint": "Hangar Transfer Format のJSONエクスポート（例：ブラウザ拡張機能 HangarXPLOR のもの）をここにドロップしてください。エクスポートはご自身で実行します。RSIの認証情報をお尋ねすることはありません。エントリはCodexと照合され、確認した行だけが追加されます。",
       "pickFile": "ファイルを選択",
       "parsing": "読み取り中…",
       "dropHint": "または .json ファイルをここにドロップ",
@@ -5144,7 +5202,7 @@
       "matched": "{{total}} 件中 {{matched}} 件のエントリがカタログと一致しました",
       "chooseOther": "別のファイルを選択",
       "exact": "一致",
-      "fuzzy": "最有力候補: {{name}}",
+      "fuzzy": "最有力候補：{{name}}",
       "noMatch": "カタログに一致なし",
       "confirm": "{{count}} 隻をインポート",
       "importing": "インポート中…",
@@ -5175,14 +5233,14 @@
     "shared": {
       "eyebrow": "共有されたロードアウト",
       "loading": "読み込み中…",
-      "by": "作成者: {{name}}",
+      "by": "作成者：{{name}}",
       "emptyLoadout": "このロードアウトにはまだ何も設定されていません。",
       "adopt": "コピーを作成",
       "adopting": "コピーを作成中…",
       "adoptHint": "自分のハンガーに追加",
       "adoptError": "うまくいきませんでした。もう一度お試しください。",
       "loginToAdopt": "ログインしてコピーを作成",
-      "aboutCta": "Verse Companionとは?",
+      "aboutCta": "Verse Companionとは？",
       "unavailable": {
         "title": "このロードアウトは利用できません",
         "body": "リンクが無効か、期限切れか、取り消されています。"
@@ -5240,7 +5298,7 @@
     },
     "forecast": "予測 {{value}}",
     "barLabel": "{{pct}} % 使用済み、月の {{month}} % が経過",
-    "sparkLabel": "1日あたりのアクティブユーザー(過去7日間)",
+    "sparkLabel": "1日あたりのアクティブユーザー（過去7日間）",
     "badge": {
       "web": "Web",
       "server": "サーバー",
@@ -5293,15 +5351,15 @@
       "unknownTitle": "状態不明です。フィードバックルーチンからの応答はまだありません。",
       "running": "開発PCが現在作業中です",
       "paused": "ルーチン一時停止中",
-      "runningTitle": "開発PCに接続可能です。フィードバックルーチンは現在作業中です({{time}} に応答)。",
-      "pausedTitle": "ルーチンは一時停止中です。利用枠をほぼ使い切りました({{time}} に応答)。枠が空くまで新しいトピックは待機します。",
+      "runningTitle": "開発PCに接続可能です。フィードバックルーチンは現在作業中です（{{time}} に応答）。",
+      "pausedTitle": "ルーチンは一時停止中です。利用枠をほぼ使い切りました（{{time}} に応答）。枠が空くまで新しいトピックは待機します。",
       "availability": "ルーチンは開発PCがオンでClaudeが起動している間のみ動作します。オンラインに戻り次第、新しいトピックに対応します。",
       "note": {
-        "queueEmpty": "前回の実行: 未対応なし",
-        "work": "前回の実行: {{n}} 件のトピックを取得",
-        "shipped": "前回の実行: {{n}} 件を出荷",
-        "claimed": "前回の実行: {{n}} 件のトピックが進行中",
-        "pausedUsageLimit": "一時停止: 利用枠をほぼ使い切りました",
+        "queueEmpty": "前回の実行：未対応なし",
+        "work": "前回の実行：{{n}} 件のトピックを取得",
+        "shipped": "前回の実行：{{n}} 件を出荷",
+        "claimed": "前回の実行：{{n}} 件のトピックが進行中",
+        "pausedUsageLimit": "一時停止：利用枠をほぼ使い切りました",
         "skipCadence": "応答のみ・作業時間外",
         "gateError": "事前チェックに失敗。ルーチンはフルモードで実行中",
         "running": "現在実行中です"
@@ -5313,7 +5371,7 @@
     "errorTitle": "エラー",
     "you": "あなた",
     "noAccount": "アカウントなし",
-    "aiSenderTitle": "AI(フィードバックルーチンが自動作成)",
+    "aiSenderTitle": "AI（フィードバックルーチンが自動作成）",
     "shipRef": "変更を見る",
     "issueRef": "Issueを見る",
     "topicNumber": "トピック #{{n}} — 参照に使える固定番号",
@@ -5330,7 +5388,7 @@
       "yesterday": "昨日"
     },
     "delete": "削除",
-    "deleteConfirm": "このメッセージを削除しますか?この操作は元に戻せません。",
+    "deleteConfirm": "このメッセージを削除しますか？この操作は元に戻せません。",
     "issue": {
       "mark": "Issueを作成",
       "pill": "Issueを依頼しました",
@@ -5357,7 +5415,7 @@
       "reopenHint": "返信すると、このアーカイブ済みトピックが再び開きます。ToDoに戻り、ルーチンが再度取り上げます。"
     },
     "compose": {
-      "placeholder": "改善点はありますか?Markdownが使えます。",
+      "placeholder": "改善点はありますか？Markdownが使えます。",
       "send": "送信",
       "newTopic": "新しいトピック",
       "complex": "複雑",
@@ -5397,7 +5455,7 @@
       "shippedLabel": "完了",
       "raisedLabel": "新規受付",
       "medianLabel": "Shipまでの中央値",
-      "prevWeek": "先週:{{value}}",
+      "prevWeek": "先週：{{value}}",
       "medianHint": "{{count}}件のShipより · 先週 {{prev}}",
       "medianHintNone": "今週はまだShipなし · 先週 {{prev}}",
       "shippedAria": "今週の完了は{{value}}件、先週は{{prev}}件",
@@ -5420,14 +5478,14 @@
       "loadTodoHint": "ルーチンの次回実行待ち",
       "loadTodoAnswered": "回答済みの質問{{count}}件",
       "loadTodoContinuation": "継続{{count}}件",
-      "oldest": "最も古い未完了トピック:{{days}}日",
+      "oldest": "最も古い未完了トピック：{{days}}日",
       "oldestNone": "未完了のトピックはありません。",
       "throughputTitle": "スループット",
       "throughputSub": "受付に対する完了 · 直近{{weeks}}週間",
       "throughputFrom": "{{weeks}}週間前",
       "throughputNow": "今週",
-      "throughputWeek": "{{date}}からの週:新規{{raised}}件、完了{{count}}件",
-      "throughputAria": "直近{{weeks}}週間:受付{{raised}}件、完了{{shipped}}件、最多の週は{{max}}件のShip、今週は{{current}}件。",
+      "throughputWeek": "{{date}}からの週：新規{{raised}}件、完了{{count}}件",
+      "throughputAria": "直近{{weeks}}週間：受付{{raised}}件、完了{{shipped}}件、最多の週は{{max}}件のShip、今週は{{current}}件。",
       "legendRaised": "受付",
       "legendShipped": "完了",
       "paceMedian": "Shipまでの中央値",
@@ -5439,8 +5497,8 @@
       "unitHours": "{{value}}時間",
       "unitDays": "{{value}}日",
       "lifecycleTitle": "ライフサイクル",
-      "lifecycleTeaser": "リファレンス:すべての段階、分岐、終了状態と現在の件数です。週ごとに変わらないため、折りたたまれています。",
-      "lifecycleIntro": "トピックの流れ(上から下):作業、そこから分岐して作業に戻る質問、そして最後にあなたの承認を経た2つの終了状態のうちのちょうど1つ。",
+      "lifecycleTeaser": "リファレンス：すべての段階、分岐、終了状態と現在の件数です。週ごとに変わらないため、折りたたまれています。",
+      "lifecycleIntro": "トピックの流れ（上から下）：作業、そこから分岐して作業に戻る質問、そして最後にあなたの承認を経た2つの終了状態のうちのちょうど1つ。",
       "lifecycleNote": "数字は現在その段階にあるトピックの数です。遷移履歴はないため、通過数のカウンターはありません。",
       "lifecycleBranch": "分岐",
       "lifecycleOutcome": "終了状態 — 2つのうちの1つ",
@@ -5450,8 +5508,8 @@
         "green": "ビルド+テストが成功し、PRがマージされる",
         "question": "判断が必要 — ルーチンがスレッドで質問する",
         "answered": "あなたがスレッドで回答する",
-        "reaper": "クレームが放置された(PRなしで30分超) — リーパーが再オープンする",
-        "hold": "赤または機密性が高い(認証、RLS、シークレット、破壊的マイグレーション)",
+        "reaper": "クレームが放置された（PRなしで30分超）— リーパーが再オープンする",
+        "hold": "赤または機密性が高い（認証、RLS、シークレット、破壊的マイグレーション）",
         "holdTarget": "PRがレビュー待ち",
         "continue": "Ship後にあなたが返信する — 継続",
         "toReview": "ビルド+テストが成功し、PRがマージされる",
@@ -5462,17 +5520,17 @@
         "authorAnswered": "ユーザーが回答する"
       },
       "fact": {
-        "oldest": "最も古い未完了トピック:{{days}}日",
+        "oldest": "最も古い未完了トピック：{{days}}日",
         "answered": "うち回答済みの質問{{count}}件",
         "continuation": "うちShip後の継続{{count}}件",
         "reopened": "うちリーパーが再オープンしたもの{{count}}件",
-        "working": "{{count}}件が実装作業中(PRはまだなし)",
+        "working": "{{count}}件が実装作業中（PRはまだなし）",
         "hold": "レビュー保留{{count}}件 — PRがあなたのマージ待ち",
-        "terminalAtRest": "終了状態(待機中) — あなたの返信で新しいラウンドが始まります",
+        "terminalAtRest": "終了状態（待機中）— あなたの返信で新しいラウンドが始まります",
         "pendingContinuation": "{{count}}件に新しい返信あり — 再度取り上げられます",
         "awaiting": "あなたの回答待ち",
         "issueTerminal": "終了状態 — GitHub Issueで追跡中。ルーチンは二度と触れません",
-        "rejectedLegacy": "終了状態(旧ステータス) — ルーチンは設定しません",
+        "rejectedLegacy": "終了状態（旧ステータス）— ルーチンは設定しません",
         "reviewShipped": "{{count}}件がShip済みで、あなたの承認待ち",
         "reviewIssues": "{{count}}件がIssueに引き継がれ、あなたの承認待ち",
         "reviewWhy": "あなたの承認でのみトピックは終了します。それ以外は作業ループに戻ります",
@@ -5483,9 +5541,9 @@
     "userTopic": {
       "release": "ルーチンに公開",
       "channelTitle": "ユーザーへのチャンネル",
-      "channelHint": "ここにあるものはすべてユーザーに表示されます。上のスレッド(管理者 ↔ ルーチン)は表示されません。",
-      "seesStatus": "ユーザーに表示される内容:",
-      "asQuestion": "ユーザーへの質問として送信(回答があるまでトピックを保留)",
+      "channelHint": "ここにあるものはすべてユーザーに表示されます。上のスレッド（管理者 ↔ ルーチン）は表示されません。",
+      "seesStatus": "ユーザーに表示される内容：",
+      "asQuestion": "ユーザーへの質問として送信（回答があるまでトピックを保留）",
       "messagePlaceholder": "ユーザーへのメッセージ…",
       "messageSend": "ユーザーに送信",
       "questionSend": "質問として送信",
@@ -5495,7 +5553,7 @@
     },
     "decline": {
       "mark": "実装せず削除",
-      "placeholder": "なぜ実装されないのですか?ユーザーがこの文章を読みます。",
+      "placeholder": "なぜ実装されないのですか？ユーザーがこの文章を読みます。",
       "confirm": "実装しない",
       "cancel": "キャンセル",
       "noteRequired": "理由を入力してください。ユーザーに表示されます。",
@@ -5546,13 +5604,13 @@
       "newCount": "新着{{count}}件",
       "moreDays": "さらに{{count}}日分を表示",
       "view": "表示",
-      "viewTitle": "アプリで表示:{{area}}",
+      "viewTitle": "アプリで表示：{{area}}",
       "openTopic": "トピックを開く",
       "progress": "進捗",
       "backToStream": "ストリームに戻る",
       "collapseBand": "{{band}}を折りたたむ",
       "expandBand": "{{band}}を展開",
-      "progressHint": "進捗:今週の動き、あなたの対応待ち、スループット"
+      "progressHint": "進捗：今週の動き、あなたの対応待ち、スループット"
     },
     "turn": {
       "admin": "あなたの番",
@@ -5575,7 +5633,7 @@
       "declined": "未実装",
       "rejected": "却下",
       "loop": "フォローアップ",
-      "pathLabel": "状況:{{station}}",
+      "pathLabel": "状況：{{station}}",
       "step": {
         "contract": "送信済み · 公開待ち",
         "doing": "実装に引き渡し済み",
@@ -5596,7 +5654,7 @@
     },
     "sheet": {
       "close": "一覧に戻る",
-      "showOneMore": "さらに1件を表示(間に{{count}}件)",
+      "showOneMore": "さらに1件を表示（間に{{count}}件）",
       "hideBetween": "間のメッセージを非表示",
       "readMore": "もっと見る",
       "readLess": "閉じる",
@@ -5622,13 +5680,13 @@
       "viewInApp": "アプリで表示",
       "more": "その他の操作"
     },
-    "deleteTitle": "メッセージを削除しますか?",
+    "deleteTitle": "メッセージを削除しますか？",
     "threadsStale": "返信を読み込めませんでした。一部のカードの分類が古い可能性があります。",
     "guard": {
       "name": "PostHogガード",
-      "title": "PostHogガード(自動作成)",
+      "title": "PostHogガード（自動作成）",
       "serviceName": "サービスガード",
-      "serviceTitle": "サービスガード(自動作成、1時間ごとのサービスチェック)"
+      "serviceTitle": "サービスガード（自動作成、1時間ごとのサービスチェック）"
     }
   },
   "feedbackFab": {
@@ -5641,11 +5699,11 @@
   "feedbackSpot": {
     "headline": "見出し",
     "titled": "{{label}}「{{text}}」",
-    "insert": "参照を挿入: {{line}}",
+    "insert": "参照を挿入：{{line}}",
     "details": "詳細"
   },
   "feedbackCapture": {
-    "hint": "管理者向けヒント: Alt+クリック(リンク以外ではCtrl+クリック)でクリックした要素を参照として取り込めます。パネルを閉じていても使えます。",
+    "hint": "管理者向けヒント：Alt+クリック（リンク以外ではCtrl+クリック）でクリックした要素を参照として取り込めます。パネルを閉じていても使えます。",
     "element": "{{role}}「{{name}}」",
     "role": {
       "link": "リンク",
@@ -5696,7 +5754,7 @@
   },
   "extension": {
     "promo": {
-      "text": "すでに艦隊をお持ちですか? ブラウザ拡張機能で、RSIハンガーから船を直接インポートできます。",
+      "text": "すでに艦隊をお持ちですか？ブラウザ拡張機能で、RSIハンガーから船を直接インポートできます。",
       "cta": "仕組み",
       "dismiss": "このヒントを非表示"
     },
@@ -5760,7 +5818,7 @@
         "downloadCta": "拡張機能をダウンロード(ZIP)",
         "browseCta": "ソースを見る",
         "buildNote": "GitHub Actionsは、変更のたびにまさにそのソースからこのZIPを自動的にビルドします。ファイルもフォルダも同じなので、ダウンロードしたものを公開ソースコードと比較できます。",
-        "browsers": "現時点ではChromium系ブラウザのみ対応です(Chrome、Edge、Brave、Opera、Vivaldi)。Firefox版は今後対応する可能性があります。"
+        "browsers": "現時点ではChromium系ブラウザのみ対応です（Chrome、Edge、Brave、Opera、Vivaldi）。Firefox版は今後対応する可能性があります。"
       },
       "alt": {
         "title": "拡張機能がない場合はファイルでインポート",
@@ -5777,7 +5835,7 @@
       "cancel": "キャンセルしてリストを破棄",
       "meta": {
         "source": "出典",
-        "sourceValue": "あなたのRSIハンガーページ(ブラウザ内で読み取り)",
+        "sourceValue": "あなたのRSIハンガーページ（ブラウザ内で読み取り）",
         "ships": "見つかった船",
         "captured": "読み取り日時"
       },
@@ -5793,12 +5851,12 @@
         "hangarLink": "ハンガーを開く"
       }
     },
-    "hangarHint": "ファイルは面倒ですか? ブラウザ拡張機能なら、RSIハンガーから直接インポートできます →"
+    "hangarHint": "ファイルは面倒ですか？ブラウザ拡張機能なら、RSIハンガーから直接インポートできます →"
   },
   "consent": {
     "banner": {
       "title": "ブラウザストレージ",
-      "text": "このアプリはCookieを設定しません。ログインセッションと言語をこのブラウザに保存し(必須)、許可した場合のみ、ニュースフィルターやコレクションなどの利便性設定と匿名の利用統計も保存します。設定でいつでも変更できます。",
+      "text": "このアプリはCookieを設定しません。ログインセッションと言語をこのブラウザに保存し（必須）、許可した場合のみ、ニュースフィルターやコレクションなどの利便性設定と匿名の利用統計も保存します。設定でいつでも変更できます。",
       "acceptAll": "すべて許可",
       "essentialOnly": "必須のみ"
     },
@@ -5818,7 +5876,7 @@
       },
       "statistics": {
         "label": "統計",
-        "desc": "どの機能が使われ、どこで問題が起きているかを把握するための、匿名の利用統計と匿名のエラーレポートです(PostHog、EUサーバー)。初期設定ではオフです。ログイン中は、名前やメールアドレスではなく、ロールのみを持つ仮名IDで扱われます。エラーが発生したセッションは、入力内容をすべてマスクした状態で記録されることがあります。オフにすると、保存された値は削除されます。"
+        "desc": "どの機能が使われ、どこで問題が起きているかを把握するための、匿名の利用統計と匿名のエラーレポートです（PostHog、EUサーバー）。初期設定ではオフです。ログイン中は、名前やメールアドレスではなく、ロールのみを持つ仮名IDで扱われます。エラーが発生したセッションは、入力内容をすべてマスクした状態で記録されることがあります。オフにすると、保存された値は削除されます。"
       }
     }
   },
@@ -5847,8 +5905,8 @@
       "remove": "高評価を取り消す",
       "signedOut": "評価するにはサインインしてください",
       "totalNone": "まだ投票がありません",
-      "totalOne": "合計1票(全ユーザー)",
-      "total": "合計{{count}}票(全ユーザー)",
+      "totalOne": "合計1票（全ユーザー）",
+      "total": "合計{{count}}票（全ユーザー）",
       "mine": "あなたの票を含みます"
     },
     "top": {
@@ -5879,7 +5937,7 @@
     "attribution": "すべての画像は© Cloud Imperium Gamesで、RSIのCDNから直接配信され、元のComm-Linkへのクレジットリンクが付いています。ファンメイドのギャラリーで、再販や再ホスティングは行いません。",
     "appTitle": "Starscapeアプリ",
     "appDesc": "Starscapeでデスクトップを切り替えましょう。先読み、クロスフェード、ワンクリックの自動起動に対応した小さなトレイアプリです。",
-    "appNote": "Windows専用 · 約0.3 MB · 未署名(SmartScreen: 詳細情報 → 実行)",
+    "appNote": "Windows専用 · 約0.3 MB · 未署名（SmartScreen: 詳細情報 → 実行）",
     "appAutoUpdate": "バックグラウンドでサイレントに自動更新されます。バージョンの状態はトレイメニューで確認できます。",
     "promo": {
       "eyebrow": "デスクトップ向けStarscape",
@@ -5897,10 +5955,10 @@
   "userFeedback": {
     "title": "フィードバック",
     "open": "フィードバックを送信",
-    "intro": "足りないもの、気になること、こうしたらいいと思うことはありますか?ここに書いてください。チームに直接届きます。",
-    "placeholder": "フィードバックを入力…(Markdownやスクリーンショットも使えます)",
+    "intro": "足りないもの、気になること、こうしたらいいと思うことはありますか？ここに書いてください。チームに直接届きます。",
+    "placeholder": "フィードバックを入力…（Markdownやスクリーンショットも使えます）",
     "send": "フィードバックを送信",
-    "sent": "ありがとうございます! フィードバックが届きました。",
+    "sent": "ありがとうございます！フィードバックが届きました。",
     "privacyHint": "お名前はチームに表示されます。その後どうなったかは、ここで確認できます。",
     "errorTitle": "エラー",
     "uploadError": "画像をアップロードできませんでした。",
@@ -5920,7 +5978,7 @@
     "withdraw": {
       "action": "取り下げる",
       "hint": "誰も対応や返信をしていない間は、フィードバックを削除できます。",
-      "question": "完全に削除しますか? この操作は元に戻せません。",
+      "question": "完全に削除しますか？この操作は元に戻せません。",
       "confirm": "はい、削除します",
       "cancel": "キャンセル",
       "refused": "削除できません。このトピックはすでに対応中のため、リストに残ります。"
@@ -5940,7 +5998,7 @@
   },
   "feedbackArea": {
     "aria": "フィードバックの対象を選択",
-    "label": "対象:",
+    "label": "対象：",
     "news": "Verseニュース",
     "codex": "Codex",
     "hangar": "ハンガー",
@@ -5954,12 +6012,12 @@
     "label": "添付ファイル",
     "image": "添付ファイル",
     "enlarge": "画像を拡大",
-    "enlargeNamed": "画像を拡大: {{name}}",
+    "enlargeNamed": "画像を拡大：{{name}}",
     "remove": "画像を削除",
     "prev": "前の画像",
     "next": "次の画像",
     "counter": "{{i}} / {{n}}",
-    "openFile": "ファイルを開く: {{name}}",
+    "openFile": "ファイルを開く：{{name}}",
     "addImage": "画像を添付",
     "addFile": "画像またはファイルを添付",
     "capture": "このページのスクリーンショットを撮る",
@@ -5985,10 +6043,10 @@
       "connected": "デスクトップアプリに接続済み",
       "expired": "接続の有効期限が切れました。30日以上通信がありません",
       "never": "デスクトップアプリはまだ接続されていません",
-      "since": "・最終確認: {{days}}日前",
-      "today": "・最終確認: 本日"
+      "since": "・最終確認：{{days}}日前",
+      "today": "・最終確認：本日"
     },
-    "fallback": "ダウンロード(最新版)",
+    "fallback": "ダウンロード（最新版）",
     "prerelease": "ここで入手できるのは常に安定版です。ベータ版とアルファ版は、Verse Companionアカウントでアプリにサインインした後にアプリ内で選択します。利用できるチャンネルはロールによって異なります。"
   },
   "appPanel": {
@@ -6045,8 +6103,8 @@
         "inappropriate": "不適切なコンテンツ",
         "other": "その他"
       },
-      "reason": "説明(任意)",
-      "reasonPlaceholder": "何がありましたか?",
+      "reason": "説明（任意）",
+      "reasonPlaceholder": "何がありましたか？",
       "submit": "通報を送信",
       "cancel": "キャンセル"
     },
@@ -6149,11 +6207,11 @@
     "view": {
       "eyebrow": "共有されたセット",
       "loading": "読み込み中…",
-      "by": "作成者: {{name}}",
-      "updated": "最終更新: {{date}}",
+      "by": "作成者：{{name}}",
+      "updated": "最終更新：{{date}}",
       "emptyLoadout": "このセットにはまだ何も登録されていません。",
       "footnote": "閲覧のみ可能です。変更できるのは所有者だけです。",
-      "aboutCta": "Verse Companionとは?",
+      "aboutCta": "Verse Companionとは？",
       "unavailable": {
         "title": "このセットは利用できません",
         "body": "リンクが無効か、無効化されています。"
@@ -6167,7 +6225,7 @@
       "groupShared": "現在のグループメンバーと共有しました。"
     },
     "error": {
-      "notFriends": "フレンドではありません(または、フレンドではなくなりました)。",
+      "notFriends": "フレンドではありません（または、フレンドではなくなりました）。",
       "loadoutNotFound": "セットが見つかりません。",
       "shareNotFound": "この共有はもう存在しません。",
       "suspended": "アカウントが停止されています。",
@@ -6187,7 +6245,7 @@
     "retry": "再試行",
     "loading": "コンセプトページを開いています…",
     "forbidden": "このコンセプトページは管理者のみ利用できます。",
-    "notFound": "このコンセプトページは(もう)存在しません。",
+    "notFound": "このコンセプトページは（もう）存在しません。",
     "error": "コンセプトページを読み込めませんでした。しばらくしてからもう一度お試しください。"
   },
   "errors": {
@@ -6202,7 +6260,7 @@
     "guessUnavailable": "このパッチには、当てる星図がありません。",
     "sessionExpired": "セッションの有効期限が切れました。もう一度サインインしてください。",
     "forbidden": "この操作を行う権限がありません。",
-    "notFound": "これは(もう)存在しません。",
+    "notFound": "これは（もう）存在しません。",
     "rateLimit": "リクエストが多すぎます。しばらくお待ちください。",
     "server": "サーバーがエラーを報告しました。",
     "generic": "問題が発生しました。",
@@ -6255,10 +6313,10 @@
       "newAriaEvent": "スロット {{n}} に新しいオペレーション – イベント利用可能"
     },
     "remove": {
-      "titleRemove": "「{{name}}」を削除しますか?",
-      "titleEmpty": "「{{name}}」を空にしますか?",
-      "msgRemove": "オペレーションは削除されます。未完了のポジション: {{n}}。",
-      "msgEmpty": "オペレーションは残り、未完了のポジションは外れます。未完了のポジション: {{n}}。",
+      "titleRemove": "「{{name}}」を削除しますか？",
+      "titleEmpty": "「{{name}}」を空にしますか？",
+      "msgRemove": "オペレーションは削除されます。未完了のポジション：{{n}}。",
+      "msgEmpty": "オペレーションは残り、未完了のポジションは外れます。未完了のポジション：{{n}}。",
       "back": "ウィッシュはウィッシュリストに残ります",
       "backOn": "オペレーションのウィッシュはウィッシュリストに残り、再び未割り当てになります。その他の未完了のポジションはウィッシュとして追加されます。",
       "backOff": "オペレーションのウィッシュもウィッシュリストから削除され、その他の未完了のポジションは破棄されます。",
@@ -6271,7 +6329,7 @@
       "reactivate": "再有効化",
       "remove": "削除",
       "removeAria": "オペレーション「{{name}}」を削除",
-      "removeTitle": "「{{name}}」を削除しますか?",
+      "removeTitle": "「{{name}}」を削除しますか？",
       "removeMsg": "このオペレーションはアーカイブにあり、完了済みの作業のみを含みます。削除されます。ウィッシュリストと7つのスロットはそのままです。",
       "removeConfirm": "削除",
       "close": "閉じる"
@@ -6306,19 +6364,19 @@
       "einsatzCount": "{{n}} 件の任務 · {{s}} ステップ",
       "noNewLines": "新しいポジションがないため、新しい任務もありません。",
       "noLines": "何も選択されていません。",
-      "matsTitle": "素材はどう入手しますか?",
+      "matsTitle": "素材はどう入手しますか？",
       "methodOf": "{{name}} の入手方法",
       "splitOf": "{{name}} の配分",
       "lessBuy": "購入を減らし、採掘を増やす",
       "moreBuy": "購入を増やし、採掘を減らす",
       "splitHint": "購入と採掘は分けられます。左が購入量、右が採掘量です。",
-      "itemsTitle": "アイテムはどう入手しますか?",
+      "itemsTitle": "アイテムはどう入手しますか？",
       "modeOf": "{{name}} の入手方法",
       "modeHint": "商人が判明している場合は購入、ブループリントが判明している場合はクラフトします。行ごとに変更できます。",
       "leaveOut": "{{name}} を任務から外す",
       "leftOut": "任務から外しました",
       "putBack": "元に戻す",
-      "placeIs": "場所: {{place}}",
+      "placeIs": "場所：{{place}}",
       "noMerchant": "商人が不明なため、購入ステップはまだありません。",
       "openCodex": "Codexで開く",
       "setPlace": "場所を設定",
@@ -6350,10 +6408,10 @@
       "craft": {
         "aria": "{{name}} のクラフトに必要なもの",
         "forItem": "{{name}} 用",
-        "bpOwned": "ブループリント {{name}}: コレクションにあります",
-        "bpMissing": "ブループリント {{name}}: 未所持、ミッションを計画済み",
-        "matOwned": "{{name}}: 必要 {{need}}、倉庫 {{have}}",
-        "matMissing": "{{name}}: 必要 {{need}}、倉庫 {{have}}、入手予定 {{missing}}",
+        "bpOwned": "ブループリント {{name}}：コレクションにあります",
+        "bpMissing": "ブループリント {{name}}：未所持、ミッションを計画済み",
+        "matOwned": "{{name}}：必要 {{need}}、倉庫 {{have}}",
+        "matMissing": "{{name}}：必要 {{need}}、倉庫 {{have}}、入手予定 {{missing}}",
         "noRecipe": "このレシピの素材はまだ判明していません。",
         "source": "ブループリントと素材はアプリが自動でコレクションとインベントリに反映します。それまでは、そこに記載されている内容が基準になります。",
         "loading": "レシピを読み込み中…"
@@ -6363,7 +6421,7 @@
       "plain": {
         "one": "1 件のポジションはまだウィッシュではありません。",
         "other": "{{count}} 件のポジションはまだウィッシュではありません。",
-        "ask": "リニューアル前に作成されたものです。ウィッシュリストにウィッシュとして載せますか?",
+        "ask": "リニューアル前に作成されたものです。ウィッシュリストにウィッシュとして載せますか？",
         "adopt": "ウィッシュとして保持",
         "keep": "そのままにする"
       },
@@ -6394,7 +6452,7 @@
       "allDone": "この任務のすべてのステップが完了しました。",
       "allDoneHint": "オペレーションの別の任務を選ぶか、オペレーションを切り替えてください。",
       "einsaetze": "このオペレーションの任務",
-      "archived": "完了: このオペレーションはアーカイブにあり、任務はここで引き続き実行されます。プラン › アーカイブで再有効化できます。"
+      "archived": "完了：このオペレーションはアーカイブにあり、任務はここで引き続き実行されます。プラン › アーカイブで再有効化できます。"
     },
     "ticker": {
       "none": "イベントはまだありません",
@@ -6418,7 +6476,7 @@
       "search": "倉庫内を検索",
       "menu": "ページメニュー",
       "reset": "ゲーム内倉庫をリセット",
-      "resetTitle": "ゲーム内倉庫をリセットしますか?",
+      "resetTitle": "ゲーム内倉庫をリセットしますか？",
       "resetMessage": "ゲームまたは検索で書き込まれた場所がすべて削除されます。手動で作成したエントリは残ります。この操作は元に戻せません。",
       "resetConfirm": "リセット",
       "filter": "倉庫を絞り込み",
@@ -6445,12 +6503,12 @@
       "range": "{{total}} 件中 {{from}}–{{to}}",
       "prev": "前のページ",
       "next": "次のページ",
-      "hintWish": "ウィッシュ内: {{n}}",
+      "hintWish": "ウィッシュ内：{{n}}",
       "hintNachschub": "オペレーション「{{name}}」内",
       "bpPick": {
         "hint": "素材とCodexページが一致するよう、Codexから選択してください。",
         "label": "ブループリントを検索",
-        "placeholder": "例: Arrowhead",
+        "placeholder": "例：Arrowhead",
         "searching": "検索中…",
         "none": "ブループリントが見つかりません。",
         "results": "見つかったブループリント",
@@ -6528,28 +6586,28 @@
         "resetFilters": "フィルターをリセット",
         "hits": "{{n}}件ヒット",
         "baysAria": "場所別のローディングベイ",
-        "byQuality": "{{name}}(品質別)",
+        "byQuality": "{{name}}（品質別）",
         "resSummary": "{{n}}か所に{{qty}}",
         "toWishlist": "ウィッシュリストに追加",
-        "bandTip": "Q {{from}}–{{to}}: {{qty}}(うち{{res}}が予約済み)",
+        "bandTip": "Q {{from}}–{{to}}: {{qty}}（うち{{res}}が予約済み）",
         "qUnknown": "Q ?",
         "qUnknownLong": "品質不明",
         "reservedN": "{{n}}件予約済み",
-        "reservedAny": "{{n}}件予約済み(品質問わず)",
+        "reservedAny": "{{n}}件予約済み（品質問わず）",
         "scrap": {
           "yes": "分解可能",
           "no": "分解不可",
-          "unknown": "分解: 不明"
+          "unknown": "分解：不明"
         },
         "noHits": "「{{q}}」に一致するものはありません",
         "fewHits": "「{{q}}」は{{n}}件のみヒットしました",
         "alt": {
-          "elsewhere": "別の場所にあります: {{place}}に{{name}}が{{qty}}",
+          "elsewhere": "別の場所にあります：{{place}}に{{name}}が{{qty}}",
           "free": "{{n}}件空き",
           "wish": "{{name}}をウィッシュリストに追加して計画する",
           "wishQ": "{{name}} Q ≥ {{q}} をウィッシュリストに追加して計画する",
           "wishGo": "ウィッシュリストに追加して計画する",
-          "swap": "代替品: {{place}}の{{name}}、{{qty}}",
+          "swap": "代替品：{{place}}の{{name}}、{{qty}}",
           "swapWhy": "同じスロット",
           "craft": "自分でクラフトする"
         },
@@ -6567,8 +6625,8 @@
         "emptySammlung": "まだブループリントを集めていません。",
         "emptySammlungSecond": "Codexを見る",
         "emptyArt": {
-          "news": "保存したニュース: {{n}}件",
-          "gallery": "保存した画像: {{n}}件"
+          "news": "保存したニュース：{{n}}件",
+          "gallery": "保存した画像：{{n}}件"
         },
         "emptyArtGo": {
           "news": "ニュースへ",
@@ -6590,7 +6648,7 @@
         "delete": "削除",
         "clearSel": "選択を解除",
         "reserveTitle": "予約",
-        "reserveLabel": "誰または何のためですか?",
+        "reserveLabel": "誰または何のためですか？",
         "reserveNeedsNote": "予約には目的が必要です。",
         "codexTier": "Codexにもあります",
         "onWishlist": "ウィッシュリストにあります",
@@ -6598,13 +6656,13 @@
           "title": "予約",
           "titleEdit": "予約を編集",
           "existing": "このコンテナの予約",
-          "for": "誰のためですか?",
+          "for": "誰のためですか？",
           "friend": "フレンド",
           "noFriend": "フレンドなし",
           "allFriends": "すべてのフレンド",
           "byFriend": "予約先",
           "note": "またはテキスト",
-          "notePlaceholder": "例: クルー飛行、売却",
+          "notePlaceholder": "例：クルー飛行、売却",
           "amount": "数量",
           "of": "空き{{free}}のうち",
           "amountBad": "0から{{free}}の間で指定してください。",
@@ -6617,13 +6675,13 @@
           "edit": "予約を編集",
           "release": "解除",
           "handout": "引き渡し済み",
-          "handoutTitle": "引き渡し済みにしますか?",
+          "handoutTitle": "引き渡し済みにしますか？",
           "handoutMessage": "{{n}}件が倉庫から出ます。",
           "newOne": "新規予約",
           "saveEdit": "保存",
           "editFor": "{{name}}の予約"
         },
-        "deleteTitle": "エントリを削除しますか?",
+        "deleteTitle": "エントリを削除しますか？",
         "deleteMessage": "{{n}}件のエントリが倉庫から消えます。",
         "deleteOne": "{{name}}を削除",
         "editAmount": "{{name}}の数量",
@@ -6653,27 +6711,27 @@
         "lead": "倉庫から{{n}}件のアイテム",
         "where": "行き先",
         "new": "新規オペレーション",
-        "newSell": "新規オペレーション: 資金稼ぎ",
+        "newSell": "新規オペレーション：資金稼ぎ",
         "append": "「{{name}}」に追加",
         "goal": "目標額(aUEC)",
-        "goalPlaceholder": "例: 1,500,000",
+        "goalPlaceholder": "例：1,500,000",
         "create": "オペレーションを作成",
         "add": "追加",
         "sellName": "資金稼ぎ",
         "scu": "SCU",
         "pcs": "個",
-        "route": "{{n}}か所(多い順)",
+        "route": "{{n}}か所（多い順）",
         "up": "{{place}}を上へ移動",
         "down": "{{place}}を下へ移動",
         "einsatzOne": "{{name}}を受け取る",
         "einsatzMany": "受け取り"
       },
       "sellForm": {
-        "kindAria": "オペレーションの目的は何ですか?",
+        "kindAria": "オペレーションの目的は何ですか？",
         "wish": "ウィッシュリストから",
         "sell": "資金稼ぎ",
         "goal": "目標額(aUEC)",
-        "goalPlaceholder": "例: 1,500,000",
+        "goalPlaceholder": "例：1,500,000",
         "pickHint": "倉庫から売却するものを選んでください。",
         "empty": "倉庫が空のため、まだ売却するものがありません。",
         "pick": "{{place}}の{{name}}を売却"
@@ -6695,7 +6753,7 @@
       "newEinsatz": "新規任務",
       "act": {
         "buy": "{{label}}を購入",
-        "mission": "ミッション: {{label}}",
+        "mission": "ミッション：{{label}}",
         "mine": "{{label}}を採掘",
         "refine": "{{label}}を精製",
         "craft": "{{label}}をクラフト",
@@ -6724,27 +6782,27 @@
           "fitsPort": "{{item}}のS{{size}}に適合",
           "ingredientFor": "{{item}}の材料",
           "usedIn": "{{item}}に必要",
-          "sameMaker": "同じメーカー: {{maker}}",
+          "sameMaker": "同じメーカー：{{maker}}",
           "sameSizeClass": "{{item}}に合うS{{size}}",
-          "otherSignal": "{{item}}({{signal}}、S{{size}})の対となるもの",
+          "otherSignal": "{{item}}（{{signal}}、S{{size}}）の対となるもの",
           "pairsWith": "{{item}}を補完",
           "paintFor": "{{item}}用塗装",
           "sameMaterial": "{{item}}と同じ素材",
-          "sameShop": "同じショップ: {{place}}",
-          "samePlace": "同じ場所: {{place}}",
-          "sameActivity": "同じアクティビティ: {{activity}}"
+          "sameShop": "同じショップ：{{place}}",
+          "samePlace": "同じ場所：{{place}}",
+          "sameActivity": "同じアクティビティ：{{activity}}"
         },
         "via": {
           "craft": "クラフト",
           "buy": "購入"
         }
       },
-      "linesFull": "オペレーションがいっぱいです(100ポジション)。先にポジションを削除してから追加してください。",
-      "partial": "{{count}}件のポジションは残りました: オペレーションがいっぱいです。",
+      "linesFull": "オペレーションがいっぱいです（100ポジション）。先にポジションを削除してから追加してください。",
+      "partial": "{{count}}件のポジションは残りました：オペレーションがいっぱいです。",
       "wishlistFailed": "ウィッシュリストを変更できませんでした。何も移動されていません。",
       "plainGone": "これらのポジションは別のデバイスで対応済みです。表示を更新しています。",
-      "wishCapped": "{{count}}個がウィッシュリストに収まらなくなり(1件あたり最大999個)、失われます。",
-      "gone": "このオペレーションはもう存在しません(別のデバイスで削除されました)。表示を更新しています。",
+      "wishCapped": "{{count}}個がウィッシュリストに収まらなくなり（1件あたり最大999個）、失われます。",
+      "gone": "このオペレーションはもう存在しません（別のデバイスで削除されました）。表示を更新しています。",
       "capReached": "保存できるオペレーションの上限に達しました。アーカイブから古いものを削除すると、再び使えるようになります。",
       "nothingFree": "このウィッシュの分はすべて、すでにオペレーションに割り当てられています。",
       "splitInvalid": "オペレーションへの振り分けが合いません。",
@@ -6770,9 +6828,9 @@
       "less": "1つ減らす",
       "more": "1つ増やす",
       "remove": "{{name}}を削除",
-      "sum": "未取得{{open}}件({{units}}個) · 取得済み{{done}}件",
+      "sum": "未取得{{open}}件（{{units}}個）· 取得済み{{done}}件",
       "clearDone": "チェック済みを削除",
-      "buttonAria": "オペレーションを開く({{count}}件)",
+      "buttonAria": "オペレーションを開く（{{count}}件）",
       "title": "オペレーション",
       "close": "オペレーションを閉じる",
       "empty": "オペレーションにはまだ何もありません。",
@@ -6791,7 +6849,7 @@
       },
       "got": "入手済み",
       "place": {
-        "title": "今どこにありますか?",
+        "title": "今どこにありますか？",
         "other": "別の場所…",
         "otherPlaceholder": "場所を入力",
         "store": "置く",
@@ -6809,8 +6867,8 @@
       "cancel": "キャンセル",
       "rename": "名前を変更",
       "delete": "削除",
-      "created": "作成日: {{date}}",
-      "deleteTitle": "このスポットを削除しますか?",
+      "created": "作成日：{{date}}",
+      "deleteTitle": "このスポットを削除しますか？",
       "deleteMessage": "「{{name}}」はすべてのデバイスから削除されます。"
     },
     "ops": {
@@ -6842,7 +6900,7 @@
         "title": "パッチでのあなたの艦隊",
         "soon": "近日公開",
         "mock": "あなたの船3隻が4.3.1で変更されました",
-        "hint": "プレビュー: まもなく、現在のパッチの影響を受けたあなたの船がここに表示されます。"
+        "hint": "プレビュー：まもなく、現在のパッチの影響を受けたあなたの船がここに表示されます。"
       }
     },
     "locker": {
@@ -6857,7 +6915,7 @@
       "jetzt": "現在",
       "inventar": "倉庫",
       "statistik": "統計",
-      "empty": "{{page}}: ここでは現在新しい機能を開発中です。"
+      "empty": "{{page}}：ここでは現在新しい機能を開発中です。"
     },
     "rail": {
       "label": "HQページ",
@@ -6892,18 +6950,18 @@
       "now": {
         "live": "ライブ",
         "noneHint": "ゲームからのライブ状況。",
-        "last": "最終確認: {{place}}、{{ago}}。",
-        "lastTime": "最終確認: {{ago}}。",
+        "last": "最終確認：{{place}}、{{ago}}。",
+        "lastTime": "最終確認：{{ago}}。",
         "nextTip": "最初に計画した任務の次のステップ。",
         "step": {
           "buy": "{{label}}を購入",
-          "mission": "ミッション: {{label}}",
+          "mission": "ミッション：{{label}}",
           "mine": "{{label}}を採掘",
           "refine": "{{label}}を精製",
           "craft": "{{label}}をクラフト",
           "transport": "{{label}}を輸送",
           "pickup": "{{label}}を受け取る",
-          "event": "イベント: {{label}}"
+          "event": "イベント：{{label}}"
         }
       },
       "planen": {
@@ -6919,9 +6977,9 @@
         "week": "今週",
         "open": "統計"
       },
-      "tip": "{{action}} · ホットキー: {{key}}"
+      "tip": "{{action}} · ホットキー：{{key}}"
     },
-    "hotkey": "ホットキー: {{key}}",
+    "hotkey": "ホットキー：{{key}}",
     "step": {
       "kind": {
         "buy": "購入",
@@ -6950,10 +7008,10 @@
           "purchase": "{{item}}を{{quantity}}個購入しました({{shop}})"
         },
         "refinery": {
-          "complete": "精製所の処理完了: {{count}}件の注文({{location}})"
+          "complete": "精製所の処理完了：{{count}}件の注文({{location}})"
         },
         "contract": {
-          "completed": "ミッション完了: {{name}}",
+          "completed": "ミッション完了：{{name}}",
           "accepted": "ミッションを受諾しました"
         },
         "qt": {
@@ -6966,7 +7024,7 @@
         "inventory": {
           "opened": "インベントリを開きました({{location}})"
         },
-        "other": "イベント: {{type}}",
+        "other": "イベント：{{type}}",
         "armistice": {
           "exited": "休戦ゾーンを出ました"
         },
@@ -6981,7 +7039,7 @@
         },
         "disconnect": "接続が切断されました",
         "blueprint": {
-          "received": "ブループリントを入手しました: {{name}}"
+          "received": "ブループリントを入手しました：{{name}}"
         }
       }
     },
@@ -6992,8 +7050,8 @@
         "hint": "アプリがあなたの現在地と行動をここにライブで送信します。",
         "syncOffTitle": "アプリは準備完了ですが、ライブデータはまだありません",
         "syncOffHint": "アプリの「設定 → オーバーレイ → Verse Companion Web HQ」でライブ同期をオンにして、ゲームを起動してください。",
-        "titleMissing": "アプリがありません: ゲームを検出できません",
-        "titleOff": "アプリがオフです: ゲームを検出できません"
+        "titleMissing": "アプリがありません：ゲームを検出できません",
+        "titleOff": "アプリがオフです：ゲームを検出できません"
       },
       "fresh": {
         "updated": "ライブ · {{at}}時点",
@@ -7003,10 +7061,10 @@
         "label": "現在地",
         "lastSeen": "最後にいた場所",
         "unknown": "現在地不明",
-        "ship": "船:"
+        "ship": "船："
       },
       "zone": {
-        "label": "ゾーン:",
+        "label": "ゾーン：",
         "unknown": "不明",
         "restricted": "制限区域",
         "commDown": "通信アレイ停止",
@@ -7020,9 +7078,9 @@
           "hydrogen": "水素残りわずか",
           "quantum": "量子燃料残りわずか"
         },
-        "hangar": "ハンガー: {{position}}番目",
-        "hangarWait": "ハンガー: {{position}}番目 · 約{{min}}分",
-        "hangarQueued": "ハンガー: 順番待ち"
+        "hangar": "ハンガー：{{position}}番目",
+        "hangarWait": "ハンガー：{{position}}番目 · 約{{min}}分",
+        "hangarQueued": "ハンガー：順番待ち"
       },
       "path": {
         "title": "あなたのルート",
@@ -7043,7 +7101,7 @@
     "mood": {
       "peaceful": "平和的",
       "combat": "戦闘",
-      "quick": "短時間(30分未満)",
+      "quick": "短時間（30分未満）",
       "long": "長時間",
       "solo": "ソロ",
       "group": "グループ",
@@ -7054,7 +7112,7 @@
       "multi": "任務×{{n}}",
       "stepsTooltip": "{{n}}ステップ",
       "pick": {
-        "title": "どの任務にしますか?",
+        "title": "どの任務にしますか？",
         "message": "「{{name}}」がミッションステップとして追加されます。",
         "none": "計画済みまたは実行中の任務がまだありません。",
         "new": "新しい任務"
@@ -7065,19 +7123,19 @@
         "confirm": "追加",
         "kindAria": "やること",
         "what": {
-          "buy": "何を買いますか?",
-          "mission": "何を稼ぎたいですか?",
-          "mine": "何を採掘しますか?",
-          "pickup": "何を受け取りますか?"
+          "buy": "何を買いますか？",
+          "mission": "何を稼ぎたいですか？",
+          "mine": "何を採掘しますか？",
+          "pickup": "何を受け取りますか？"
         },
         "whatPh": {
-          "buy": "例: Medpen",
-          "mission": "例: P4-ARのブループリント",
-          "mine": "例: Quantanium",
-          "pickup": "例: ハンガーからの貨物"
+          "buy": "例：Medpen",
+          "mission": "例：P4-ARのブループリント",
+          "mine": "例：Quantanium",
+          "pickup": "例：ハンガーからの貨物"
         },
-        "where": "場所は?",
-        "whereOptional": "場所は?(任意)",
+        "where": "場所は？",
+        "whereOptional": "場所は？（任意）",
         "wherePh": "場所を選択",
         "qty": "数量"
       },
@@ -7141,7 +7199,7 @@
         "deaths": {
           "name": "死亡 / 保険請求",
           "sub": "死亡 / 保険請求",
-          "hint": "破線: 保険請求、実線: 死亡。",
+          "hint": "破線：保険請求、実線：死亡。",
           "col": "死亡",
           "col2": "保険請求"
         },
@@ -7194,7 +7252,7 @@
       "captured": "インベントリに登録しました。",
       "actions": {
         "browse": "閲覧",
-        "find": "どこにありますか?",
+        "find": "どこにありますか？",
         "add": "追加"
       },
       "totals": {
@@ -7223,7 +7281,7 @@
         "modes": "操作を選択",
         "mode": {
           "browse": "閲覧",
-          "find": "どこにありますか?",
+          "find": "どこにありますか？",
           "add": "追加"
         },
         "search": "インベントリを検索",
@@ -7248,7 +7306,7 @@
         "onWishlist": "ウィッシュリストに追加"
       },
       "retry": "再試行",
-      "destroyed": "最後に破壊: {{at}}",
+      "destroyed": "最後に破壊：{{at}}",
       "ships": {
         "title": "船",
         "count": "ハンガーに{{n}}隻",
@@ -7270,22 +7328,22 @@
         "days": "{{n}}日前に最後に開いた"
       },
       "desk": {
-        "open": "登録: {{name}}",
-        "addOne": "1個保管: {{name}}",
-        "takeOne": "1個取り出す: {{name}}",
+        "open": "登録：{{name}}",
+        "addOne": "1個保管：{{name}}",
+        "takeOne": "1個取り出す：{{name}}",
         "availShort": "{{free}} 空き · {{reserved}} 予約済み",
         "amount": "数量",
         "in": "保管",
         "out": "取り出す",
         "set": "数量を設定",
         "for": "予約先",
-        "forHint": "例: プレイヤーXまたは売却",
+        "forHint": "例：プレイヤーXまたは売却",
         "reserve": "予約",
         "reservations": "予約",
         "handOut": "引き渡し済み",
         "release": "解除",
         "delete": "リストから削除",
-        "deleteTitle": "「{{name}}」を削除しますか?",
+        "deleteTitle": "「{{name}}」を削除しますか？",
         "deleteText": "この項目は、予約も含めてこの場所から削除されます。",
         "emptyTitle": "「{{name}}」は空になります",
         "emptyText": "この後ここには何も残らないため、項目はリストから削除されます。",
@@ -7295,28 +7353,28 @@
       },
       "lager": {
         "empty": "インベントリにはまだ何もありません。何か入れると、ここでその場所を検索できます。",
-        "emptyHow": "登録の方法: ゲーム内でインベントリを開くと、アプリが読み取ります。または「追加」から手動で登録してください。",
+        "emptyHow": "登録の方法：ゲーム内でインベントリを開くと、アプリが読み取ります。または「追加」から手動で登録してください。",
         "storage": "ハンガーターミナルの船"
       },
       "find": {
-        "title": "どこにありますか?",
+        "title": "どこにありますか？",
         "item": "アイテムまたは原材料",
-        "itemHint": "例: Quantanium",
-        "want": "必要数は?",
+        "itemHint": "例：Quantanium",
+        "want": "必要数は？",
         "unit": "単位",
         "sort": "並び順",
         "nearest": "最寄り順",
         "most": "数量順",
         "yours": "あなたのインベントリ",
-        "here": "現在地: {{place}}",
-        "whereAmI": "今どこにいますか?",
+        "here": "現在地：{{place}}",
+        "whereAmI": "今どこにいますか？",
         "unknownHere": "現在地がわからないため、数量順に並べています。アプリを起動するか、場所を選択してください。",
         "prompt": "探しているものを入力してください。その下に保管場所が表示されます。",
-        "noHit": "インベントリに該当するものはありません。別の単位ではどうでしょう?",
+        "noHit": "インベントリに該当するものはありません。別の単位ではどうでしょう？",
         "take": "{{n}}個取得",
-        "summaryOne": "足ります: 1か所に{{want}} {{unit}}。",
-        "summaryMany": "合計で足ります: {{stops}}か所から{{want}} {{unit}}。",
-        "summaryShort": "足りません: インベントリには{{want}} {{unit}}のうち{{total}}のみ。",
+        "summaryOne": "足ります：1か所に{{want}} {{unit}}。",
+        "summaryMany": "合計で足ります：{{stops}}か所から{{want}} {{unit}}。",
+        "summaryShort": "足りません：インベントリには{{want}} {{unit}}のうち{{total}}のみ。",
         "summaryTotal": "インベントリに{{total}} {{unit}}。",
         "pcsUnit": "個",
         "tier": {
@@ -7329,11 +7387,11 @@
       },
       "capture": {
         "subKind": "サブタイプ",
-        "subNone": "その他(サブタイプなし)",
+        "subNone": "その他（サブタイプなし）",
         "title": "インベントリに追加",
         "item": "アイテムまたは原材料",
-        "itemHint": "例: Quantanium",
-        "locationHint": "例: Area 18",
+        "itemHint": "例：Quantanium",
+        "locationHint": "例：Area 18",
         "qty": "数量",
         "unit": "単位",
         "pcs": "個数",
@@ -7356,12 +7414,12 @@
       "launchNow": "今すぐ起動",
       "starting": "アプリを起動しています…",
       "started": "アプリを起動しています。そこでサインインすると、データがここに反映されます。",
-      "downloading": "アプリが見つかりません: ダウンロードを開始しました(約500 MB)。完了後にセットアップを実行してください。",
+      "downloading": "アプリが見つかりません：ダウンロードを開始しました（約500 MB）。完了後にセットアップを実行してください。",
       "noResponse": "アプリから応答がありません。すでに起動している場合は問題ありません。そうでなければ手動で起動するか、再ダウンロードしてください。",
-      "retry": "インストール済みですか? 再起動",
+      "retry": "インストール済みですか？再起動",
       "download": "アプリをダウンロード",
       "downloadCta": "アプリをダウンロード",
-      "downloadStarted": "ダウンロードを開始しました(約500 MB)。完了後にセットアップを実行してください。",
+      "downloadStarted": "ダウンロードを開始しました（約500 MB）。完了後にセットアップを実行してください。",
       "tipDownload": "インストーラーを直接ダウンロードします。アプリがインストール済みの場合は一度起動してください。接続されると、ここから起動できます。右上の「アプリ」からいつでも再度開けます。",
       "tipLaunch": "PCでアプリを開きます。応答がない場合はダウンロードが始まります。右上の「アプリ」からいつでも再度開けます。",
       "close": "閉じる"
@@ -7390,7 +7448,7 @@
       },
       "shared": {
         "title": "フレンドが共有",
-        "by": "共有者:",
+        "by": "共有者：",
         "readOnly": "閲覧のみ",
         "answer": "あなたの回答",
         "slot": "クルー枠",
@@ -7403,8 +7461,8 @@
         "kindVariant": "バリアント · {{ship}}"
       },
       "now": {
-        "online": "現在オンライン:",
-        "active": "開催中: {{title}} · 参加確定 {{n}}人"
+        "online": "現在オンライン：",
+        "active": "開催中：{{title}} · 参加確定 {{n}}人"
       }
     },
     "events": {
@@ -7414,7 +7472,7 @@
       "dot": "開催中のイベント",
       "end": {
         "official": "{{date}}まで",
-        "estimate": "遅くとも{{date}}まで(推定)",
+        "estimate": "遅くとも{{date}}まで（推定）",
         "unknown": "終了時期不明"
       },
       "pick": {
@@ -7438,7 +7496,7 @@
         "ac": "Arena Commander"
       },
       "prereq": {
-        "title": "前提条件(推定)",
+        "title": "前提条件（推定）",
         "none": "記載なし",
         "and": "および",
         "or": "または"
@@ -7478,23 +7536,23 @@
       },
       "claim": {
         "title": "{{name}}を受け取る",
-        "channel": "どうやって入手しましたか?",
+        "channel": "どうやって入手しましたか？",
         "byApp": "アプリが入手経路を検出しました。変更することもできます。",
         "store": "倉庫に入れる",
         "isShip": "船である",
         "toHangar": "ハンガーに追加されます。",
-        "toInventory": "インベントリ(場所「Event-Belohnungen」)に追加されます。",
+        "toInventory": "インベントリ（場所「Event-Belohnungen」）に追加されます。",
         "complete": "イベント全体を完了にする",
         "confirm": "受け取る"
       },
       "offer": {
-        "area": "あなたは{{event}}のエリアにいます。このオペレーションに切り替えますか?",
-        "ac": "Arena Commanderが起動中です – {{event}}に該当します。このオペレーションに切り替えますか?",
+        "area": "あなたは{{event}}のエリアにいます。このオペレーションに切り替えますか？",
+        "ac": "Arena Commanderが起動中です – {{event}}に該当します。このオペレーションに切り替えますか？",
         "switch": "切り替える",
         "notNow": "今はしない"
       },
       "abortDialog": {
-        "title": "{{name}}を中止しますか?",
+        "title": "{{name}}を中止しますか？",
         "message": "進捗は保存されたままで、ウィッシュリストには何も戻りません。イベントはいつでもアーカイブから再開できます。"
       }
     },
@@ -7514,13 +7572,13 @@
         "toggle": "このページでのアプリの動作",
         "start": "アプリを使うと、現在地、搭乗中の船、次にやることをここでリアルタイムに確認できます。",
         "inventar": "アプリがゲームからインベントリと船を読み取ります。手入力は不要です。",
-        "jetzt": "アプリが現在地を報告し、ステップを自動でチェックします:",
+        "jetzt": "アプリが現在地を報告し、ステップを自動でチェックします：",
         "planen": "オペレーションの項目が届くと、アプリがそれを検知して完了にします。",
         "statistik": "アプリがプレイ中にプレイ時間、セッション、ミッション、損失をカウントします。アプリがないと、このページは空のままです。",
         "jetztList": {
-          "e1": "現在地と船(例: 「Stanton › New Babbage」)。",
-          "e2": "計画した行程の次のステップ(例: 購入や移動)。",
-          "e3": "最新のイベント(例: 「ミッション完了」「量子ジャンプ終了」)。"
+          "e1": "現在地と船（例：「Stanton › New Babbage」）。",
+          "e2": "計画した行程の次のステップ（例：購入や移動）。",
+          "e3": "最新のイベント（例：「ミッション完了」「量子ジャンプ終了」）。"
         }
       }
     },
@@ -7556,7 +7614,7 @@
         }
       },
       "end": {
-        "noQuit": "正常に終了しませんでした(クラッシュまたはアプリ終了)",
+        "noQuit": "正常に終了しませんでした（クラッシュまたはアプリ終了）",
         "live": "実行中"
       },
       "showAll": "全{{n}}件のセッションを表示",
@@ -7568,7 +7626,7 @@
   "verse": {
     "crumb": "Verse",
     "toast": {
-      "lit": "星が灯りました: {{task}}",
+      "lit": "星が灯りました：{{task}}",
       "count": "{{total}}個中{{lit}}個",
       "remaining": "4K壁紙まであと{{n}}個",
       "close": "閉じる",
@@ -7601,7 +7659,7 @@
       "link": "リンク"
     },
     "status": {
-      "aria": "パッチ状況: {{line}}",
+      "aria": "パッチ状況：{{line}}",
       "live": "LIVE",
       "ptu": "PTU {{line}}",
       "since": "LIVE公開から{{n}}日",
@@ -7613,7 +7671,7 @@
       "cta": "今すぐ見る",
       "headlineQuiet": "Verseは静かです — 前回の訪問以降、新着はありません",
       "headlineError": "現在ブリーフィングを利用できません",
-      "loading": "ブリーフィングを読み込み中 …",
+      "loading": "ブリーフィングを読み込み中…",
       "allSeen": "最新の状態です",
       "newSince": "前回の訪問以降の新着",
       "patchNew": "{{channel}} · {{version}}の新情報",
@@ -7679,7 +7737,7 @@
       "gallery": {
         "title": "ギャラリー",
         "topic": "ギャラリー",
-        "hook": "新しいデスクトップはどれにしますか?",
+        "hook": "新しいデスクトップはどれにしますか？",
         "stat": "新しいウォールペーパー{{n}}件",
         "teaser": "Starscapeのウォールペーパーを見て、共有して、投票しよう"
       }
@@ -7696,11 +7754,11 @@
           "value": "{{n}}日"
         },
         "cadence": {
-          "label": "メインパッチの間隔(中央値)",
+          "label": "メインパッチの間隔（中央値）",
           "value": "{{n}}日"
         },
         "subCadence": {
-          "label": "ホットフィックスの間隔(中央値)",
+          "label": "ホットフィックスの間隔（中央値）",
           "value": "{{n}}日"
         },
         "stable": {
@@ -7710,7 +7768,7 @@
       },
       "ready": {
         "title": "{{line}}のプリフライト",
-        "titleRenamed": "{{line}}(旧{{former}})のプリフライト",
+        "titleRenamed": "{{line}}（旧{{former}}）のプリフライト",
         "progress": "{{total}}件中{{done}}件完了",
         "step": {
           "notes": "パッチノートを読んだ",
@@ -7720,18 +7778,18 @@
         }
       },
       "comet": {
-        "title": "パッチ予想投票:{{line}}はいつLIVEになる?",
+        "title": "パッチ予想投票：{{line}}はいつLIVEになる？",
         "hint": "予想を投稿しよう。投稿後にコミュニティの中央値が見られます。",
         "label": "LIVE日の予想",
         "submit": "予想を投稿",
-        "yours": "あなたの予想:{{date}}",
-        "median": "コミュニティの中央値:{{date}}(予想{{n}}件)",
+        "yours": "あなたの予想：{{date}}",
+        "median": "コミュニティの中央値：{{date}}（予想{{n}}件）",
         "heading": "パッチ予想",
         "crowd": "コミュニティの予想状況",
         "cta": "予想を投稿",
-        "mine": "あなたの予想:{{date}}",
+        "mine": "あなたの予想：{{date}}",
         "count": "予想{{n}}件",
-        "release": "リリース:{{date}}",
+        "release": "リリース：{{date}}",
         "stripAria": "コミュニティの中央値 {{date}}、予想{{n}}件",
         "you": "あなたの予想",
         "medianShort": "中央値 {{date}}",
@@ -7747,7 +7805,7 @@
     },
     "hub": {
       "brand": "Verse Companion",
-      "search": "検索 …",
+      "search": "検索…",
       "searchKey": "Ctrl K",
       "more": "Verseのその他の情報",
       "prev": "前のストーリー",
@@ -7801,16 +7859,16 @@
     "progress": "{{total}}個中{{lit}}個の星",
     "sun": {
       "faded": {
-        "aria": "太陽: 色あせ",
+        "aria": "太陽：色あせ",
         "tip": "太陽は色あせています。下で{{patch}}がLIVEになる日を予想しましょう。±1日以内に当たれば太陽が輝きます。"
       },
       "tipped": {
-        "aria": "太陽: 予想済み、LIVE日待ち",
+        "aria": "太陽：予想済み、LIVE日待ち",
         "tip": "予想を投稿済みです。{{patch}}がLIVEになるまで太陽はほのかに光ります。±1日以内に当たれば輝きます。"
       },
       "hit": {
-        "aria": "太陽: 点灯",
-        "tip": "的中: 予想がLIVE日から1日以内で、太陽が輝いています。"
+        "aria": "太陽：点灯",
+        "tip": "的中：予想がLIVE日から1日以内で、太陽が輝いています。"
       }
     },
     "export": {
@@ -7897,7 +7955,7 @@
       "meteor": {
         "title": "流星群",
         "desc": "LIVE日には星図の上を流星が横切ります。",
-        "today": "今日はLIVE日: 流星群が星図の上を駆け抜けます。",
+        "today": "今日はLIVE日：流星群が星図の上を駆け抜けます。",
         "notToday": "流星群は最新パッチのLIVE日にのみ現れます。"
       },
       "supernova": {
@@ -7922,7 +7980,7 @@
       "splinter": "{{per}}個中{{n}}個目のかけら"
     },
     "glyph": {
-      "aria": "星図: {{total}}個中{{lit}}個の星"
+      "aria": "星図：{{total}}個中{{lit}}個の星"
     },
     "gallery": {
       "title": "自分の星図",
@@ -7948,7 +8006,7 @@
     "map": {
       "title": "星図 {{patch}}",
       "subtitle": "{{total}}個の星 · 形から新しい船が分かる",
-      "shape": "形: {{name}}",
+      "shape": "形：{{name}}",
       "patchesAria": "パッチの星図を選択",
       "chipTip": "星図 {{patch}} · {{total}}個中{{lit}}個の星",
       "mine": "自分の星図",
@@ -8026,17 +8084,17 @@
       },
       "head": {
         "closed": "{{patch}} の予想は終了しました",
-        "tipped": "{{patch}} のあなたの予想: {{date}}",
+        "tipped": "{{patch}} のあなたの予想：{{date}}",
         "hit": "{{date}} に着弾",
-        "miss": "あなたのパッチ予想: {{date}}",
+        "miss": "あなたのパッチ予想：{{date}}",
         "open": "{{patch}} の予想受付中",
-        "missed": "{{patch}} の予想を逃しました: {{date}}"
+        "missed": "{{patch}} の予想を逃しました：{{date}}"
       },
       "formerly": "旧 {{patch}}",
       "earlier": "以前の日",
       "later": "以降の日",
       "dayAria": "{{date}} にパッチ予想を設定",
-      "undoToast": "{{patch}} のパッチ予想を設定しました: {{date}}",
+      "undoToast": "{{patch}} のパッチ予想を設定しました：{{date}}",
       "source": {
         "ptu": "PTU から判定",
         "eptu": "EPTU から判定",
@@ -8049,7 +8107,7 @@
       "kind": "見分ける",
       "ruleAria": "判定ルール",
       "rule": "星図の形は、パッチの最新の船に由来します。7隻のうち1隻が正解です。挑戦は1回だけ。船をクリックすると予想が確定し、数秒間は取り消せます。正解すると星が灯り、星図に名前が表示されます。",
-      "optionAria": "予想する: {{name}}",
+      "optionAria": "予想する：{{name}}",
       "state": {
         "open": "受付中",
         "correct": "正解",
@@ -8058,7 +8116,7 @@
       },
       "head": {
         "open": "星図の中で見分けた船をタップ",
-        "correct": "正解: {{name}}",
+        "correct": "正解：{{name}}",
         "wrong": "星図に表示されているのは {{name}} です",
         "unavailable": "この問題はまだ利用できません"
       },
@@ -8067,15 +8125,15 @@
         "wrong": "今回は星なし – 答えは星図に残ります。",
         "unavailable": "この星図には、現在見分ける船が設定されていません。Codexにパッチのゲームデータが揃うと自動で選ばれ、ここで予想できるようになります。"
       },
-      "undoToast": "予想を確定しました: {{name}}"
+      "undoToast": "予想を確定しました：{{name}}"
     },
     "series": {
       "kind": "連続記録",
       "count": "{{n}} 個の星図を連続で点灯",
       "countOne": "1 個の星図を連続で点灯",
       "helpAria": "連続記録のしくみ",
-      "help": "連続記録は、星図を点灯させた(星を1つ以上灯す、または太陽が昇った)パッチが何回連続しているかを数えます。最新の星図はまだ進行中のため、記録が途切れることはありません。それより前の星図が暗いままだと、最初からやり直しです。道の各段階でその数から報酬が解放され、一度解放されたものはそのまま残ります(最高記録: {{best}})。",
-      "helpReserve": "連続記録は、星図を点灯させた(星を1つ以上灯す、または太陽が昇った)パッチが何回連続しているかを数えます。最新の星図はまだ進行中のため、記録が途切れることはありません。燃料予備が使えます。今回は暗い星図が1つあっても記録は途切れません。解放されたものはそのまま残ります(最高記録: {{best}})。",
+      "help": "連続記録は、星図を点灯させた（星を1つ以上灯す、または太陽が昇った）パッチが何回連続しているかを数えます。最新の星図はまだ進行中のため、記録が途切れることはありません。それより前の星図が暗いままだと、最初からやり直しです。道の各段階でその数から報酬が解放され、一度解放されたものはそのまま残ります（最高記録：{{best}}）。",
+      "helpReserve": "連続記録は、星図を点灯させた（星を1つ以上灯す、または太陽が昇った）パッチが何回連続しているかを数えます。最新の星図はまだ進行中のため、記録が途切れることはありません。燃料予備が使えます。今回は暗い星図が1つあっても記録は途切れません。解放されたものはそのまま残ります（最高記録：{{best}}）。",
       "roadAria": "連続記録の報酬",
       "stopOn": "{{title}} – {{desc}} ✓ 解放済み · 点灯した星図 {{at}} 個から",
       "stopNext": "{{title}} – {{desc}} 次の目標 · 星図を連続で {{at}} 個点灯から",
@@ -8114,7 +8172,7 @@
       "top": "最高段階に到達しました。これからの星もすべてあなたの空に加わります。",
       "perks": "ランクに応じて、ベータ機能への早期アクセス、アイテムの提案、下記のランク報酬が解放されます。",
       "mapOpen": "星図を大きく開く",
-      "mapAlt": "あなたの星図: 各パッチの星座を1つの夜空に",
+      "mapAlt": "あなたの星図：各パッチの星座を1つの夜空に",
       "mapNone": "星図に最初の星を灯すと、ここにあなたの空が表示されます。",
       "mapCaption": "あなたの星図",
       "mapUpdates": "ランクが上がるたびに自動で更新されます。",
@@ -8136,7 +8194,7 @@
       "reward": {
         "wallpaper": {
           "title": "全形式の壁紙",
-          "desc": "あなたの空を壁紙に: 4K (3840 × 2160)、スマホ縦向け、ウルトラワイド (5120 × 1440)。"
+          "desc": "あなたの空を壁紙に：4K (3840 × 2160)、スマホ縦向け、ウルトラワイド (5120 × 1440)。"
         },
         "badge": {
           "title": "共有できるバッジ",
@@ -8152,7 +8210,7 @@
         },
         "frame": {
           "title": "測量リング",
-          "desc": "紋章の周りに、点線の2つ目のリングが表示されます(紋章が表示されるすべての場所で)。"
+          "desc": "紋章の周りに、点線の2つ目のリングが表示されます（紋章が表示されるすべての場所で）。"
         },
         "deepfield": {
           "title": "ディープフィールド",
@@ -8184,7 +8242,7 @@
         },
         "astrographer": {
           "name": "アストログラファー",
-          "meaning": "およそ3パッチ分の星: 終盤の報酬が解放されます。"
+          "meaning": "およそ3パッチ分の星：終盤の報酬が解放されます。"
         },
         "master": {
           "name": "マスターカートグラファー",
@@ -8198,18 +8256,18 @@
     },
     "ideas": {
       "title": "報酬のアイデア",
-      "lead": "今後ランクで何がもらえたら嬉しいですか? 最も票を集めたアイデアから、チームが目を通します。",
+      "lead": "今後ランクで何がもらえたら嬉しいですか？最も票を集めたアイデアから、チームが目を通します。",
       "label": "新しいランク報酬へのアイデア",
       "submit": "アイデアを送信",
-      "sent": "ありがとうございます! あなたのアイデアがリストに載りました。",
-      "locked": "段階5({{name}}、星 {{stars}} 個)から、アイデアの投稿と投票ができます。",
+      "sent": "ありがとうございます！あなたのアイデアがリストに載りました。",
+      "locked": "段階5（{{name}}、星 {{stars}} 個）から、アイデアの投稿と投票ができます。",
       "retry": "もう一度試す",
       "empty": "まだアイデアがありません。",
-      "votes": "票数: {{count}}",
-      "voteAria": "このアイデアに投票(現在 {{votes}} 票)",
+      "votes": "票数：{{count}}",
+      "voteAria": "このアイデアに投票（現在 {{votes}} 票）",
       "archived": "アーカイブ済み",
       "archive": "アーカイブ",
-      "archiveTitle": "アイデアをアーカイブしますか?",
+      "archiveTitle": "アイデアをアーカイブしますか？",
       "archiveMessage": "「{{body}}」はプレイヤーのリストから消えます。"
     }
   },
@@ -8222,8 +8280,8 @@
     },
     "staffOnly": "チーム専用",
     "fab": {
-      "admin": "ベータ切替 (管理者)",
-      "collaborator": "ベータ切替 (コラボレーター)"
+      "admin": "ベータ切替（管理者）",
+      "collaborator": "ベータ切替（コラボレーター）"
     },
     "chip": {
       "title": "ベータ領域",
@@ -8232,8 +8290,8 @@
   },
   "fusionBar": {
     "backTo": "{{name}} に戻る",
-    "kindSwitch": "カテゴリを切り替え (現在: {{kind}})",
-    "removeFilter": "フィルターを解除: {{name}}",
+    "kindSwitch": "カテゴリを切り替え（現在：{{kind}}）",
+    "removeFilter": "フィルターを解除：{{name}}",
     "moreFilters": "フィルターをさらに {{count}} 件表示",
     "hits": "{{count}} 件",
     "demo": {
@@ -8247,7 +8305,7 @@
       "weaponGroup": "武器グループ"
     },
     "navAria": "主要エリア",
-    "areaMenu": "エリアを切り替え — 現在: {{area}}",
+    "areaMenu": "エリアを切り替え — 現在：{{area}}",
     "home": "ホーム",
     "filters": "フィルター",
     "sectionsAria": "このエリアのサブページ",
@@ -8302,11 +8360,11 @@
       "newTabShort": "新しいタブで開く",
       "copyLink": "{{name}} のリンクをコピー",
       "copyLinkShort": "リンクをコピー",
-      "strip": "Codex全体: {{n}} 件",
-      "stripBusy": "Codex全体: 検索中…",
+      "strip": "Codex全体：{{n}} 件",
+      "stripBusy": "Codex全体：検索中…",
       "copied": "リンクをコピーしました",
       "keys": {
-        "dropContext": "入力欄の先頭: コンテキストを解除"
+        "dropContext": "入力欄の先頭：コンテキストを解除"
       },
       "action": {
         "add": "ハンガー +",
@@ -8348,7 +8406,7 @@
       },
       "telemetry": {
         "title": "テレメトリ",
-        "text": "今重要なこと:クォータ、エラー、サービス、使用状況、コストを一目で確認。"
+        "text": "今重要なこと：クォータ、エラー、サービス、使用状況、コストを一目で確認。"
       },
       "feedback": {
         "title": "フィードバック",
@@ -8377,7 +8435,7 @@
     "aria": "アプリをダウンロード",
     "scc": {
       "name": "Verse Companion App",
-      "desc": "ゲームのすぐ隣で:ライブ情報、オーバーレイ、キー割り当てをAlt+Tabなしで確認できます。"
+      "desc": "ゲームのすぐ隣で：ライブ情報、オーバーレイ、キー割り当てをAlt+Tabなしで確認できます。"
     },
     "starscape": {
       "name": "Starscape",
@@ -8407,7 +8465,7 @@
     "hub": {
       "eyebrow": "アプリ",
       "title": "アプリ",
-      "subtitle": "ウェブサイトと併用するアプリ一式:Verse Data Uploader、Starscape、ブラウザ拡張機能。",
+      "subtitle": "ウェブサイトと併用するアプリ一式：Verse Data Uploader、Starscape、ブラウザ拡張機能。",
       "breadcrumbAria": "アプリ",
       "uploader": {
         "name": "Verse Data Uploader",
@@ -8415,7 +8473,7 @@
       },
       "starscape": {
         "name": "Starscape",
-        "desc": "デスクトップアプリ:Verseギャラリーを動く壁紙に。"
+        "desc": "デスクトップアプリ：Verseギャラリーを動く壁紙に。"
       },
       "extension": {
         "name": "ブラウザ拡張機能",
@@ -8462,8 +8520,8 @@
       "atRsi": "RSIで見る",
       "allProducts": "すべての製品",
       "add": "追加",
-      "whereStored": "どこにありますか?",
-      "whereInstalled": "装備先は?",
+      "whereStored": "どこにありますか？",
+      "whereInstalled": "装備先は？",
       "planOps": "ミッションを計画",
       "sourceOf": "入手先",
       "openSet": "セットを開く",
@@ -8526,7 +8584,7 @@
       "missionVariants": "{{n}}件のバリアント"
     },
     "abbr": {
-      "alias": "「{{word}}」の解釈:",
+      "alias": "「{{word}}」の解釈：",
       "chip": "「{{word}}」がチップになりました"
     },
     "newInPatch": "パッチ {{version}}の新要素",
@@ -8538,11 +8596,11 @@
       "dropChip": "最後のチップを削除"
     },
     "hint": {
-      "lead": "ヒント:",
-      "tryAria": "試してみる: {{hint}}"
+      "lead": "ヒント：",
+      "tryAria": "試してみる：{{hint}}"
     },
     "signIn": {
-      "title": "サインインしますか?",
+      "title": "サインインしますか？",
       "message": "ウィッシュ、インベントリ、オペレーションはアカウントに紐づきます。保存するにはサインインしてください。",
       "confirm": "サインインへ"
     },
@@ -8806,11 +8864,11 @@
         "t": "Esc で閉じても入力したテキストは残ります"
       },
       "68": {
-        "t": "略語も使えます: 「qd s2」",
+        "t": "略語も使えます：「qd s2」",
         "q": "qd s2"
       },
       "69": {
-        "t": "入力ミス? 検索が「もしかして…」と提案します"
+        "t": "入力ミス？検索が「もしかして…」と提案します"
       }
     },
     "outside": {
@@ -8859,9 +8917,9 @@
       "sets": "セット",
       "einsaetze_planned": "予定のミッション",
       "einsaetze_done": "完了したミッション",
-      "missions_30d": "ミッション(30日間)",
+      "missions_30d": "ミッション（30日間）",
       "kartograph_rank": "カートグラファーランク",
-      "active_days_30": "アクティブな日数(30日間)"
+      "active_days_30": "アクティブな日数（30日間）"
     },
     "group": {
       "kind": {
@@ -8880,7 +8938,7 @@
       "general": "全般",
       "generalHint": "下で個別に設定しない限り、すべてのフレンドに適用されます。変更はすぐに保存されます。",
       "facetHint": {
-        "hangar": "あなたの船(ウィッシュを含む)。メモと構成は含まれません。",
+        "hangar": "あなたの船（ウィッシュを含む）。メモと構成は含まれません。",
         "flagship": "ハンガーの一番上に固定した船です。",
         "presence": "今オンラインかどうか。正確な時刻は表示されません。",
         "stats": "船、セット、ミッション、アクティブな日数、カートグラファーランクなどの数値です。"
@@ -8892,13 +8950,13 @@
       "inherit": "全般と同じ",
       "on": "オン",
       "off": "オフ",
-      "result": "このフレンドに見える内容:",
+      "result": "このフレンドに見える内容：",
       "nothing": "何も見えません",
       "eyebrow": "ソーシャル"
     },
     "teams": {
       "title": "グループ",
-      "hint": "グループは上記の非公開のフレンドリストと異なり、招待コードで参加する場所です。メンバーは互いの名前、ハンドル、役割と、あなたがグループと共有するミッション(クルー枠と人数を含む)を見られます。それ以外は見えません。ハンガー、オンライン状況、フレンドリストは対象外です。",
+      "hint": "グループは上記の非公開のフレンドリストと異なり、招待コードで参加する場所です。メンバーは互いの名前、ハンドル、役割と、あなたがグループと共有するミッション（クルー枠と人数を含む）を見られます。それ以外は見えません。ハンガー、オンライン状況、フレンドリストは対象外です。",
       "namePlaceholder": "新しいグループの名前",
       "create": "グループを作成",
       "codePlaceholder": "招待コード",
@@ -8912,16 +8970,16 @@
       "inviteCode": "招待コード",
       "expires": "{{date}}まで有効",
       "rotate": "新しいコード",
-      "rotateTitle": "招待コードを置き換えますか?",
+      "rotateTitle": "招待コードを置き換えますか？",
       "rotateMessage": "「{{name}}」の古いコードはすぐに使えなくなります。すでにグループにいる人はそのままです。",
       "leave": "退出",
-      "leaveTitle": "このグループから退出しますか?",
+      "leaveTitle": "このグループから退出しますか？",
       "leaveMessage": "「{{name}}」から退出し、そこで共有されたミッションは表示されなくなります。あなた自身のミッションは削除されません。",
       "delete": "グループを削除",
-      "deleteTitle": "このグループを削除しますか?",
+      "deleteTitle": "このグループを削除しますか？",
       "deleteMessage": "「{{name}}」はすべてのメンバーに対して削除されます。ミッションは所有者のもとに残り、共有だけが終了します。",
       "removeMember": "削除",
-      "removeTitle": "このメンバーを削除しますか?",
+      "removeTitle": "このメンバーを削除しますか？",
       "removeMessage": "{{name}}は「{{group}}」とそこで共有されたミッションにアクセスできなくなります。",
       "makeAdmin": "管理者にする",
       "makeMember": "メンバーにする",
@@ -8949,7 +9007,7 @@
       "invite": "招待",
       "invited": "フレンドを招待しました。",
       "already": "このフレンドはすでにこのミッションに参加しています。",
-      "slotsLabel": "クルー枠(カンマ区切り、最大{{max}})",
+      "slotsLabel": "クルー枠（カンマ区切り、最大{{max}}）",
       "slotsSave": "枠を保存",
       "crew": "クルー",
       "counts": "承諾{{yes}}、未定{{maybe}}、辞退{{no}}",
@@ -8995,7 +9053,7 @@
     "groups": {
       "title": "グループ",
       "privateNote": "グループは非公開です。フレンドにはグループもどのグループに所属しているかも見えません。フレンドは複数のグループに所属できます。",
-      "shareNote": "グループに参加した人は、そのグループと共有しているもの(ミッション、船のバリアント)を受け取ります。削除された人やグループが削除された場合はアクセスできなくなります。グループと共有したセットは、現在のメンバーにのみ渡されます。",
+      "shareNote": "グループに参加した人は、そのグループと共有しているもの（ミッション、船のバリアント）を受け取ります。削除された人やグループが削除された場合はアクセスできなくなります。グループと共有したセットは、現在のメンバーにのみ渡されます。",
       "kindLabel": "グループの種類",
       "namePlaceholder": "グループ名",
       "create": "グループを作成",
@@ -9005,9 +9063,9 @@
       "rename": "名前を変更",
       "delete": "削除",
       "renameTitle": "グループ「{{name}}」の名前を変更",
-      "deleteTitle": "グループ「{{name}}」を削除しますか?",
+      "deleteTitle": "グループ「{{name}}」を削除しますか？",
       "deleteMessage": "フレンドはそのままフレンドです。このグループと共有した内容は、他の方法で共有していない限り、メンバーには見えなくなります。",
-      "friendPageHint": "フレンドのページには、そのフレンドがあなたのどのグループに所属しているかが表示されます。例:"
+      "friendPageHint": "フレンドのページには、そのフレンドがあなたのどのグループに所属しているかが表示されます。例："
     },
     "comparePanel": {
       "title": "比較",
@@ -9030,7 +9088,7 @@
       "missing": "このページは存在しないか、あなたには表示されません。フレンド限定です。",
       "since": "{{date}}からフレンド",
       "share": "何かを共有",
-      "inGroups": "あなたのグループ:",
+      "inGroups": "あなたのグループ：",
       "fromFriend": "{{name}}さんがあなたと共有",
       "nothingShared": "まだ何も共有されていません。",
       "fromMe": "あなたが共有",
@@ -9043,9 +9101,9 @@
       "kindSet": "セット",
       "kindVariant": "バリアント",
       "kindEinsatz": "ミッション",
-      "removeTitle": "{{name}}さんをフレンドから削除しますか?",
+      "removeTitle": "{{name}}さんをフレンドから削除しますか？",
       "removeMessage": "削除すると、お互いに共有したものは表示されなくなります。",
-      "blockTitle": "{{name}}さんをブロックしますか?",
+      "blockTitle": "{{name}}さんをブロックしますか？",
       "blockMessage": "フレンド関係が解除され、この人はあなたにリクエストを送れなくなります。"
     },
     "inviteLanding": {
@@ -9094,7 +9152,7 @@
     }
   },
   "quick": {
-    "toNachschub": "オペレーションへ: {{name}}",
+    "toNachschub": "オペレーションへ：{{name}}",
     "wish": "ウィッシュ",
     "allWish": "すべてのウィッシュ",
     "allWishCount": "ウィッシュ{{n}}件",
@@ -9120,9 +9178,9 @@
   },
   "wishRemoval": {
     "title": "{{name}}を削除",
-    "howMany": "いくつ削除しますか?",
-    "caption": "この{{n}}個が外れます:",
-    "captionOne": "この1個が外れます:",
+    "howMany": "いくつ削除しますか？",
+    "caption": "この{{n}}個が外れます：",
+    "captionOne": "この1個が外れます：",
     "barLabel": "外れる先",
     "free": "空き{{n}}",
     "fromOp": "「{{name}}」から{{n}}",
@@ -9140,7 +9198,7 @@
     "confirmDissolve": "削除して解散",
     "toastDissolved": "オペレーションも一緒に解散されました。",
     "release": {
-      "title": "{{name}}をオペレーションから外しますか?",
+      "title": "{{name}}をオペレーションから外しますか？",
       "text": "{{n}}個はウィッシュリストに残り、再び空き状態になります。",
       "textOne": "このアイテムはウィッシュリストに残り、再び空き状態になります。",
       "confirm": "外す",
@@ -9174,7 +9232,7 @@
     "remove": "{{name}}を削除",
     "removeGroup": "グループ{{name}}を削除",
     "removed": "{{name}}をウィッシュから削除しました",
-    "removedGroup": "{{name}}を削除しました(ウィッシュ{{n}}件)",
+    "removedGroup": "{{name}}を削除しました（ウィッシュ{{n}}件）",
     "selected": "選択中",
     "clear": "すべて選択解除",
     "toNachschub": "オペレーションへ",
@@ -9247,7 +9305,7 @@
       "hangar": "ハンガーで見る",
       "sammlung": "コレクションで見る"
     },
-    "whereTitle": "どこにありますか?",
+    "whereTitle": "どこにありますか？",
     "otherPlace": "その他の場所…",
     "otherPlaceholder": "場所を入力",
     "store": "置く",
@@ -9255,7 +9313,7 @@
     "assign": {
       "go": "割り当て",
       "title": "オペレーションに割り当てる",
-      "howMany": "いくつ割り当てますか?",
+      "howMany": "いくつ割り当てますか？",
       "ofWished": "希望{{n}}個中",
       "ofFree": "空き{{n}}個中",
       "newest": "最後に作成",
@@ -9278,7 +9336,7 @@
     }
   },
   "itemStage": {
-    "aria": "ステージ: {{name}}",
+    "aria": "ステージ：{{name}}",
     "eyebrowSil": "シルエット",
     "eyebrow3d": "3Dモデル",
     "viewAria": "表示",
@@ -9307,7 +9365,7 @@
   "blueprintWish": {
     "craftTimes": "クラフトする回数",
     "button": "素材 ×{{n}} をウィッシュリストに追加",
-    "done": "{{n}}× {{name}}: 素材をウィッシュリストに追加しました"
+    "done": "{{n}}× {{name}}：素材をウィッシュリストに追加しました"
   },
   "adminEvents": {
     "eyebrow": "管理",
@@ -9322,7 +9380,7 @@
     "reextract": "再評価",
     "backfill": "未評価を評価",
     "backfillProgress": "{{n}}件のデータシートを書き込みました…",
-    "backfillDone": "完了: {{n}}件のデータシートを書き込みました。",
+    "backfillDone": "完了：{{n}}件のデータシートを書き込みました。",
     "col": {
       "field": "フィールド",
       "value": "値",

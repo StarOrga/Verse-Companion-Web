@@ -3596,7 +3596,10 @@
           "fixed": "¿Han arreglado…?",
           "next": "¿Cuándo llega el próximo?",
           "nextThis": "¿Cuándo llega este parche?",
-          "nextPast": "¿Qué vino después?"
+          "nextPast": "¿Qué vino después?",
+          "first": "Primeros pasos en este parche",
+          "community": "Comunidad",
+          "urteil": "Tu veredicto"
         },
         "noteOf": "Cambios en {{version}} · parte de Alpha {{line}}",
         "wholeLine": "Ver el parche {{line}} completo",
@@ -3615,7 +3618,8 @@
           "verify": "Si el juego se cierra justo después de un parche: ejecuta «Verify» en el launcher antes de reportar un bug.",
           "repair": "Personaje atascado o equipo que falta: ejecuta Character Repair en tu cuenta de RSI y vuelve a iniciar sesión.",
           "known": "Echa un vistazo a los problemas conocidos antes de reportar: la mayoría de los bugs nuevos ya figuran ahí."
-        }
+        },
+        "nextTitle": "Preparación para el próximo parche principal"
       },
       "contents": {
         "inNotes": "En las notas de la versión",
@@ -3623,7 +3627,11 @@
         "less": "Contraer",
         "leftover": "Más puntos de la nota sin tarjeta de hoja de ruta ({{n}})",
         "noRoadmap": "No hay datos de hoja de ruta para este parche; aquí tienes la nota «{{title}}»:",
-        "ofNote": "Los cambios de «{{title}}»:"
+        "ofNote": "Los cambios de «{{title}}»:",
+        "fixedTitle": "Corregido",
+        "knownTitle": "Problemas conocidos",
+        "gallery": "Imágenes de este parche",
+        "moreLines": "Mostrar {{n}} más"
       },
       "fixed": {
         "placeholder": "Buscar en este parche… p. ej. quantum drive",
@@ -3776,6 +3784,56 @@
       "sinceDays": "Desde hace {{days}} días",
       "toBoard": "Centro de parches",
       "toNotes": "Leer las notas del parche"
+    },
+    "patchBoard": {
+      "switch": {
+        "aria": "Elegir canal",
+        "live": "Live",
+        "ptu": "PTU",
+        "liveHint": "Lo que importa a los jugadores de Live",
+        "ptuHint": "Builds de prueba: cada build por separado"
+      },
+      "unread": "No leído",
+      "newForYou": "Nuevo para ti",
+      "readFull": "Leer completo",
+      "markRead": "Leído",
+      "readOn": "leído el {{date}}",
+      "readEarlier": "leído antes",
+      "readAgain": "Volver a leer",
+      "now": {
+        "title": "Recién llegado a Live",
+        "since": "Desde el {{date}}",
+        "none": "Aún no hay ningún parche Live en el feed."
+      },
+      "next": {
+        "title": "Lo próximo en Live",
+        "none": "Aún no se conoce el próximo parche.",
+        "testing": "En pruebas de {{ring}}",
+        "noDate": "Sin fecha oficial",
+        "announced": "Anunciado para el {{date}}",
+        "estimate": "Estimación: {{when}}"
+      },
+      "allAbout": "Todo sobre {{line}}",
+      "close": "Cerrar",
+      "noDate": "Sin fecha",
+      "roadmap": {
+        "aria": "Estado en la hoja de ruta",
+        "committed": "Confirmado",
+        "tentative": "Posible",
+        "released": "Entregado"
+      },
+      "status": {
+        "next": "A continuación"
+      },
+      "daysLive": "{{n}} días en Live",
+      "earlier": "{{n}} actualizaciones anteriores",
+      "earlierHide": "Ocultar actualizaciones anteriores",
+      "ptu": {
+        "newest": "Build de prueba más reciente",
+        "aria": "Builds de prueba, la más reciente primero",
+        "empty": "Ahora mismo no hay builds de prueba en el feed.",
+        "wave": "{{stage}} · oleada {{n}}"
+      }
     }
   },
   "stability": {
@@ -4852,7 +4910,7 @@
     },
     "disclaimerTitle": "Aviso sobre el sitio de fans",
     "rsiLink": "Sitio oficial de Star Citizen: robertsspaceindustries.com",
-    "noticeOriginal": "Este es un sitio de fans no oficial de Star Citizen, sin afiliación con el grupo de empresas Cloud Imperium. Todo el contenido de este sitio que no haya sido creado por su responsable o sus usuarios es propiedad de sus respectivos dueños.",
+    "noticeOriginal": "This is an unofficial Star Citizen fan site, not affiliated with the Cloud Imperium group of companies. All content on this site not authored by its host or users are property of their respective owners.",
     "noticeOriginalLabel": "Texto original (inglés)",
     "trademarksOriginal": "Star Citizen®, Roberts Space Industries® y Cloud Imperium® son marcas registradas de Cloud Imperium Rights LLC"
   },

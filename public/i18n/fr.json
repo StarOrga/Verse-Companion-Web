@@ -3596,7 +3596,10 @@
           "fixed": "Ont-ils corrigé … ?",
           "next": "Quand sort le prochain ?",
           "nextThis": "Quand ce patch arrive-t-il ?",
-          "nextPast": "Et ensuite ?"
+          "nextPast": "Et ensuite ?",
+          "first": "Premiers pas dans ce patch",
+          "community": "Communauté",
+          "urteil": "Ton verdict"
         },
         "noteOf": "Changements de la {{version}} · fait partie d'Alpha {{line}}",
         "wholeLine": "Voir tout le patch {{line}}",
@@ -3615,7 +3618,8 @@
           "verify": "Plantages juste après un patch : lance « Verify » dans le launcher avant de signaler un bug.",
           "repair": "Personnage bloqué ou équipement manquant : lance Character Repair dans ton compte RSI, puis reconnecte-toi.",
           "known": "Parcours les problèmes connus avant de signaler : la plupart des bugs récents y figurent déjà."
-        }
+        },
+        "nextTitle": "Se préparer au prochain patch majeur"
       },
       "contents": {
         "inNotes": "Dans les notes de version",
@@ -3623,7 +3627,11 @@
         "less": "Replier",
         "leftover": "Autres points de la note sans carte de roadmap ({{n}})",
         "noRoadmap": "Aucune donnée de roadmap pour ce patch – voici la note « {{title}} » :",
-        "ofNote": "Les changements de « {{title}} » :"
+        "ofNote": "Les changements de « {{title}} » :",
+        "fixedTitle": "Corrigé",
+        "knownTitle": "Problèmes connus",
+        "gallery": "Images de ce patch",
+        "moreLines": "Afficher {{n}} de plus"
       },
       "fixed": {
         "placeholder": "Rechercher dans ce patch … p. ex. quantum drive",
@@ -3776,6 +3784,56 @@
       "sinceDays": "Depuis {{days}} jours",
       "toBoard": "Patch Central",
       "toNotes": "Lire les patch notes"
+    },
+    "patchBoard": {
+      "switch": {
+        "aria": "Choisir le canal",
+        "live": "Live",
+        "ptu": "PTU",
+        "liveHint": "Ce qui compte pour les joueurs Live",
+        "ptuHint": "Builds de test : chaque build, un par un"
+      },
+      "unread": "Non lu",
+      "newForYou": "Nouveau pour toi",
+      "readFull": "Lire en entier",
+      "markRead": "Lu",
+      "readOn": "lu le {{date}}",
+      "readEarlier": "lu plus tôt",
+      "readAgain": "Relire",
+      "now": {
+        "title": "Tout juste arrivé sur Live",
+        "since": "Depuis le {{date}}",
+        "none": "Pas encore de patch Live dans le flux."
+      },
+      "next": {
+        "title": "Prochainement sur Live",
+        "none": "Aucun prochain patch connu pour l'instant.",
+        "testing": "En test sur {{ring}}",
+        "noDate": "Pas de date officielle",
+        "announced": "Annoncé pour le {{date}}",
+        "estimate": "Estimation : {{when}}"
+      },
+      "allAbout": "Tout sur {{line}}",
+      "close": "Fermer",
+      "noDate": "Sans date",
+      "roadmap": {
+        "aria": "État de la roadmap",
+        "committed": "Confirmé",
+        "tentative": "Possible",
+        "released": "Livré"
+      },
+      "status": {
+        "next": "À suivre"
+      },
+      "daysLive": "{{n}} jours en live",
+      "earlier": "{{n}} mises à jour précédentes",
+      "earlierHide": "Masquer les mises à jour précédentes",
+      "ptu": {
+        "newest": "Build de test le plus récent",
+        "aria": "Builds de test, les plus récents d'abord",
+        "empty": "Aucun build de test dans le flux pour le moment.",
+        "wave": "{{stage}} · vague {{n}}"
+      }
     }
   },
   "stability": {
@@ -4852,7 +4910,7 @@
     },
     "disclaimerTitle": "Avis de site de fans",
     "rsiLink": "Site officiel de Star Citizen : robertsspaceindustries.com",
-    "noticeOriginal": "Ceci est un site de fans non officiel de Star Citizen, non affilié au groupe de sociétés Cloud Imperium. Tout contenu de ce site qui n'a pas été créé par son hébergeur ou ses utilisateurs est la propriété de ses détenteurs respectifs.",
+    "noticeOriginal": "This is an unofficial Star Citizen fan site, not affiliated with the Cloud Imperium group of companies. All content on this site not authored by its host or users are property of their respective owners.",
     "noticeOriginalLabel": "Texte original",
     "trademarksOriginal": "Star Citizen®, Roberts Space Industries® et Cloud Imperium® sont des marques déposées de Cloud Imperium Rights LLC"
   },

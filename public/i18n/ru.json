@@ -3596,7 +3596,10 @@
           "fixed": "Исправили ли …?",
           "next": "Когда следующий?",
           "nextThis": "Когда выйдет этот патч?",
-          "nextPast": "Что было дальше?"
+          "nextPast": "Что было дальше?",
+          "first": "Первые шаги в этом патче",
+          "community": "Сообщество",
+          "urteil": "Ваш вердикт"
         },
         "noteOf": "Изменения в {{version}} · часть Alpha {{line}}",
         "wholeLine": "Открыть весь патч {{line}}",
@@ -3615,7 +3618,8 @@
           "verify": "Вылеты сразу после патча: запустите «Verify» в лаунчере, прежде чем сообщать о баге.",
           "repair": "Персонаж завис или пропало снаряжение: запустите Character Repair в аккаунте RSI и войдите снова.",
           "known": "Перед отправкой отчёта просмотрите известные проблемы — большинство свежих багов уже в списке."
-        }
+        },
+        "nextTitle": "Подготовка к следующему крупному патчу"
       },
       "contents": {
         "inNotes": "В примечаниях к релизу",
@@ -3623,7 +3627,11 @@
         "less": "Свернуть",
         "leftover": "Другие пункты заметки без карточки Roadmap ({{n}})",
         "noRoadmap": "Нет данных Roadmap по этому патчу — вот заметка «{{title}}»:",
-        "ofNote": "Изменения из «{{title}}»:"
+        "ofNote": "Изменения из «{{title}}»:",
+        "fixedTitle": "Исправлено",
+        "knownTitle": "Известные проблемы",
+        "gallery": "Изображения из этого патча",
+        "moreLines": "Показать ещё {{n}}"
       },
       "fixed": {
         "placeholder": "Искать в этом патче … напр. quantum drive",
@@ -3776,6 +3784,56 @@
       "sinceDays": "Уже {{days}} дн.",
       "toBoard": "Центр патчей",
       "toNotes": "Читать примечания к патчу"
+    },
+    "patchBoard": {
+      "switch": {
+        "aria": "Выберите канал",
+        "live": "Live",
+        "ptu": "PTU",
+        "liveHint": "Что важно игрокам Live",
+        "ptuHint": "Тестовые билды: каждый билд по отдельности"
+      },
+      "unread": "Не прочитано",
+      "newForYou": "Новое для вас",
+      "readFull": "Читать полностью",
+      "markRead": "Прочитано",
+      "readOn": "прочитано {{date}}",
+      "readEarlier": "прочитано ранее",
+      "readAgain": "Прочитать снова",
+      "now": {
+        "title": "Только что вышел в Live",
+        "since": "С {{date}}",
+        "none": "В ленте пока нет патча Live."
+      },
+      "next": {
+        "title": "Следующий в Live",
+        "none": "Следующий патч пока неизвестен.",
+        "testing": "На тесте в {{ring}}",
+        "noDate": "Официальной даты нет",
+        "announced": "Объявлен на {{date}}",
+        "estimate": "Оценка: {{when}}"
+      },
+      "allAbout": "Всё о {{line}}",
+      "close": "Закрыть",
+      "noDate": "Без даты",
+      "roadmap": {
+        "aria": "Статус в Roadmap",
+        "committed": "Подтверждено",
+        "tentative": "Возможно",
+        "released": "Выпущено"
+      },
+      "status": {
+        "next": "Следующий на очереди"
+      },
+      "daysLive": "Дней в Live: {{n}}",
+      "earlier": "Более ранние обновления: {{n}}",
+      "earlierHide": "Скрыть более ранние обновления",
+      "ptu": {
+        "newest": "Новейший тестовый билд",
+        "aria": "Тестовые билды, сначала новые",
+        "empty": "Сейчас в ленте нет тестовых билдов.",
+        "wave": "{{stage}} · волна {{n}}"
+      }
     }
   },
   "stability": {
@@ -4852,7 +4910,7 @@
     },
     "disclaimerTitle": "Уведомление о фан-сайте",
     "rsiLink": "Официальный сайт Star Citizen: robertsspaceindustries.com",
-    "noticeOriginal": "Это неофициальный фан-сайт Star Citizen, не связанный с группой компаний Cloud Imperium. Все материалы на этом сайте, созданные не его владельцем и не пользователями, являются собственностью соответствующих правообладателей.",
+    "noticeOriginal": "This is an unofficial Star Citizen fan site, not affiliated with the Cloud Imperium group of companies. All content on this site not authored by its host or users are property of their respective owners.",
     "noticeOriginalLabel": "Оригинальная формулировка (английский)",
     "trademarksOriginal": "Star Citizen®, Roberts Space Industries® и Cloud Imperium® являются зарегистрированными товарными знаками Cloud Imperium Rights LLC"
   },

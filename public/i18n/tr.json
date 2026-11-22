@@ -3596,7 +3596,10 @@
           "fixed": "… düzeltildi mi?",
           "next": "Bir sonrakisi ne zaman?",
           "nextThis": "Bu yama ne zaman geliyor?",
-          "nextPast": "Sonra ne geldi?"
+          "nextPast": "Sonra ne geldi?",
+          "first": "Bu yamada ilk adımlar",
+          "community": "Topluluk",
+          "urteil": "Senin kararın"
         },
         "noteOf": "{{version}} sürümündeki değişiklikler · Alpha {{line}} kapsamında",
         "wholeLine": "{{line}} yamasının tamamını gör",
@@ -3615,7 +3618,8 @@
           "verify": "Yamadan hemen sonra çöküyorsa, hata bildirmeden önce başlatıcıda \"Verify\" çalıştır.",
           "repair": "Karakter takıldıysa veya ekipman eksikse RSI hesabında Character Repair çalıştır, sonra tekrar giriş yap.",
           "known": "Bildirmeden önce bilinen sorunlara göz at — yeni hataların çoğu zaten orada listelenmiştir."
-        }
+        },
+        "nextTitle": "Sonraki büyük yamaya hazırlık"
       },
       "contents": {
         "inNotes": "Sürüm notlarında",
@@ -3623,7 +3627,11 @@
         "less": "Daralt",
         "leftover": "Yol haritası kartı olmayan diğer not maddeleri ({{n}})",
         "noRoadmap": "Bu yama için yol haritası verisi yok — işte \"{{title}}\" notu:",
-        "ofNote": "“{{title}}” notundaki değişiklikler:"
+        "ofNote": "“{{title}}” notundaki değişiklikler:",
+        "fixedTitle": "Düzeltildi",
+        "knownTitle": "Bilinen sorunlar",
+        "gallery": "Bu yamadan görseller",
+        "moreLines": "{{n}} tane daha göster"
       },
       "fixed": {
         "placeholder": "Bu yamada ara … ör. quantum drive",
@@ -3776,6 +3784,56 @@
       "sinceDays": "{{days}} gündür",
       "toBoard": "Yama Merkezi",
       "toNotes": "Yama notlarını oku"
+    },
+    "patchBoard": {
+      "switch": {
+        "aria": "Kanal seç",
+        "live": "Live",
+        "ptu": "PTU",
+        "liveHint": "Live oyuncuları için önemli olanlar",
+        "ptuHint": "Test build'leri: her bir build ayrı ayrı"
+      },
+      "unread": "Okunmadı",
+      "newForYou": "Senin için yeni",
+      "readFull": "Tamamını oku",
+      "markRead": "Okundu",
+      "readOn": "{{date}} tarihinde okundu",
+      "readEarlier": "daha önce okundu",
+      "readAgain": "Yeniden oku",
+      "now": {
+        "title": "Live'a yeni geldi",
+        "since": "{{date}} tarihinden beri",
+        "none": "Akışta henüz Live yaması yok."
+      },
+      "next": {
+        "title": "Live'da sıradaki",
+        "none": "Sonraki yama henüz bilinmiyor.",
+        "testing": "{{ring}} testinde",
+        "noDate": "Resmi tarih yok",
+        "announced": "{{date}} için duyuruldu",
+        "estimate": "Tahmin: {{when}}"
+      },
+      "allAbout": "{{line}} hakkında her şey",
+      "close": "Kapat",
+      "noDate": "Tarihsiz",
+      "roadmap": {
+        "aria": "Yol haritası durumu",
+        "committed": "Onaylandı",
+        "tentative": "Olası",
+        "released": "Teslim edildi"
+      },
+      "status": {
+        "next": "Sırada"
+      },
+      "daysLive": "{{n}} gündür Live'da",
+      "earlier": "{{n}} önceki güncelleme",
+      "earlierHide": "Önceki güncellemeleri gizle",
+      "ptu": {
+        "newest": "En yeni test build'i",
+        "aria": "Test build'leri, en yenisi önce",
+        "empty": "Şu anda akışta test build'i yok.",
+        "wave": "{{stage}} · {{n}}. dalga"
+      }
     }
   },
   "stability": {
@@ -4852,7 +4910,7 @@
     },
     "disclaimerTitle": "Hayran sitesi bildirimi",
     "rsiLink": "Resmî Star Citizen sitesi: robertsspaceindustries.com",
-    "noticeOriginal": "Bu, resmî olmayan bir Star Citizen hayran sitesidir ve Cloud Imperium şirketler grubuyla bağlantılı değildir. Bu sitede, site sahibi veya kullanıcıları tarafından oluşturulmamış tüm içerikler ilgili sahiplerinin mülkiyetindedir.",
+    "noticeOriginal": "This is an unofficial Star Citizen fan site, not affiliated with the Cloud Imperium group of companies. All content on this site not authored by its host or users are property of their respective owners.",
     "noticeOriginalLabel": "Orijinal ifade",
     "trademarksOriginal": "Star Citizen®, Roberts Space Industries® ve Cloud Imperium®, Cloud Imperium Rights LLC'nin tescilli ticari markalarıdır"
   },

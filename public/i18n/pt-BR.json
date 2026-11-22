@@ -3596,7 +3596,10 @@
           "fixed": "Corrigiram …?",
           "next": "Quando sai o próximo?",
           "nextThis": "Quando sai este patch?",
-          "nextPast": "O que veio depois?"
+          "nextPast": "O que veio depois?",
+          "first": "Primeiros passos neste patch",
+          "community": "Comunidade",
+          "urteil": "Seu veredito"
         },
         "noteOf": "Mudanças em {{version}} · parte do Alpha {{line}}",
         "wholeLine": "Ver o patch {{line}} completo",
@@ -3615,7 +3618,8 @@
           "verify": "Travando logo após um patch: execute \"Verify\" no launcher antes de reportar um bug.",
           "repair": "Personagem travado ou equipamento sumido: execute o Character Repair na sua conta RSI e faça login de novo.",
           "known": "Dê uma olhada nos problemas conhecidos antes de reportar — a maioria dos bugs recentes já está listada lá."
-        }
+        },
+        "nextTitle": "Preparando-se para o próximo patch principal"
       },
       "contents": {
         "inNotes": "Nas notas de lançamento",
@@ -3623,7 +3627,11 @@
         "less": "Recolher",
         "leftover": "Outros tópicos da nota sem card no roadmap ({{n}})",
         "noRoadmap": "Sem dados de roadmap para este patch – aqui está a nota \"{{title}}\":",
-        "ofNote": "As mudanças de “{{title}}”:"
+        "ofNote": "As mudanças de “{{title}}”:",
+        "fixedTitle": "Corrigido",
+        "knownTitle": "Problemas conhecidos",
+        "gallery": "Imagens deste patch",
+        "moreLines": "Mostrar mais {{n}}"
       },
       "fixed": {
         "placeholder": "Pesquisar neste patch … ex.: quantum drive",
@@ -3776,6 +3784,56 @@
       "sinceDays": "Há {{days}} dias",
       "toBoard": "Central de patches",
       "toNotes": "Ler as notas do patch"
+    },
+    "patchBoard": {
+      "switch": {
+        "aria": "Escolher canal",
+        "live": "Live",
+        "ptu": "PTU",
+        "liveHint": "O que importa para quem joga no Live",
+        "ptuHint": "Builds de teste: cada build individualmente"
+      },
+      "unread": "Não lido",
+      "newForYou": "Novo para você",
+      "readFull": "Ler na íntegra",
+      "markRead": "Lido",
+      "readOn": "lido em {{date}}",
+      "readEarlier": "lido antes",
+      "readAgain": "Ler de novo",
+      "now": {
+        "title": "Acabou de chegar ao Live",
+        "since": "Desde {{date}}",
+        "none": "Ainda não há patch Live no feed."
+      },
+      "next": {
+        "title": "Próximo no Live",
+        "none": "Ainda não se sabe qual é o próximo patch.",
+        "testing": "Em teste no {{ring}}",
+        "noDate": "Sem data oficial",
+        "announced": "Anunciado para {{date}}",
+        "estimate": "Estimativa: {{when}}"
+      },
+      "allAbout": "Tudo sobre {{line}}",
+      "close": "Fechar",
+      "noDate": "Sem data",
+      "roadmap": {
+        "aria": "Status no roadmap",
+        "committed": "Confirmado",
+        "tentative": "Possível",
+        "released": "Entregue"
+      },
+      "status": {
+        "next": "A seguir"
+      },
+      "daysLive": "{{n}} dias no Live",
+      "earlier": "{{n}} atualizações anteriores",
+      "earlierHide": "Ocultar atualizações anteriores",
+      "ptu": {
+        "newest": "Build de teste mais recente",
+        "aria": "Builds de teste, da mais recente",
+        "empty": "No momento não há builds de teste no feed.",
+        "wave": "{{stage}} · onda {{n}}"
+      }
     }
   },
   "stability": {

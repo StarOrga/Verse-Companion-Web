@@ -139,7 +139,7 @@
     "continueDiscord": "使用 Discord 繼續",
     "inviteOnly": "僅限受邀者存取。請向管理員索取邀請。",
     "deniedInvite": "此帳號尚未受邀。本站僅限受邀者使用——請向管理員索取邀請。",
-    "deniedSignup": "此帳號尚未獲准。僅限受邀者存取——請先申請存取權限,再重新登入。",
+    "deniedSignup": "此帳號尚未獲准。僅限受邀者存取——請先申請存取權限，再重新登入。",
     "unavailable": {
       "title": "無法驗證你的存取權限",
       "body": "剛才無法載入你的個人資料——通常是登入後的短暫小狀況。你仍處於登入狀態。",
@@ -204,7 +204,7 @@
     "phaseBadge": "Alpha",
     "badge": "製圖師徽章",
     "accountMenu": "帳號選單",
-    "profilePicture": "個人頭像(帳號選單)",
+    "profilePicture": "個人頭像（帳號選單）",
     "adminOnly": "僅限管理員",
     "adminMenu": "管理員",
     "telemetry": "遙測",
@@ -229,8 +229,8 @@
     "verse": "Verse",
     "translations": "AI 翻譯",
     "social": "社群",
-    "accountMenuRequests": "帳號選單,{{count}} 個待處理的好友邀請",
-    "socialRequests": "社群,{{count}} 個待處理的好友邀請"
+    "accountMenuRequests": "帳號選單，{{count}} 個待處理的好友邀請",
+    "socialRequests": "社群，{{count}} 個待處理的好友邀請"
   },
   "impersonation": {
     "banner": {
@@ -3347,7 +3347,7 @@
   "news": {
     "loading": "載入中…",
     "empty": "目前還沒有新聞。",
-    "emptyFavorites": "尚未收藏任何內容 — 用收藏圖示收藏貼文後,就會顯示在這裡。",
+    "emptyFavorites": "尚未收藏任何內容 — 用收藏圖示收藏貼文後，就會顯示在這裡。",
     "errorTitle": "無法載入新聞",
     "lastUpdated": "{{rel}}更新",
     "refreshing": "更新中…",
@@ -3382,7 +3382,7 @@
       "allPosts": "所有活動貼文",
       "runningUntil": "進行中 · 至 {{date}}",
       "endsToday": "進行中 · 今天結束",
-      "startsTomorrow": "明天起,{{date}}",
+      "startsTomorrow": "明天起，{{date}}",
       "startsIn": "{{date}} 起 · {{n}} 天後",
       "estimated": "日期為預估",
       "error": "無法載入活動。",
@@ -3435,7 +3435,7 @@
         "deltaSlower": "比中位數慢 {{n}} 天",
         "deltaSame": "與中位數完全相同",
         "barDays": "Alpha {{version}}:{{n}} 天",
-        "chartAria": "{{title}}:目前 {{latest}} {{unit}},{{n}} 筆數據的中位數為 {{median}} {{unit}}",
+        "chartAria": "{{title}}：目前 {{latest}} {{unit}},{{n}} 筆數據的中位數為 {{median}} {{unit}}",
         "unit": {
           "days": "天"
         },
@@ -3445,13 +3445,13 @@
           "sub": "從首個測試版本到正式上線的天數"
         },
         "cadence": {
-          "title": "更新週期(主要版本)",
+          "title": "更新週期（主要版本）",
           "short": "週期",
           "sub": "兩次 Live 發布之間的天數"
         },
         "median": "歷史中位數",
         "subCadence": {
-          "title": "更新週期(小型更新)",
+          "title": "更新週期（小型更新）",
           "short": "小型更新",
           "sub": "PTU 或 Live 中兩次小型更新之間的天數"
         },
@@ -3459,19 +3459,19 @@
           "aria": "圖表時間範圍",
           "6m": "6 個月",
           "all": "全部時間",
-          "empty": "此範圍內沒有數據,請切換到「全部時間」。"
+          "empty": "此範圍內沒有數據，請切換到「全部時間」。"
         }
       },
       "ptuRelease": {
         "title": "{{version}} 何時上線 LIVE?",
         "infoLabel": "這些日期是怎麼來的",
-        "infoEstimate": "我們的預估:此版本的首個測試版本日期,加上過去各版本從首個 PTU 版本到 LIVE 所花時間的中位數。這是推算結果,並非承諾。",
-        "infoOfficial": "官方日期:RSI 在其狀態網站上排定的 LIVE 部署日期,一旦該處有排程即會顯示。RSI 不會在更新說明中標明日期。",
+        "infoEstimate": "我們的預估：此版本的首個測試版本日期，加上過去各版本從首個 PTU 版本到 LIVE 所花時間的中位數。這是推算結果，並非承諾。",
+        "infoOfficial": "官方日期：RSI 在其狀態網站上排定的 LIVE 部署日期，一旦該處有排程即會顯示。RSI 不會在更新說明中標明日期。",
         "estimate": "我們的預估",
         "estimateBasis": "已測試 {{days}} 天 · PTU → LIVE 中位數 {{median}} 天(n = {{n}})",
-        "noEstimate": "目前數據不足,無法預估",
+        "noEstimate": "目前數據不足，無法預估",
         "official": "官方(RSI)",
-        "source": "來源:RSI 狀態,{{title}}",
+        "source": "來源：RSI 狀態，{{title}}",
         "noOfficial": "尚無官方日期",
         "statusLink": "請查看 RSI 狀態頁面",
         "openNotes": "查看 {{version}} 的變更",
@@ -3480,7 +3480,7 @@
       "forecast": {
         "title": "預估時程",
         "short": "時程",
-        "sub": "根據更新週期推估的中位數,非官方日期",
+        "sub": "根據更新週期推估的中位數，非官方日期",
         "row": {
           "ptu": "下一個 PTU",
           "live": "下一個 Live 更新",
@@ -3504,7 +3504,7 @@
       },
       "search": {
         "label": "搜尋修補內容",
-        "placeholder": "例如:Orison、Hotfix、Quantum Drive",
+        "placeholder": "例如：Orison、Hotfix、Quantum Drive",
         "clear": "清除搜尋",
         "noHits": "找不到結果 — 其他拼寫也沒有。"
       },
@@ -3523,14 +3523,14 @@
         "openCard": "在 RSI 上開啟路線圖項目「{{name}}」"
       },
       "detail": {
-        "loading": "正在載入修補內容 …",
+        "loading": "正在載入修補內容…",
         "unavailable": "此說明沒有可用內容 — 請至 RSI 閱讀。",
         "noMatch": "此說明中沒有符合的結果。",
         "fullNotes": "完整說明 ↗",
         "linkOut": "連結 ↗",
         "openOnRsi": "在 RSI 開啟 ↗",
-        "openOnRsiAria": "在 RSI 開啟 {{title}}(新分頁)",
-        "truncated": "這則說明非常長,其餘內容請至 RSI 查看。",
+        "openOnRsiAria": "在 RSI 開啟 {{title}}（新分頁）",
+        "truncated": "這則說明非常長，其餘內容請至 RSI 查看。",
         "hits": "{{count}} 筆結果",
         "points": "{{count}} 分"
       },
@@ -3540,12 +3540,12 @@
           "none": "無資料"
         },
         "componentHint": {
-          "community": "討論串中新回覆的每日數量(更新說明與熱修復討論串),以及附有 Issue Council 工單的回覆所佔比例與推薦權重",
-          "service": "依 RSI Status 統計,每日非計畫性服務異常的分鐘數(7 天),另加目前未解決的異常",
-          "cig": "CIG 已知問題文章中尚未解決的項目,以及其 7 天內的增加量"
+          "community": "討論串中新回覆的每日數量（更新說明與熱修復討論串），以及附有 Issue Council 工單的回覆所佔比例與推薦權重",
+          "service": "依 RSI Status 統計，每日非計畫性服務異常的分鐘數（7 天），另加目前未解決的異常",
+          "cig": "CIG 已知問題文章中尚未解決的項目，以及其 7 天內的增加量"
         },
         "timeline": "自上線以來",
-        "timelineAria": "自上線以來每日的穩定度,共 {{days}} 個取樣點",
+        "timelineAria": "自上線以來每日的穩定度，共 {{days}} 個取樣點",
         "hotfixMark": "熱修復 {{build}},{{date}}",
         "tickets": {
           "title": "社群回報的內容",
@@ -3564,7 +3564,7 @@
         "other": "無版本"
       },
       "stack": {
-        "aria": "修補檔,最新在前",
+        "aria": "版本，最新在前",
         "sinceDays": "持續 {{n}} 天",
         "replaced": "於 {{date}}",
         "liveSince": "自 {{date}} 起上線",
@@ -3574,59 +3574,67 @@
         "noBuild": "尚無建置版本",
         "plannedFor": "預計於 {{quarter}}",
         "inRing": "於 {{ring}} · {{n}} 波 · {{ago}}",
-        "hotfixOne": "1 次熱修復,於 {{date}}",
-        "hotfixes": "{{n}} 次熱修復,最近一次 {{date}}",
-        "nextLive": "下一個正式服修補檔 {{when}}(預估)",
+        "hotfixOne": "1 次熱修復，於 {{date}}",
+        "hotfixes": "{{n}} 次熱修復，最近一次 {{date}}",
+        "nextLive": "下一個正式服版本 {{when}}（預估）",
         "notes": "{{n}} 則說明",
         "planned": "{{n}} 個路線圖項目",
         "openDossier": "開啟 {{name}} 的檔案",
         "openItem": "在檔案中開啟 {{name}}",
         "moreItems": "再查看 {{n}} 個路線圖項目",
-        "older": "較舊的修補檔 · {{lines}}",
-        "olderHide": "收合較舊的修補檔"
+        "older": "較舊的版本 · {{lines}}",
+        "olderHide": "收合較舊的版本"
       },
       "dossier": {
         "toc": "章節",
-        "unknown": "找不到 Alpha {{line}} 的修補檔資料。",
+        "unknown": "找不到 Alpha {{line}} 的版本資料。",
         "section": {
           "stabilitaet": "穩定度",
           "builds": "進行中的測試建置",
           "prepPast": "你需要知道的事",
-          "contents": "內容有什麼?",
-          "fixed": "他們修好了……嗎?",
-          "next": "下一個何時推出?",
-          "nextThis": "這個修補檔何時推出?",
-          "nextPast": "之後發生了什麼?"
+          "contents": "內容有什麼？",
+          "fixed": "他們修好了……嗎？",
+          "next": "下一個何時推出？",
+          "nextThis": "這個版本何時推出？",
+          "nextPast": "之後發生了什麼？",
+          "first": "這個版本的第一步",
+          "community": "社群",
+          "urteil": "你的評價"
         },
         "noteOf": "{{version}} 的變更 · Alpha {{line}} 的一部分",
-        "wholeLine": "查看完整的 {{line}} 修補檔",
-        "eyebrow": "修補檔"
+        "wholeLine": "查看完整的 {{line}} 版本",
+        "eyebrow": "版本"
       },
       "prep": {
-        "source": "依據 Spectrum 貼文(「Important Build Info」)",
+        "source": "依據 Spectrum 貼文（「Important Build Info」）",
         "known": "已知問題",
         "focus": "測試重點",
         "wipe": "重置",
         "noBuildInfo": "RSI 未針對此建置發布「Important Build Info」。",
-        "generalTitle": "適用於每個修補檔",
+        "generalTitle": "適用於每個版本",
         "generalItem": {
-          "launcher": "開啟啟動器並等待下載完成——啟動器顯示的版本必須與修補檔相符。",
-          "shaders": "若更新後畫面閃爍或幀率下降,請清空著色器資料夾(%LOCALAPPDATA%\\\\Star Citizen\\\\)。",
-          "verify": "更新後立即當機:回報錯誤前,請先在啟動器中執行「Verify」。",
-          "repair": "角色卡住或裝備遺失:請在 RSI 帳號中執行 Character Repair,然後重新登入。",
+          "launcher": "開啟啟動器並等待下載完成——啟動器顯示的版本必須與版本相符。",
+          "shaders": "若更新後畫面閃爍或幀率下降，請清空著色器資料夾(%LOCALAPPDATA%\\\\Star Citizen\\\\)。",
+          "verify": "更新後立即當機：回報錯誤前，請先在啟動器中執行「Verify」。",
+          "repair": "角色卡住或裝備遺失：請在 RSI 帳號中執行 Character Repair,然後重新登入。",
           "known": "回報前請先瀏覽已知問題——大多數新錯誤已列在那裡。"
-        }
+        },
+        "nextTitle": "為下一個大型版本做準備"
       },
       "contents": {
         "inNotes": "在版本說明中",
         "more": "完整內容",
         "less": "收合",
         "leftover": "沒有路線圖卡片的其他說明要點({{n}})",
-        "noRoadmap": "此修補檔沒有路線圖資料——以下是說明「{{title}}」:",
-        "ofNote": "「{{title}}」的變更:"
+        "noRoadmap": "此版本沒有路線圖資料——以下是說明「{{title}}」：",
+        "ofNote": "「{{title}}」的變更：",
+        "fixedTitle": "已修正",
+        "knownTitle": "已知問題",
+        "gallery": "這個版本的圖片",
+        "moreLines": "再顯示 {{n}} 則"
       },
       "fixed": {
-        "placeholder": "搜尋此修補檔……例如 quantum drive",
+        "placeholder": "搜尋此版本……例如 quantum drive",
         "hits": "在 {{notes}} 則說明中找到 {{n}} 筆結果",
         "coverage": "已完整搜尋 {{loaded}} / {{total}} 則說明",
         "loadRest": "載入並搜尋其餘說明",
@@ -3635,15 +3643,15 @@
         "allNotes": "所有說明({{n}})"
       },
       "next": {
-        "sentenceLive": "下一個正式服修補檔預計約 {{date}}——{{when}}。",
+        "sentenceLive": "下一個正式服版本預計約 {{date}}——{{when}}。",
         "sentenceHistory": "Alpha {{line}} 於 {{date}} 在 {{days}} 天後被 Alpha {{next}} 取代——通常為 {{median}} 天。",
-        "sentencePlanned": "依週期,Alpha {{line}} 預計約 {{date}} 上線——{{when}}。",
-        "disclaimer": "根據修補檔週期的中位數估算,並非官方日期。",
-        "markers": "軸上的標記:上一個正式服修補檔、PTU 開始、通常的測試結束、上線、熱修復、今天以及通常的下一個日期。開始、上線與目標有標示——其餘由提示框說明。",
+        "sentencePlanned": "依週期，Alpha {{line}} 預計約 {{date}} 上線——{{when}}。",
+        "disclaimer": "根據版本週期的中位數估算，並非官方日期。",
+        "markers": "軸上的標記：上一個正式服版本、PTU 開始、通常的測試結束、上線、熱修復、今天以及通常的下一個日期。開始、上線與目標有標示——其餘由提示框說明。",
         "planned": {
           "sentence": "Alpha {{line}} 預計於 {{quarter}} 推出。",
           "unknown": "Alpha {{line}} 尚無日期。",
-          "status": "尚無測試建置——依一般節奏,下一個上線日期約為 {{date}}。",
+          "status": "尚無測試建置——依一般節奏，下一個上線日期約為 {{date}}。",
           "basisCadence": "一般節奏 · 取自 n = {{n}} 的中位數",
           "basisLead": "一般測試階段 · 取自 n = {{n}} 的中位數"
         },
@@ -3658,10 +3666,10 @@
           "leadUsual": "一般應為"
         },
         "span": {
-          "leadTime": "測試 → 上線:{{days}} 天",
-          "cadence": "上線 → 上線:{{days}} 天"
+          "leadTime": "測試 → 上線：{{days}} 天",
+          "cadence": "上線 → 上線：{{days}} 天"
         },
-        "charts": "詳細圖表(PTU → 上線 · 週期 · 子修補檔 · 時程)",
+        "charts": "詳細圖表（PTU → 上線 · 週期 · 子版本 · 時程）",
         "status": {
           "live": "Alpha {{line}} 已上線 {{days}} 天——通常 {{median}} 天後會有下一個。",
           "testing": "Alpha {{line}} 已測試 {{days}} 天——通常 {{median}} 天後上線。",
@@ -3669,14 +3677,14 @@
           "over": "CIG 比一般節奏晚了 {{n}} 天。"
         },
         "legend": {
-          "real": "上線週期(有憑據)",
-          "usual": "一般節奏(中位數)",
+          "real": "上線週期（有憑據）",
+          "usual": "一般節奏（中位數）",
           "over": "超出節奏",
           "lead": "測試階段(PTU)"
         },
         "fact": {
-          "lead": "測試 → 上線:{{days}} 天",
-          "cadence": "上一個週期 上線 → 上線:{{days}} 天",
+          "lead": "測試 → 上線：{{days}} 天",
+          "cadence": "上一個週期 上線 → 上線：{{days}} 天",
           "usual": "一般 {{median}} 天(n = {{n}})",
           "later": "比一般晚 {{n}} 天",
           "earlier": "比一般早 {{n}} 天",
@@ -3684,12 +3692,12 @@
           "hotfix": "上線後 {{n}} 次熱修復",
           "hotfixLast": "最近一次於 {{date}}"
         },
-        "infoLabel": "這些數字從何而來?"
+        "infoLabel": "這些數字從何而來？"
       },
       "monitor": {
-        "title": "下一個修補檔何時推出?",
-        "infoLabel": "這個估算從何而來?",
-        "infoBasis": "依據:n = {{n}} 個已測量週期的中位數 {{median}} 天。",
+        "title": "下一個版本何時推出？",
+        "infoLabel": "這個估算從何而來？",
+        "infoBasis": "依據：n = {{n}} 個已測量週期的中位數 {{median}} 天。",
         "over": "超出 {{n}} 天",
         "tile": {
           "live": "正式服",
@@ -3699,14 +3707,14 @@
           "cadenceStateFoot": "{{days}} / 約 {{median}} 天 · 中位數 · n = {{n}}",
           "next": "下一個",
           "goLive": "上線",
-          "nextUnknown": "下一個修補檔",
+          "nextUnknown": "下一個版本",
           "nextEta": "預估 {{date}}",
           "hotfixOne": "1 次熱修復 · {{date}}",
           "hotfixMany": "{{n}} 次熱修復 · 最近 {{date}}"
         }
       },
       "find": {
-        "summary": "在 {{patches}} 個修補檔中找到 {{hits}} 筆結果 · 已搜尋 {{loaded}} / {{total}} 則說明",
+        "summary": "在 {{patches}} 個版本中找到 {{hits}} 筆結果 · 已搜尋 {{loaded}} / {{total}} 則說明",
         "groupCount": "{{roadmap}} 個路線圖項目 · {{notes}} 個要點",
         "moreInDossier": "檔案中還有 {{n}} 筆結果",
         "loadRest": "載入並搜尋其餘 {{n}} 則說明",
@@ -3758,14 +3766,14 @@
     "verdict": {
       "label": "Verse 現況",
       "liveOnly": "{{line}} 已上線",
-      "due": "{{line}} 已上線 · 下一個主要修補檔 {{days}} 天後",
-      "dueWeeks": "{{line}} 已上線 · 下一個主要修補檔約 {{weeks}} 週後",
-      "today": "{{line}} 已上線 · 下一個主要修補檔預計今天推出",
-      "overdue": "{{line}} 已上線 · 下一個主要修補檔已逾期 {{days}} 天",
-      "overdueWeeks": "{{line}} 已上線 · 下一個主要修補檔已逾期約 {{weeks}} 週",
-      "basis": "依目前修補檔週期估算",
+      "due": "{{line}} 已上線 · 下一個主要版本 {{days}} 天後",
+      "dueWeeks": "{{line}} 已上線 · 下一個主要版本約 {{weeks}} 週後",
+      "today": "{{line}} 已上線 · 下一個主要版本預計今天推出",
+      "overdue": "{{line}} 已上線 · 下一個主要版本已逾期 {{days}} 天",
+      "overdueWeeks": "{{line}} 已上線 · 下一個主要版本已逾期約 {{weeks}} 週",
+      "basis": "依目前版本週期估算",
       "basisTesting": "{{test}} 測試中 · 依一般測試時長估算",
-      "freshLiveLabel": "新修補檔已上線",
+      "freshLiveLabel": "新版本已上線",
       "freshPtuLabel": "PTU 新內容",
       "freshLive": "{{line}} 現已上線",
       "freshPtu": "{{line}} 已進入 PTU",
@@ -3774,8 +3782,58 @@
       "sinceToday": "自今天起",
       "sinceYesterday": "自昨天起",
       "sinceDays": "已 {{days}} 天",
-      "toBoard": "修補檔中心",
-      "toNotes": "閱讀修補檔說明"
+      "toBoard": "版本中心",
+      "toNotes": "閱讀版本說明"
+    },
+    "patchBoard": {
+      "switch": {
+        "aria": "選擇頻道",
+        "live": "Live",
+        "ptu": "PTU",
+        "liveHint": "Live 玩家在意的內容",
+        "ptuHint": "測試建置：每一個建置都列出"
+      },
+      "unread": "未讀",
+      "newForYou": "給你的新內容",
+      "readFull": "閱讀全文",
+      "markRead": "已讀",
+      "readOn": "已於 {{date}} 閱讀",
+      "readEarlier": "先前已讀",
+      "readAgain": "再讀一次",
+      "now": {
+        "title": "剛登上 Live",
+        "since": "自 {{date}} 起",
+        "none": "Feed 中還沒有 Live 版本。"
+      },
+      "next": {
+        "title": "Live 上的下一個",
+        "none": "尚不知道下一個版本。",
+        "testing": "正在 {{ring}} 測試中",
+        "noDate": "無官方日期",
+        "announced": "已公布為 {{date}}",
+        "estimate": "預估：{{when}}"
+      },
+      "allAbout": "關於 {{line}} 的一切",
+      "close": "關閉",
+      "noDate": "無日期",
+      "roadmap": {
+        "aria": "路線圖狀態",
+        "committed": "已確認",
+        "tentative": "可能",
+        "released": "已交付"
+      },
+      "status": {
+        "next": "即將到來"
+      },
+      "daysLive": "已上線 {{n}} 天",
+      "earlier": "{{n}} 則較早的更新",
+      "earlierHide": "隱藏較早的更新",
+      "ptu": {
+        "newest": "最新測試建置",
+        "aria": "測試建置，最新的在前",
+        "empty": "目前 Feed 中沒有測試建置。",
+        "wave": "{{stage}} · 第 {{n}} 批"
+      }
     }
   },
   "stability": {
@@ -3897,7 +3955,7 @@
     },
     "prompts": {
       "reenable": "要重新啟用資料包「{{name}}」嗎？",
-      "delete": "要永久刪除 Bundle「{{name}}」嗎?\n\n此操作無法復原。",
+      "delete": "要永久刪除 Bundle「{{name}}」嗎？\n此操作無法復原。",
       "disableTitle": "要停用資料包「{{name}}」嗎？",
       "reasonLabel": "原因（選填）",
       "deleteTitle": "要刪除資料包嗎？",
@@ -3981,25 +4039,25 @@
     },
     "password": {
       "title": "密碼",
-      "hint": "設定新密碼。立即生效,你仍會保持登入。"
+      "hint": "設定新密碼。立即生效，你仍會保持登入。"
     },
     "username": {
       "title": "使用者名稱",
       "label": "使用者名稱",
-      "hint": "3–20 個字元:小寫字母 a–z、數字 0–9 與底線 (_)。",
+      "hint": "3–20 個字元：小寫字母 a–z、數字 0–9 與底線 (_)。",
       "placeholder": "your_callsign",
       "save": "儲存",
       "saving": "儲存中…",
       "saved": "使用者名稱已儲存。",
-      "errInvalid": "使用者名稱無效。請使用 3–20 個字元:a–z、0–9、_。",
+      "errInvalid": "使用者名稱無效。請使用 3–20 個字元：a–z、0–9、_。",
       "errTaken": "此使用者名稱已被使用。",
-      "errGeneric": "無法儲存使用者名稱,請再試一次。"
+      "errGeneric": "無法儲存使用者名稱，請再試一次。"
     },
     "locale": {
       "title": "語言與地區",
-      "hint": "語言決定翻譯與完整拼寫的月份名稱;地區決定日期欄位的順序與時間格式。「自動」會沿用瀏覽器回報的設定。",
+      "hint": "語言決定翻譯與完整拼寫的月份名稱；地區決定日期欄位的順序與時間格式。「自動」會沿用瀏覽器回報的設定。",
       "auto": "自動",
-      "detected": "自動偵測:{{value}}",
+      "detected": "自動偵測：{{value}}",
       "preview": "範例",
       "language": {
         "label": "語言"
@@ -4066,10 +4124,10 @@
     },
     "composer": {
       "title": "輸入",
-      "hint": "適用於所有訊息欄位:新主題、討論串回覆,以及處理模式中的回答框。",
+      "hint": "適用於所有訊息欄位：新主題、討論串回覆，以及處理模式中的回答框。",
       "sendOnEnter": {
         "label": "按 Enter 送出",
-        "descOn": "按 Enter 送出訊息,Shift+Enter 換行。Ctrl/Cmd+Enter 同樣可送出。",
+        "descOn": "按 Enter 送出訊息，Shift+Enter 換行。Ctrl/Cmd+Enter 同樣可送出。",
         "descOff": "按 Enter 換行。只有按 Ctrl/Cmd+Enter 或傳送按鈕才會送出。"
       }
     },
@@ -4078,31 +4136,31 @@
       "hint": "Codex 索引與搜尋顯示的內容。",
       "showNonUsable": {
         "label": "顯示無法使用的物品",
-        "descOn": "門、座椅、顯示器等遊戲物件會歸在「無法使用」下,並在搜尋中排在所有可用結果之後。",
-        "descOff": "你無法使用的門、座椅、顯示器等遊戲物件會被隱藏,包括區域樹、清單與搜尋。"
+        "descOn": "門、座椅、顯示器等遊戲物件會歸在「無法使用」下，並在搜尋中排在所有可用結果之後。",
+        "descOff": "你無法使用的門、座椅、顯示器等遊戲物件會被隱藏，包括區域樹、清單與搜尋。"
       }
     },
     "feedbackFab": {
       "title": "意見回饋按鈕",
-      "hint": "位於角落、用來送出意見回饋的按鈕,團隊的回覆也會顯示在這裡。",
+      "hint": "位於角落、用來送出意見回饋的按鈕，團隊的回覆也會顯示在這裡。",
       "show": {
         "label": "顯示意見回饋按鈕",
         "descOn": "意見回饋按鈕位於每個頁面的右下角。",
-        "descOff": "意見回饋按鈕已隱藏,團隊的回覆與提問也會一併看不到。在此重新開啟即可查看你的意見回饋。"
+        "descOff": "意見回饋按鈕已隱藏，團隊的回覆與提問也會一併看不到。在此重新開啟即可查看你的意見回饋。"
       },
       "staff": {
         "title": "意見回饋與 Beta 按鈕",
-        "hint": "角落的按鈕:送出意見回饋並查看團隊回覆,上方為 Beta 開關。",
+        "hint": "角落的按鈕：送出意見回饋並查看團隊回覆，上方為 Beta 開關。",
         "label": "顯示意見回饋與 Beta 按鈕",
-        "audience": "(僅限管理員與協作者)",
+        "audience": "（僅限管理員與協作者）",
         "descOn": "意見回饋按鈕與 Beta 按鈕位於每個頁面的右下角。",
-        "descOff": "意見回饋與 Beta 按鈕已隱藏,團隊的回覆與提問也會一併看不到。在此重新開啟即可查看你的意見回饋或 Beta 開關。"
+        "descOff": "意見回饋與 Beta 按鈕已隱藏，團隊的回覆與提問也會一併看不到。在此重新開啟即可查看你的意見回饋或 Beta 開關。"
       },
       "routineTint": {
         "label": "意見回饋標題僅顯示綠 / 紅",
-        "audience": "(僅限管理員)",
-        "descOn": "「意見回饋」標題在例行程序運行或處理中時亮綠燈,無任何處理時亮紅燈。僅適用於你的帳號。",
-        "descOff": "「意見回饋」標題顯示四種狀態:綠色表示就緒、藍色表示正在處理、琥珀色表示暫停、紅色表示無法連線。"
+        "audience": "（僅限管理員）",
+        "descOn": "「意見回饋」標題在例行程序運行或處理中時亮綠燈，無任何處理時亮紅燈。僅適用於你的帳號。",
+        "descOff": "「意見回饋」標題顯示四種狀態：綠色表示就緒、藍色表示正在處理、琥珀色表示暫停、紅色表示無法連線。"
       }
     },
     "danger": {
@@ -4110,53 +4168,53 @@
       "warning": "永久刪除你的帳號。你的上傳與 Bundle 也會一併消失。此操作無法復原。",
       "deleteBtn": "刪除我的帳號",
       "deleting": "刪除中…",
-      "confirm": "你的帳號({{email}})將被永久刪除,你的上傳與 Bundle 也會一併消失。之後你會被登出。確定嗎?",
+      "confirm": "你的帳號({{email}})將被永久刪除，你的上傳與 Bundle 也會一併消失。之後你會被登出。確定嗎？",
       "failed": "刪除失敗",
-      "viaAdmin": "目前帳號刪除由管理員執行。請透過網站聲明中的聯絡方式與我們聯繫;我們會一併刪除你的帳號與個人檔案、機庫、配置和上傳內容。",
+      "viaAdmin": "目前帳號刪除由管理員執行。請透過網站聲明中的聯絡方式與我們聯繫；我們會一併刪除你的帳號與個人檔案、機庫、配置和上傳內容。",
       "imprintLink": "前往網站聲明",
       "errors": {
         "forbidden": "只有管理員可以在此刪除帳號。",
-        "unauthorized": "你的登入階段已過期,請重新登入。",
-        "protectedAdmin": "此帳號受到保護,無法刪除。",
+        "unauthorized": "你的登入階段已過期，請重新登入。",
+        "protectedAdmin": "此帳號受到保護，無法刪除。",
         "lastAdmin": "無法刪除最後一位管理員。請先指派另一位管理員。",
         "notFound": "此帳號已不存在。",
-        "invalidBody": "請求無效,請重新載入頁面。"
+        "invalidBody": "請求無效，請重新載入頁面。"
       }
     }
   },
   "admin": {
     "title": "管理 · 使用者管理",
-    "subtitle": "只有管理員可以變更角色。最後一位管理員無法被降級,請先提升另一位管理員。",
+    "subtitle": "只有管理員可以變更角色。最後一位管理員無法被降級，請先提升另一位管理員。",
     "lastAdmin": "最後一位管理員",
-    "lastAdminTip": "變更此角色前請先提升另一位管理員,否則系統將沒有任何管理員。",
+    "lastAdminTip": "變更此角色前請先提升另一位管理員，否則系統將沒有任何管理員。",
     "protected": "受保護",
-    "protectedTip": "受保護的創辦人帳號。角色、核准與刪除已在資料庫中鎖定,只能在伺服器端 (service_role) 解除,無法透過管理介面解除。",
+    "protectedTip": "受保護的創辦人帳號。角色、核准與刪除已在資料庫中鎖定，只能在伺服器端 (service_role) 解除，無法透過管理介面解除。",
     "register": {
       "title": "註冊",
-      "subtitle": "將電子郵件加入允許清單,並設定首次登入時的角色。若帳號已存在則立即核准;邀請郵件為選填。",
+      "subtitle": "將電子郵件加入允許清單，並設定首次登入時的角色。若帳號已存在則立即核准；邀請郵件為選填。",
       "emailPlaceholder": "person@example.com",
       "sendInvite": "寄送邀請郵件",
       "send": "註冊",
       "sending": "註冊中…",
       "status": {
         "allowlisted": "已將 {{email}} 加入允許清單。",
-        "approved_existing": "{{email}} 已有帳號,已核准。",
+        "approved_existing": "{{email}} 已有帳號，已核准。",
         "invited": "已將 {{email}} 加入允許清單並寄出邀請。"
       },
       "unknownError": "註冊失敗。",
       "err": {
-        "method_not_allowed": "請求被拒絕(方法錯誤)。",
-        "server_misconfigured": "伺服器設定有誤,請檢查 Edge Function 的 Secrets。",
-        "unauthorized": "你的登入階段已過期,請重新登入。",
+        "method_not_allowed": "請求被拒絕（方法錯誤）。",
+        "server_misconfigured": "伺服器設定有誤，請檢查 Edge Function 的 Secrets。",
+        "unauthorized": "你的登入階段已過期，請重新登入。",
         "forbidden": "只有管理員可以註冊他人。",
-        "invalid_json": "無法讀取請求,請再試一次。",
+        "invalid_json": "無法讀取請求，請再試一次。",
         "invalid_email": "這不是有效的電子郵件地址。",
         "invalid_role": "沒有這個角色。",
         "allowlist_write_failed": "無法將此電子郵件加入允許清單。",
-        "user_lookup_failed": "允許清單已更新,但查詢既有帳號失敗。",
-        "invite_failed": "此電子郵件已在允許清單中,但邀請郵件寄送失敗。",
-        "role_assign_failed": "已邀請,但無法設定角色。",
-        "existing_account_not_updated": "此電子郵件已在允許清單中,但既有帳號未被變更,很可能是受保護的管理員。",
+        "user_lookup_failed": "允許清單已更新，但查詢既有帳號失敗。",
+        "invite_failed": "此電子郵件已在允許清單中，但邀請郵件寄送失敗。",
+        "role_assign_failed": "已邀請，但無法設定角色。",
+        "existing_account_not_updated": "此電子郵件已在允許清單中，但既有帳號未被變更，很可能是受保護的管理員。",
         "user_exists": "此電子郵件已註冊。允許清單仍已更新。"
       },
       "open": "邀請他人"
@@ -4164,24 +4222,24 @@
     "share": {
       "button": "複製分享連結",
       "copied": "分享連結已複製到剪貼簿。",
-      "copyFailed": "無法複製連結,請手動複製。"
+      "copyFailed": "無法複製連結，請手動複製。"
     },
     "people": {
       "unapproved": "未核准",
-      "unapprovedTip": "此帳號是自行註冊的,從未獲得核准,因此無法使用此應用程式。",
+      "unapprovedTip": "此帳號是自行註冊的，從未獲得核准，因此無法使用此應用程式。",
       "approve": "核准",
-      "approveTitle": "要核准此帳號嗎?",
-      "approveConfirm": "要核准 {{email}} 嗎?此帳號將以檢視者身分取得應用程式的存取權;之後可再指派更高的角色。",
+      "approveTitle": "要核准此帳號嗎？",
+      "approveConfirm": "要核准 {{email}} 嗎？此帳號將以檢視者身分取得應用程式的存取權；之後可再指派更高的角色。",
       "unapprovedOne": "{{n}} 個帳號未核准",
       "unapprovedMany": "{{n}} 個帳號未核准",
       "title": "人員",
-      "subtitle": "帳號與尚未使用的邀請合併顯示在同一份清單中。該電子郵件地址一登入,邀請就會從清單中消失。",
+      "subtitle": "帳號與尚未使用的邀請合併顯示在同一份清單中。該電子郵件地址一登入，邀請就會從清單中消失。",
       "invitedPill": "已邀請",
       "invitedTitle": "已預先登錄以供登入——目前尚無帳號使用此電子郵件地址。",
       "withdraw": "撤回邀請",
-      "withdrawTitle": "僅會撤銷預先登錄,已加入的帳號完全不受影響。",
-      "withdrawConfirm": "要撤回對 {{email}} 的邀請嗎?該地址將失去預先登錄的存取權,且不會通知任何人。",
-      "withdrawConfirmTitle": "要撤回邀請嗎?"
+      "withdrawTitle": "僅會撤銷預先登錄，已加入的帳號完全不受影響。",
+      "withdrawConfirm": "要撤回對 {{email}} 的邀請嗎？該地址將失去預先登錄的存取權，且不會通知任何人。",
+      "withdrawConfirmTitle": "要撤回邀請嗎？"
     },
     "col": {
       "user": "使用者",
@@ -4202,20 +4260,20 @@
     "errorTitle": "操作失敗",
     "loading": "正在載入使用者…",
     "delete": {
-      "confirmSelf": "你的帳號({{email}})將被永久刪除,你的上傳內容與 Bundle 也會一併消失,之後你將被登出。確定嗎?",
-      "confirmOther": "要永久刪除 {{email}} 嗎?該使用者的上傳內容與 Bundle 也會一併消失,且無法復原。",
+      "confirmSelf": "你的帳號({{email}})將被永久刪除，你的上傳內容與 Bundle 也會一併消失，之後你將被登出。確定嗎？",
+      "confirmOther": "要永久刪除 {{email}} 嗎？該使用者的上傳內容與 Bundle 也會一併消失，且無法復原。",
       "failed": "刪除失敗",
-      "title": "要刪除帳號嗎?",
+      "title": "要刪除帳號嗎？",
       "err": {
-        "protected_admin": "此帳號受到保護,無法變更或刪除。",
+        "protected_admin": "此帳號受到保護，無法變更或刪除。",
         "cannot_delete_last_admin": "無法刪除最後一位管理員。",
-        "user_not_found": "此帳號不存在(或已不存在)。",
+        "user_not_found": "此帳號不存在（或已不存在）。",
         "forbidden": "只有管理員可以刪除帳號。",
-        "unauthorized": "你的工作階段已過期,請重新登入。",
-        "invalid_body": "請求不完整,請重新載入頁面後再試一次。",
+        "unauthorized": "你的工作階段已過期，請重新登入。",
+        "invalid_body": "請求不完整，請重新載入頁面後再試一次。",
         "delete_failed": "無法刪除此帳號。",
         "server_misconfigured": "伺服器設定有誤——請檢查 Edge Function 的 Secrets。",
-        "method_not_allowed": "請求已被拒絕(方法錯誤)。"
+        "method_not_allowed": "請求已被拒絕（方法錯誤）。"
       }
     },
     "tokens": {
@@ -4228,10 +4286,10 @@
       "connections": {
         "title": "連結",
         "comingSoon": "即將推出",
-        "mockNote": "預覽:與 SC 應用程式的連結尚未實作。上方的狀態僅為預留位置,並非實際存在的連線。",
+        "mockNote": "預覽：與 SC 應用程式的連結尚未實作。上方的狀態僅為預留位置，並非實際存在的連線。",
         "scApp": {
           "name": "Verse Companion App",
-          "desc": "將桌面應用程式直接連結到你的帳號,讓上傳內容與資料自動歸屬於你。"
+          "desc": "將桌面應用程式直接連結到你的帳號，讓上傳內容與資料自動歸屬於你。"
         }
       },
       "newToken": "建立新權杖",
@@ -4249,7 +4307,7 @@
       "neverUsed": "從未",
       "revoke": "撤銷",
       "revoking": "撤銷中…",
-      "revokeConfirm": "要撤銷權杖「{{name}}」嗎?此操作無法復原,任何使用該權杖的用戶端會立即收到 401。",
+      "revokeConfirm": "要撤銷權杖「{{name}}」嗎？此操作無法復原，任何使用該權杖的用戶端會立即收到 401。",
       "revokeSuccess": "權杖已撤銷。",
       "revokeError": "撤銷失敗",
       "dialog": {
@@ -4266,9 +4324,9 @@
         "patch:read": "讀取 /v1/patch",
         "ships:read": "讀取 /v1/ships",
         "components:read": "讀取 /v1/components",
-        "keybinds:read": "讀取 /v1/keybinds(按鍵配置與分類)",
-        "*:read": "捷徑:所有讀取端點",
-        "admin:tokens": "管理權杖(仍需管理員角色)"
+        "keybinds:read": "讀取 /v1/keybinds（按鍵配置與分類）",
+        "*:read": "捷徑：所有讀取端點",
+        "admin:tokens": "管理權杖（仍需管理員角色）"
       },
       "reveal": {
         "title": "你的新權杖",
@@ -4278,7 +4336,7 @@
         "ack": "我已儲存",
         "tokenLabel": "明文權杖"
       },
-      "revokeTitle": "要撤銷權杖嗎?",
+      "revokeTitle": "要撤銷權杖嗎？",
       "eyebrow": "API 權杖"
     },
     "filter": {
@@ -4290,21 +4348,21 @@
     },
     "requests": {
       "title": "邀請申請",
-      "subtitle": "來自首頁的申請。接受後會像 + 後面的邀請表單一樣登錄該電子郵件,並寄出邀請信,信中連結會直接導向讓對方自行設定密碼的頁面。我們絕不會代為指定密碼。",
+      "subtitle": "來自首頁的申請。接受後會像 + 後面的邀請表單一樣登錄該電子郵件，並寄出邀請信，信中連結會直接導向讓對方自行設定密碼的頁面。我們絕不會代為指定密碼。",
       "empty": "沒有待處理的申請。",
       "accept": "接受",
       "decline": "拒絕",
-      "declineConfirm": "要拒絕 {{email}} 的申請嗎?對方不會收到通知。",
-      "accepted": "已接受 {{email}},並完成登錄與邀請。",
-      "acceptedNoMail": "已接受並核准 {{email}}。未寄出邀請信——此地址已有帳號,對方直接登入即可。建議你自行告知對方。",
+      "declineConfirm": "要拒絕 {{email}} 的申請嗎？對方不會收到通知。",
+      "accepted": "已接受 {{email}}，並完成登錄與邀請。",
+      "acceptedNoMail": "已接受並核准 {{email}}。未寄出邀請信——此地址已有帳號，對方直接登入即可。建議你自行告知對方。",
       "declined": "已拒絕 {{email}} 的申請。",
       "allowlisted": "已在允許清單中",
       "joined": "已有帳號",
-      "declineTitle": "要拒絕申請嗎?"
+      "declineTitle": "要拒絕申請嗎？"
     },
     "reports": {
       "title": "可疑帳號",
-      "subtitle": "有未處理檢舉的帳號,依被檢舉次數由多到少排列。",
+      "subtitle": "有未處理檢舉的帳號，依被檢舉次數由多到少排列。",
       "count": "{{count}} 則檢舉",
       "by": "由 {{name}} 檢舉"
     },
@@ -4320,7 +4378,7 @@
       "suspendedPill": "已停權",
       "warnReason": "警告內容",
       "suspendReason": "停權原因",
-      "reasonPlaceholder": "發生了什麼事?此文字會顯示給受影響的對象。",
+      "reasonPlaceholder": "發生了什麼事？此文字會顯示給受影響的對象。",
       "reasonVisible": "此文字會原樣顯示給受影響的對象。",
       "duration": "期間",
       "durations": {
@@ -4332,35 +4390,35 @@
       "indefinite": "無限期",
       "flash": {
         "warned": "警告已傳送。",
-        "suspended": "帳號已停權,存取權限立即封鎖。",
+        "suspended": "帳號已停權，存取權限立即封鎖。",
         "unsuspended": "已解除停權。",
         "reviewed": "檢舉已標記為已處理。",
         "dismissed": "檢舉已駁回。"
       },
       "error": {
-        "protected": "無法對此帳號進行管理(自己的帳號、管理員或受保護帳號)。",
+        "protected": "無法對此帳號進行管理（自己的帳號、管理員或受保護帳號）。",
         "invalidTarget": "選擇無效。",
         "userNotFound": "找不到帳號。",
         "reasonRequired": "請填寫原因。",
         "reasonTooLong": "文字過長。",
         "invalidDuration": "期間無效。",
         "forbidden": "你沒有執行此操作的權限。",
-        "generic": "操作未成功,請再試一次。"
+        "generic": "操作未成功，請再試一次。"
       }
     },
     "silhouettes": {
       "title": "Holotable 輪廓",
       "subtitle": "目前建置版本的輪廓涵蓋率。",
-      "build": "目前建置版本:{{channel}} {{patch}}({{build}})",
+      "build": "目前建置版本：{{channel}} {{patch}}({{build}})",
       "total": "艦船總數",
       "withSilhouette": "有輪廓",
       "withAnchors": "有錨點",
       "without": "無輪廓",
-      "withoutTip": "此建置版本中上傳器未提供輪廓的艦體。Holotable 會為它們顯示預留圖示;它們的磚塊若有擷取到的預覽圖示就使用它,否則使用 RSI 商店圖片——若都無法載入圖片則顯示通用圖示。後兩者由哪一個生效,只有在瀏覽器中才能決定。",
+      "withoutTip": "此建置版本中上傳器未提供輪廓的艦體。Holotable 會為它們顯示預留圖示；它們的磚塊若有擷取到的預覽圖示就使用它，否則使用 RSI 商店圖片——若都無法載入圖片則顯示通用圖示。後兩者由哪一個生效，只有在瀏覽器中才能決定。",
       "barLabel": "{{pct}} % 有輪廓",
-      "fallbackSplit": "無輪廓:{{icon}} 有預覽圖示,{{none}} 使用 RSI 圖片或圖示",
+      "fallbackSplit": "無輪廓：{{icon}} 有預覽圖示，{{none}} 使用 RSI 圖片或圖示",
       "missingToggle": "顯示 {{count}} 個無輪廓的艦體",
-      "reasonSplit": "原因:{{no_mesh}} 無網格、{{convert_failed}} 轉換失敗、{{empty}} 空白、{{unexplained}} 未記錄原因",
+      "reasonSplit": "原因：{{no_mesh}} 無網格、{{convert_failed}} 轉換失敗、{{empty}} 空白、{{unexplained}} 未記錄原因",
       "reason": {
         "no_mesh": "無網格",
         "convert_failed": "轉換失敗",
@@ -4368,10 +4426,10 @@
         "none": "未記錄原因"
       },
       "reasonTip": {
-        "no_mesh": "記錄中沒有指定 .cga/.cgf 幾何,或檔案不在封存檔內。",
+        "no_mesh": "記錄中沒有指定 .cga/.cgf 幾何，或檔案不在封存檔內。",
         "convert_failed": "cgf-converter 或讀取 glb 失敗。",
-        "empty": "已轉換,但沒有三角形或無法描出輪廓。",
-        "none": "上傳器未回報此艦體的原因——可能是上傳器 0.68.0 之前的建置版本,或輪廓步驟未執行。"
+        "empty": "已轉換，但沒有三角形或無法描出輪廓。",
+        "none": "上傳器未回報此艦體的原因——可能是上傳器 0.68.0 之前的建置版本，或輪廓步驟未執行。"
       },
       "noBuild": "沒有目前的建置版本——尚無可統計的內容。",
       "retry": "重試"
@@ -4379,7 +4437,7 @@
     "translations": {
       "eyebrow": "Admin",
       "title": "AI 翻譯",
-      "subtitle": "以 Claude 翻譯遊戲文字:開關、上限、語言、工作與詞彙表。",
+      "subtitle": "以 Claude 翻譯遊戲文字：開關、上限、語言、工作與詞彙表。",
       "tabs": {
         "overview": "總覽",
         "cards": "Flashcards",
@@ -4394,7 +4452,7 @@
       "saved": "已儲存。",
       "switch": {
         "label": "Claude API 翻譯",
-        "hint": "自下次資料上傳起生效。只會自動翻譯差異內容(與前一個建置版本相比新增或變更的文字)。"
+        "hint": "自下次資料上傳起生效。只會自動翻譯差異內容（與前一個建置版本相比新增或變更的文字）。"
       },
       "caps": {
         "upload": "每次上傳上限(USD)",
@@ -4411,26 +4469,26 @@
         "revoke": "撤銷",
         "fullRun": "開始完整翻譯",
         "fullRunOpen": "完整翻譯進行中——請見工作",
-        "fullRunGap": "僅翻譯缺少的 {{missing}} 筆文字(約 {{pct}} %)。CIG 或翻譯記憶庫已有的內容不收費。",
-        "fullRunUnmeasured": "翻譯 CIG 與翻譯記憶庫尚未有的所有內容。事先的估算免費,並會測量涵蓋率。",
+        "fullRunGap": "僅翻譯缺少的 {{missing}} 筆文字（約 {{pct}} %）。CIG 或翻譯記憶庫已有的內容不收費。",
+        "fullRunUnmeasured": "翻譯 CIG 與翻譯記憶庫尚未有的所有內容。事先的估算免費，並會測量涵蓋率。",
         "coverage": {
           "label": "{{lang}} 涵蓋率",
           "value": "{{pct}} %",
-          "detail": "{{total}} 筆文字中有 {{covered}} 筆已翻譯(來自 CIG 或翻譯記憶庫)。最近一次工作時間:{{at}}",
+          "detail": "{{total}} 筆文字中有 {{covered}} 筆已翻譯（來自 CIG 或翻譯記憶庫）。最近一次工作時間：{{at}}",
           "unknown": "涵蓋率未知",
           "unknownHint": "將於此語言的第一次工作時測量。"
         },
-        "approveTitle": "要核准 {{lang}} 嗎?",
-        "approveText": "從現在起,新的上傳內容也會翻譯成 {{lang}}(僅限差異內容)。",
-        "revokeTitle": "要撤銷 {{lang}} 的核准嗎?",
-        "revokeText": "新的上傳內容將不再翻譯成 {{lang}},現有的翻譯會保留。"
+        "approveTitle": "要核准 {{lang}} 嗎？",
+        "approveText": "從現在起，新的上傳內容也會翻譯成 {{lang}}（僅限差異內容）。",
+        "revokeTitle": "要撤銷 {{lang}} 的核准嗎？",
+        "revokeText": "新的上傳內容將不再翻譯成 {{lang}}，現有的翻譯會保留。"
       },
       "fullRun": {
-        "title": "要核准 {{lang}} 的完整翻譯嗎?",
-        "text": "約需花費 {{usd}} $({{count}} 筆文字)——所有尚未翻譯的文字都會被翻譯。每次上傳的費用上限不適用於完整翻譯。",
+        "title": "要核准 {{lang}} 的完整翻譯嗎？",
+        "text": "約需花費 {{usd}} $（{{count}} 筆文字）——所有尚未翻譯的文字都會被翻譯。每次上傳的費用上限不適用於完整翻譯。",
         "confirm": "核准並付費",
-        "startTitle": "要建立 {{lang}} 的完整翻譯嗎?",
-        "startText": "工作會先進行估算,這不收費,需要幾分鐘。之後它會連同費用與文字筆數留在工作清單中,等待你的核准。",
+        "startTitle": "要建立 {{lang}} 的完整翻譯嗎？",
+        "startText": "工作會先進行估算，這不收費，需要幾分鐘。之後它會連同費用與文字筆數留在工作清單中，等待你的核准。",
         "startConfirm": "建立並估算"
       },
       "jobs": {
@@ -4439,19 +4497,19 @@
         "noBuild": "目前沒有建置版本。",
         "approve": "核准",
         "cancel": "取消",
-        "cancelTitle": "要取消 {{lang}} 的工作嗎?",
-        "cancelText": "工作將會終止;已產生的費用仍會保留。",
+        "cancelTitle": "要取消 {{lang}} 的工作嗎？",
+        "cancelText": "工作將會終止；已產生的費用仍會保留。",
         "progress": "{{pct}} %",
         "hold": {
           "full": "完整翻譯須經你核准後才會開始。",
           "upload_cap": "估算超過每次上傳的上限。",
           "monthly_cap": "此工作會使當月超出上限。",
-          "overrun": "第一批群組的花費比估算多了 {{pct}} %。估算已修正,其餘部分須經你核准後才會開始。"
+          "overrun": "第一批群組的花費比估算多了 {{pct}} %。估算已修正，其餘部分須經你核准後才會開始。"
         },
         "capped": {
-          "job_budget": "已達到工作預算上限:{{texts}} 筆文字未再重試,仍維持未翻譯。",
-          "monthly_cap": "已達到每月上限:{{texts}} 筆文字未再重試,仍維持未翻譯。",
-          "judge": "已達到預算上限:已略過 Judge 抽樣。"
+          "job_budget": "已達到工作預算上限：{{texts}} 筆文字未再重試，仍維持未翻譯。",
+          "monthly_cap": "已達到每月上限：{{texts}} 筆文字未再重試，仍維持未翻譯。",
+          "judge": "已達到預算上限：已略過 Judge 抽樣。"
         },
         "cols": {
           "build": "Build",
@@ -4485,7 +4543,7 @@
       "jobErrors": {
         "unknown": "翻譯工作發生未知錯誤。",
         "base_build_missing": "缺少比較用的 Build。",
-        "conflict": "此工作已被同時修改,請重新載入。",
+        "conflict": "此工作已被同時修改，請重新載入。",
         "english_missing": "缺少英文原文。",
         "job_not_found": "找不到工作。",
         "lang_unknown": "未知的語言。",
@@ -4497,18 +4555,18 @@
         "results_missing": "缺少結果。",
         "r2_not_configured": "儲存空間 (R2) 尚未設定。",
         "internal": "翻譯管線發生內部錯誤。",
-        "worker_limit": "此工作連續多次超出 Worker 的 CPU 或記憶體限制,已被停止。",
+        "worker_limit": "此工作連續多次超出 Worker 的 CPU 或記憶體限制，已被停止。",
         "no_live_build": "目前沒有 LIVE Build。",
         "source_not_permitted": "此來源的授權尚未釐清。",
         "source_unknown": "此來源已不存在。",
         "nothing_to_do": "沒有需要翻譯的內容。",
         "phase_unknown": "此工作處於未知的步驟。",
-        "job_cleanup_pending": "前一個工作仍在清理中,請一分鐘後再試。",
-        "resubmit_limit": "建立批次多次沒有回應。為避免批次被重複計費,此工作已停止。請到 Anthropic Console 檢查是否有遺留的批次。"
+        "job_cleanup_pending": "前一個工作仍在清理中，請一分鐘後再試。",
+        "resubmit_limit": "建立批次多次沒有回應。為避免批次被重複計費，此工作已停止。請到 Anthropic Console 檢查是否有遺留的批次。"
       },
       "glossary": {
         "title": "詞彙表",
-        "search": "搜尋(原文或譯文)",
+        "search": "搜尋（原文或譯文）",
         "lang": "語言",
         "origin": "來源",
         "category": "分類",
@@ -4527,12 +4585,12 @@
         "historyEmpty": "尚無變更。",
         "deleted": "已刪除",
         "undo": "復原",
-        "undoTitle": "要復原這項變更嗎?",
+        "undoTitle": "要復原這項變更嗎？",
         "undoText": "此項目將還原為「{{term}}」。",
         "empty": "沒有符合這些篩選條件的項目。",
         "prev": "上一頁",
         "next": "下一頁",
-        "pageOf": "第 {{page}} 頁,共 {{pages}} 頁",
+        "pageOf": "第 {{page}} 頁，共 {{pages}} 頁",
         "origins": {
           "cig": "CIG",
           "ai": "AI",
@@ -4549,24 +4607,24 @@
       },
       "cards": {
         "title": "字卡",
-        "intro": "僅在 AI 卡關時使用:一個問題,一個答案。最重要的字卡排在最前面。",
+        "intro": "僅在 AI 卡關時使用：一個問題，一個答案。最重要的字卡排在最前面。",
         "lang": "語言",
-        "goal": "每日目標:{{done}} / {{goal}} 張字卡",
+        "goal": "每日目標：{{done}} / {{goal}} 張字卡",
         "goalLabel": "每日目標進度",
-        "streak": "連續紀錄:{{days}} 天",
+        "streak": "連續紀錄：{{days}} 天",
         "open": "剩餘 {{count}} 張",
         "skippedBefore": "已略過",
         "fresh": "目前的 Patch",
         "spread": "影響 {{count}} 個字串",
-        "choose": "哪個翻譯比較好?",
+        "choose": "哪個翻譯比較好？",
         "option": {
           "a": "選項 A",
           "b": "選項 B"
         },
         "bothWrong": "兩者皆不對 – 自行輸入",
-        "ownText": "你的文字(將作為管理員修正採用)",
-        "note": "給 AI 的提示備註(選填)",
-        "saveRule": "儲存為規則(全域適用)",
+        "ownText": "你的文字（將作為管理員修正採用）",
+        "note": "給 AI 的提示備註（選填）",
+        "saveRule": "儲存為規則（全域適用）",
         "submit": "儲存答案",
         "skip": "略過",
         "kinds": {
@@ -4582,7 +4640,7 @@
           "neighbours": "相鄰行",
           "research": "研究"
         },
-        "thanks": "謝謝,已儲存。",
+        "thanks": "謝謝，已儲存。",
         "impact": "此答案統一了 {{count}} 個字串。",
         "points": "+{{points}} 分",
         "next": "下一張字卡",
@@ -4598,18 +4656,18 @@
         "title": "來源",
         "intro": "作為翻譯起點的社群語言包。請在授權釐清後再匯入。",
         "syncAll": "立即同步",
-        "syncTitle": "要同步所有來源嗎?",
-        "syncText": "檢查每個啟用中的來源是否有變更,並為有變更的來源在背景啟動匯入。",
+        "syncTitle": "要同步所有來源嗎？",
+        "syncText": "檢查每個啟用中的來源是否有變更，並為有變更的來源在背景啟動匯入。",
         "import": "匯入 Seed",
-        "importTitle": "要匯入 {{name}} 的 Seed 嗎?",
+        "importTitle": "要匯入 {{name}} 的 Seed 嗎？",
         "importText": "{{lang}} 的語言包將在背景檢查並納入翻譯基底。CIG 的行不會被更動。",
-        "importLocked": "授權釐清後才能進行(已授權或已許可)。",
-        "importStarted": "{{name}}:已開始匯入。匯入在背景執行,進度請見「背景執行」。",
-        "synced": "已同步:檢查 {{checked}} 個,啟動 {{changed}} 個匯入,{{errors}} 個錯誤。",
+        "importLocked": "授權釐清後才能進行（已授權或已許可）。",
+        "importStarted": "{{name}}：已開始匯入。匯入在背景執行，進度請見「背景執行」。",
+        "synced": "已同步：檢查 {{checked}} 個，啟動 {{changed}} 個匯入，{{errors}} 個錯誤。",
         "learn": "學習",
-        "learnTitle": "要開始 {{lang}} 的學習步驟嗎?",
+        "learnTitle": "要開始 {{lang}} 的學習步驟嗎？",
         "learnText": "從現有資料推導出 {{lang}} 的詞彙、風格與字卡。可能產生費用。",
-        "learnStarted": "已開始 {{lang}} 的學習步驟。學習在背景執行,進度請見「背景執行」。",
+        "learnStarted": "已開始 {{lang}} 的學習步驟。學習在背景執行，進度請見「背景執行」。",
         "draft": "建立請求草稿",
         "drafted": "已為 {{name}} 建立草稿 – 請見「請求」。",
         "empty": "尚未登錄任何來源。",
@@ -4676,8 +4734,8 @@
       },
       "outreach": {
         "title": "給維護者的請求",
-        "noAutoSend": "此處不會自動寄出任何內容。草稿需由受保護的管理員核准,再手動複製文字並寄出,之後標記為已寄出。",
-        "intro": "草稿依授權類型由範本產生,內容會說明我們使用什麼以及如何標示出處。",
+        "noAutoSend": "此處不會自動寄出任何內容。草稿需由受保護的管理員核准，再手動複製文字並寄出，之後標記為已寄出。",
+        "intro": "草稿依授權類型由範本產生，內容會說明我們使用什麼以及如何標示出處。",
         "empty": "沒有草稿。請在「來源」下為各來源建立。",
         "subject": "主旨",
         "body": "內容",
@@ -4703,24 +4761,24 @@
         "save": "儲存草稿",
         "approve": "核准",
         "approveLocked": "只有受保護的管理員可以核准請求。",
-        "approveTitle": "要核准寄給 {{name}} 的請求嗎?",
+        "approveTitle": "要核准寄給 {{name}} 的請求嗎？",
         "approveText": "核准不會寄出任何內容。之後可複製文字並手動寄出。",
         "approved": "已核准。未寄出任何內容。",
         "copy": "複製文字",
         "copied": "文字已複製到剪貼簿。",
         "markSent": "標記為已寄出",
-        "markSentTitle": "要標記為已寄出嗎?",
+        "markSentTitle": "要標記為已寄出嗎？",
         "markSentText": "你已自行將訊息寄給 {{name}}。這裡僅作記錄。",
         "recordAnswer": "記錄回覆",
         "answerText": "維護者的回覆",
         "decision": "決定",
         "saveAnswer": "儲存回覆",
-        "answerRecorded": "回覆:",
+        "answerRecorded": "回覆：",
         "cancel": "取消"
       },
       "alerts": {
         "title": "提示",
-        "intro": "CIG 變更了某一行的原文或其自身的翻譯,而該行有管理員修正。請確認修正是否仍然適用。",
+        "intro": "CIG 變更了某一行的原文或其自身的翻譯，而該行有管理員修正。請確認修正是否仍然適用。",
         "emptyTitle": "沒有待處理的提示",
         "empty": "所有管理員修正仍與目前的原文相符。",
         "enOld": "先前的英文",
@@ -4851,9 +4909,9 @@
       "news": "最新消息"
     },
     "disclaimerTitle": "粉絲網站聲明",
-    "rsiLink": "官方 Star Citizen 網站:robertsspaceindustries.com",
-    "noticeOriginal": "本網站為非官方 Star Citizen 粉絲網站,與 Cloud Imperium 集團旗下公司並無關聯。本網站上所有非由網站主或使用者創作的內容,均為其各自所有者的財產。",
-    "noticeOriginalLabel": "原文(英文)",
+    "rsiLink": "官方 Star Citizen 網站：robertsspaceindustries.com",
+    "noticeOriginal": "This is an unofficial Star Citizen fan site, not affiliated with the Cloud Imperium group of companies. All content on this site not authored by its host or users are property of their respective owners.",
+    "noticeOriginalLabel": "原文（英文）",
     "trademarksOriginal": "Star Citizen®、Roberts Space Industries® 與 Cloud Imperium® 為 Cloud Imperium Rights LLC 的註冊商標"
   },
   "legal": {
@@ -4989,7 +5047,7 @@
   },
   "hangar": {
     "title": "我的機庫",
-    "subtitle": "你的個人艦隊:艦船配置、元件 Loadout 與角色組合 — 建立於 Codex 中的即時遊戲資料之上。",
+    "subtitle": "你的個人艦隊：艦船配置、元件 Loadout 與角色組合 — 建立於 Codex 中的即時遊戲資料之上。",
     "counts": {
       "owned": "已擁有",
       "wishlist": "願望清單"
@@ -5045,7 +5103,7 @@
       "rename": "重新命名",
       "cancel": "取消",
       "share": "分享",
-      "deleteConfirm": "確定永久刪除?",
+      "deleteConfirm": "確定永久刪除？",
       "roleLabel": "角色"
     },
     "detail": {
@@ -5058,7 +5116,7 @@
       "notes": "備註",
       "notesPlaceholder": "關於這艘艦船的備註…",
       "removeConfirm": {
-        "title": "要將 {{name}} 從機庫中移除嗎?",
+        "title": "要將 {{name}} 從機庫中移除嗎？",
         "bodyNone": "此操作無法復原。",
         "bodyOne": "這艘艦船的配置也會一併刪除。此操作無法復原。",
         "bodyMany": "這艘艦船的 {{count}} 個配置也會一併刪除。此操作無法復原。"
@@ -5066,16 +5124,16 @@
     },
     "configs": {
       "title": "配置",
-      "namePlaceholder": "例如:PvP 配裝…",
+      "namePlaceholder": "例如：PvP 配裝…",
       "create": "建立",
-      "empty": "尚無配置 — 為配置命名並選擇角色,即可開始自訂 Loadout。",
+      "empty": "尚無配置 — 為配置命名並選擇角色，即可開始自訂 Loadout。",
       "activate": "設為啟用",
       "saveLoadout": "儲存 Loadout",
       "discard": "捨棄",
       "delete": "刪除",
       "roleLabel": "角色",
       "deleteConfirm": {
-        "title": "要刪除配置「{{name}}」嗎?",
+        "title": "要刪除配置「{{name}}」嗎？",
         "body": "此操作無法復原。"
       }
     },
@@ -5092,7 +5150,7 @@
       "quantumRange": "量子航程",
       "assigned": "物品",
       "ofPorts": "共 {{count}} 個連接埠",
-      "note": "根據此目錄版本的已擷取元件資料計算;未匯入資料的物品缺少數值 — 所列數據僅為近似值。"
+      "note": "根據此目錄版本的已擷取元件資料計算；未匯入資料的物品缺少數值 — 所列數據僅為近似值。"
     },
     "compStat": {
       "jumpRange": "躍遷航程",
@@ -5106,36 +5164,36 @@
       "empty": "空",
       "change": "變更",
       "reset": "原廠",
-      "createConfigFirst": "請先在上方建立配置,即可開始編輯 Loadout。"
+      "createConfigFirst": "請先在上方建立配置，即可開始編輯 Loadout。"
     },
     "picker": {
       "loading": "載入中…"
     },
     "teaser": {
       "title": "你的個人機庫",
-      "subtitle": "登入以建立你的艦隊 — 免費,Alpha 期間採邀請制。",
+      "subtitle": "登入以建立你的艦隊 — 免費，Alpha 期間採邀請制。",
       "save": {
         "title": "儲存你的艦船",
-        "text": "將整支艦隊集中在一處:已擁有的艦船與願望清單,可自訂名稱與備註。"
+        "text": "將整支艦隊集中在一處：已擁有的艦船與願望清單，可自訂名稱與備註。"
       },
       "overview": {
         "title": "艦隊總覽",
-        "text": "已釘選的旗艦、數量統計,以及快速前往每艘艦船的詳細頁面。"
+        "text": "已釘選的旗艦、數量統計，以及快速前往每艘艦船的詳細頁面。"
       },
       "loadouts": {
         "title": "測試 Loadout",
-        "text": "更換艦船上的元件與武器,在花費任何 aUEC 之前先查看數值影響。"
+        "text": "更換艦船上的元件與武器，在花費任何 aUEC 之前先查看數值影響。"
       },
       "compare": {
         "title": "比較",
-        "text": "將艦船與元件並排釘選,比較真正重要的數據。"
+        "text": "將艦船與元件並排釘選，比較真正重要的數據。"
       },
       "cta": "登入以開啟你的機庫"
     },
     "import": {
       "open": "匯入…",
       "title": "從匯出檔匯入",
-      "hint": "將 Hangar Transfer Format 的 JSON 匯出檔拖曳到此處(例如來自 HangarXPLOR 瀏覽器擴充功能 — 匯出由你自行執行,我們絕不會索取 RSI 帳號憑證)。條目會與 Codex 比對,只有你確認的列才會被加入。",
+      "hint": "將 Hangar Transfer Format 的 JSON 匯出檔拖曳到此處（例如來自 HangarXPLOR 瀏覽器擴充功能 — 匯出由你自行執行，我們絕不會索取 RSI 帳號憑證）。條目會與 Codex 比對，只有你確認的列才會被加入。",
       "pickFile": "選擇檔案",
       "parsing": "讀取中…",
       "dropHint": "或將 .json 檔案拖曳到此處",
@@ -5144,7 +5202,7 @@
       "matched": "{{total}} 個條目中有 {{matched}} 個已比對到目錄",
       "chooseOther": "選擇其他檔案",
       "exact": "比對",
-      "fuzzy": "最接近的猜測:{{name}}",
+      "fuzzy": "最接近的猜測：{{name}}",
       "noMatch": "沒有目錄比對結果",
       "confirm": "匯入 {{count}} 艘艦船",
       "importing": "匯入中…",
@@ -5174,13 +5232,13 @@
     },
     "shared": {
       "eyebrow": "已分享的 Loadout",
-      "loading": "載入中 …",
-      "by": "作者:{{name}}",
+      "loading": "載入中…",
+      "by": "作者：{{name}}",
       "emptyLoadout": "這個 Loadout 尚未設定任何內容。",
       "adopt": "建立副本",
-      "adopting": "正在建立副本 …",
+      "adopting": "正在建立副本…",
       "adoptHint": "加入你自己的機庫",
-      "adoptError": "操作失敗,請再試一次。",
+      "adoptError": "操作失敗，請再試一次。",
       "loginToAdopt": "登入以建立副本",
       "aboutCta": "什麼是 Verse Companion?",
       "unavailable": {
@@ -5203,18 +5261,18 @@
     "subtitle": "目前重要的事項。詳細資料請見 PostHog。",
     "asOf": "截至",
     "openPosthog": "開啟 PostHog ↗",
-    "loading": "正在載入遙測資料 …",
+    "loading": "正在載入遙測資料…",
     "errorTitle": "錯誤",
     "retry": "再試一次",
-    "unavailable": "無法取得 PostHog 的資料。這些卡片僅顯示在沒有 PostHog 時已知的內容;這並不代表一切正常。",
+    "unavailable": "無法取得 PostHog 的資料。這些卡片僅顯示在沒有 PostHog 時已知的內容；這並不代表一切正常。",
     "cardUnavailable": "沒有可用資料。",
     "status": {
       "attention": "有 {{n}} 件事需要注意",
       "attentionOne": "有 1 件事需要注意",
-      "calm": "一切平靜,無需處理",
-      "blind": "無法取得完整資訊,PostHog 無法連線",
+      "calm": "一切平靜，無需處理",
+      "blind": "無法取得完整資訊，PostHog 無法連線",
       "since": "自你上次造訪({{date}})以來",
-      "firstVisit": "首次造訪,回顧過去 7 天"
+      "firstVisit": "首次造訪，回顧過去 7 天"
     },
     "level": {
       "ok": "正常",
@@ -5239,8 +5297,8 @@
       "desktopInstalls": "個活躍安裝"
     },
     "forecast": "預測 {{value}}",
-    "barLabel": "已使用 {{pct}}%,本月已過 {{month}}%",
-    "sparkLabel": "每日活躍使用者,最近 7 天",
+    "barLabel": "已使用 {{pct}}%，本月已過 {{month}}%",
+    "sparkLabel": "每日活躍使用者，最近 7 天",
     "badge": {
       "web": "網頁",
       "server": "伺服器",
@@ -5282,26 +5340,26 @@
   "adminFeedback": {
     "title": "意見回饋看板",
     "deployLag": "部署待處理",
-    "deployLagHint": "已合併,但正式環境尚未包含此變更。Vercel 部署完成後就會出現。",
-    "subtitle": "寫下可以改進的地方 — 夜間例行程序會接手未處理的項目、發佈,並在此標記。",
+    "deployLagHint": "已合併，但正式環境尚未包含此變更。Vercel 部署完成後就會出現。",
+    "subtitle": "寫下可以改進的地方 — 夜間例行程序會接手未處理的項目、發佈，並在此標記。",
     "heartbeat": {
       "online": "開發電腦可連線",
       "offline": "開發電腦無法連線",
       "unknown": "開發電腦狀態未知",
       "onlineTitle": "開發電腦可連線 — 意見回饋例行程序已於 {{time}} 回報。新主題正在處理中。",
-      "offlineTitle": "開發電腦無法連線 — 意見回饋例行程序上次回報是在 {{time}}。可能是電腦關機、Claude 未開啟或用量已用盡;新主題會等到它恢復後再處理。",
+      "offlineTitle": "開發電腦無法連線 — 意見回饋例行程序上次回報是在 {{time}}。可能是電腦關機、Claude 未開啟或用量已用盡；新主題會等到它恢復後再處理。",
       "unknownTitle": "狀態未知 — 尚未收到意見回饋例行程序的任何回應。",
       "running": "開發電腦正在運作中",
       "paused": "例行程序已暫停",
-      "runningTitle": "開發電腦可連線 — 意見回饋例行程序目前正在運作(於 {{time}} 回報)。",
-      "pausedTitle": "例行程序已暫停 — 用量額度即將用盡,於 {{time}} 回報。新主題會等到額度恢復後再處理。",
-      "availability": "例行程序只會在開發電腦開機且 Claude 開啟時執行 — 一旦重新上線,就會處理新主題。",
+      "runningTitle": "開發電腦可連線 — 意見回饋例行程序目前正在運作（於 {{time}} 回報）。",
+      "pausedTitle": "例行程序已暫停 — 用量額度即將用盡，於 {{time}} 回報。新主題會等到額度恢復後再處理。",
+      "availability": "例行程序只會在開發電腦開機且 Claude 開啟時執行 — 一旦重新上線，就會處理新主題。",
       "note": {
-        "queueEmpty": "上次執行:沒有待處理項目",
-        "work": "上次執行:已接手 {{n}} 個主題",
-        "shipped": "上次執行:已發佈 {{n}} 個",
-        "claimed": "上次執行:{{n}} 個主題處理中",
-        "pausedUsageLimit": "已暫停:用量額度即將用盡",
+        "queueEmpty": "上次執行：沒有待處理項目",
+        "work": "上次執行：已接手 {{n}} 個主題",
+        "shipped": "上次執行：已發佈 {{n}} 個",
+        "claimed": "上次執行：{{n}} 個主題處理中",
+        "pausedUsageLimit": "已暫停：用量額度即將用盡",
         "skipCadence": "僅回報心跳 — 目前不在工作時段內",
         "gateError": "預檢失敗 — 例行程序以完整模式執行",
         "running": "目前有執行中的作業"
@@ -5313,13 +5371,13 @@
     "errorTitle": "錯誤",
     "you": "你",
     "noAccount": "無帳號",
-    "aiSenderTitle": "AI(由意見回饋例行程序自動建立)",
+    "aiSenderTitle": "AI（由意見回饋例行程序自動建立）",
     "shipRef": "查看變更",
     "issueRef": "查看 Issue",
-    "topicNumber": "主題 #{{n}} — 固定編號,可供你引用",
+    "topicNumber": "主題 #{{n}} — 固定編號，可供你引用",
     "search": {
       "label": "搜尋意見回饋",
-      "placeholder": "搜尋 … 主題、整個討論串或 #編號",
+      "placeholder": "搜尋… 主題、整個討論串或 #編號",
       "clear": "清除搜尋",
       "results": "{{count}} 筆結果 · 依相關性排序",
       "empty": "找不到「{{query}}」的結果。",
@@ -5330,12 +5388,12 @@
       "yesterday": "昨天"
     },
     "delete": "刪除",
-    "deleteConfirm": "要刪除這則訊息嗎?此操作無法復原。",
+    "deleteConfirm": "要刪除這則訊息嗎？此操作無法復原。",
     "issue": {
       "mark": "建立 Issue",
       "pill": "已請求建立 Issue",
       "undo": "復原",
-      "requestBody": "請**不要自行實作**此主題,而是為它建立一個 GitHub Issue。接著設定 `status = issue_created`,並將 Issue 網址填入 `ship_ref`;之後此主題會像其他結果一樣進入驗收流程。"
+      "requestBody": "請**不要自行實作**此主題，而是為它建立一個 GitHub Issue。接著設定 `status = issue_created`，並將 Issue 網址填入 `ship_ref`；之後此主題會像其他結果一樣進入驗收流程。"
     },
     "status": {
       "open": "待辦",
@@ -5354,10 +5412,10 @@
       "reply": "回覆",
       "replyPlaceholderNo": "回覆 #{{no}} —「{{title}}」",
       "replyPlaceholderTopic": "回覆「{{title}}」",
-      "reopenHint": "回覆會重新開啟這個已封存的主題 — 它會回到待辦,並由例行程序再次接手。"
+      "reopenHint": "回覆會重新開啟這個已封存的主題 — 它會回到待辦，並由例行程序再次接手。"
     },
     "compose": {
-      "placeholder": "有哪些地方可以更好?支援 Markdown。",
+      "placeholder": "有哪些地方可以更好？支援 Markdown。",
       "send": "送出",
       "newTopic": "新主題",
       "complex": "複雜",
@@ -5371,17 +5429,17 @@
       "draftFailed": "草稿未儲存 – 請檢查連線",
       "sendKey": "⏎",
       "sendKeyCtrl": "Ctrl+⏎",
-      "attachNotCached": "無法快取圖片 – 重新載入後會遺失,但仍會一併送出。",
+      "attachNotCached": "無法快取圖片 – 重新載入後會遺失，但仍會一併送出。",
       "attachmentsLabel": "附件",
       "dropHere": "將圖片拖放到此處",
       "imageError": "無法處理這張圖片。",
       "tooManyImages": "每則訊息最多 {{max}} 張圖片。",
-      "uploadError": "圖片上傳失敗,請再試一次。",
+      "uploadError": "圖片上傳失敗，請再試一次。",
       "captureError": "無法擷取此頁面的螢幕截圖。",
       "imagesOnly": "這裡只能附加圖片。",
       "fileTooLarge": "檔案過大 – 每個附件最大 {{max}} MB。",
       "charCount": "{{used}} / {{max}} 字元",
-      "charLimit": "已達字元上限:每則訊息最多 {{max}} 字元。",
+      "charLimit": "已達字元上限：每則訊息最多 {{max}} 字元。",
       "dictate": "語音輸入({{key}})",
       "dictateStop": "停止語音輸入({{key}})",
       "dictateUnsupported": "此瀏覽器不支援語音輸入 – 請使用 Chrome、Edge 或 Safari。",
@@ -5397,18 +5455,18 @@
       "shippedLabel": "已完成",
       "raisedLabel": "新提出",
       "medianLabel": "發布中位數時間",
-      "prevWeek": "上週:{{value}}",
+      "prevWeek": "上週：{{value}}",
       "medianHint": "來自 {{count}} 項發布 · 上週 {{prev}}",
       "medianHintNone": "本週尚無發布 · 上週 {{prev}}",
-      "shippedAria": "本週完成 {{value}} 項,上週 {{prev}} 項",
-      "raisedAria": "本週新提出 {{value}} 個主題,上週 {{prev}} 個",
-      "medianAria": "本週發布中位數時間 {{value}},上週 {{prev}}",
+      "shippedAria": "本週完成 {{value}} 項，上週 {{prev}} 項",
+      "raisedAria": "本週新提出 {{value}} 個主題，上週 {{prev}} 個",
+      "medianAria": "本週發布中位數時間 {{value}}，上週 {{prev}}",
       "verdictDown": "完成數比新提出數多 {{count}} 項 — 待處理堆積正在減少。",
       "verdictUp": "新提出數比完成數多 {{count}} 項 — 待處理堆積正在增加。",
       "verdictEven": "本週新提出與完成數量持平。",
-      "verdictIdle": "本週至今沒有新提出,也沒有發布。",
+      "verdictIdle": "本週至今沒有新提出，也沒有發布。",
       "loadTitle": "目前看板",
-      "loadSub": "此刻的狀態 — 沒有時間範圍,也沒有推估。",
+      "loadSub": "此刻的狀態 — 沒有時間範圍，也沒有推估。",
       "loadWaiting": "等你處理",
       "loadWaitingAsk": "{{count}} 項詢問",
       "loadWaitingReview": "{{count}} 項驗收",
@@ -5420,14 +5478,14 @@
       "loadTodoHint": "等待例行程序的下次執行",
       "loadTodoAnswered": "{{count}} 項已回覆的詢問",
       "loadTodoContinuation": "{{count}} 項延續",
-      "oldest": "最舊的未結主題:{{days}} 天",
+      "oldest": "最舊的未結主題：{{days}} 天",
       "oldestNone": "已無未結主題。",
       "throughputTitle": "處理量",
       "throughputSub": "完成數與新提出數 · 最近 {{weeks}} 週",
       "throughputFrom": "{{weeks}} 週前",
       "throughputNow": "本週",
-      "throughputWeek": "{{date}} 起該週:新提出 {{raised}} 個,完成 {{count}} 個",
-      "throughputAria": "最近 {{weeks}} 週:新提出 {{raised}} 個主題,完成 {{shipped}} 個,最佳週 {{max}} 項發布,本週 {{current}} 項。",
+      "throughputWeek": "{{date}} 起該週：新提出 {{raised}} 個，完成 {{count}} 個",
+      "throughputAria": "最近 {{weeks}} 週：新提出 {{raised}} 個主題，完成 {{shipped}} 個，最佳週 {{max}} 項發布，本週 {{current}} 項。",
       "legendRaised": "新提出",
       "legendShipped": "已完成",
       "paceMedian": "發布中位數時間",
@@ -5439,22 +5497,22 @@
       "unitHours": "{{value}} 小時",
       "unitDays": "{{value}} 天",
       "lifecycleTitle": "生命週期",
-      "lifecycleTeaser": "參考:每個階段、分支與終點狀態及其目前的數量。它不會逐週變動 — 因此預設收合。",
-      "lifecycleIntro": "一個主題由上到下的路徑:處理、中途分出並回到處理的詢問,以及底部兩種終點狀態中的恰好一種 — 在你驗收之後。",
-      "lifecycleNote": "數字顯示目前有多少主題處於該階段 — 沒有轉換歷程,因此沒有通過量計數器。",
+      "lifecycleTeaser": "參考：每個階段、分支與終點狀態及其目前的數量。它不會逐週變動 — 因此預設收合。",
+      "lifecycleIntro": "一個主題由上到下的路徑：處理、中途分出並回到處理的詢問，以及底部兩種終點狀態中的恰好一種 — 在你驗收之後。",
+      "lifecycleNote": "數字顯示目前有多少主題處於該階段 — 沒有轉換歷程，因此沒有通過量計數器。",
       "lifecycleBranch": "分支",
       "lifecycleOutcome": "終點狀態 — 二擇一",
       "stageNow": "目前處於此階段的主題數",
       "flow": {
         "pickup": "例行程序接手最舊的主題",
-        "green": "建置與測試通過,PR 已合併",
+        "green": "建置與測試通過，PR 已合併",
         "question": "需要決定 — 例行程序在討論串中詢問",
         "answered": "你在討論串中回覆",
-        "reaper": "認領已失效(超過 30 分鐘沒有 PR)— 回收程序重新開啟",
-        "hold": "測試失敗或屬敏感內容(驗證、RLS、機密、破壞性遷移)",
+        "reaper": "認領已失效（超過 30 分鐘沒有 PR）— 回收程序重新開啟",
+        "hold": "測試失敗或屬敏感內容（驗證、RLS、機密、破壞性遷移）",
         "holdTarget": "PR 等待審查",
         "continue": "你在發布後回覆 — 延續",
-        "toReview": "建置與測試通過,PR 已合併",
+        "toReview": "建置與測試通過，PR 已合併",
         "toReviewIssue": "已轉交給 GitHub Issue",
         "accepted": "你進行驗收",
         "reopened": "你繼續對話",
@@ -5462,30 +5520,30 @@
         "authorAnswered": "使用者回覆"
       },
       "fact": {
-        "oldest": "最舊的未結主題:{{days}} 天",
+        "oldest": "最舊的未結主題：{{days}} 天",
         "answered": "其中 {{count}} 項已回覆的詢問",
         "continuation": "其中 {{count}} 項發布後的延續",
         "reopened": "其中 {{count}} 項由回收程序重新開啟",
-        "working": "{{count}} 項正在實作中(尚無 PR)",
+        "working": "{{count}} 項正在實作中（尚無 PR）",
         "hold": "{{count}} 項審查暫緩 — PR 等待你合併",
         "terminalAtRest": "靜止的終點 — 你的回覆會開啟新一輪",
         "pendingContinuation": "{{count}} 項有新回覆 — 將被再次接手",
         "awaiting": "等待你的回覆",
-        "issueTerminal": "終點狀態 — 在 GitHub Issue 上繼續追蹤;例行程序不會再碰它",
-        "rejectedLegacy": "終點(舊版狀態)— 例行程序從不設定此狀態",
-        "reviewShipped": "{{count}} 項已發布,等待你的驗收",
+        "issueTerminal": "終點狀態 — 在 GitHub Issue 上繼續追蹤；例行程序不會再碰它",
+        "rejectedLegacy": "終點（舊版狀態）— 例行程序從不設定此狀態",
+        "reviewShipped": "{{count}} 項已發布，等待你的驗收",
         "reviewIssues": "{{count}} 項已轉交 Issue,等待你的驗收",
         "reviewWhy": "只有你的驗收才會結束一個主題 — 否則它會回到處理流程",
         "doneTerminal": "終點狀態 — 已驗收並結案",
-        "declinedTerminal": "終點狀態 — 刻意不實作,並附上理由告知使用者"
+        "declinedTerminal": "終點狀態 — 刻意不實作，並附上理由告知使用者"
       }
     },
     "userTopic": {
       "release": "交給例行程序",
       "channelTitle": "與使用者的管道",
-      "channelHint": "這裡的所有內容使用者都看得到。上方的討論串(管理員 ↔ 例行程序)則看不到。",
-      "seesStatus": "使用者看到:",
-      "asQuestion": "以詢問形式傳送給使用者(主題會暫停直到他們回覆)",
+      "channelHint": "這裡的所有內容使用者都看得到。上方的討論串（管理員 ↔ 例行程序）則看不到。",
+      "seesStatus": "使用者看到：",
+      "asQuestion": "以詢問形式傳送給使用者（主題會暫停直到他們回覆）",
       "messagePlaceholder": "給使用者的訊息…",
       "messageSend": "傳送給使用者",
       "questionSend": "以詢問傳送",
@@ -5495,7 +5553,7 @@
     },
     "decline": {
       "mark": "不實作並移除",
-      "placeholder": "為什麼不會實作?使用者會閱讀這段文字。",
+      "placeholder": "為什麼不會實作？使用者會閱讀這段文字。",
       "confirm": "不實作",
       "cancel": "取消",
       "noteRequired": "請提供理由 — 使用者會看到。",
@@ -5507,15 +5565,15 @@
         },
         "alreadyShipped": {
           "label": "已實作",
-          "text": "這項已經完成並上線。歡迎查看目前版本 — 如果仍有不對勁的地方,請再次提出。"
+          "text": "這項已經完成並上線。歡迎查看目前版本 — 如果仍有不對勁的地方，請再次提出。"
         },
         "notReproducible": {
           "label": "無法重現",
-          "text": "我們無法重現此問題。如果再次發生,請再回報一次,並附上操作步驟、發生時間,以及(若可以)螢幕截圖。"
+          "text": "我們無法重現此問題。如果再次發生，請再回報一次，並附上操作步驟、發生時間，以及（若可以）螢幕截圖。"
         },
         "tooLittleInfo": {
           "label": "資訊不足",
-          "text": "這裡的資訊太少,我們無法據以處理。請再次描述你做了什麼、發生了什麼,以及你原本預期的結果。"
+          "text": "這裡的資訊太少，我們無法據以處理。請再次描述你做了什麼、發生了什麼，以及你原本預期的結果。"
         },
         "offRoadmap": {
           "label": "不符合路線圖",
@@ -5523,12 +5581,12 @@
         },
         "noise": {
           "label": "無可執行的回饋",
-          "text": "很抱歉,我們無法處理這項內容 — 其中沒有可供我們著手的線索。"
+          "text": "很抱歉，我們無法處理這項內容 — 其中沒有可供我們著手的線索。"
         }
       }
     },
     "review": {
-      "hint": "請在正式版應用程式上查看結果。如果沒問題,此主題就完成了。如果不對,直接回覆即可 — 你的回覆會讓主題重新開啟,並作為任務回到例行程序的佇列中。",
+      "hint": "請在正式版應用程式上查看結果。如果沒問題，此主題就完成了。如果不對，直接回覆即可 — 你的回覆會讓主題重新開啟，並作為任務回到例行程序的佇列中。",
       "accept": "已驗收"
     },
     "sourceFilter": {
@@ -5546,13 +5604,13 @@
       "newCount": "{{count}} 項新增",
       "moreDays": "再顯示 {{count}} 天",
       "view": "查看",
-      "viewTitle": "在應用程式中查看:{{area}}",
+      "viewTitle": "在應用程式中查看：{{area}}",
       "openTopic": "開啟主題",
       "progress": "進度",
       "backToStream": "返回動態",
       "collapseBand": "收合{{band}}",
       "expandBand": "展開{{band}}",
-      "progressHint": "進度:本週的進展、等你處理的事項,以及處理量"
+      "progressHint": "進度：本週的進展、等你處理的事項，以及處理量"
     },
     "turn": {
       "admin": "輪到你了",
@@ -5575,7 +5633,7 @@
       "declined": "未實作",
       "rejected": "已駁回",
       "loop": "後續修正",
-      "pathLabel": "狀態:{{station}}",
+      "pathLabel": "狀態：{{station}}",
       "step": {
         "contract": "已提交 · 等待發布",
         "doing": "已交付實作",
@@ -5596,7 +5654,7 @@
     },
     "sheet": {
       "close": "返回列表",
-      "showOneMore": "再顯示 1 則(中間還有 {{count}} 則)",
+      "showOneMore": "再顯示 1 則（中間還有 {{count}} 則）",
       "hideBetween": "隱藏中間的訊息",
       "readMore": "顯示更多",
       "readLess": "顯示較少",
@@ -5605,12 +5663,12 @@
     "filters": {
       "title": "篩選",
       "open": "篩選",
-      "who": "對象?",
+      "who": "對象？",
       "whoAll": "所有人",
       "whoMine": "我的主題",
       "whoOthers": "其他管理員",
       "whoUsers": "使用者回饋",
-      "where": "位置在哪?",
+      "where": "位置在哪？",
       "whereAll": "任何位置",
       "area": "區域",
       "areaAll": "所有區域",
@@ -5622,13 +5680,13 @@
       "viewInApp": "在應用程式中檢視",
       "more": "更多操作"
     },
-    "deleteTitle": "要刪除訊息嗎?",
+    "deleteTitle": "要刪除訊息嗎？",
     "threadsStale": "無法載入回覆 — 部分卡片的歸類可能已過時。",
     "guard": {
       "name": "PostHog 守護",
-      "title": "PostHog 守護(自動建立)",
+      "title": "PostHog 守護（自動建立）",
       "serviceName": "服務守護",
-      "serviceTitle": "服務守護(自動建立,每小時檢查服務)"
+      "serviceTitle": "服務守護（自動建立，每小時檢查服務）"
     }
   },
   "feedbackFab": {
@@ -5798,13 +5856,13 @@
   "consent": {
     "banner": {
       "title": "瀏覽器儲存空間",
-      "text": "本應用程式不會設定 Cookie。它會在此瀏覽器中儲存你的登入工作階段和語言(必要),以及 — 僅在你允許時 — 新聞篩選和你的收藏等便利偏好設定,還有匿名使用統計。你可以隨時在設定中變更。",
+      "text": "本應用程式不會設定 Cookie。它會在此瀏覽器中儲存你的登入工作階段和語言（必要），以及 — 僅在你允許時 — 新聞篩選和你的收藏等便利偏好設定，還有匿名使用統計。你可以隨時在設定中變更。",
       "acceptAll": "全部允許",
       "essentialOnly": "僅限必要項目"
     },
     "settings": {
       "title": "瀏覽器儲存空間與隱私",
-      "hint": "本應用程式不會設定 Cookie。以下所有內容都儲存在此瀏覽器的 localStorage 中。匿名使用統計預設為關閉,且僅在你同意後才會收集。",
+      "hint": "本應用程式不會設定 Cookie。以下所有內容都儲存在此瀏覽器的 localStorage 中。匿名使用統計預設為關閉，且僅在你同意後才會收集。",
       "alwaysOn": "永遠啟用",
       "on": "已允許",
       "off": "關閉",
@@ -5818,7 +5876,7 @@
       },
       "statistics": {
         "label": "統計",
-        "desc": "匿名使用統計和匿名錯誤報告(PostHog,歐盟伺服器),用於了解哪些區域被使用以及哪裡出現問題。預設為關閉。登入後,你會以假名 ID 搭配你的角色顯示 — 絕不會包含你的姓名或電子郵件;發生錯誤的工作階段可能會被錄製,且所有輸入內容都會被遮蔽。關閉後會刪除已儲存的值。"
+        "desc": "匿名使用統計和匿名錯誤報告（PostHog,歐盟伺服器），用於了解哪些區域被使用以及哪裡出現問題。預設為關閉。登入後，你會以假名 ID 搭配你的角色顯示 — 絕不會包含你的姓名或電子郵件；發生錯誤的工作階段可能會被錄製，且所有輸入內容都會被遮蔽。關閉後會刪除已儲存的值。"
       }
     }
   },
@@ -5985,11 +6043,11 @@
       "connected": "桌面應用程式已連線",
       "expired": "連線已過期——超過 30 天未有聯繫",
       "never": "桌面應用程式尚未連線",
-      "since": "· 上次上線:{{days}} 天前",
-      "today": "· 上次上線:今天"
+      "since": "· 上次上線：{{days}} 天前",
+      "today": "· 上次上線：今天"
     },
-    "fallback": "下載(最新版)",
-    "prerelease": "這裡永遠是穩定版。使用 Verse Companion 帳號登入後,即可在應用程式中選擇 Beta 與 Alpha——可用的通道取決於你的角色。"
+    "fallback": "下載（最新版）",
+    "prerelease": "這裡永遠是穩定版。使用 Verse Companion 帳號登入後，即可在應用程式中選擇 Beta 與 Alpha——可用的通道取決於你的角色。"
   },
   "appPanel": {
     "version": "目前已發布的版本",
@@ -6187,8 +6245,8 @@
     "retry": "重試",
     "loading": "正在開啟概念頁面…",
     "forbidden": "此概念頁面僅限管理員存取。",
-    "notFound": "此概念頁面不存在(或已不存在)。",
-    "error": "無法載入概念頁面,請稍後再試。"
+    "notFound": "此概念頁面不存在（或已不存在）。",
+    "error": "無法載入概念頁面，請稍後再試。"
   },
   "errors": {
     "offline": "你似乎已離線。連線恢復後再試一次。",
@@ -6200,9 +6258,9 @@
     "guessMade": "你已經猜過這張星圖——只有一次機會。",
     "guessInvalid": "此選項不屬於這張星圖。",
     "guessUnavailable": "此版本沒有需要辨識的星圖。",
-    "sessionExpired": "你的登入已過期,請重新登入。",
+    "sessionExpired": "你的登入已過期，請重新登入。",
     "forbidden": "你沒有執行此操作的權限。",
-    "notFound": "此項目不存在(或已不存在)。",
+    "notFound": "此項目不存在（或已不存在）。",
     "rateLimit": "請求過多——請稍候片刻。",
     "server": "伺服器回報了錯誤。",
     "generic": "發生了一些問題。",
@@ -7568,7 +7626,7 @@
   "verse": {
     "crumb": "Verse",
     "toast": {
-      "lit": "已點亮星星:{{task}}",
+      "lit": "已點亮星星：{{task}}",
       "count": "{{lit}} / {{total}}",
       "remaining": "再 {{n}} 顆即可獲得 4K 桌布",
       "close": "關閉",
@@ -7601,7 +7659,7 @@
       "link": "連結"
     },
     "status": {
-      "aria": "Patch 狀態:{{line}}",
+      "aria": "Patch 狀態：{{line}}",
       "live": "Live",
       "ptu": "PTU {{line}}",
       "since": "已上線 {{n}} 天",
@@ -7628,7 +7686,7 @@
         "planned": "計畫中"
       },
       "topAria": "最新消息",
-      "storyAria": "第 {{n}} 則消息:{{title}}",
+      "storyAria": "第 {{n}} 則消息：{{title}}",
       "status": {
         "live": "{{line}} 已上線 {{n}} 天",
         "liveOne": "{{line}} 已上線 1 天",
@@ -7671,15 +7729,15 @@
       "patches": {
         "title": "Patch News",
         "topic": "更新檔",
-        "hook": "{{next}} 何時推出,以及帶來哪些改動",
-        "hookNoLine": "下一個更新檔何時推出,以及帶來哪些改動",
+        "hook": "{{next}} 何時推出，以及帶來哪些改動",
+        "hookNoLine": "下一個更新檔何時推出，以及帶來哪些改動",
         "stat": "{{n}} 則新說明",
-        "teaser": "下一個更新檔何時推出,以及帶來哪些改動"
+        "teaser": "下一個更新檔何時推出，以及帶來哪些改動"
       },
       "gallery": {
         "title": "圖庫",
         "topic": "圖庫",
-        "hook": "哪一張會成為你的新桌布?",
+        "hook": "哪一張會成為你的新桌布？",
         "stat": "{{n}} 張新桌布",
         "teaser": "瀏覽、分享並為 Starscape 桌布投票"
       }
@@ -7696,11 +7754,11 @@
           "value": "{{n}} 天"
         },
         "cadence": {
-          "label": "主要 Patch 之間的間隔(中位數)",
+          "label": "主要 Patch 之間的間隔（中位數）",
           "value": "{{n}} 天"
         },
         "subCadence": {
-          "label": "Hotfix 之間的間隔(中位數)",
+          "label": "Hotfix 之間的間隔（中位數）",
           "value": "{{n}} 天"
         },
         "stable": {
@@ -7710,7 +7768,7 @@
       },
       "ready": {
         "title": "{{line}} 的起飛前檢查",
-        "titleRenamed": "{{line}} 的起飛前檢查(前身為 {{former}})",
+        "titleRenamed": "{{line}} 的起飛前檢查（前身為 {{former}}）",
         "progress": "已完成 {{done}} / {{total}} 項",
         "step": {
           "notes": "已閱讀 Patch Notes",
@@ -7720,18 +7778,18 @@
         }
       },
       "comet": {
-        "title": "Patch 預測投票:{{line}} 何時登上 LIVE?",
+        "title": "Patch 預測投票：{{line}} 何時登上 LIVE?",
         "hint": "投下你的預測——投票後可看到社群中位數。",
         "label": "你預測的 LIVE 日期",
         "submit": "送出預測",
-        "yours": "你的預測:{{date}}",
-        "median": "社群中位數:{{date}}({{n}} 筆預測)",
+        "yours": "你的預測：{{date}}",
+        "median": "社群中位數：{{date}}（{{n}} 筆預測）",
         "heading": "Patch 預測",
         "crowd": "社群的預測分佈",
         "cta": "送出你的預測",
-        "mine": "你的預測:{{date}}",
+        "mine": "你的預測：{{date}}",
         "count": "{{n}} 筆預測",
-        "release": "發布日:{{date}}",
+        "release": "發布日：{{date}}",
         "stripAria": "社群中位數 {{date}},{{n}} 筆預測",
         "you": "你的預測",
         "medianShort": "中位數 {{date}}",
@@ -7743,11 +7801,11 @@
       "connected": "Starscape 已連結",
       "share": "分享圖庫",
       "heroTitle": "Starscape 把圖庫帶到你的桌面",
-      "heroBody": "桌面應用程式會自動輪播圖庫中的桌布,並顯示你獲得的星圖。"
+      "heroBody": "桌面應用程式會自動輪播圖庫中的桌布，並顯示你獲得的星圖。"
     },
     "hub": {
       "brand": "Verse Companion",
-      "search": "搜尋 …",
+      "search": "搜尋…",
       "searchKey": "Ctrl K",
       "more": "Verse 更多內容",
       "prev": "上一則消息",
@@ -8348,7 +8406,7 @@
       },
       "telemetry": {
         "title": "遙測",
-        "text": "此刻最重要的資訊:配額、錯誤、服務、用量與成本一目瞭然。"
+        "text": "此刻最重要的資訊：配額、錯誤、服務、用量與成本一目瞭然。"
       },
       "feedback": {
         "title": "意見回饋",
@@ -8377,7 +8435,7 @@
     "aria": "下載應用程式",
     "scc": {
       "name": "Verse Companion App",
-      "desc": "就在遊戲旁邊:即時資訊、浮動視窗與按鍵配置,不用再 Alt-Tab 切換。"
+      "desc": "就在遊戲旁邊：即時資訊、浮動視窗與按鍵配置，不用再 Alt-Tab 切換。"
     },
     "starscape": {
       "name": "Starscape",
@@ -8385,7 +8443,7 @@
     },
     "uploader": {
       "name": "Verse Data Uploader",
-      "desc": "讀取你的 Star Citizen 安裝檔案,並將艦船、數值與 3D 模型填入 Codex。"
+      "desc": "讀取你的 Star Citizen 安裝檔案，並將艦船、數值與 3D 模型填入 Codex。"
     },
     "footer": "這是穩定版。登入後可在應用程式中選擇 Beta 與 Alpha——你能看到哪些頻道取決於你的角色。"
   },
@@ -8407,15 +8465,15 @@
     "hub": {
       "eyebrow": "應用程式",
       "title": "應用程式",
-      "subtitle": "所有在網站之外運作的工具:Verse Data Uploader、Starscape 與瀏覽器擴充功能。",
+      "subtitle": "所有在網站之外運作的工具：Verse Data Uploader、Starscape 與瀏覽器擴充功能。",
       "breadcrumbAria": "應用程式",
       "uploader": {
         "name": "Verse Data Uploader",
-        "desc": "讀取你的 Star Citizen 安裝檔案,並將資料上傳至 Codex。"
+        "desc": "讀取你的 Star Citizen 安裝檔案，並將資料上傳至 Codex。"
       },
       "starscape": {
         "name": "Starscape",
-        "desc": "桌面應用程式:將 Verse 圖庫變成動態桌布。"
+        "desc": "桌面應用程式：將 Verse 圖庫變成動態桌布。"
       },
       "extension": {
         "name": "瀏覽器擴充功能",
@@ -9094,7 +9152,7 @@
     }
   },
   "quick": {
-    "toNachschub": "加入行動:{{name}}",
+    "toNachschub": "加入行動：{{name}}",
     "wish": "願望",
     "allWish": "所有願望",
     "allWishCount": "{{n}} 個願望",
@@ -9312,17 +9370,17 @@
   "adminEvents": {
     "eyebrow": "管理員",
     "title": "活動資料表",
-    "subtitle": "信心度低於 80 % 的欄位會維持未知,直到你核准或手動設定。",
+    "subtitle": "信心度低於 80 % 的欄位會維持未知，直到你核准或手動設定。",
     "retry": "再試一次",
     "listAria": "活動",
     "pending": "{{n}} 個待處理",
     "noSheet": "無資料表",
-    "loading": "載入中 …",
+    "loading": "載入中…",
     "empty": "沒有活動。",
     "reextract": "重新評估",
     "backfill": "評估缺少的項目",
-    "backfillProgress": "已寫入 {{n}} 份資料表 …",
-    "backfillDone": "完成:已寫入 {{n}} 份資料表。",
+    "backfillProgress": "已寫入 {{n}} 份資料表…",
+    "backfillDone": "完成：已寫入 {{n}} 份資料表。",
     "col": {
       "field": "欄位",
       "value": "值",
@@ -9341,7 +9399,7 @@
       "start": "開始",
       "end": "結束"
     },
-    "editAria": "值(JSON 格式)",
+    "editAria": "值（JSON 格式）",
     "unknown": "未知",
     "save": "儲存",
     "approve": "核准",
@@ -9387,7 +9445,7 @@
   "pwa": {
     "card": {
       "title": "取得應用程式",
-      "benefit": "全螢幕、啟動更快,直接從主畫面開啟。",
+      "benefit": "全螢幕、啟動更快，直接從主畫面開啟。",
       "install": "安裝",
       "later": "稍後"
     },
