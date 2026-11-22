@@ -377,7 +377,10 @@ describe('Verse briefing — component', () => {
     beta.set({ ...beta(), verse: true });
   });
 
-  describe('cinematic entrance (owner brief 2026-11-04)', () => {
+  // fakeAsync ticks of 10 s through every animation frame: ~1 s alone, but under a
+  // loaded machine (ship build + lint + full suite) single cases ran 30-47 s and hit
+  // the 15 s default. Same budget idea as sc-popup's back-gesture block.
+  describe('cinematic entrance (owner brief 2026-11-04)', { timeout: 60_000 }, () => {
     const stage = (fx: { nativeElement: HTMLElement }) => fx.nativeElement.querySelector('section.bstage');
     const title = (fx: { nativeElement: HTMLElement }) => fx.nativeElement.querySelector('.hrow h1');
     let chrome: ShellChromeService;
