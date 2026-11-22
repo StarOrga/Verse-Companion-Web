@@ -131,9 +131,9 @@ export function jobNotes(status: string, stats: unknown): JobNote[] {
 /** i18n key for a job's / orchestrator's error code; unknown codes get a generic sentence, never raw text. */
 export function jobErrorKey(code: string | null | undefined): string | null {
   if (!code) return null;
-  return KNOWN_JOB_ERRORS.has(code)
-    ? `admin.translations.jobErrors.${code.replace(/^translate\./, '')}`
-    : 'admin.translations.jobErrors.unknown';
+  if (KNOWN_JOB_ERRORS.has(code)) return `admin.translations.jobErrors.${code.replace(/^translate\./, '')}`;
+  // The pipeline only writes `translate.*` keys: anything else was put on the row by hand (SQL).
+  return code.startsWith('translate.') ? 'admin.translations.jobErrors.unknown' : 'admin.translations.jobErrors.manual';
 }
 
 export type GlossaryOrigin = 'cig' | 'ai' | 'admin' | 'mined' | 'community';
