@@ -526,7 +526,9 @@ describe('Verse hub — Funkfeuer 2 stage (beta shell)', () => {
   });
 });
 
-describe('Verse hub — beacons idle hint', () => {
+// Long fakeAsync ticks: fine alone, but over the 15 s default on a loaded machine
+// (ship build + full suite). Same budget idea as sc-popup's back-gesture block.
+describe('Verse hub — beacons idle hint', { timeout: 60_000 }, () => {
   beforeEach(() => TestBed.configureTestingModule({ providers: [provideRouter([]), provideTranslateService({})] }));
   afterEach(() => TestBed.resetTestingModule());
 
