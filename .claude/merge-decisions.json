@@ -2385,6 +2385,21 @@
         "hunks": [
           "531642e46da3"
         ]
+      },
+      {
+        "ship": "#1252",
+        "by": "Jerry",
+        "value": "0.297.0"
+      },
+      {
+        "ship": "claude/patch-display-improvement-3feb0e",
+        "by": "Mollywator",
+        "value": "0.297.1 (generated from CHANGELOG, main's current version)",
+        "decided": true,
+        "at": "2026-11-22T10:53:07.222Z",
+        "hunks": [
+          "3779207f60a9"
+        ]
       }
     ],
     "public/release-notes.json›root›current": [
