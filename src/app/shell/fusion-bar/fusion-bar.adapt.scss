@@ -161,7 +161,7 @@
 }
 // The chip's chevron and padding, mirrored in the invisible copy that decides the fold.
 .trail-measure li.ks {
-  padding: 0 18px 0 var(--sc-space-2);
+  padding: 0 18px 0 var(--sc-space-2); /* ds-ok: mirrors the chip's chevron (14) + gap + padding, a measure only */
 }
 .trail li.ks {
   flex: 0 1 auto;

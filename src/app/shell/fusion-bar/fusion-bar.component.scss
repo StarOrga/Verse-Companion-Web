@@ -649,12 +649,12 @@ $dock-ease: cubic-bezier(0.55, 0, 0.2, 1);
 }
 // The path's last step: a small accent chip on the trail's own line.
 .kindsw {
-  gap: 2px;
+  gap: 2px; /* ds-ok: chevron hugs the label inside a one-line chip */
   min-width: 0;
   max-width: 100%;
   height: 20px;
-  margin: -2px 0;
-  padding: 0 2px 0 var(--sc-space-2);
+  margin: -2px 0; /* ds-ok: the chip overhangs the path's 15px line by 2px each side */
+  padding: 0 2px 0 var(--sc-space-2); /* ds-ok: the chevron's own box is the right padding */
   font-size: inherit;
   color: var(--sc-fg-0);
   background: color-mix(in srgb, var(--sc-accent) 12%, transparent);

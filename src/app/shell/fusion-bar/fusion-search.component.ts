@@ -748,7 +748,7 @@ const VERSE_HOME = /^\/(verse)?(?:[?#]|$)/;
     :host(.bottom:not(.open)) .field { display: none; }
     :host(.bottom:not(.open)) .mag {
       display: flex; align-items: center; gap: var(--sc-space-2); flex: 1 1 auto; min-width: 0;
-      height: 44px; padding: 0 var(--sc-space-3); border: 0; border-radius: 16px;
+      height: 44px; padding: 0 var(--sc-space-3); border: 0; border-radius: 16px; /* ds-ok: the field's own 16px round, so the closed field looks like the open one */
       background: color-mix(in srgb, var(--sc-bg-0) 88%, transparent); color: var(--sc-fg-2);
       font: inherit; text-align: start; cursor: pointer;
     }
