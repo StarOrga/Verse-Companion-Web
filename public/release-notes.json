@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.297.0",
+  "current": "0.297.1",
   "releases": [
+    {
+      "version": "0.297.1",
+      "date": "2026-11-22",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "App connect page (Data Uploader / Starscape): the checkmark now sits exactly between the two orbs and the streak burst starts from it; the glow that lay over the footer is gone."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.297.0",
       "date": "2026-11-22",
