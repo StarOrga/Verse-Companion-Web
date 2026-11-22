@@ -6840,6 +6840,7 @@
         "more": "Alle {{n}} Änderungen",
         "less": "Weniger",
         "reorder": "Nachbestellen ({{n}})",
+        "logKind": { "in": "Eingelagert", "out": "Entnommen", "reserve": "Reserviert" },
         "logEmpty": "Noch keine Änderung.",
         "variants": "{{n}} Varianten",
         "inSpace": "Weltall",

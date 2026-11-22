@@ -2,7 +2,7 @@ import type { HqCodexKindRow, HqInventoryRemovalRow, HqInventoryStack } from './
 import { bestandKindOf } from './hq-codex-kind';
 import { buildGatherStops, gatherProgress, gatherToSteps, moveStop, nextStop, orderByAmount, parseGather, withStopDone } from './hq-gather';
 import { aggregateQuality, averageLabel, qualityBands, rangeLabel, resolveStacks, takeFromStacks } from './hq-quality';
-import { lastRemovals } from './hq-removals';
+import { lastAdditions, lastRemovals } from './hq-removals';
 import { parseSellGoal, sellProgress } from '../nachschub/nachschub.model';
 
 /** One item row: ONE per place and item with the total qty, the quality split in `stacks` (known shares only). */
@@ -134,6 +134,15 @@ describe('last ten removals', () => {
     const out = lastRemovals([], [ev('new', '2026-11-03T00:00:00Z'), ev('old', '2026-11-02T00:00:00Z'), ev('gone', '2026-11-04T00:00:00Z', true)], []);
     expect(out.length).toBe(1);
     expect(out[0].key).toContain('new');
+  });
+
+  it('keeps additions out of the removals and lists them on their own (#354)', () => {
+    const rows = [man('a1', '2026-11-05T00:00:00Z', 'Eisen', 'add'), man('t1', '2026-11-04T00:00:00Z', 'Pistole'), man('r1', '2026-11-06T00:00:00Z', 'Gold', 'raise')];
+    expect(lastRemovals(rows, [], []).map((r) => r.name)).toEqual(['Pistole']);
+    expect(lastAdditions(rows).map((r) => [r.name, r.kind])).toEqual([
+      ['Gold', 'raise'],
+      ['Eisen', 'add'],
+    ]);
   });
 });
 

@@ -6840,6 +6840,7 @@
         "more": "All {{n}} changes",
         "less": "Less",
         "reorder": "Reorder ({{n}})",
+        "logKind": { "in": "Stored", "out": "Taken out", "reserve": "Reserved" },
         "logEmpty": "No change yet.",
         "variants": "{{n}} variants",
         "inSpace": "In space",

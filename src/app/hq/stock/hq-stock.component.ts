@@ -890,13 +890,18 @@ export class HqStockComponent implements OnInit {
       .lastRemovals(this.live.events())
       .filter((r) => keep(r.location, r.name, r.className, r.unit))
       .map((r) => ({ key: `o:${r.key}`, at: r.at, kind: 'out' as const, name: r.name, className: r.className, qty: r.qty, unit: r.unit, place: this.crateLabel(r.location), why: r.kind }));
+    // #354: Einlagern and upward corrections stand in the same log (concept d83b72d8).
+    const ins: LogLine[] = this.inv
+      .lastAdditions()
+      .filter((r) => keep(r.location, r.name, r.className, r.unit))
+      .map((r) => ({ key: r.key, at: r.at, kind: 'in' as const, name: r.name, className: r.className, qty: r.qty, unit: r.unit, place: this.crateLabel(r.location), why: r.kind }));
     const res: LogLine[] = [];
     for (const c of this.crates()) {
       if (!keep(c.location, c.name, c.className, c.unit)) continue;
       const all = [...c.anyReservations, ...c.stacks.flatMap((s) => s.reservations)];
       all.forEach((r, i) => res.push({ key: `r:${c.key}:${r.id ?? i}`, at: r.at, kind: 'reserve', name: c.name, className: c.className, qty: r.amount, unit: c.unit, place: this.crateLabel(c.location) }));
     }
-    return [...outs, ...res].filter((l) => !!l.at).sort((a, b) => b.at.localeCompare(a.at));
+    return [...ins, ...outs, ...res].filter((l) => !!l.at).sort((a, b) => b.at.localeCompare(a.at));
   });
   protected readonly filterSummary = computed(() => {
     const parts: string[] = [];
