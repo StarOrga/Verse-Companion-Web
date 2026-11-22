@@ -214,6 +214,23 @@ describe('TranslationCardsComponent (Karteikarten v2)', () => {
     expect(track).toHaveBeenCalledWith('admin:translation_deck_finish', { lang: 'de', cards: 1, points: 20 });
   });
 
+  it('an empty deck with legacy cards waiting never claims „Alles geklärt“ (#396)', async () => {
+    const base = backend([]);
+    const { el } = await mount((c) => {
+      if (c.target === 'translation_card_board') {
+        const b = board();
+        return { data: { ...b, langs: b.langs.map((l) => (l.lang === 'de' ? { ...l, deck_open: 0, deck_waiting: 54 } : l)) } };
+      }
+      if (c.target === 'translation_deck') return { data: deckOf([], { open_total: 0, waiting_total: 54, deck_affected: 0 }) };
+      return base(c);
+    });
+    expect(q(el, '[data-test=finish]')).not.toBeNull();
+    expect(q(el, '.finish-h')?.textContent?.trim()).toBe('admin.translations.cards.finish.titleWaiting');
+    expect(q(el, '[data-test=finish-waiting]')?.textContent).toContain('admin.translations.cards.finish.legacy');
+    expect(q(el, '[data-test=lang-de]')?.textContent).toContain('admin.translations.cards.row.legacy');
+    expect(q(el, '[data-test=lang-de]')?.classList.contains('done')).toBe(false);
+  });
+
   it('a KI language opens its veto list as cards in the same frame; „Passt“ and „Sieht falsch aus“ score', async () => {
     const { harness, el, cmp, rpc, track } = await mount(backend(), '/admin/translations?tab=cards&lang=it');
     expect(cmp.vetoMode()).toBe(true);

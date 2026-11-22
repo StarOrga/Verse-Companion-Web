@@ -4652,6 +4652,8 @@
         "row": {
           "deck": "your deck · {{count}} open",
           "clear": "your deck · all settled",
+          "legacyOne": "your deck · 1 card after the learning pass",
+          "legacy": "your deck · {{count}} cards after the learning pass",
           "ki": "{{count}} by AI",
           "unsure": "{{count}} unsure",
           "kiSummary": "AI decided {{count}}",
@@ -4800,6 +4802,9 @@
         },
         "finish": {
           "title": "All settled for {{lang}}",
+          "titleWaiting": "Deck empty for now for {{lang}}",
+          "legacyOne": "1 older card waits for the next learning pass: it prepares the card again, then it is in your deck or the AI decides it.",
+          "legacy": "{{count}} older cards wait for the next learning pass: it prepares them again, then they are in your deck or the AI decides them.",
           "sum": "{{cards}} · {{texts}} unified",
           "points": "points",
           "split": "{{base}} for {{cards}}, {{bonus}} bonus for the full daily goal",
