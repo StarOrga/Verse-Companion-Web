@@ -8,6 +8,8 @@ import { AuthService } from '../auth/auth.service';
 import { ImpersonationService } from '../auth/impersonation.service';
 import { DesktopConnectionService } from './desktop-connection.service';
 import { SupabaseClientProvider } from '../core/supabase.client';
+import de from '../../../public/i18n/de.json';
+import en from '../../../public/i18n/en.json';
 
 describe('DesktopReadAuthComponent', () => {
   let submit: Mock;
@@ -99,6 +101,61 @@ describe('DesktopReadAuthComponent', () => {
     expect(form.action).toBe('http://127.0.0.1:5000/scc/callback');
   });
 
+  it('back from Starscape with done=ok shows the connected stage without a session check', async () => {
+    const getSession = vi.fn();
+    const { fixture, cmp } = setup({ done: 'ok' });
+    TestBed.inject(SupabaseClientProvider).client.auth.getSession = getSession as never;
+    await cmp.ngOnInit();
+    fixture.detectChanges();
+    expect(cmp.status()).toBe('connected');
+    expect(fixture.nativeElement.querySelector('h1')?.textContent).toContain('desktopConnect.titleConnected');
+    expect((cmp as unknown as { phase: () => string }).phase()).toBe('done');
+    // Title + one line of info, nothing to click.
+    expect(fixture.nativeElement.querySelectorAll('h1').length).toBe(1);
+    expect(fixture.nativeElement.querySelectorAll('p').length).toBe(1);
+    expect(fixture.nativeElement.querySelector('button, a')).toBeNull();
+    expect(getSession).not.toHaveBeenCalled();
+    expect(touch).not.toHaveBeenCalled();
+    expect(submit).not.toHaveBeenCalled();
+  });
+
+  for (const [done, key] of [
+    ['csrf', 'desktopConnect.done.csrf'],
+    ['no_token', 'desktopConnect.done.noToken'],
+    ['origin', 'desktopConnect.done.failed'],
+    ['something-new', 'desktopConnect.done.failed'],
+  ] as const) {
+    it(`done=${done} names its cause and offers no retry link`, async () => {
+      const { fixture, cmp } = setup({ done });
+      await cmp.ngOnInit();
+      fixture.detectChanges();
+      expect(cmp.status()).toBe('error');
+      expect(cmp.errorMsg()).toBe(key);
+      expect(fixture.nativeElement.querySelector('h1')?.textContent).toContain('desktopConnect.titleFailed');
+      expect(fixture.nativeElement.querySelector('a, button')).toBeNull();
+      expect(submit).not.toHaveBeenCalled();
+    });
+  }
+
+  it('done=start asks to start the sign-in in the app', async () => {
+    const { fixture, cmp } = setup({ done: 'start' });
+    await cmp.ngOnInit();
+    fixture.detectChanges();
+    expect(cmp.status()).toBe('start');
+    expect(fixture.nativeElement.querySelector('p')?.textContent).toContain('desktopConnect.start');
+    expect(submit).not.toHaveBeenCalled();
+  });
+
+  it('signed out: title, one info line and the sign-in link only', async () => {
+    authed = false;
+    const { fixture, cmp } = setup({ cb: 'http://127.0.0.1:5000/scc/callback', state: 's' });
+    await cmp.ngOnInit();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('h1')?.textContent).toContain('desktopConnect.titleConnect');
+    expect(fixture.nativeElement.querySelectorAll('p').length).toBe(1);
+    expect(fixture.nativeElement.querySelectorAll('a, button').length).toBe(1);
+  });
+
   it('posts the token in the body, never in the URL', async () => {
     const { cmp } = setup({ cb: 'http://127.0.0.1:5000/scc/callback', state: 'st' });
     await cmp.ngOnInit();
@@ -115,4 +172,24 @@ describe('DesktopReadAuthComponent', () => {
     expect(field('refresh_token')).toBe('app-refresh');
     expect(field('email')).toBe('pilot@example.com');
   });
+});
+
+describe('DesktopReadAuthComponent i18n keys', () => {
+  const KEYS = [
+    'titleConnect', 'titleConnecting', 'titleConnected', 'titleFailed',
+    'authorizing', 'loginRequired', 'redirecting', 'handedOverHint', 'connected', 'start',
+    'errorMissingParams', 'errorBadCallback', 'errorNoToken', 'retry',
+    'done.csrf', 'done.noToken', 'done.failed',
+  ];
+  for (const [lang, cat] of [['de', de], ['en', en]] as const) {
+    for (const key of KEYS) {
+      it(`${lang}: desktopConnect.${key} is a non-empty string`, () => {
+        const value = key
+          .split('.')
+          .reduce<unknown>((node, part) => (node as Record<string, unknown> | undefined)?.[part], (cat as { desktopConnect: unknown }).desktopConnect);
+        expect(typeof value).toBe('string');
+        expect((value as string).length).toBeGreaterThan(0);
+      });
+    }
+  }
 });
