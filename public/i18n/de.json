@@ -8548,7 +8548,6 @@
     },
     "search": {
       "label": "Suche",
-      "open": "Suche öffnen",
       "clear": "Eingabe löschen",
       "dropContext": "Kontext entfernen — überall suchen",
       "places": "Seiten",
