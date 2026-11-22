@@ -4,6 +4,15 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.293.0] - 2026-11-22
+
+### Added
+- The web app speaks the twelve game-string languages: Spanish (Spain and Latin America), French, Italian, Japanese, Korean, Polish, Brazilian Portuguese, Russian, Turkish, Simplified and Traditional Chinese. The browser language is detected; the choice is saved to the profile.
+- Desktop app language packs: Turkish and Traditional Chinese, all twelve packs proofread.
+
+### Fixed
+- Translation cost estimates in the game-string pipeline used list prices for batch jobs and showed twice the real cost.
+
 ## [0.292.0] - 2026-11-22
 
 ### Added
