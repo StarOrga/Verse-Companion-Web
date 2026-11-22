@@ -73,6 +73,38 @@ export function framedLikeNews(rect: readonly [number, number, number, number]):
   return { s, x: sx / s - rect[0], y: sy / s - rect[1] };
 }
 
+/**
+ * How much larger the Patches planet stands than the News planet (patch board
+ * concept 20261110-1749, item 10: "größer, aber nicht weiter reinrücken"). The
+ * planet grows to the LEFT: its right (inner) edge and its vertical centre stay
+ * where the News frame puts them, so it never moves further under the page.
+ */
+export const PATCHES_PLANET_GROW = 1.3;
+
+/**
+ * How far the grown Patches planet steps OUT of the page, as a share of the News
+ * planet's width. On News the planet's inner edge already reaches the page's
+ * first letters; the bigger Patches planet must not sit under text (QA wave 3,
+ * 2026-11-21: it covered the first letters of the 4.10.3 bullets), so its inner
+ * edge moves outwards — never further in.
+ */
+export const PATCHES_PLANET_OUT = 0.06;
+
+/** Screen frame of a door planet: News-like, grown leftwards around its centre line, inner edge moved out by `out`. */
+function grownFrame(grow: number, out = 0): { x: number; y: number; w: number } {
+  const w = NEWS.s * WORLD_RECTS.news[2];
+  const x = NEWS.s * (WORLD_RECTS.news[0] + NEWS.x);
+  const y = NEWS.s * (WORLD_RECTS.news[1] + NEWS.y);
+  return { x: x + w - w * grow - w * out, y: y + (w - w * grow) / 2, w: w * grow };
+}
+
+/** Pose that frames `rect` like the News planet, scaled by `grow` around its right edge / centre. */
+export function framedLikeNewsGrown(rect: readonly [number, number, number, number], grow: number, out = PATCHES_PLANET_OUT): CameraPose {
+  const f = grownFrame(grow, out);
+  const s = f.w / rect[2];
+  return { s, x: f.x / s - rect[0], y: f.y / s - rect[1] };
+}
+
 export interface ScenePoseDef {
   readonly cam: CameraPose;
   /** Objects shown at rest (opacity); every other object fades out during the flight. */
@@ -88,7 +120,7 @@ export const POSES: Readonly<Record<ScenePoseId, ScenePoseDef>> = {
   // show while the camera carries them away (data-carry, shell-scene.component.scss).
   verse: { cam: VERSE, show: { planet: 1, hqst: 1, holo: 1 }, veil: 0 },
   news: { cam: NEWS, show: { news: 1 }, veil: 0 },
-  patches: { cam: framedLikeNews(WORLD_RECTS.patches), show: { patches: 1 }, veil: 0 },
+  patches: { cam: framedLikeNewsGrown(WORLD_RECTS.patches, PATCHES_PLANET_GROW), show: { patches: 1 }, veil: 0 },
   gallery: { cam: framedLikeNews(WORLD_RECTS.gallery), show: { gallery: 1 }, veil: 0 },
   // The constellation morphs into the star map; the big planet stays faint, Galerie is gone (r4).
   starmap: { cam: { s: 3, x: -155.427, y: -70.5 }, show: { starmap: 1, planet: 0.3 }, veil: 0 },
@@ -131,7 +163,8 @@ const NEWS_FRAME = {
 };
 
 /** The pose that frames `rect` (world vw) the way the News pose frames the News planet. */
-export function framedLike(rect: readonly [number, number, number, number]): CameraPose {
+export function framedLike(rect: readonly [number, number, number, number], grow = 1): CameraPose {
+  if (grow !== 1) return framedLikeNewsGrown(rect, grow);
   const s = NEWS_FRAME.w / rect[2];
   return { s, x: NEWS_FRAME.x / s - rect[0], y: NEWS_FRAME.y / s - rect[1] };
 }
@@ -173,7 +206,8 @@ export function poseCam(id: ScenePoseId, anchors: VerseAnchors | null, adminSlot
   if (id === 'admin') return adminSlot ? framedInto(WORLD_RECTS.station, adminSlot) : POSES.admin.cam;
   if (!anchors) return POSES[id].cam;
   if (id === 'verse') return verseCam(anchors);
-  if (id === 'news' || id === 'patches' || id === 'gallery') return framedLike(doorRects(anchors)[id]);
+  if (id === 'patches') return framedLike(doorRects(anchors)[id], PATCHES_PLANET_GROW);
+  if (id === 'news' || id === 'gallery') return framedLike(doorRects(anchors)[id]);
   return POSES[id].cam;
 }
 

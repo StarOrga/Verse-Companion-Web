@@ -317,6 +317,16 @@
         "hunks": [
           "c61c3ffba591"
         ]
+      },
+      {
+        "ship": "claude/patch-display-improvement-3feb0e",
+        "by": "Mollywator",
+        "value": "regenerated for the merged tree",
+        "decided": true,
+        "at": "2026-11-22T00:13:33.980Z",
+        "hunks": [
+          "355190787eda"
+        ]
       }
     ],
     ".claude/project-map.md›docs/›count": [
@@ -419,6 +429,16 @@
         "at": "2026-11-19T22:42:13.751Z",
         "hunks": [
           "6b16eacfc70d"
+        ]
+      },
+      {
+        "ship": "claude/patch-display-improvement-3feb0e",
+        "by": "Mollywator",
+        "value": "regenerated for the merged tree",
+        "decided": true,
+        "at": "2026-11-22T00:13:33.980Z",
+        "hunks": [
+          "122c2ba22c9a"
         ]
       }
     ],
@@ -857,6 +877,16 @@
         "hunks": [
           "1ac2ea1f3954"
         ]
+      },
+      {
+        "ship": "claude/patch-display-improvement-3feb0e",
+        "by": "Mollywator",
+        "value": "regenerated for the merged tree",
+        "decided": true,
+        "at": "2026-11-22T00:13:33.980Z",
+        "hunks": [
+          "ebb5c187568d"
+        ]
       }
     ],
     ".claude/project-map.md›ingest-catalog count›value": [
@@ -1156,6 +1186,18 @@
         ]
       }
     ],
+    ".claude/project-map.md›src/app/news›count": [
+      {
+        "ship": "claude/patch-display-improvement-3feb0e",
+        "by": "Mollywator",
+        "value": "regenerated for the merged tree",
+        "decided": true,
+        "at": "2026-11-22T00:13:33.980Z",
+        "hunks": [
+          "6f1f09fe2a6c"
+        ]
+      }
+    ],
     ".claude/project-map.md›src/app/shared/›file count": [
       {
         "ship": "claude/3d-view-component-visibility-27ac32",
@@ -1248,6 +1290,16 @@
         "at": "2026-11-15T04:18:13.845Z",
         "hunks": [
           "97ff2866726a"
+        ]
+      },
+      {
+        "ship": "claude/patch-display-improvement-3feb0e",
+        "by": "Mollywator",
+        "value": "regenerated for the merged tree",
+        "decided": true,
+        "at": "2026-11-22T00:13:33.980Z",
+        "hunks": [
+          "51daeae072a9"
         ]
       }
     ],
