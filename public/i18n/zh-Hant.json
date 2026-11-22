@@ -3408,6 +3408,7 @@
       "play": "播放影片"
     },
     "patchBoard": {
+      "today": "今天",
       "switch": {
         "aria": "選擇頻道",
         "live": "Live",

@@ -3408,6 +3408,7 @@
       "play": "動画を再生"
     },
     "patchBoard": {
+      "today": "今日",
       "switch": {
         "aria": "チャンネルを選択",
         "live": "Live",

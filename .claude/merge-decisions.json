@@ -694,6 +694,23 @@
         ]
       }
     ],
+    ".claude/project-map.md›header›project-name": [
+      {
+        "ship": "#1246",
+        "by": "Jerry",
+        "value": "# Project Map — verse-companion"
+      },
+      {
+        "ship": "claude/patch-display-improvement-3feb0e",
+        "by": "Mollywator",
+        "value": "generated title (ship_build regenerates it from the stale main checkout's package.json name)",
+        "decided": true,
+        "at": "2026-11-22T11:30:59.149Z",
+        "hunks": [
+          "3b933ff375c9"
+        ]
+      }
+    ],
     ".claude/project-map.md›header›tracked file count": [
       {
         "ship": "#1158",
@@ -951,6 +968,38 @@
         "at": "2026-11-22T10:53:08.931Z",
         "hunks": [
           "40814965035e"
+        ]
+      }
+    ],
+    ".claude/project-map.md›header›tracked-files-count": [
+      {
+        "ship": "#1256",
+        "by": "Jerry",
+        "value": "3796 tracked files"
+      },
+      {
+        "ship": "claude/patch-display-improvement-3feb0e",
+        "by": "Mollywator",
+        "value": "3770 tracked files (upstream +1, minus the 26 discarded concept files)",
+        "decided": true,
+        "at": "2026-11-22T10:48:20.158Z",
+        "hunks": [
+          "2d02b7eeecb9"
+        ]
+      },
+      {
+        "ship": "#1257",
+        "by": "Jerry",
+        "value": "3798 tracked files"
+      },
+      {
+        "ship": "claude/patch-display-improvement-3feb0e",
+        "by": "Mollywator",
+        "value": "3772 tracked files (generated count of the merged tree)",
+        "decided": true,
+        "at": "2026-11-22T11:08:50.735Z",
+        "hunks": [
+          "a3b99cc5e02f"
         ]
       }
     ],
@@ -2377,6 +2426,36 @@
         "at": "2026-11-20T21:40:30.698Z",
         "hunks": [
           "531642e46da3"
+        ]
+      },
+      {
+        "ship": "#1252",
+        "by": "Jerry",
+        "value": "0.297.0"
+      },
+      {
+        "ship": "claude/patch-display-improvement-3feb0e",
+        "by": "Mollywator",
+        "value": "0.297.1 (generated from CHANGELOG, main's current version)",
+        "decided": true,
+        "at": "2026-11-22T10:53:07.222Z",
+        "hunks": [
+          "3779207f60a9"
+        ]
+      },
+      {
+        "ship": "#1257",
+        "by": "Jerry",
+        "value": "0.297.1"
+      },
+      {
+        "ship": "claude/patch-display-improvement-3feb0e",
+        "by": "Mollywator",
+        "value": "regenerated from CHANGELOG (main's 0.297.1 was stale)",
+        "decided": true,
+        "at": "2026-11-22T11:08:50.735Z",
+        "hunks": [
+          "4bb3306dc988"
         ]
       }
     ],
