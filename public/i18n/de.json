@@ -4067,7 +4067,20 @@
       },
       "languages": {
         "de": "Deutsch",
-        "en": "Englisch"
+        "en": "Englisch",
+        "es": "Spanisch",
+        "es-419": "Spanisch (Lateinamerika)",
+        "fr": "Französisch",
+        "hi": "Hindi",
+        "it": "Italienisch",
+        "ja": "Japanisch",
+        "ko": "Koreanisch",
+        "pl": "Polnisch",
+        "pt-BR": "Portugiesisch (Brasilien)",
+        "ru": "Russisch",
+        "tr": "Türkisch",
+        "zh-Hans": "Chinesisch (vereinfacht)",
+        "zh-Hant": "Chinesisch (traditionell)"
       },
       "regions": {
         "DE": "Deutschland",
@@ -8535,7 +8548,6 @@
     },
     "search": {
       "label": "Suche",
-      "open": "Suche öffnen",
       "clear": "Eingabe löschen",
       "dropContext": "Kontext entfernen — überall suchen",
       "places": "Seiten",

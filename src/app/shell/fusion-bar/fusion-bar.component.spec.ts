@@ -66,6 +66,7 @@ describe('FusionBarComponent', () => {
     const el = fixture.nativeElement as HTMLElement;
     const sw = el.querySelector('.kindsw') as HTMLButtonElement;
     expect(sw.textContent).toContain('codex.kinds.weapon');
+    expect(sw.closest('.plate .trail'), 'the switch is the path\'s last step, never a pill beside the field').not.toBeNull();
     expect(sw.getAttribute('aria-expanded')).toBe('false');
     sw.click();
     fixture.detectChanges();
@@ -117,7 +118,7 @@ describe('FusionBarComponent', () => {
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
     expect(el.querySelector('.kindsw i')?.textContent).toContain('368');
-    expect(el.querySelector('.count')?.textContent).toContain('fusionBar.hits');
+    expect(el.querySelector('sc-fusion-search .count')?.textContent, 'the count sits inside the field').toContain('fusionBar.hits');
     expect(el.querySelector('sc-fusion-search .tok .tok-v')?.textContent).toContain('Aegis');
     (el.querySelector('.tok-x') as HTMLButtonElement).click();
     expect(removed).toEqual(['manufacturer']);
@@ -266,7 +267,7 @@ describe('FusionBarComponent', () => {
     el.remove();
   });
 
-  it('without a toolbar the docked search has no width cap (it runs up to Apps); with one it keeps 520px', async () => {
+  it('the docked search has no width cap, with or without a toolbar (same width on every page)', async () => {
     layout.set('content');
     const fixture = await setup('/verse/news');
     // A fixture created later resets TestBed's root elements: build the toolbar host first.
@@ -279,7 +280,7 @@ describe('FusionBarComponent', () => {
     const off = TestBed.inject(ShellChromeService).registerToolbar(host.componentInstance.tb());
     fixture.detectChanges();
     expect(el.classList).toContain('tools');
-    expect(getComputedStyle(el.querySelector('.search')!).maxWidth).toBe('520px');
+    expect(getComputedStyle(el.querySelector('.search')!).maxWidth).toBe('none');
     off();
     el.remove();
   });

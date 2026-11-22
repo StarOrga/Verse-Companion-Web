@@ -112,7 +112,7 @@ describe('_chunk', () => {
 describe('_cost', () => {
   it('real spend from usage incl. cache', () => {
     const usd = usageCostUsd('claude-sonnet-5-5', { input_tokens: 1e6, output_tokens: 1e6, cache_read_input_tokens: 1e6, cache_creation_input_tokens: 1e6 });
-    assert.ok(Math.abs(usd - (2 + 10 + 0.2 + 4)) < 1e-9);
+    assert.ok(Math.abs(usd - (1 + 5 + 0.1 + 2)) < 1e-9);
   });
   it('opus costs more than sonnet for the same chunk', () => {
     const c = { inputChars: 50_000, enChars: 40_000, strings: 100 };

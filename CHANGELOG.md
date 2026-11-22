@@ -4,6 +4,22 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.297.0] - 2026-11-22
+
+### Added
+- The web app speaks thirteen more languages: Spanish (Spain and Latin America), French, Hindi, Italian, Japanese, Korean, Polish, Brazilian Portuguese, Russian, Turkish, Simplified and Traditional Chinese. The browser language is detected; the choice is saved to the profile.
+- Desktop app language packs: Latin American Spanish, Turkish and Traditional Chinese, all packs proofread. Web and desktop app now offer the same languages.
+
+### Fixed
+- Translation cost estimates in the game-string pipeline used list prices for batch jobs and showed twice the real cost.
+- The AI cost ledger of all server functions priced Claude Sonnet 5.5 and Opus 5.5 at twice their list price.
+
+## [0.296.0] - 2026-11-22
+
+### Changed
+- Subheader search: the field starts right after the brand and runs up to the icons, with the same width on every page. The Codex kind switch is now the last step of the path ("Codex › Kommend ▾"), and the hit count sits inside the field.
+- Phone: the closed search is a wide field with its placeholder instead of a lone magnifier.
+
 ## [0.295.0] - 2026-11-22
 
 ### Changed

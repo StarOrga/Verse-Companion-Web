@@ -4067,7 +4067,20 @@
       },
       "languages": {
         "de": "German",
-        "en": "English"
+        "en": "English",
+        "es": "Spanish",
+        "es-419": "Latin American Spanish",
+        "fr": "French",
+        "hi": "Hindi",
+        "it": "Italian",
+        "ja": "Japanese",
+        "ko": "Korean",
+        "pl": "Polish",
+        "pt-BR": "Brazilian Portuguese",
+        "ru": "Russian",
+        "tr": "Turkish",
+        "zh-Hans": "Simplified Chinese",
+        "zh-Hant": "Traditional Chinese"
       },
       "regions": {
         "DE": "Germany",
@@ -8535,7 +8548,6 @@
     },
     "search": {
       "label": "Search",
-      "open": "Open search",
       "clear": "Clear input",
       "dropContext": "Remove context — search everywhere",
       "places": "Pages",
