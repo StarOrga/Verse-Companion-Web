@@ -76,7 +76,7 @@ PWA caveat are baked into its output, so the correct reply is now the cheap one 
 a ✅ nobody verified cannot be produced by accident. Pass `--route` **without** the
 leading slash — Git Bash rewrites a leading-slash argument into a Windows path.
 
-So step 5b runs as four rules, in this order:
+So step 5b runs as five rules, in this order:
 
 1. **Wait for the production deployment that carries the merge SHA.** After the
    squash-merge *and* after every out-of-band deploy (`db push`, `functions
@@ -123,6 +123,13 @@ So step 5b runs as four rules, in this order:
    nix" reports that look exactly like a failed deploy and are not one, so it
    belongs in **every** review reply for a `src/`/`public/` change — not only once
    something already looks wrong.
+5. **The reply closes the ask — no open question, no offered alternative.** Post
+   the printed text as it is, with nothing appended, and send no separate
+   "zur Logik …, soll ich auch …?" note after it: the board offers ✓ Abgenommen
+   next to it. A fork still open is decided on its default and named as a fact
+   in `--changed`, or the topic is not ship-closed but parked `needs_input`
+   (core, "A ship answers the ask"). Only the standing invite stays. (#394,
+   2026-11-21.)
 
 ```sql
 -- step 5b: post the review reply after the ship UPDATE *and* the verified deploy (service_role)
