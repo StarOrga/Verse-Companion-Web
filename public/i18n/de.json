@@ -3454,6 +3454,56 @@
       "badge": "Video",
       "play": "Video abspielen"
     },
+    "patchBoard": {
+      "switch": {
+        "aria": "Kanal wählen",
+        "live": "Live",
+        "ptu": "PTU",
+        "liveHint": "Was für Live-Spieler zählt",
+        "ptuHint": "Test-Builds: jeder einzelne Stand"
+      },
+      "unread": "Ungelesen",
+      "newForYou": "Neu für dich",
+      "readFull": "Ganz lesen",
+      "markRead": "Gelesen",
+      "readOn": "gelesen am {{date}}",
+      "readEarlier": "früher gelesen",
+      "readAgain": "Nochmal lesen",
+      "now": {
+        "title": "Gerade auf Live gekommen",
+        "since": "Seit {{date}}",
+        "none": "Noch kein Live-Patch im Feed."
+      },
+      "next": {
+        "title": "Als Nächstes auf Live",
+        "none": "Noch kein nächster Patch bekannt.",
+        "testing": "Im {{ring}}-Test",
+        "noDate": "Kein offizielles Datum",
+        "announced": "Angekündigt für {{date}}",
+        "estimate": "Schätzung {{when}}"
+      },
+      "allAbout": "Alles zu {{line}}",
+      "close": "Schließen",
+      "noDate": "Ohne Datum",
+      "roadmap": {
+        "aria": "Roadmap-Stand",
+        "committed": "Bestätigt",
+        "tentative": "Möglich",
+        "released": "Ausgeliefert"
+      },
+      "status": {
+        "next": "Als Nächstes"
+      },
+      "daysLive": "{{n}} Tage live",
+      "earlier": "{{n}} frühere Updates",
+      "earlierHide": "Frühere Updates ausblenden",
+      "ptu": {
+        "newest": "Neuester Test-Build",
+        "aria": "Test-Builds, neueste zuerst",
+        "empty": "Gerade keine Test-Builds im Feed.",
+        "wave": "{{stage}} · Welle {{n}}"
+      }
+    },
     "patch": {
       "line": "Alpha {{version}}",
       "otherLine": "Ohne Versionsangabe",
@@ -3638,7 +3688,9 @@
         "section": {
           "stabilitaet": "Stabilität",
           "builds": "Laufende Test-Builds",
-          "prep": "Wie bereite ich mich vor?",
+          "first": "Erste Schritte in diesem Patch",
+          "community": "Community",
+          "urteil": "Dein Urteil",
           "prepPast": "Was war zu beachten?",
           "contents": "Was steckt drin?",
           "fixed": "Haben sie … gefixt?",
@@ -3657,6 +3709,7 @@
         "wipe": "Wipe",
         "noBuildInfo": "RSI hat zu diesem Build keine „Important Build Info“ veröffentlicht.",
         "generalTitle": "Gilt für jeden Patch",
+        "nextTitle": "Vorbereitung auf den nächsten Hauptpatch",
         "generalItem": {
           "launcher": "Launcher öffnen und warten, bis er die neue Version wirklich heruntergeladen hat – die Versionsnummer im Launcher muss zum Patch passen.",
           "shaders": "Shader-Ordner leeren (%LOCALAPPDATA%\\\\Star Citizen\\\\), wenn Grafik flackert oder die Bildrate nach dem Patch einbricht.",
@@ -3667,6 +3720,10 @@
       },
       "contents": {
         "inNotes": "In den Release-Notes",
+        "fixedTitle": "Behoben",
+        "knownTitle": "Bekannte Probleme",
+        "gallery": "Bilder aus diesem Patch",
+        "moreLines": "Weitere {{n}} anzeigen",
         "more": "Langtext",
         "less": "Einklappen",
         "leftover": "Weitere Stichpunkte der Note ohne Roadmap-Karte ({{n}})",
@@ -3888,8 +3945,7 @@
       "confirmedSub": "Die berechnete Zahl liegt im Rahmen des Community-Urteils.",
       "sum": "{{n}} Stimmen · Korrektur {{c}}",
       "yours": "dein Urteil",
-      "blindTitle": "Erst dein Urteil, dann die Zahl",
-      "ask": "Wie stabil läuft {{line}} bei dir?",
+      "ask": "Wie läuft {{line}} bei dir?",
       "mine": "Dein Urteil:",
       "changeFrom": "änderbar ab {{time}}",
       "hint": {
@@ -3897,8 +3953,6 @@
         "wackelig": "spielbar, aber nervig",
         "instabil": "ständig Abbrüche"
       },
-      "cannotJudge": "Kann ich nicht beurteilen",
-      "showNumber": "Zahl ohne Urteil anzeigen",
       "tooSoon": "Änderbar frühestens {{h}} h nach deiner Abgabe.",
       "rules": "Gezählt werden Accounts, die mindestens {{days}} Tage alt sind. Änderbar frühestens {{h}} h nach deiner Abgabe. Dein Urteil wird nie mit deinem Namen gezeigt.",
       "signedOut": "Melde dich an, um mitzuurteilen.",

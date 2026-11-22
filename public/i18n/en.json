@@ -3454,6 +3454,56 @@
       "badge": "Video",
       "play": "Play video"
     },
+    "patchBoard": {
+      "switch": {
+        "aria": "Choose channel",
+        "live": "Live",
+        "ptu": "PTU",
+        "liveHint": "What matters to Live players",
+        "ptuHint": "Test builds: every single build"
+      },
+      "unread": "Unread",
+      "newForYou": "New for you",
+      "readFull": "Read in full",
+      "markRead": "Read",
+      "readOn": "read on {{date}}",
+      "readEarlier": "read earlier",
+      "readAgain": "Read again",
+      "now": {
+        "title": "Just arrived on Live",
+        "since": "Since {{date}}",
+        "none": "No Live patch in the feed yet."
+      },
+      "next": {
+        "title": "Next on Live",
+        "none": "No next patch known yet.",
+        "testing": "In {{ring}} testing",
+        "noDate": "No official date",
+        "announced": "Announced for {{date}}",
+        "estimate": "Estimate {{when}}"
+      },
+      "allAbout": "Everything about {{line}}",
+      "close": "Close",
+      "noDate": "No date",
+      "roadmap": {
+        "aria": "Roadmap status",
+        "committed": "Confirmed",
+        "tentative": "Possible",
+        "released": "Delivered"
+      },
+      "status": {
+        "next": "Up next"
+      },
+      "daysLive": "{{n}} days live",
+      "earlier": "{{n}} earlier updates",
+      "earlierHide": "Hide earlier updates",
+      "ptu": {
+        "newest": "Newest test build",
+        "aria": "Test builds, newest first",
+        "empty": "No test builds in the feed right now.",
+        "wave": "{{stage}} · wave {{n}}"
+      }
+    },
     "patch": {
       "line": "Alpha {{version}}",
       "otherLine": "Without a version",
@@ -3638,7 +3688,9 @@
         "section": {
           "stabilitaet": "Stability",
           "builds": "Running test builds",
-          "prep": "How do I prepare?",
+          "first": "First steps in this patch",
+          "community": "Community",
+          "urteil": "Your verdict",
           "prepPast": "What you needed to know",
           "contents": "What's in it?",
           "fixed": "Did they fix …?",
@@ -3657,6 +3709,7 @@
         "wipe": "Wipe",
         "noBuildInfo": "RSI published no \"Important Build Info\" for this build.",
         "generalTitle": "True for every patch",
+        "nextTitle": "Getting ready for the next major patch",
         "generalItem": {
           "launcher": "Open the launcher and let it finish downloading — the version it shows has to match the patch.",
           "shaders": "Clear the shader folder (%LOCALAPPDATA%\\\\Star Citizen\\\\) if graphics flicker or the frame rate drops after the patch.",
@@ -3667,6 +3720,10 @@
       },
       "contents": {
         "inNotes": "In the release notes",
+        "fixedTitle": "Fixed",
+        "knownTitle": "Known issues",
+        "gallery": "Images from this patch",
+        "moreLines": "Show {{n}} more",
         "more": "Full text",
         "less": "Collapse",
         "leftover": "Further note bullets without a roadmap card ({{n}})",
@@ -3888,8 +3945,7 @@
       "confirmedSub": "The computed number is within the community verdict.",
       "sum": "{{n}} votes · correction {{c}}",
       "yours": "your verdict",
-      "blindTitle": "Your verdict first, then the number",
-      "ask": "How stable does {{line}} run for you?",
+      "ask": "How is {{line}} running for you?",
       "mine": "Your verdict:",
       "changeFrom": "changeable from {{time}}",
       "hint": {
@@ -3897,8 +3953,6 @@
         "wackelig": "playable, but annoying",
         "instabil": "constant drops"
       },
-      "cannotJudge": "I can't judge this",
-      "showNumber": "Show the number without a verdict",
       "tooSoon": "You can change it {{h}} h after your last vote at the earliest.",
       "rules": "Only accounts at least {{days}} days old count. Changeable {{h}} h after your last vote at the earliest. Your verdict is never shown with your name.",
       "signedOut": "Sign in to add your verdict.",

@@ -1,5 +1,5 @@
 import type { PatchOutline, PatchOutlineNode } from './patch-outline';
-import { extractPrep, parsePrepLine, prepTone } from './patch-prep';
+import { extractFixed, extractImages, extractPrep, parsePrepLine, prepTone } from './patch-prep';
 
 function node(kind: PatchOutlineNode['kind'], text: string, depth = 0): PatchOutlineNode {
   return { kind, text, depth };
@@ -78,5 +78,29 @@ describe('parsePrepLine / prepTone', () => {
     expect(prepTone('Full wipe')).toBe('wiped');
     expect(prepTone('Carried over, no wipe')).toBe('kept');
     expect(prepTone('20,000')).toBe('neutral');
+  });
+});
+
+describe('extractFixed / extractImages', () => {
+  const outline = {
+    slug: 's', subject: 'x', truncated: false, bulletCount: 3,
+    nodes: [
+      { kind: 'heading', text: 'Features', depth: 0 },
+      { kind: 'bullet', text: 'A feature', depth: 0 },
+      { kind: 'heading', text: 'Bug Fixes', depth: 0 },
+      { kind: 'subheading', text: 'Ships', depth: 0 },
+      { kind: 'bullet', text: 'Fixed a crash', depth: 0, links: ['https://example.test/shot.png?x=1', 'https://example.test/page'] },
+      { kind: 'heading', text: 'Known Issues', depth: 0 },
+      { kind: 'bullet', text: 'Not a fix', depth: 0 },
+    ],
+  } as PatchOutline;
+
+  it('reads the Bug Fixes block up to the next heading, skipping area labels', () => {
+    expect(extractFixed(outline)).toEqual(['Fixed a crash']);
+    expect(extractFixed(null)).toEqual([]);
+  });
+
+  it('collects image links only, once each', () => {
+    expect(extractImages(outline)).toEqual(['https://example.test/shot.png?x=1']);
   });
 });

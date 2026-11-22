@@ -30,11 +30,9 @@ describe('componentDeductions', () => {
 
 describe('StabilityLongComponent', () => {
   const agg = signal<VoteAggregate | null>(AGG);
-  const blind = signal(false);
 
   beforeEach(() => {
     agg.set(AGG);
-    blind.set(false);
     TestBed.configureTestingModule({
       providers: [
         provideRouter([]),
@@ -42,10 +40,10 @@ describe('StabilityLongComponent', () => {
         {
           provide: PatchStabilityVotesService,
           useValue: {
-            line: signal('4.3'), aggregate: agg.asReadonly(), error: signal(null).asReadonly(), saving: signal(false).asReadonly(), blind,
+            line: signal('4.3'), aggregate: agg.asReadonly(), error: signal(null).asReadonly(), saving: signal(false).asReadonly(),
             own: () => ({ verdict: null, nextChangeAt: null }),
             correctionFor: (s: number) => (agg() ? communityCorrection(s, agg() as VoteAggregate) : null),
-            ensure: () => undefined, load: async () => undefined, reveal: () => blind.set(false), castVote: async () => 'ok',
+            ensure: () => undefined, load: async () => undefined, castVote: async () => 'ok',
           },
         },
         { provide: AuthService, useValue: { user: signal({ id: 'u1' }) } },
@@ -84,14 +82,11 @@ describe('StabilityLongComponent', () => {
     expect(el.querySelector('.ghost')).toBeNull();
   });
 
-  it('blind: the number is blurred and inert, the vote card leads', () => {
-    blind.set(true);
+  it('open: the number is shown at once, the vote card closes the section', () => {
     const el = render({ verdict: VERDICT, live: true, previous: null });
-    const calc = el.querySelector('.calc')!;
-    expect(calc.classList.contains('blind')).toBe(true);
-    expect(calc.hasAttribute('inert')).toBe(true);
-    expect(el.querySelectorAll('sc-community-verdict').length).toBe(1);
-    expect(el.firstElementChild!.tagName.toLowerCase()).toBe('sc-community-verdict');
+    expect(el.querySelector('.calc')!.hasAttribute('inert')).toBe(false);
+    expect(el.querySelector('.hp')).not.toBeNull();
+    expect(el.lastElementChild!.tagName.toLowerCase()).toBe('sc-community-verdict');
   });
 
   it('without loaded votes the stability still renders from the computed number', () => {

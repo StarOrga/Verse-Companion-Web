@@ -4,7 +4,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
 import { filter } from 'rxjs';
 import { NewsService } from '../../news/news.service';
+import { NgTemplateOutlet } from '@angular/common';
 import { PatchBoardComponent } from '../../news/patch-board.component';
+import { PatchBoardV2Component } from '../../news/patch-board-v2.component';
+import { PATCH_BOARD_V2 } from '../../news/patch-board-flag';
 import { PtuReleaseComponent } from '../../news/ptu-release.component';
 import { nextLineInTesting } from '../../news/patch-stats';
 import { VerseApiService } from '../data/verse-api.service';
@@ -77,18 +80,28 @@ export function cometStrip(median: string | null, mine: string | null): CometStr
   // Subpages sit in the page frame; only the hub runs edge to edge (concept 2026-10-28).
   host: { class: DOCK_HOST_CLASS },
   standalone: true,
-  imports: [TranslatePipe, RouterLink, VerseHeaderComponent, PatchBoardComponent, PtuReleaseComponent],
+  imports: [NgTemplateOutlet, TranslatePipe, RouterLink, VerseHeaderComponent, PatchBoardComponent, PatchBoardV2Component, PtuReleaseComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (enabled()) {
       <sc-verse-header planet="patches" [title]="'verse.area.patches' | translate" [subtitle]="'verse.patches.sub' | translate" />
 
-      <!-- The build in the PTU right now: our estimate and RSI's announced date (feedback #317). -->
-      <sc-ptu-release class="sc-enter" style="--sc-enter-i: 1" [groups]="news.patchLines()" [deployment]="news.feed()?.deployment ?? null" [now]="now()" />
+      @if (v2) {
+        <sc-patch-board-v2 class="sc-enter" style="--sc-enter-i: 1" [embedded]="true" [barSearch]="shellOn()" [searchQuery]="barTerm()" [announcedDate]="releaseDate()">
+          <ng-container ngProjectAs="[pbNext]"><ng-container [ngTemplateOutlet]="pre" /></ng-container>
+        </sc-patch-board-v2>
+      } @else {
+        <!-- The build in the PTU right now: our estimate and RSI's announced date (feedback #317). -->
+        <sc-ptu-release class="sc-enter" style="--sc-enter-i: 1" [groups]="news.patchLines()" [deployment]="news.feed()?.deployment ?? null" [now]="now()" />
 
-      <sc-patch-board class="sc-enter" style="--sc-enter-i: 1" [embedded]="true" [barSearch]="shellOn()" [searchQuery]="barTerm()">
+        <sc-patch-board class="sc-enter" style="--sc-enter-i: 1" [embedded]="true" [barSearch]="shellOn()" [searchQuery]="barTerm()">
+          <ng-container ngProjectAs="[pbNext]"><ng-container [ngTemplateOutlet]="pre" /></ng-container>
+        </sc-patch-board>
+      }
+
+      <ng-template #pre>
         @if (targetLine(); as line) {
-          <div pbNext class="ng">
+          <div class="ng" [class.ng-v2]="v2">
             <section class="col" aria-labelledby="vp-ready-h">
               <div class="ngh">
                 <h3 id="vp-ready-h">
@@ -150,7 +163,7 @@ export function cometStrip(median: string | null, mine: string | null): CometStr
             </section>
           </div>
         }
-      </sc-patch-board>
+      </ng-template>
     } @else {
       <sc-patch-board />
     }
@@ -162,6 +175,8 @@ export function cometStrip(median: string | null, mine: string | null): CometStr
       display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 16px 30px;
       padding: 14px 16px 16px 150px; border-top: 1px solid color-mix(in srgb, var(--sc-accent) 12%, transparent);
     }
+    /* In the "Live first" board the pre-flight sits under the PTU box, not inside a card. */
+    .ng.ng-v2 { padding: 14px 16px; border: 1px solid var(--sc-border); border-radius: 12px; background: color-mix(in srgb, var(--sc-bg-1) 60%, transparent); }
     .ngh { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; margin-bottom: 10px; }
     .ngh h3 {
       margin: 0; font-family: var(--sc-font-display); font-size: max(0.72rem, var(--sc-fs-floor)); font-weight: 600;
@@ -219,6 +234,9 @@ export class VersePatchesComponent {
   readonly enabled = inject(BetaService).isEnabled('verse');
   /** Without the shell β there is no subheader search; the board keeps its own field. */
   protected readonly shellOn = inject(BetaService).isEnabled('shell');
+
+  /** Which board renders — see `PATCH_BOARD_V2` (set false there to restore the previous board). */
+  protected readonly v2 = PATCH_BOARD_V2;
 
   protected readonly steps = READINESS_STEPS;
 

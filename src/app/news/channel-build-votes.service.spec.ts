@@ -83,15 +83,6 @@ describe('ChannelBuildVotesService', () => {
     expect(c.correction).toBe(0);
   });
 
-  it('blind per build: without an own vote until revealed', async () => {
-    const { service } = setup();
-    await service.load();
-    expect(service.blind('ptu', '4.10.3')).toBe(false);
-    expect(service.blind('hotfix', '4.3.2')).toBe(true);
-    service.reveal('hotfix', '4.3.2');
-    expect(service.blind('hotfix', '4.3.2')).toBe(false);
-  });
-
   it('castVote upserts on the build key', async () => {
     const { service, upserts, conflicts } = setup();
     expect(await service.castVote('ptu', '4.10.3', 'instabil')).toBe('ok');

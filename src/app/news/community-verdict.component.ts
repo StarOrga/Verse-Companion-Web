@@ -33,10 +33,8 @@ export interface VoteSource {
   readonly aggregate: Signal<VoteAggregate | null>;
   readonly error: Signal<string | null>;
   readonly saving: Signal<boolean>;
-  readonly blind: Signal<boolean>;
   own(): { verdict: StabilityWord | null; nextChangeAt: string | null };
   correctionFor(S: number): CommunityCorrection | null;
-  reveal(): void;
   retry(): void;
   cast(word: StabilityWord): Promise<CastResult>;
 }
@@ -46,10 +44,10 @@ export interface VoteSource {
  * the LIVE line as stabil / wackelig / instabil (or abstain), the distribution
  * and the resulting correction follow.
  *
- * BLIND: until the user voted, abstained ("Kann ich nicht beurteilen") or asked
- * for the number ("Zahl ohne Urteil anzeigen"), only the vote entry shows —
- * the parent hides the number the same way (`src().blind()`). Signed-out users
- * see the result and a sign-in hint instead of the buttons. A load failure is
+ * OPEN: the number and the distribution are always shown; the vote is one line
+ * ("Wie läuft {{line}} bei dir?") with the answer buttons. The dossier lists
+ * the result and the user's own vote as two sections and picks one with `part`.
+ * Signed-out users see the result and a sign-in hint instead of the buttons. A load failure is
  * an error state with retry, never "no votes".
  */
 @Component({
@@ -67,9 +65,11 @@ export interface VoteSource {
       } @else if (!src().aggregate()) {
         <p class="state muted">{{ 'stability.vote.loading' | translate }}</p>
       } @else {
-        <h4>{{ 'stability.vote.title' | translate }}</h4>
+        @if (part() !== 'vote') {
+          <h4>{{ 'stability.vote.title' | translate }}</h4>
+        }
 
-        @if (!src().blind()) {
+        @if (part() !== 'vote') {
           @let c = correction();
           @if (c) {
             @if (c.state === 'too-few') {
@@ -107,10 +107,7 @@ export interface VoteSource {
           }
         }
 
-        @if (user()) {
-          @if (src().blind()) {
-            <p class="line">{{ 'stability.vote.blindTitle' | translate }}</p>
-          }
+        @if (part() !== 'result') { @if (user()) {
           @if (own(); as mine) {
             <p class="mine">
               {{ 'stability.vote.mine' | translate }} <b [attr.data-word]="mine">{{ ('stability.word.' + mine) | translate }}</b>
@@ -128,12 +125,6 @@ export interface VoteSource {
               </button>
             }
           </div>
-          @if (src().blind()) {
-            <div class="alt">
-              <button type="button" class="lnk" (click)="src().reveal()">{{ 'stability.vote.cannotJudge' | translate }}</button>
-              <button type="button" class="lnk" (click)="src().reveal()">{{ 'stability.vote.showNumber' | translate }}</button>
-            </div>
-          }
           @if (notice() === 'too-soon') {
             <p class="notice" role="status">{{ 'stability.vote.tooSoon' | translate: { h: changeHours } }}</p>
           } @else if (notice() === 'daily-cap') {
@@ -149,7 +140,7 @@ export interface VoteSource {
             {{ 'stability.vote.signedOut' | translate }}
             <a [routerLink]="['/login']" [queryParams]="{ redirect: router.url }">{{ 'stability.vote.signIn' | translate }}</a>
           </p>
-        }
+        } }
       }
     </section>
   `,
@@ -189,15 +180,9 @@ export interface VoteSource {
     .vb[data-word='stabil'] b { color: var(--sc-success); }
     .vb[data-word='wackelig'] b, .vb[data-word='instabil'] b { color: var(--sc-warning); }
     .vb:hover:not(:disabled) { border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 10%, var(--sc-bg-0)); }
-    .vb:focus-visible, .lnk:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
+    .vb:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
     .vb[aria-pressed='true'] { border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 14%, var(--sc-bg-0)); }
     .vb:disabled { cursor: not-allowed; opacity: 0.6; }
-    .alt { display: flex; flex-wrap: wrap; gap: 4px 16px; }
-    .lnk {
-      min-height: max(32px, var(--sc-tap-min)); padding: 0; background: none; border: 0; cursor: pointer;
-      font: inherit; font-size: max(0.8rem, var(--sc-fs-floor)); color: var(--sc-fg-2); text-decoration: underline; text-underline-offset: 3px;
-    }
-    .lnk:hover { color: var(--sc-fg-0); }
     .notice { color: var(--sc-warning); font-size: max(0.8rem, var(--sc-fs-floor)); }
     .signin { color: var(--sc-fg-1); font-size: max(0.84rem, var(--sc-fs-floor)); }
     .signin a { color: var(--sc-accent); margin-left: 6px; }
@@ -216,6 +201,8 @@ export class CommunityVerdictComponent {
   readonly stability = input<number | null>(null);
   /** Votes of a Hotfix / PTU build (`ChannelBuildVotesService.source`); without it the card judges the LIVE `line`. */
   readonly source = input<VoteSource | null>(null);
+  /** `result`: the distribution and correction only; `vote`: the one-line question with the answer buttons only. */
+  readonly part = input<'all' | 'result' | 'vote'>('all');
 
   readonly words = WORDS;
   readonly min = MIN_EFFECTIVE_VOTES;
@@ -227,10 +214,8 @@ export class CommunityVerdictComponent {
     aggregate: this.votes.aggregate,
     error: this.votes.error,
     saving: this.votes.saving,
-    blind: this.votes.blind,
     own: () => this.votes.own(),
     correctionFor: (S) => this.votes.correctionFor(S),
-    reveal: () => this.votes.reveal(),
     retry: () => void this.votes.load(this.line()),
     cast: (w) => this.votes.castVote(this.line(), w),
   };
@@ -265,8 +250,7 @@ export class CommunityVerdictComponent {
     const src = this.src();
     const res = await src.cast(word);
     this.now.set(Date.now());
-    if (res === 'ok') src.reveal();
-    else if (res === 'too-soon' || res === 'daily-cap' || res === 'closed' || res === 'error') this.notice.set(res);
+    if (res === 'too-soon' || res === 'daily-cap' || res === 'closed' || res === 'error') this.notice.set(res);
   }
 
   pct(share: number): number {
