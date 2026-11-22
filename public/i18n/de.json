@@ -4651,6 +4651,8 @@
         "row": {
           "deck": "dein Stapel · {{count}} offen",
           "clear": "dein Stapel · alles geklärt",
+          "legacyOne": "dein Stapel · 1 Karte kommt nach dem Lernlauf",
+          "legacy": "dein Stapel · {{count}} Karten kommen nach dem Lernlauf",
           "ki": "{{count}} von KI",
           "unsure": "{{count}} unsicher",
           "kiSummary": "KI hat {{count}} entschieden",
@@ -4799,6 +4801,9 @@
         },
         "finish": {
           "title": "Alles geklärt für {{lang}}",
+          "titleWaiting": "Stapel vorerst leer für {{lang}}",
+          "legacyOne": "1 ältere Karte wartet auf den nächsten Lernlauf: er bereitet sie neu auf, danach liegt sie im Stapel oder entscheidet die KI.",
+          "legacy": "{{count}} ältere Karten warten auf den nächsten Lernlauf: er bereitet sie neu auf, danach liegen sie im Stapel oder entscheidet die KI.",
           "sum": "{{cards}} · {{texts}} vereinheitlicht",
           "points": "Punkte",
           "split": "{{base}} für {{cards}}, {{bonus}} Bonus fürs volle Tagesziel",

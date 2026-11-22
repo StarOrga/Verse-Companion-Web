@@ -7,7 +7,7 @@
 -- the 10th decision, weekly points, leaderboard names, is_me).
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(60);
+select plan(63);
 
 -- Fixtures (as the migration owner) ----------------------------------------
 -- ...e0031 admin "Nova", ...e0032 admin "Jerry", ...e0033 viewer.
@@ -84,6 +84,11 @@ select ok(not (public.translation_deck('de', 50)->'cards' @> '[{"id":"00000000-0
 select is((public.translation_deck('it', 50)->>'open_total')::int, 1, 'the convention also covers a member language');
 select throws_ok($$ select public.translation_deck('xx') $$, '22023', null, 'an unknown language is rejected');
 select is(jsonb_array_length(public.translation_deck('de', 2)->'cards'), 2, 'the limit cuts the deck');
+select is((public.translation_deck('de', 50)->>'waiting_total')::int, 1, 'the deck names the legacy card that waits for the cleanup');
+select is((select (e->>'deck_open')::int from jsonb_array_elements(public.translation_card_board()->'langs') e where e->>'lang' = 'de'),
+  (public.translation_deck('de', 50)->>'open_total')::int, 'the board row counts the same open cards as the deck (#396)');
+select is((select (e->>'deck_waiting')::int from jsonb_array_elements(public.translation_card_board()->'langs') e where e->>'lang' = 'de'),
+  1, 'the board row names the legacy card apart');
 
 -- Answers ---------------------------------------------------------------------------------
 select throws_ok($$ select public.answer_translation_card('00000000-0000-4000-a000-0000000c0101', 'x') $$, '22023', null, 'an invalid answer is rejected');

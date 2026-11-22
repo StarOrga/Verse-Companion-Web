@@ -251,7 +251,9 @@ export function langRows(board: CardBoard | null): LangRow[] {
     line: l.judged
       ? l.deck_open > 0
         ? { key: `${I18N}.row.deck`, params: { count: l.deck_open } }
-        : { key: `${I18N}.row.clear` }
+        : (l.deck_waiting ?? 0) > 0
+          ? { key: countKey(`${I18N}.row.legacy`, l.deck_waiting!), params: { count: l.deck_waiting! } }
+          : { key: `${I18N}.row.clear` }
       : { key: `${I18N}.row.ki`, params: { count: l.ai_decided } },
     unsure: l.judged ? 0 : l.ai_unsure,
     auto: l.judged ? l.ai_review : 0,
