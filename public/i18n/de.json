@@ -4843,17 +4843,25 @@
     }
   },
   "desktopConnect": {
-    "title": "Verse Companion verbinden",
+    "titleConnect": "Starscape verbinden",
+    "titleConnecting": "Verbinde…",
+    "titleConnected": "Verbunden",
+    "titleFailed": "Verbindung fehlgeschlagen",
     "authorizing": "Prüfe deine Session…",
-    "loginRequired": "Bitte erst einloggen, dann gehts automatisch zurück zur App.",
-    "redirecting": "Autorisiert. Schicke Token zur App…",
-    "redirectingHint": "Dieses Fenster kann gleich geschlossen werden.",
+    "loginRequired": "Melde dich an, danach geht die Anmeldung automatisch an Starscape.",
+    "redirecting": "Übergebe deine Anmeldung an Starscape.",
+    "handedOverHint": "Die App übernimmt deine Anmeldung, du kannst dieses Fenster schließen. Ist sie nicht verbunden, starte die Verbindung in der App neu.",
+    "connected": "Starscape ist mit deinem Konto verbunden. Du kannst dieses Fenster schließen.",
+    "start": "Starte die Anmeldung über das Starscape-Traymenü – die App öffnet diese Seite dann selbst.",
     "errorMissingParams": "Callback- oder State-Parameter fehlt.",
     "errorBadCallback": "Callback-URL ist kein 127.0.0.1-Loopback im erwarteten Portbereich.",
     "errorNoToken": "Kein Access-Token in der Session.",
     "retry": "Erneut versuchen",
-    "handedOver": "Zurück zur App",
-    "handedOverHint": "Die App übernimmt deine Anmeldung, du kannst dieses Fenster schließen. Ist sie nicht verbunden, starte die Verbindung in der App neu."
+    "done": {
+      "csrf": "Die Anmeldung gehörte nicht zu dieser Starscape-Sitzung. Starte sie im Traymenü neu.",
+      "noToken": "Starscape hat keine Anmeldung erhalten. Starte sie im Traymenü neu.",
+      "failed": "Die Übergabe an Starscape ist fehlgeschlagen. Starte die Anmeldung im Traymenü neu."
+    }
   },
   "desktopAuth": {
     "titleConnect": "Verse Data Uploader verbinden",

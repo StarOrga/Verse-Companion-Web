@@ -11,8 +11,13 @@
 //!      expires_at}` in the request body. A navigation is used rather than a
 //!      `fetch()` because Chrome's Private Network Access blocks subresource
 //!      requests from a public HTTPS origin to 127.0.0.1.
-//!   4. We validate `state`, render the "you can close this window" page into
-//!      the navigated tab, and hand the session back.
+//!   4. We validate `state`, answer the navigation with a 303 back to the web
+//!      app's `/apps/starscape/connect?done=<outcome>` — so the tab ends on the
+//!      same connect stage the user just saw, not on a bare loopback page — and
+//!      hand the session back. The plain loopback page stays the fallback for a
+//!      web base that is no http(s) URL. Same contract as the data-uploader's
+//!      `handoffRedirectUrl`; a web build without the `done` handling would show
+//!      a missing-parameter error there, so the web side ships first.
 //!
 //! `/apps/starscape/connect` is deliberately the route we use, not `/apps/uploader/auth`:
 //! the latter is collaborator-gated, while Starscape must work for viewers too
@@ -126,7 +131,7 @@ fn handle_connection(mut stream: TcpStream, state: &str) -> Option<Session> {
     if method != "POST" {
         // A direct browser hit (reload, hand-typed URL). Render something
         // neutral; the real hand-off is always the POST.
-        respond(&mut stream, 200, "text/html; charset=utf-8", page(true, START_IN_APP).as_bytes());
+        answer(&mut stream, 200, Outcome::Start, true, START_IN_APP);
         return None;
     }
 
@@ -136,7 +141,7 @@ fn handle_connection(mut stream: TcpStream, state: &str) -> Option<Session> {
     // carries its real origin.
     let origin = header(&head, "origin");
     if !origin_is_acceptable(origin) {
-        respond(&mut stream, 403, "text/html; charset=utf-8", page(false, BAD_ORIGIN).as_bytes());
+        answer(&mut stream, 403, Outcome::Origin, false, BAD_ORIGIN);
         log::line(&format!(
             "auth: hand-off from an unexpected origin ({}) — rejected",
             origin.unwrap_or("<none>")
@@ -147,18 +152,18 @@ fn handle_connection(mut stream: TcpStream, state: &str) -> Option<Session> {
     let fields = parse_form(&body);
     let got_state = field(&fields, "state");
     if got_state != state {
-        respond(&mut stream, 400, "text/html; charset=utf-8", page(false, CSRF_MISMATCH).as_bytes());
+        answer(&mut stream, 400, Outcome::Csrf, false, CSRF_MISMATCH);
         log::line("auth: CSRF state mismatch — hand-off rejected");
         return None;
     }
     let token = field(&fields, "token");
     if token.is_empty() {
-        respond(&mut stream, 400, "text/html; charset=utf-8", page(false, NO_TOKEN).as_bytes());
+        answer(&mut stream, 400, Outcome::NoToken, false, NO_TOKEN);
         log::line("auth: hand-off carried no token");
         return None;
     }
 
-    respond(&mut stream, 200, "text/html; charset=utf-8", page(true, CONNECTED).as_bytes());
+    answer(&mut stream, 200, Outcome::Ok, true, CONNECTED);
     log::line("auth: website hand-off accepted");
     Some(Session {
         access_token: token.to_string(),
@@ -246,22 +251,93 @@ fn find(haystack: &[u8], needle: &[u8]) -> Option<usize> {
 }
 
 fn respond(stream: &mut TcpStream, status: u16, content_type: &str, body: &[u8]) {
-    let reason = match status {
-        200 => "OK",
-        204 => "No Content",
-        400 => "Bad Request",
-        403 => "Forbidden",
-        404 => "Not Found",
-        _ => "OK",
-    };
     let head = format!(
-        "HTTP/1.1 {status} {reason}\r\nContent-Type: {content_type}\r\nContent-Length: {}\r\n\
+        "HTTP/1.1 {status} {}\r\nContent-Type: {content_type}\r\nContent-Length: {}\r\n\
          Cache-Control: no-store\r\nConnection: close\r\n\r\n",
+        reason(status),
         body.len()
     );
     let _ = stream.write_all(head.as_bytes());
     let _ = stream.write_all(body);
     let _ = stream.flush();
+}
+
+/// `303 See Other` to `location`: the browser follows it with a GET, so a
+/// reload of the page it lands on never resends the form-POST.
+fn redirect(stream: &mut TcpStream, location: &str) {
+    let head = format!(
+        "HTTP/1.1 303 {}\r\nLocation: {location}\r\nContent-Length: 0\r\n\
+         Cache-Control: no-store\r\nConnection: close\r\n\r\n",
+        reason(303)
+    );
+    let _ = stream.write_all(head.as_bytes());
+    let _ = stream.flush();
+}
+
+fn reason(status: u16) -> &'static str {
+    match status {
+        200 => "OK",
+        204 => "No Content",
+        303 => "See Other",
+        400 => "Bad Request",
+        403 => "Forbidden",
+        404 => "Not Found",
+        _ => "OK",
+    }
+}
+
+/// How a browser navigation to the loopback ended, as the web app's connect
+/// page reads it from `?done=` — the contract with
+/// `src/app/desktop/desktop-read-auth.component.ts`. A code the page does not
+/// know falls to its generic failure text.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Outcome {
+    /// Hand-off accepted; the app has the session.
+    Ok,
+    /// A plain GET (reload, hand-typed URL): the sign-in starts in the app.
+    Start,
+    /// The `state` did not belong to this sign-in.
+    Csrf,
+    /// The POST carried no token.
+    NoToken,
+    /// The POST came from an unexpected origin.
+    Origin,
+}
+
+impl Outcome {
+    fn code(self) -> &'static str {
+        match self {
+            Outcome::Ok => "ok",
+            Outcome::Start => "start",
+            Outcome::Csrf => "csrf",
+            Outcome::NoToken => "no_token",
+            Outcome::Origin => "origin",
+        }
+    }
+}
+
+/// Where the loopback sends the browser tab: the web app's own connect page,
+/// which renders the outcome in its stage. `None` when `web_base` is no
+/// http(s) URL with a host — the caller then renders its plain page instead.
+fn handoff_redirect_url(web_base: &str, outcome: Outcome) -> Option<String> {
+    let base = web_base.trim_end_matches('/');
+    let host = base.strip_prefix("https://").or_else(|| base.strip_prefix("http://"))?;
+    // Nothing that could break out of the `Location` header line.
+    if host.is_empty() || base.bytes().any(|b| b.is_ascii_control() || b == b' ') {
+        return None;
+    }
+    Some(format!("{base}/apps/starscape/connect?done={}", outcome.code()))
+}
+
+/// End a browser navigation on the web app's connect page (303, the outcome in
+/// `?done=`), so success and failure look like the page the user just saw.
+/// Without a usable web base the plain loopback page with `status` stays the
+/// fallback.
+fn answer(stream: &mut TcpStream, status: u16, outcome: Outcome, ok: bool, text: (&str, &str)) {
+    match handoff_redirect_url(WEB_BASE, outcome) {
+        Some(location) => redirect(stream, &location),
+        None => respond(stream, status, "text/html; charset=utf-8", page(ok, text).as_bytes()),
+    }
 }
 
 // ---------------- form parsing ----------------
@@ -339,6 +415,9 @@ fn percent_encode(s: &str) -> String {
 }
 
 // ---------------- hand-off pages ----------------
+//
+// Fallback only: every browser navigation is answered with a 303 to the web
+// app's connect stage (`answer`); these render when the web base is unusable.
 
 const CONNECTED: (&str, &str) = ("Starscape · Verbunden", "Du kannst dieses Fenster schließen.");
 const START_IN_APP: (&str, &str) =
@@ -431,6 +510,107 @@ mod tests {
         // A plaintext attacker page still carries its real origin — reject it.
         assert!(!origin_is_acceptable(Some("http://evil.example")));
         assert!(!origin_is_acceptable(Some("https://phish.vercel.app")));
+    }
+
+    #[test]
+    fn every_outcome_redirects_to_the_web_connect_stage() {
+        for (outcome, code) in [
+            (Outcome::Ok, "ok"),
+            (Outcome::Start, "start"),
+            (Outcome::Csrf, "csrf"),
+            (Outcome::NoToken, "no_token"),
+            (Outcome::Origin, "origin"),
+        ] {
+            assert_eq!(
+                handoff_redirect_url(WEB_BASE, outcome),
+                Some(format!("{WEB_BASE}/apps/starscape/connect?done={code}"))
+            );
+        }
+    }
+
+    #[test]
+    fn redirect_target_tolerates_a_trailing_slash_and_refuses_unusable_bases() {
+        assert_eq!(
+            handoff_redirect_url("https://example.test/", Outcome::Ok).as_deref(),
+            Some("https://example.test/apps/starscape/connect?done=ok")
+        );
+        assert_eq!(handoff_redirect_url("", Outcome::Ok), None);
+        assert_eq!(handoff_redirect_url("https://", Outcome::Ok), None);
+        assert_eq!(handoff_redirect_url("ftp://example.test", Outcome::Ok), None);
+        assert_eq!(handoff_redirect_url("javascript:alert(1)", Outcome::Ok), None);
+        assert_eq!(handoff_redirect_url("https://a.test\r\nSet-Cookie: x=1", Outcome::Ok), None);
+    }
+
+    /// Drive `handle_connection` over a real loopback socket; returns the raw
+    /// response and the session it produced.
+    fn exchange(request: String, state: &str) -> (String, Option<Session>) {
+        let listener = TcpListener::bind((Ipv4Addr::LOCALHOST, 0)).expect("bind");
+        let addr = listener.local_addr().expect("addr");
+        let client = std::thread::spawn(move || {
+            let mut s = TcpStream::connect(addr).expect("connect");
+            let _ = s.set_read_timeout(Some(Duration::from_secs(5)));
+            s.write_all(request.as_bytes()).expect("write");
+            let mut out = String::new();
+            let _ = s.read_to_string(&mut out);
+            out
+        });
+        let (stream, _) = listener.accept().expect("accept");
+        let session = handle_connection(stream, state);
+        (client.join().expect("client"), session)
+    }
+
+    fn post(body: &str, origin: Option<&str>) -> String {
+        let origin = origin.map(|o| format!("Origin: {o}\r\n")).unwrap_or_default();
+        format!(
+            "POST {CALLBACK_PATH} HTTP/1.1\r\nHost: 127.0.0.1\r\n{origin}\
+             Content-Type: application/x-www-form-urlencoded\r\nContent-Length: {}\r\n\r\n{body}",
+            body.len()
+        )
+    }
+
+    fn stage(code: &str) -> String {
+        format!("{WEB_BASE}/apps/starscape/connect?done={code}")
+    }
+
+    #[test]
+    fn accepted_hand_off_ends_on_the_web_stage_with_done_ok() {
+        let (res, session) = exchange(
+            post("state=s1&token=tok&email=a%40b.c&refresh_token=r&expires_at=42", Some("null")),
+            "s1",
+        );
+        assert!(res.starts_with("HTTP/1.1 303 See Other\r\n"), "{res}");
+        assert_eq!(header(&res, "location"), Some(stage("ok").as_str()));
+        assert!(!res.contains("<html"), "no loopback page on success: {res}");
+        let s = session.expect("session");
+        assert_eq!(s.access_token, "tok");
+        assert_eq!(s.refresh_token, "r");
+        assert_eq!(s.expires_at, 42);
+        assert_eq!(s.email, "a@b.c");
+    }
+
+    #[test]
+    fn rejected_hand_offs_redirect_with_their_cause_and_yield_no_session() {
+        for (body, origin, code) in [
+            ("state=wrong&token=tok", Some("null"), "csrf"),
+            ("state=s1", None, "no_token"),
+            ("state=s1&token=tok", Some("http://evil.example"), "origin"),
+        ] {
+            let (res, session) = exchange(post(body, origin), "s1");
+            assert!(res.starts_with("HTTP/1.1 303 "), "{code}: {res}");
+            assert_eq!(header(&res, "location"), Some(stage(code).as_str()), "{code}");
+            assert!(session.is_none(), "{code}");
+        }
+    }
+
+    #[test]
+    fn a_plain_get_redirects_to_start_and_other_paths_stay_404() {
+        let get = format!("GET {CALLBACK_PATH} HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n");
+        let (res, session) = exchange(get, "s1");
+        assert_eq!(header(&res, "location"), Some(stage("start").as_str()));
+        assert!(session.is_none());
+
+        let (res, _) = exchange("GET /favicon.ico HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n".to_string(), "s1");
+        assert!(res.starts_with("HTTP/1.1 404 "), "{res}");
     }
 
     #[test]
