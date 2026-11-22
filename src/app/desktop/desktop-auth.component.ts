@@ -18,10 +18,21 @@ type AuthStatus =
   | 'authorizing'
   | 'login_required'
   | 'confirm'
-  | 'cancelled'
   | 'redirecting'
+  | 'connected'
+  | 'start'
   | 'unauthorized'
   | 'error';
+
+/**
+ * Outcomes the uploader's loopback reports back via `?done=` after the
+ * hand-off (`data-uploader/src/lib/oauth.ts` → `handoffRedirectUrl`). Anything
+ * else falls to the generic failure text.
+ */
+const DONE_ERRORS: Record<string, string> = {
+  csrf: 'desktopAuth.done.csrf',
+  no_token: 'desktopAuth.done.noToken',
+};
 
 /**
  * Desktop-Tool OAuth callback endpoint.
@@ -35,16 +46,18 @@ type AuthStatus =
  *  3. Ensures the user is collaborator+ (else surfaces the rejection).
  *  4. Waits for an explicit "Connect" click (AUD-170). Without it, any page
  *     that opened this URL with its own loopback listener would receive the
- *     user's tokens silently. "Cancel" sends nothing, and no desktop session
- *     is minted before the click.
- *  5. Reads the Supabase session access_token and POSTs it to the loopback as
- *     `{state, token, email}` JSON body — NEVER as URL parameters. After the
- *     POST acknowledges, navigates the browser tab to `<cb>?state=<csrf>&ack=1`
- *     (no token in URL → no JWT in browser history). Hardening for Codex
- *     review 2026-05-24 MED-6.
+ *     user's tokens silently. Closing the tab instead sends nothing, and no
+ *     desktop session is minted before the click.
+ *  5. Hands the session to the loopback as a top-level form POST — the token
+ *     in the body, NEVER in a URL (no JWT in browser history). Hardening for
+ *     Codex review 2026-05-24 MED-6.
+ *  6. Shows the outcome when the loopback sends the tab back here as
+ *     `?done=<outcome>` (`data-uploader/src/lib/oauth.ts` → `handoffRedirectUrl`),
+ *     so the hand-off ends in this stage, not on a bare loopback page.
  *
- * The Electron OAuth handler in `desktop-tool/src/lib/oauth.ts` matches `state`,
- * captures `token` from the POST body, closes the loopback server, and resolves.
+ * The uploader's OAuth handler in `data-uploader/src/lib/oauth.ts` matches
+ * `state`, captures `token` from the POST body, closes the loopback server, and
+ * resolves.
  */
 @Component({
   selector: 'sc-desktop-auth',
@@ -53,25 +66,19 @@ type AuthStatus =
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <sc-app-link-stage app="uploader" [phase]="phase()">
-      <h1>{{ 'desktopAuth.title' | translate }}</h1>
+      <!-- Every state reads the same: one title (the call to action), one line of info, at most one action. -->
+      <h1>{{ title() | translate }}</h1>
       @switch (status()) {
         @case ('authorizing') {
           <p>{{ 'desktopAuth.authorizing' | translate }}</p>
         }
         @case ('confirm') {
-          <p>{{ 'desktopAuth.confirmPrompt' | translate: { port: port() } }}</p>
-          <p class="hint">{{ 'desktopAuth.confirmHint' | translate }}</p>
+          <p>{{ 'desktopAuth.confirmInfo' | translate: { port: port() } }}</p>
           <div class="actions">
             <button type="button" scAction tier="primary" [busy]="busy()" (click)="confirm()">
               {{ 'desktopAuth.confirm' | translate }}
             </button>
-            <button type="button" scAction tier="secondary" [disabled]="busy()" (click)="cancel()">
-              {{ 'desktopAuth.cancel' | translate }}
-            </button>
           </div>
-        }
-        @case ('cancelled') {
-          <p>{{ 'desktopAuth.cancelled' | translate }}</p>
         }
         @case ('login_required') {
           <p>{{ 'desktopAuth.loginRequired' | translate }}</p>
@@ -82,23 +89,24 @@ type AuthStatus =
           </div>
         }
         @case ('redirecting') {
-          @if (handedOver()) {
-            <p class="ok">{{ 'desktopAuth.handedOver' | translate }}</p>
-            <p class="hint">{{ 'desktopAuth.handedOverHint' | translate }}</p>
-          } @else {
-            <p class="ok">{{ 'desktopAuth.redirecting' | translate }}</p>
-            <p class="hint">{{ 'desktopAuth.redirectingHint' | translate }}</p>
-          }
+          <p>{{ (handedOver() ? 'desktopAuth.handedOverHint' : 'desktopAuth.redirecting') | translate }}</p>
+        }
+        @case ('connected') {
+          <p>{{ 'desktopAuth.connected' | translate }}</p>
+        }
+        @case ('start') {
+          <p>{{ 'desktopAuth.start' | translate }}</p>
         }
         @case ('unauthorized') {
-          <p class="err">{{ 'desktopAuth.unauthorized' | translate }}</p>
-          <p class="hint">{{ 'desktopAuth.unauthorizedHint' | translate }}</p>
+          <p>{{ 'desktopAuth.unauthorized' | translate }}</p>
         }
         @case ('error') {
           <p class="err">{{ errorMsg()! | translate }}</p>
-          <div class="actions">
-            <a scAction tier="secondary" [href]="returnUrl || '/'">{{ 'desktopAuth.retry' | translate }}</a>
-          </div>
+          @if (returnUrl) {
+            <div class="actions">
+              <a scAction tier="secondary" [href]="returnUrl">{{ 'desktopAuth.retry' | translate }}</a>
+            </div>
+          }
         }
       }
     </sc-app-link-stage>
@@ -120,10 +128,21 @@ export class DesktopAuthComponent implements OnInit {
     switch (this.status()) {
       case 'authorizing': return 'checking';
       case 'redirecting': return this.handedOver() ? 'done' : 'linking';
-      case 'cancelled':
+      case 'connected': return 'done';
       case 'unauthorized': return 'halt';
       case 'error': return 'error';
       default: return 'ready';
+    }
+  });
+  /** The stage's one heading — the call to action while it waits, the outcome once it has one. */
+  protected readonly title = computed(() => {
+    switch (this.status()) {
+      case 'confirm': return 'desktopAuth.titleConfirm';
+      case 'redirecting': return this.handedOver() ? 'desktopAuth.titleConnected' : 'desktopAuth.titleConnecting';
+      case 'connected': return 'desktopAuth.titleConnected';
+      case 'unauthorized': return 'desktopAuth.titleDenied';
+      case 'error': return 'desktopAuth.titleFailed';
+      default: return 'desktopAuth.titleConnect';
     }
   });
   /** i18n key, never raw text. */
@@ -138,6 +157,21 @@ export class DesktopAuthComponent implements OnInit {
   returnUrl = '';
 
   async ngOnInit() {
+    const q = this.route.snapshot.queryParamMap;
+
+    // Back from the uploader's loopback (`?done=<outcome>`): the hand-off is
+    // over, so show its outcome in this stage — no session, no cb/state needed.
+    const done = q.get('done');
+    if (done) {
+      if (done === 'ok') this.status.set('connected');
+      else if (done === 'start') this.status.set('start');
+      else {
+        this.errorMsg.set(DONE_ERRORS[done] ?? 'desktopAuth.done.failed');
+        this.status.set('error');
+      }
+      return;
+    }
+
     // A token handoff must never run under a presentation overlay: under an
     // anon preview `isAuthenticated()` reports false (dead-ends this flow at
     // `login_required`, forcing a pointless re-login loop for a user who is
@@ -149,7 +183,6 @@ export class DesktopAuthComponent implements OnInit {
       return;
     }
 
-    const q = this.route.snapshot.queryParamMap;
     this.cb = q.get('cb') ?? '';
     this.state = q.get('state') ?? '';
 
@@ -208,12 +241,6 @@ export class DesktopAuthComponent implements OnInit {
     if (this.busy() || this.status() !== 'confirm') return;
     this.busy.set(true);
     await this.handOff();
-  }
-
-  /** "Cancel" — nothing is minted, nothing is sent. */
-  cancel(): void {
-    if (this.busy()) return;
-    this.status.set('cancelled');
   }
 
   private async handOff(): Promise<void> {
