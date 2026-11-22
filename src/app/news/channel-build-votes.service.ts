@@ -87,7 +87,6 @@ export class ChannelBuildVotesService {
   private readonly _loading = signal(false);
   private readonly _saving = signal(false);
   private readonly _error = signal<string | null>(null);
-  private readonly _revealed = signal<ReadonlySet<string>>(new Set());
   private started = false;
 
   /** Null until the first successful load. */
@@ -135,16 +134,6 @@ export class ChannelBuildVotesService {
     return b ? communityCorrection(S, b.aggregate) : null;
   }
 
-  /** Blind voting per build, exactly as on the LIVE line. */
-  blind(channel: string, version: string): boolean {
-    const b = this.find(channel, version);
-    return !!this.auth.user() && !!b && b.aggregate.ownVerdict === null && !this._revealed().has(buildKey(channel, version));
-  }
-
-  reveal(channel: string, version: string): void {
-    this._revealed.update((s) => new Set(s).add(buildKey(channel, version)));
-  }
-
   /** Cast the first vote or change it (upsert). Reloads on success and on a rule refusal. */
   async castVote(channel: VotableChannel, version: string, verdict: StabilityWord): Promise<CastResult> {
     const userId = this.auth.user()?.id ?? null;
@@ -184,10 +173,8 @@ export class ChannelBuildVotesService {
       aggregate: agg,
       error: this.error,
       saving: this.saving,
-      blind: computed(() => this.blind(channel, version)),
       own: () => ({ verdict: agg()?.ownVerdict ?? null, nextChangeAt: agg()?.ownNextChangeAt ?? null }),
       correctionFor: (S: number) => this.correctionFor(channel, version, S),
-      reveal: () => this.reveal(channel, version),
       retry: () => void this.load(),
       cast: (w: StabilityWord) => this.castVote(channel, version, w),
     };
