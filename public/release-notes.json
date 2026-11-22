@@ -1,7 +1,37 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.297.1",
+  "current": "0.297.2",
   "releases": [
+    {
+      "version": "0.297.2",
+      "date": "2026-11-22",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Patch board: a patch note from today reads \"heute\" / \"today\" instead of \"seit 0 Tagen\" / \"for 0 days\"."
+            },
+            {
+              "title": "",
+              "text": "Verse: News and Patches show the door planet at the same, smaller size again (the round-4 concept size)."
+            }
+          ]
+        },
+        {
+          "category": "Removed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "The patch-lesestand concept page (decided \"discard\" at its close-out; it stays in git history)."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.297.1",
       "date": "2026-11-22",
