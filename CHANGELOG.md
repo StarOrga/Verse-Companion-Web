@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Starscape sign-in now ends on the website's connect screen: after connecting, the browser tab shows "Verbunden" in the same stage as the Data Uploader instead of a bare Starscape page. Failures name their cause there (wrong sign-in session, no sign-in received). Needs Starscape 0.12.0; older versions keep their own page.
 
+## [0.294.0] - 2026-11-22
+
+### Changed
+- Search: groups are ordered by their best match (exact name > word > partial > typo), equal groups go ships > components > weapons > items; the page context only breaks ties and never buries an exact hit; own hangar hits lead when they match as well.
+- Search: typo tolerance per word (e.g. "libertor" finds the Liberator), always ranked below real matches; class-name-only hits rank below name hits.
+
 ## [0.293.1] - 2026-11-22
 
 ### Changed
