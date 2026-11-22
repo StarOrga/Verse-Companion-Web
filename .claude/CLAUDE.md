@@ -16,6 +16,8 @@ See root [CLAUDE.md](../CLAUDE.md) for project conventions. This file is the ind
 - `devops:research` — RSI/Star-Citizen API discovery, comparing approaches
 - `devops:qa` — type-check, build, e2e
 
+**Briefing a UI agent** (`devops:frontend`, `devops:designer`, any agent that edits templates or styles): its prompt carries the design brief — "Read `.claude/deep-knowledge/design-system.md` first. Use StarUI tokens and catalog entries; mark anything new or off-scale `ds-new: <reason>` or `ds-ok: <reason>`; list every deviation in your report." The SessionStart hook `.claude/hooks/session.design-hint.mjs` injects the same lines into every session.
+
 ## Local LLM delegation
 
 Mechanical generation (DTOs, i18n stubs, simple test scaffolds > 20 lines) → delegate via `local_generate`.

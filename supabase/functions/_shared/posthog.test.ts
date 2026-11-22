@@ -138,12 +138,12 @@ test('list prices are exactly twice the orchestrator batch prices', () => {
 });
 
 test('cost: tokens, cache, batch discount, dated model ids, unknown model', () => {
-  assert.equal(costUsd('claude-sonnet-5-5', { input_tokens: 1_000_000, output_tokens: 1_000_000 }), 24);
-  assert.equal(costUsd('claude-sonnet-5-5', { input_tokens: 1_000_000, output_tokens: 1_000_000 }, { batch: true }), 12);
+  assert.equal(costUsd('claude-sonnet-5-5', { input_tokens: 1_000_000, output_tokens: 1_000_000 }), 12);
+  assert.equal(costUsd('claude-sonnet-5-5', { input_tokens: 1_000_000, output_tokens: 1_000_000 }, { batch: true }), 6);
   assert.equal(costUsd('claude-haiku-4-5', { input_tokens: 2000, output_tokens: 200 }), 0.003);
   assert.equal(priceFor('claude-haiku-4-5-20251001').in, 1);
   assert.equal(priceFor('mystery').out, 40);
-  assert.equal(costUsd('claude-sonnet-5-5', { cache_read_input_tokens: 1_000_000 }), 0.4);
+  assert.equal(costUsd('claude-sonnet-5-5', { cache_read_input_tokens: 1_000_000 }), 0.2);
 });
 
 test('cron run outcome: 429 throttle is healthy, 5xx and a throw are failures', () => {

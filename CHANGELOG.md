@@ -4,6 +4,53 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.297.0] - 2026-11-22
+
+### Added
+- The web app speaks thirteen more languages: Spanish (Spain and Latin America), French, Hindi, Italian, Japanese, Korean, Polish, Brazilian Portuguese, Russian, Turkish, Simplified and Traditional Chinese. The browser language is detected; the choice is saved to the profile.
+- Desktop app language packs: Latin American Spanish, Turkish and Traditional Chinese, all packs proofread. Web and desktop app now offer the same languages.
+
+### Fixed
+- Translation cost estimates in the game-string pipeline used list prices for batch jobs and showed twice the real cost.
+- The AI cost ledger of all server functions priced Claude Sonnet 5.5 and Opus 5.5 at twice their list price.
+
+## [0.296.0] - 2026-11-22
+
+### Changed
+- Subheader search: the field starts right after the brand and runs up to the icons, with the same width on every page. The Codex kind switch is now the last step of the path ("Codex › Kommend ▾"), and the hit count sits inside the field.
+- Phone: the closed search is a wide field with its placeholder instead of a lone magnifier.
+
+## [0.295.0] - 2026-11-22
+
+### Changed
+- Starscape sign-in now ends on the website's connect screen: after connecting, the browser tab shows "Verbunden" in the same stage as the Data Uploader instead of a bare Starscape page. Failures name their cause there (wrong sign-in session, no sign-in received). Needs Starscape 0.12.0; older versions keep their own page.
+
+## [0.294.0] - 2026-11-22
+
+### Changed
+- Search: groups are ordered by their best match (exact name > word > partial > typo), equal groups go ships > components > weapons > items; the page context only breaks ties and never buries an exact hit; own hangar hits lead when they match as well.
+- Search: typo tolerance per word (e.g. "libertor" finds the Liberator), always ranked below real matches; class-name-only hits rank below name hits.
+
+## [0.293.1] - 2026-11-22
+
+### Changed
+- Feedback routine: a topic is marked shipped only when the requested change is done; a ship reply never ends in an open question (decided default stated as fact, or the topic is parked as a question instead).
+
+## [0.293.0] - 2026-11-22
+
+### Added
+- Admin → KI-Übersetzung → Karteikarten is now a card game: the Duell-Karte answers by tap, arrow keys or swipe, with undo through the app toast.
+- Languages you don't judge are decided by the KI with a German back-translation; you only veto. A sheet in the „Tagesziel & Sprachen“ box picks which languages stay in your deck.
+- Weekly points (20 per decision plus a daily-goal bonus), a streak and a leaderboard with names.
+
+### Changed
+- Spelling-only pairs, foreign bracket text and clear majorities no longer become cards; spelling patterns become one convention question for all languages, with a per-language exception.
+- The translation page's tabs move to a section rail at the page edge, like HQ; the crumb reads „Admin“.
+- „Nicht meine Entscheidung“ replaces skipping a card.
+
+### Removed
+- The old card RPCs, the stored English card question and the `skipped` card status (database migration).
+
 ## [0.292.0] - 2026-11-22
 
 ### Added

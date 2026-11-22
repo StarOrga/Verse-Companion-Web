@@ -9,20 +9,27 @@
 //  - Chips FILTER: a hit that fails one is not "inside". A fast-exact hit
 //    (name score >= prefix) outside the chips is kept in a dashed `outside`
 //    group with a reason; the rest is only counted (`filteredOut`).
-//  - The CONTEXT only ORDERS the groups (invisible) and says why in `reason`.
+//  - Groups stand in the order of their BEST match (search-rank.ts, #395): an
+//    exact hit leads, equally good groups follow the size hierarchy (ship >
+//    component > weapon > item > …). The CONTEXT only adds a small boost on
+//    top (invisible) and says why in `reason`.
 //    The HQ ownership chips (Bestand / Hangar / Sets, `ownFirst`) are ordering too:
 //    the own group stands first, the catalog groups follow with the HQ CTAs.
 //  - Every group lists up to `perGroup` rows; the UI shows the first three
 //    (SEARCH_ROWS_SHOWN) on every page.
-//  - Among hits with an equal name score: recently opened by the reader, then
-//    owned, then often opened by others (signals) decide the order.
+//  - Rows order by match quality (search-quality.ts, typo tolerant). Among
+//    equal ones: fitting the chip's ship ("passt auf"), then recently opened by
+//    the reader, then owned, then often opened by others (signals).
 
 import {
   PolyHitKind,
   PolySearchHit,
+  polyMatchQuality,
   polyMatchScore,
 } from '../codex-poly-search';
-import { kindRank, type SearchContext } from '../../shell/fusion-bar/search-context';
+import type { SearchContext } from '../../shell/fusion-bar/search-context';
+import { contextBoost, orderGroups } from './search-rank';
+import { qualityOfScore } from '../search-quality';
 import {
   CodexSearchGroup,
   PageLocation,
@@ -165,6 +172,7 @@ export function composeSearchResult(input: ComposeInput): SearchResult {
   let filteredOut = 0;
   const outsideHits: { hit: PolySearchHit; chip: SearchChip; score: number }[] = [];
   const catalog: SearchResultGroup[] = [];
+  const bestOf = new Map<SearchResultGroup, number>();
   // "lager" / "inventar": the reader's own data only, whatever groups the caller read.
   const ownOnlyChips = chips.some((c) => c.filter.ownOnly);
   for (const g of ownOnlyChips ? [] : input.groups) {
@@ -187,13 +195,17 @@ export function composeSearchResult(input: ComposeInput): SearchResult {
       else filteredOut++;
     }
     if (inside.length === 0) continue;
-    const ordered = inside
-      .map((hit, i) => ({ hit, i, s: polyMatchScore(term, hit), k: signalOrder(signals, hit.kind, hit.classNameSlug), w: !!input.wished?.(hit) }))
-      .sort((a, b) => Number(b.w) - Number(a.w) || b.s - a.s || a.k[0] - b.k[0] || a.k[1] - b.k[1] || a.k[2] - b.k[2] || a.i - b.i)
+    const scored = inside.map((hit, i) => ({
+      hit, i, s: polyMatchQuality(term, hit), k: signalOrder(signals, hit.kind, hit.classNameSlug), w: !!input.wished?.(hit),
+      // The context at row level: a part that fits the chip's ship leads among equal matches.
+      f: input.fit?.(hit)?.verdict === 'fits' ? 0 : 1,
+    }));
+    const ordered = scored
+      .sort((a, b) => Number(b.w) - Number(a.w) || b.s - a.s || a.f - b.f || a.k[0] - b.k[0] || a.k[1] - b.k[1] || a.k[2] - b.k[2] || a.i - b.i)
       .map((x) => x.hit);
     // A group a chip trimmed on the client cannot promise the index total.
     const total = dropped === 0 ? Math.max(g.total, ordered.length) : ordered.length;
-    catalog.push({
+    const entry: SearchResultGroup = {
       id: g.kind,
       kind: g.kind,
       reason: null,
@@ -203,9 +215,12 @@ export function composeSearchResult(input: ComposeInput): SearchResult {
       expandable: Math.max(0, ordered.length - SEARCH_ROWS_SHOWN),
       moreTarget: total > SEARCH_ROWS_SHOWN && !input.ownSet ? indexMoreTarget(g.kind, term, chips) : null,
       outside: false,
-    });
+    };
+    catalog.push(entry);
+    bestOf.set(entry, scored.reduce((m, x) => Math.max(m, x.s), 0));
   }
-  catalog.sort((a, b) => kindRank(a.kind as PolyHitKind, ctx) - kindRank(b.kind as PolyHitKind, ctx));
+  const catalogOrdered = orderGroups(catalog, (g) => g.kind as PolyHitKind, (g) => bestOf.get(g) ?? 0, ctx);
+  const catalogBest = catalogOrdered.length ? (bestOf.get(catalogOrdered[0]) ?? 0) : 0;
 
   // ── own data / patches / gallery ──────────────────────────────────────────
   const own = input.own;
@@ -264,9 +279,11 @@ export function composeSearchResult(input: ComposeInput): SearchResult {
   }
 
   // ── order (invisible) ─────────────────────────────────────────────────────
-  const groups: SearchResultGroup[] = [...catalog];
+  const groups: SearchResultGroup[] = [...catalogOrdered];
   const inHq = ctx.key.startsWith('hq') || ctx.ownedFirst || ownFirst;
-  if (ownGroup) groups.splice(inHq ? 0 : Math.min(1, groups.length), 0, ownGroup);
+  // The reader's own rows lead on HQ pages and whenever they match at least as well as the best catalog group.
+  const ownLeads = inHq || (!!own && ownQuality(term, own) >= catalogBest);
+  if (ownGroup) groups.splice(ownLeads ? 0 : Math.min(1, groups.length), 0, ownGroup);
   if (missionGroup) groups.push(missionGroup);
   if (galleryGroup) {
     if (ctx.key === 'gallery') groups.unshift(galleryGroup);
@@ -352,6 +369,16 @@ export function isNearExactRow(term: string, row: SearchResultRow): boolean {
     default:
       return searchScore(term, row.title) === 4;
   }
+}
+
+/** The best match quality of the reader's own rows (title, own name, name without its first word, class). */
+function ownQuality(term: string, own: OwnSearchResult): number {
+  let best = 0;
+  for (const r of own.rows) {
+    const rest = r.title.includes(' ') ? r.title.slice(r.title.indexOf(' ') + 1) : null;
+    best = Math.max(best, qualityOfScore(recordScore(term, [r.title, r.ownName, rest], [r.classNameSlug])));
+  }
+  return best;
 }
 
 /** The greyed "Du bist hier" row: name and hint only — no CTA, no icons, no fit badge. */
@@ -496,6 +523,6 @@ function groupReason(g: SearchResultGroup, index: number, ctx: SearchContext): S
   }
   if (index !== 0) return null;
   if (g.id === 'gallery' && ctx.key === 'gallery') return { key: 'search.why.context', params: { ctx: ctx.labelKey } };
-  if (g.kind && ctx.prefer.includes(g.kind)) return { key: 'search.why.context', params: { ctx: ctx.labelKey, kind: g.kind } };
+  if (g.kind && ctx.prefer.includes(g.kind) && contextBoost(g.kind as PolyHitKind, ctx) > 0) return { key: 'search.why.context', params: { ctx: ctx.labelKey, kind: g.kind } };
   return null;
 }

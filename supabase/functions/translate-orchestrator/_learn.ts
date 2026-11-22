@@ -16,6 +16,8 @@
 // Every write is idempotent (insert-only glossary rows, TM upserts by hash, cards deduped), so a
 // re-run after a crash or a second trigger converges instead of duplicating.
 
+import { applyBack } from './_back.ts';
+import type { BackItem } from './_back.ts';
 import { createCards, termCard } from './_cards.ts';
 import type { ApplySummary } from './_cards.ts';
 import { arbitrate } from './_arbiter.ts';
@@ -546,6 +548,8 @@ export interface LearnState {
   haiku: LearnBatch<HaikuItem[]> | null;
   align: LearnBatch<AlignLine[]> | null;
   web: LearnBatch<WebItem[]> | null;
+  /** German back-translations of KI decisions (karteikarten-neu P6). */
+  back?: LearnBatch<BackItem[]> | null;
   last?: { trigger: LearnTrigger; at: string; build_id: string | null };
   /** Haiku pairs already judged for this build (source|a|b, lower case). */
   seen?: { build_id: string | null; sigs: Record<string, 1> };
@@ -569,6 +573,11 @@ export interface LearnSummary {
   haiku?: { submitted: number; promoted: number; replaced: number; cards: number };
   align?: { submitted: number; rewritten: number };
   web?: { submitted: number; attached: number };
+  back?: { submitted: number; written: number };
+  /** KI path at the pass start: decisions for not-mine/vetoed cards, cards of languages nobody judges. */
+  route?: { decided: number; parked: number; rerouted: number };
+  /** P14 one-shot cleanup of the cards that predate the concept. */
+  cleanup?: { seen: number; decided: number; folded: number; open: number; skipped?: string };
   arbiter?: ArbiterSummary;
   blocked: string[];
   /** resume only: a finished batch was read and applied in this call. */
@@ -587,13 +596,13 @@ export async function resumeLearning(deps: Deps, lang: string): Promise<LearnSum
   if (!hasLearn(deps)) return { ...sum, skipped: 'no_learn_db' };
   const state = await loadState(deps.store, lang);
   const arb = await deps.store.getJson(learnKey(lang, 'arbiter')) as { queue?: unknown[]; batch?: unknown } | null;
-  const busy = state.haiku || state.align || state.web || arb?.batch || (arb?.queue?.length ?? 0) > 0;
+  const busy = state.haiku || state.align || state.web || state.back || arb?.batch || (arb?.queue?.length ?? 0) > 0;
   if (!busy) return { ...sum, skipped: 'idle' };
   const settings = await deps.learn.getLearnSettings();
   await pollBatches(deps, lang, settings, state, sum);
   if (arb) sum.arbiter = await arbitrate(deps, lang, []);
   const a = sum.arbiter;
-  sum.applied = !!(sum.haiku || sum.align || sum.web || (a && (a.replaced || a.kept || a.cards || a.submitted)));
+  sum.applied = !!(sum.haiku || sum.align || sum.web || sum.back || (a && (a.replaced || a.kept || a.cards || a.submitted)));
   return sum;
 }
 
@@ -664,6 +673,14 @@ export async function pollBatches(d: LearnDeps, lang: string, settings: LearnSet
       await d.store.putJson(stateKey(lang), state);
     }
   }
+  if (state.back) {
+    const read = await readLearnBatch(d, state.back.id, 'back', HAIKU_MODEL, lang);
+    if (read) {
+      sum.back = { submitted: 0, written: await applyBack(d, state.back.items, read.results) };
+      state.back = null;
+      await d.store.putJson(stateKey(lang), state);
+    }
+  }
   if (state.web) {
     const read = await readLearnBatch(d, state.web.id, 'web', WEB_MODEL, lang);
     if (read) {
@@ -713,7 +730,7 @@ async function applyHaiku(
       } else if (v.outcome === 'card') {
         cards.push(termCard({
           lang, source_term: x.source, a: { text: x.a, source: 'glossary', votes: x.a_ev }, b: { text: x.b, source: 'mined', votes: x.b_ev },
-          spread: x.total, sampleKeys: x.keys, doubt: v.doubt, fresh: false, why: 'revise_disagreement',
+          spread: x.total, sampleKeys: x.keys, examples: x.examples, doubt: v.doubt, fresh: false, why: 'revise_disagreement',
         }));
       }
       return;
@@ -724,7 +741,7 @@ async function applyHaiku(
     } else {
       cards.push(termCard({
         lang, source_term: x.source, a: { text: x.a, source: 'mined', votes: x.a_ev }, b: { text: x.b, source: 'mined', votes: x.b_ev },
-        spread: x.total, sampleKeys: x.keys, doubt: v.doubt, fresh: false, why: 'contested_term',
+        spread: x.total, sampleKeys: x.keys, examples: x.examples, doubt: v.doubt, fresh: false, why: 'contested_term',
       }));
     }
   });
@@ -734,7 +751,7 @@ async function applyHaiku(
     } else promoted += await d.learn.insertGlossary(lang, [r]);
   }
   await d.store.putJson(learnKey(lang, 'revise'), revise);
-  const n = cards.length ? await createCards(d.learn, cards) : 0;
+  const n = cards.length ? await createCards(d.learn, cards, undefined, d.store, d.now) : 0;
   return { promoted, replaced, cards: n };
 }
 
@@ -787,7 +804,9 @@ export async function submitWeb(
   const name = LANG_NAMES[lang] ?? lang;
   const reqs = top.map((c, i) => {
     const ctx = (c.context ?? {}) as Record<string, unknown>;
-    const user = `Star Citizen ${name} localization question for a reviewer: ${c.question}
+    const p = (c.params ?? {}) as { term?: string; en?: string };
+    const q = p.term ? `How should "${p.term}" be translated everywhere?` : `Which translation fits "${String(p.en ?? ctx.en ?? "").slice(0, 120)}" better?`;
+    const user = `Star Citizen ${name} localization question for a reviewer: ${q}
 English: ${String(ctx.en ?? ctx.term ?? '')}
 Option A: ${c.option_a.text}
 Option B: ${c.option_b.text}

@@ -2,8 +2,8 @@
 --
 -- Pins: seed rows and approved languages, everything admin-only (anon/plain user see
 -- nothing), trust fields (card points, source status, outreach approval) move through the
--- RPCs only, outreach approval needs a PROTECTED admin, a card answer computes
--- points = 10 + least(impact, 500) / 10, and a granted answer flips the source to permitted.
+-- RPCs only, outreach approval needs a PROTECTED admin, a card answer scores 20 points (v2: the card
+-- RPCs are covered in detail by translation_cards_v2.test.sql), and a granted answer flips the source to permitted.
 begin;
 create extension if not exists pgtap with schema extensions;
 select plan(34);
@@ -19,11 +19,11 @@ where id in ('00000000-0000-4000-a000-0000000e0021', '00000000-0000-4000-a000-00
 insert into public.protected_admins (user_id, reason)
 values ('00000000-0000-4000-a000-0000000e0021', 'pgtap');
 
-insert into public.translation_cards (id, lang, kind, question, option_a, option_b, impact) values
-  ('00000000-0000-4000-a000-0000000c0001', 'de', 'meta', 'q1', '{"text":"a","source":"ai"}', '{"text":"b","source":"community"}', 120),
-  ('00000000-0000-4000-a000-0000000c0002', 'de', 'wording', 'q2', '{"text":"a","source":"ai"}', '{"text":"b","source":"community"}', 900),
-  ('00000000-0000-4000-a000-0000000c0003', 'de', 'style', 'q3', '{"text":"a","source":"ai"}', '{"text":"b","source":"community"}', 5),
-  ('00000000-0000-4000-a000-0000000c0004', 'de', 'style', 'q4', '{"text":"a","source":"ai"}', '{"text":"b","source":"community"}', 0);
+insert into public.translation_cards (id, lang, kind, params, option_a, option_b, impact, dedupe_key) values
+  ('00000000-0000-4000-a000-0000000c0001', 'de', 'meta', '{"term":"t1"}', '{"text":"a","source":"ai"}', '{"text":"b","source":"community"}', 120, 'seed:1'),
+  ('00000000-0000-4000-a000-0000000c0002', 'de', 'wording', '{"en":"e2","key":"k2"}', '{"text":"a","source":"ai"}', '{"text":"b","source":"community"}', 900, 'seed:2'),
+  ('00000000-0000-4000-a000-0000000c0003', 'de', 'wording', '{"en":"e3","key":"k3"}', '{"text":"a","source":"ai"}', '{"text":"b","source":"community"}', 5, 'seed:3'),
+  ('00000000-0000-4000-a000-0000000c0004', 'de', 'wording', '{"en":"e4","key":"k4"}', '{"text":"a","source":"ai"}', '{"text":"b","source":"community"}', 0, 'seed:4');
 insert into public.translation_override_alerts (id, lang, key, admin_text) values
   ('00000000-0000-4000-a000-0000000a0001', 'de', 'k_one', 'admin text'),
   ('00000000-0000-4000-a000-0000000a0002', 'de', 'k_two', 'admin text');
@@ -58,8 +58,8 @@ select is((select count(*)::int from public.translation_sources), 0, 'a viewer s
 select is((select count(*)::int from public.translation_cards), 0, 'a viewer sees no cards');
 select throws_ok($$ select public.answer_translation_card('00000000-0000-4000-a000-0000000c0001', 'a') $$,
   '42501', null, 'a viewer cannot answer a card');
-select throws_ok($$ select * from public.translation_card_leaderboard() $$,
-  '42501', null, 'a viewer cannot read the leaderboard');
+select throws_ok($$ select public.translation_card_board() $$,
+  '42501', null, 'a viewer cannot read the board');
 
 -- Unprotected admin ------------------------------------------------------------
 select set_config('request.jwt.claims',
@@ -98,20 +98,20 @@ select is((select status from public.translation_sources where id = 'thord82'), 
   'a granted answer flips the source to permitted');
 
 -- Cards -----------------------------------------------------------------------------
-select is((select points from public.answer_translation_card('00000000-0000-4000-a000-0000000c0001', 'a')), 22,
-  'impact 120 gives 10 + 12 points');
-select is((select points from public.answer_translation_card('00000000-0000-4000-a000-0000000c0002', 'own', 'eigener Text', 'note', true)), 60,
-  'impact is capped at 500 (10 + 50 points)');
+select is((public.answer_translation_card('00000000-0000-4000-a000-0000000c0001', 'a')->>'points')::int, 20,
+  'a decision scores 20 points');
+select is((public.answer_translation_card('00000000-0000-4000-a000-0000000c0002', 'own', 'eigener Text')->>'points')::int, 20,
+  'an own text scores 20 points, whatever the impact');
 select throws_ok($$ select public.answer_translation_card('00000000-0000-4000-a000-0000000c0003', 'own') $$,
   '22023', null, 'an own answer needs a text');
 select throws_ok($$ select public.answer_translation_card('00000000-0000-4000-a000-0000000c0001', 'b') $$,
   'P0002', null, 'an answered card cannot be answered again');
-select is((select status from public.skip_translation_card('00000000-0000-4000-a000-0000000c0003')), 'skipped',
-  'a card can be skipped');
-select is((select open_count || '/' || answered_today || '/' || streak_days from public.translation_card_stats('de')),
-  '2/2/1', 'stats: two cards left (one skipped), two answered today, streak 1');
-select is((select points || '/' || answers from public.translation_card_leaderboard() limit 1), '82/2',
-  'leaderboard sums points and answers per admin');
+select is(public.not_mine_translation_card('00000000-0000-4000-a000-0000000c0003')->'card'->>'status', 'ai',
+  'a card can be sent to the KI ("Nicht meine Entscheidung")');
+select is((public.translation_card_board()->'goal'->>'done') || '/' || (public.translation_card_board()->>'streak_days'), '2/1',
+  'board: two decisions today, streak 1');
+select is((public.translation_card_board()->'week'->>'points')::int, 40,
+  'board: the weekly points sum the decisions');
 
 -- Alerts -----------------------------------------------------------------------------
 select throws_ok($$ select public.resolve_override_alert('00000000-0000-4000-a000-0000000a0001', 'edited') $$,

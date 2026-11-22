@@ -133,9 +133,19 @@ community entries also carry `src` (source id) and `lic` (licence).
   candidates, do-not-translate names, per-language style statistics, few-shot from the whole TM, judge
   term corrections, Haiku pre-decisions, capped web research for open cards. A term becomes binding
   (origin `mined`) at ≥ 5 occurrences and ≥ 90 % agreement; below that or contradicting → card.
-- **Cards** (`translation_cards`): the last resort when the arbiter or the learning step cannot decide;
-  sorted by spread, reach, kind (meta < wording < style), doubt, fresh. An answer has no automatic effect;
-  the orchestrator applies it (own text → TM admin entry, "save as rule" → admin glossary row).
+- **Cards** (`translation_cards`, v2 since migration `20261121170000`): the last resort when the arbiter or
+  the learning step cannot decide. Pre-filters bundle spelling patterns into one convention card for all
+  languages, cut foreign bracket notes and let a clear majority win; languages no admin judges (P7,
+  `translation_admin_langs`, default German) are decided by the KI and only offered for a veto. Cards store
+  kind + parameters, never question prose. Answers, „Nicht meine Entscheidung“, veto and undo go through the
+  card RPCs and take effect at the next learn pass. RPC contract and lifecycle:
+  [concept contract](../concepts/20261121-1151-karteikarten-neu/contract.md).
+- **Karteikarten tab** (`/admin/translations?tab=cards`, `src/app/admin/translations/translation-cards.component.ts`
+  + `cards/`): the deck as a game — box „Tagesziel & Sprachen“ (goal ring, one row per language, the KI row
+  last; `&lang=<code>` opens that deck or veto list), the Duell-Karte in the middle, box „Statistik“ (place,
+  named weekly leaderboard, streak). Tap / ←→ / swipe answers, E own text, ↑ not mine, A exception for one
+  language, Enter turns the deck, ? key sheet, Ctrl+Z or the app undo toast undoes. Events
+  `admin:translation_*` (deck start → finish is a funnel tile on „Wird es genutzt?“).
 - **Alerts** (`translation_override_alerts`, `_alerts.ts`): detected when a delta's base→current diff
   touches a key with an admin entry (TM `admin` for the OLD English hash or an admin glossary term in the
   string). One open alert per `(lang, key)`; a repeat keeps the original `en_old`/`cig_old`.

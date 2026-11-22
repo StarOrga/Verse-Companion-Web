@@ -9,15 +9,15 @@
 export interface ModelPrice { in: number; out: number }
 
 export const LIST_PRICES: Record<string, ModelPrice> = {
-  'claude-opus-5-5': { in: 8, out: 40 },
-  'claude-sonnet-5-5': { in: 4, out: 20 },
+  'claude-opus-5-5': { in: 4, out: 20 },
+  'claude-sonnet-5-5': { in: 2, out: 10 },
   'claude-haiku-5-5': { in: 0.1, out: 0.5 },
   'claude-haiku-4-5': { in: 1, out: 5 },
   'gpt-4o-mini': { in: 0.15, out: 0.6 },
 };
 
-/** Unknown model: price like the dearest Claude so the ledger never under-reports. */
-const FALLBACK: ModelPrice = LIST_PRICES['claude-opus-5-5'];
+/** Unknown model: price like the dearest Claude (Fable 5.2, $8 / $40) so the ledger never under-reports. */
+const FALLBACK: ModelPrice = { in: 8, out: 40 };
 export const CACHE_READ_FACTOR = 0.1;
 export const CACHE_WRITE_FACTOR = 1.25; // 5-minute cache write; the orchestrator's 1 h writes use _cost.ts
 export const WEB_SEARCH_USD = 0.01;
