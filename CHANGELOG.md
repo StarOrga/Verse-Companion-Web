@@ -4,6 +4,12 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.296.0] - 2026-11-22
+
+### Changed
+- Subheader search: the field starts right after the brand and runs up to the icons, with the same width on every page. The Codex kind switch is now the last step of the path ("Codex › Kommend ▾"), and the hit count sits inside the field.
+- Phone: the closed search is a wide field with its placeholder instead of a lone magnifier.
+
 ## [0.295.0] - 2026-11-22
 
 ### Changed

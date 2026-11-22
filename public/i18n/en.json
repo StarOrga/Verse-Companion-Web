@@ -8535,7 +8535,6 @@
     },
     "search": {
       "label": "Search",
-      "open": "Open search",
       "clear": "Clear input",
       "dropContext": "Remove context — search everywhere",
       "places": "Pages",
