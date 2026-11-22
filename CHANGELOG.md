@@ -4,7 +4,7 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.293.0] - 2026-11-22
+## [0.294.0] - 2026-11-22
 
 ### Added
 - The web app speaks the twelve game-string languages: Spanish (Spain and Latin America), French, Italian, Japanese, Korean, Polish, Brazilian Portuguese, Russian, Turkish, Simplified and Traditional Chinese. The browser language is detected; the choice is saved to the profile.
@@ -12,6 +12,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Translation cost estimates in the game-string pipeline used list prices for batch jobs and showed twice the real cost.
+
+## [0.293.0] - 2026-11-22
+
+### Added
+- Admin → KI-Übersetzung → Karteikarten is now a card game: the Duell-Karte answers by tap, arrow keys or swipe, with undo through the app toast.
+- Languages you don't judge are decided by the KI with a German back-translation; you only veto. A sheet in the „Tagesziel & Sprachen“ box picks which languages stay in your deck.
+- Weekly points (20 per decision plus a daily-goal bonus), a streak and a leaderboard with names.
+
+### Changed
+- Spelling-only pairs, foreign bracket text and clear majorities no longer become cards; spelling patterns become one convention question for all languages, with a per-language exception.
+- The translation page's tabs move to a section rail at the page edge, like HQ; the crumb reads „Admin“.
+- „Nicht meine Entscheidung“ replaces skipping a card.
+
+### Removed
+- The old card RPCs, the stored English card question and the `skipped` card status (database migration).
 
 ## [0.292.0] - 2026-11-22
 
