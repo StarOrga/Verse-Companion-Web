@@ -3408,6 +3408,7 @@
       "play": "Videoyu oynat"
     },
     "patchBoard": {
+      "today": "bugün",
       "switch": {
         "aria": "Kanal seç",
         "live": "Live",

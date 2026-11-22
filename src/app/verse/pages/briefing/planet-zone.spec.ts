@@ -287,7 +287,7 @@ describe('Verse hub — Funkfeuer 2 stage (beta shell)', () => {
     fixture.destroy();
   });
 
-  it('gives admins the station as a mini satellite that flies straight to /admin', fakeAsync(() => {
+  it('gives admins the station as a mini satellite that flies straight to the admin hub', fakeAsync(() => {
     admin.set(true);
     const fixture = TestBed.createComponent(VerseBriefingComponent);
     fixture.detectChanges();
@@ -295,7 +295,7 @@ describe('Verse hub — Funkfeuer 2 stage (beta shell)', () => {
     fixture.detectChanges();
     const el: HTMLElement = fixture.nativeElement;
     const sat = el.querySelector<HTMLAnchorElement>('sc-briefing-beacons a.adm-l');
-    expect(sat?.getAttribute('href')).toBe('/admin');
+    expect(sat?.getAttribute('href')).toBe('/admin/hub');
     expect(sat?.querySelector('sc-briefing-station svg')).not.toBeNull();
     // Admin-only is said by the colour; the words stay for assistive tech only.
     expect(sat?.getAttribute('aria-label')).toBe('verse.hub.admin · verse.hub.adminValue · verse.hub.adminHint');
@@ -526,7 +526,9 @@ describe('Verse hub — Funkfeuer 2 stage (beta shell)', () => {
   });
 });
 
-describe('Verse hub — beacons idle hint', () => {
+// Long fakeAsync ticks: fine alone, but over the 15 s default on a loaded machine
+// (ship build + full suite). Same budget idea as sc-popup's back-gesture block.
+describe('Verse hub — beacons idle hint', { timeout: 60_000 }, () => {
   beforeEach(() => TestBed.configureTestingModule({ providers: [provideRouter([]), provideTranslateService({})] }));
   afterEach(() => TestBed.resetTestingModule());
 
