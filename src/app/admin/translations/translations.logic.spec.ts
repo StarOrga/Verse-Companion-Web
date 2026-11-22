@@ -100,7 +100,9 @@ describe('translations.logic', () => {
     expect(jobErrorKey('translate.nothing_to_do')).toBe('admin.translations.jobErrors.nothing_to_do');
     expect(jobErrorKey(null)).toBeNull();
     expect(jobErrorKey('translate.no_api_key')).toBe('admin.translations.jobErrors.no_api_key');
-    expect(jobErrorKey('some raw failure text')).toBe('admin.translations.jobErrors.unknown');
+    expect(jobErrorKey('translate.some_future_key')).toBe('admin.translations.jobErrors.unknown');
+    // The pipeline writes only translate.* keys: other text was put on the row by hand.
+    expect(jobErrorKey('cancelled by hand: burn stop')).toBe('admin.translations.jobErrors.manual');
   });
 
   describe('glossary query', () => {

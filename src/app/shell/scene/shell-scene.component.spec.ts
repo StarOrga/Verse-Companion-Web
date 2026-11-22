@@ -14,9 +14,6 @@ import {
   easeInOutCubic,
   framedInto,
   framedLikeNews,
-  framedLikeNewsGrown,
-  PATCHES_PLANET_GROW,
-  PATCHES_PLANET_OUT,
   poseAt,
   poseCam,
   poseTransform,
@@ -54,7 +51,8 @@ describe('Shell scene — model', () => {
 
   it('takes the camera poses of the mock (rounds/05 d5-*-cam end frames)', () => {
     expect(POSES.verse.cam).toEqual({ s: 1, x: -100, y: -50 });
-    expect(POSES.news.cam).toEqual({ s: 7.8571, x: -106.756, y: -81.801 });
+    // News: the round-4 patch-board mock size (580 px of 1895, rim at 9.5 vw), owner 2026-11-22.
+    expect(POSES.news.cam).toEqual({ s: 5.1, x: -107.575, y: -82.2125 });
     expect(POSES.starmap.cam).toEqual({ s: 3, x: -155.427, y: -70.5 });
     expect(POSES.codex.cam).toEqual({ s: 1, x: -225, y: -37.5 });
     expect(POSES.hq.cam).toEqual({ s: 3.6, x: -162.986, y: -120.313 });
@@ -95,20 +93,20 @@ describe('Shell scene — model', () => {
     }
   });
 
-  it('Patches planet is bigger than News, its inner (right) edge steps out of the page, never further in', () => {
-    const [nx, ny, nw] = WORLD_RECTS.news;
-    const news = screen(POSES.news.cam, nx, ny);
-    const newsW = POSES.news.cam.s * nw;
-    const [x, y, size] = WORLD_RECTS.patches;
-    const p = POSES.patches.cam;
-    expect(p).toEqual(framedLikeNewsGrown(WORLD_RECTS.patches, PATCHES_PLANET_GROW));
-    const at = screen(p, x, y);
-    const w = p.s * size;
-    expect(w).toBeGreaterThan(newsW);
-    expect(at[0] + w).toBeCloseTo(news[0] + newsW - newsW * PATCHES_PLANET_OUT, 3);
-    expect(at[0] + w).toBeLessThan(news[0] + newsW);
-    expect(at[1] + w / 2).toBeCloseTo(news[1] + newsW / 2, 3);
+  it('Patches planet stands exactly like the News planet (round-4 mock size, one size for both)', () => {
+    const [nx2, ny2, nw2] = WORLD_RECTS.news;
+    const n = screen(POSES.news.cam, nx2, ny2);
+    const nW = POSES.news.cam.s * nw2;
+    expect(nW).toBeCloseTo(30.6, 1);
+    expect(n[0] + nW).toBeCloseTo(9.5, 1);
+    const [px, py, ps] = WORLD_RECTS.patches;
+    const pp = screen(POSES.patches.cam, px, py);
+    expect(POSES.patches.cam.s * ps).toBeCloseTo(nW, 3);
+    expect(pp[0]).toBeCloseTo(n[0], 3);
+    expect(pp[1]).toBeCloseTo(n[1], 3);
   });
+
+
 
   it('isolates the objects per pose (C5): News only its planet, Admin only the station, Sternkarte faint planet without Galerie', () => {
     expect(POSES.news.show).toEqual({ news: 1 });
