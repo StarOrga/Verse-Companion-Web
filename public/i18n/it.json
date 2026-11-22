@@ -4071,6 +4071,7 @@
         "es": "Spagnolo",
         "es-419": "Spagnolo latinoamericano",
         "fr": "Francese",
+        "hi": "Hindi",
         "it": "Italiano",
         "ja": "Giapponese",
         "ko": "Coreano",
@@ -4079,8 +4080,7 @@
         "ru": "Russo",
         "tr": "Turco",
         "zh-Hans": "Cinese semplificato",
-        "zh-Hant": "Cinese tradizionale",
-        "hi": "Hindi"
+        "zh-Hant": "Cinese tradizionale"
       },
       "regions": {
         "DE": "Germania",
@@ -4607,7 +4607,6 @@
       },
       "cards": {
         "title": "Flashcard",
-        "next": "Prossima carta",
         "cardAria": "Carta {{n}} di {{total}}",
         "count": "{{n}} di {{total}}",
         "affectsOne": "riguarda 1 testo",
@@ -4620,6 +4619,7 @@
         "votes": "{{votes}}×",
         "quoted": "«{{text}}»",
         "forSubject": "per «{{en}}»",
+        "next": "Prossima carta",
         "notMine": "Non spetta a me",
         "goalCap": "Obiettivo giornaliero",
         "goalOf": "{{done}} / {{target}}",
@@ -5037,17 +5037,14 @@
     }
   },
   "desktopConnect": {
-    "title": "Collega Verse Companion",
     "authorizing": "Controllo della sessione…",
     "loginRequired": "Accedi prima: ti riportiamo qui automaticamente.",
     "redirecting": "Autorizzato. Invio del token all'app…",
-    "redirectingHint": "Tra poco puoi chiudere questa finestra.",
+    "handedOverHint": "L'app sta prendendo in carico la tua sessione, puoi chiudere questa finestra. Se non si è collegata, riavvia la connessione nell'app.",
     "errorMissingParams": "Parametro callback o state mancante.",
     "errorBadCallback": "L'URL di callback non è un loopback 127.0.0.1 nell'intervallo di porte previsto.",
     "errorNoToken": "Nessun token di accesso nella sessione.",
-    "retry": "Riprova",
-    "handedOver": "Torna all'app",
-    "handedOverHint": "L'app sta prendendo in carico la tua sessione, puoi chiudere questa finestra. Se non si è collegata, riavvia la connessione nell'app."
+    "retry": "Riprova"
   },
   "desktopAuth": {
     "titleConnect": "Collega Verse Data Uploader",

@@ -4071,6 +4071,7 @@
         "es": "Espagnol",
         "es-419": "Espagnol d’Amérique latine",
         "fr": "Français",
+        "hi": "Hindi",
         "it": "Italien",
         "ja": "Japonais",
         "ko": "Coréen",
@@ -4079,8 +4080,7 @@
         "ru": "Russe",
         "tr": "Turc",
         "zh-Hans": "Chinois simplifié",
-        "zh-Hant": "Chinois traditionnel",
-        "hi": "Hindi"
+        "zh-Hant": "Chinois traditionnel"
       },
       "regions": {
         "DE": "Allemagne",
@@ -4607,7 +4607,6 @@
       },
       "cards": {
         "title": "Cartes mémoire",
-        "next": "Carte suivante",
         "cardAria": "Carte {{n}} sur {{total}}",
         "count": "{{n}} sur {{total}}",
         "affectsOne": "concerne 1 texte",
@@ -4620,6 +4619,7 @@
         "votes": "{{votes}}×",
         "quoted": "« {{text}} »",
         "forSubject": "pour « {{en}} »",
+        "next": "Carte suivante",
         "notMine": "Pas à moi de décider",
         "goalCap": "Objectif du jour",
         "goalOf": "{{done}} / {{target}}",
@@ -5037,17 +5037,14 @@
     }
   },
   "desktopConnect": {
-    "title": "Connecter Verse Companion",
     "authorizing": "Vérification de ta session…",
     "loginRequired": "Connecte-toi d'abord — tu seras redirigé ici automatiquement.",
     "redirecting": "Autorisé. Envoi du jeton à l'application…",
-    "redirectingHint": "Tu peux fermer cette fenêtre dans un instant.",
+    "handedOverHint": "L'application reprend ta session, tu peux fermer cette fenêtre. Si la connexion n'a pas abouti, relance-la dans l'application.",
     "errorMissingParams": "Paramètre de rappel ou d'état manquant.",
     "errorBadCallback": "L'URL de rappel n'est pas une boucle locale 127.0.0.1 dans la plage de ports attendue.",
     "errorNoToken": "Aucun jeton d'accès dans la session.",
-    "retry": "Réessayer",
-    "handedOver": "Retour à l'application",
-    "handedOverHint": "L'application reprend ta session, tu peux fermer cette fenêtre. Si la connexion n'a pas abouti, relance-la dans l'application."
+    "retry": "Réessayer"
   },
   "desktopAuth": {
     "titleConnect": "Connecter Verse Data Uploader",

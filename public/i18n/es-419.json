@@ -4071,6 +4071,7 @@
         "es": "Español",
         "es-419": "Español latinoamericano",
         "fr": "Francés",
+        "hi": "Hindi",
         "it": "Italiano",
         "ja": "Japonés",
         "ko": "Coreano",
@@ -4079,8 +4080,7 @@
         "ru": "Ruso",
         "tr": "Turco",
         "zh-Hans": "Chino simplificado",
-        "zh-Hant": "Chino tradicional",
-        "hi": "Hindi"
+        "zh-Hant": "Chino tradicional"
       },
       "regions": {
         "DE": "Alemania",
@@ -4607,7 +4607,6 @@
       },
       "cards": {
         "title": "Tarjetas de estudio",
-        "next": "Siguiente tarjeta",
         "cardAria": "Tarjeta {{n}} de {{total}}",
         "count": "{{n}} de {{total}}",
         "affectsOne": "afecta a 1 texto",
@@ -4620,6 +4619,7 @@
         "votes": "{{votes}}×",
         "quoted": "«{{text}}»",
         "forSubject": "para «{{en}}»",
+        "next": "Siguiente tarjeta",
         "notMine": "No me corresponde",
         "goalCap": "Objetivo diario",
         "goalOf": "{{done}} / {{target}}",
@@ -5037,17 +5037,14 @@
     }
   },
   "desktopConnect": {
-    "title": "Conectar Verse Companion",
     "authorizing": "Comprobando tu sesión…",
     "loginRequired": "Inicia sesión primero; te devolveremos aquí automáticamente.",
     "redirecting": "Autorizado. Enviando el token a la app…",
-    "redirectingHint": "Puedes cerrar esta ventana en un momento.",
+    "handedOverHint": "La app está tomando tu sesión, puedes cerrar esta ventana. Si no se conectó, inicia la conexión de nuevo en la app.",
     "errorMissingParams": "Falta el parámetro callback o state.",
     "errorBadCallback": "La URL de callback no es un loopback 127.0.0.1 dentro del rango de puertos esperado.",
     "errorNoToken": "No hay token de acceso en la sesión.",
-    "retry": "Intentar de nuevo",
-    "handedOver": "Volver a la app",
-    "handedOverHint": "La app está tomando tu sesión, puedes cerrar esta ventana. Si no se conectó, inicia la conexión de nuevo en la app."
+    "retry": "Intentar de nuevo"
   },
   "desktopAuth": {
     "titleConnect": "Conectar Verse Data Uploader",

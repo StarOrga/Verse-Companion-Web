@@ -4071,6 +4071,7 @@
         "es": "西班牙文",
         "es-419": "西班牙文（拉丁美洲）",
         "fr": "法文",
+        "hi": "印地文",
         "it": "義大利文",
         "ja": "日文",
         "ko": "韓文",
@@ -4079,8 +4080,7 @@
         "ru": "俄文",
         "tr": "土耳其文",
         "zh-Hans": "簡體中文",
-        "zh-Hant": "繁體中文",
-        "hi": "印地文"
+        "zh-Hant": "繁體中文"
       },
       "regions": {
         "DE": "德國",
@@ -4607,7 +4607,6 @@
       },
       "cards": {
         "title": "字卡",
-        "next": "下一張字卡",
         "cardAria": "第 {{n}} 張字卡，共 {{total}} 張",
         "count": "{{n}} / {{total}}",
         "affectsOne": "影響 1 則文字",
@@ -4620,6 +4619,7 @@
         "votes": "{{votes}}×",
         "quoted": "「{{text}}」",
         "forSubject": "針對「{{en}}」",
+        "next": "下一張字卡",
         "notMine": "不由我決定",
         "goalCap": "每日目標",
         "goalOf": "{{done}} / {{target}}",
@@ -5037,17 +5037,14 @@
     }
   },
   "desktopConnect": {
-    "title": "連結 Verse Companion",
     "authorizing": "正在檢查你的工作階段…",
     "loginRequired": "請先登入 — 我們會自動帶你回到這裡。",
     "redirecting": "已授權。正在將權杖傳送給應用程式…",
-    "redirectingHint": "稍後即可關閉此視窗。",
+    "handedOverHint": "應用程式正在接手你的工作階段，你可以關閉此視窗。若未連線成功，請在應用程式中重新開始連線。",
     "errorMissingParams": "缺少 callback 或 state 參數。",
     "errorBadCallback": "Callback URL 不是預期連接埠範圍內的 127.0.0.1 loopback。",
     "errorNoToken": "工作階段中沒有 存取權杖。",
-    "retry": "再試一次",
-    "handedOver": "返回應用程式",
-    "handedOverHint": "應用程式正在接手你的工作階段，你可以關閉此視窗。若未連線成功，請在應用程式中重新開始連線。"
+    "retry": "再試一次"
   },
   "desktopAuth": {
     "titleConnect": "連結 Verse Data Uploader",

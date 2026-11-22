@@ -4071,6 +4071,7 @@
         "es": "İspanyolca",
         "es-419": "Latin Amerika İspanyolcası",
         "fr": "Fransızca",
+        "hi": "Hintçe",
         "it": "İtalyanca",
         "ja": "Japonca",
         "ko": "Korece",
@@ -4079,8 +4080,7 @@
         "ru": "Rusça",
         "tr": "Türkçe",
         "zh-Hans": "Basitleştirilmiş Çince",
-        "zh-Hant": "Geleneksel Çince",
-        "hi": "Hintçe"
+        "zh-Hant": "Geleneksel Çince"
       },
       "regions": {
         "DE": "Almanya",
@@ -4607,7 +4607,6 @@
       },
       "cards": {
         "title": "Bilgi kartları",
-        "next": "Sonraki kart",
         "cardAria": "Kart {{n}} / {{total}}",
         "count": "{{n}} / {{total}}",
         "affectsOne": "1 metni etkiler",
@@ -4620,6 +4619,7 @@
         "votes": "{{votes}}×",
         "quoted": "“{{text}}”",
         "forSubject": "“{{en}}” için",
+        "next": "Sonraki kart",
         "notMine": "Benim kararım değil",
         "goalCap": "Günlük hedef",
         "goalOf": "{{done}} / {{target}}",
@@ -5037,17 +5037,14 @@
     }
   },
   "desktopConnect": {
-    "title": "Verse Companion'ı bağla",
     "authorizing": "Oturumun kontrol ediliyor…",
     "loginRequired": "Önce giriş yap — seni otomatik olarak buraya geri yönlendireceğiz.",
     "redirecting": "Yetkilendirildi. Token uygulamaya gönderiliyor…",
-    "redirectingHint": "Birazdan bu pencereyi kapatabilirsin.",
+    "handedOverHint": "Uygulama oturumunu devralıyor, bu pencereyi kapatabilirsin. Bağlanmadıysa bağlantıyı uygulamada yeniden başlat.",
     "errorMissingParams": "Callback veya state parametresi eksik.",
     "errorBadCallback": "Callback URL'si, beklenen port aralığında bir 127.0.0.1 loopback adresi değil.",
     "errorNoToken": "Oturumda erişim token'ı yok.",
-    "retry": "Tekrar dene",
-    "handedOver": "Uygulamaya dön",
-    "handedOverHint": "Uygulama oturumunu devralıyor, bu pencereyi kapatabilirsin. Bağlanmadıysa bağlantıyı uygulamada yeniden başlat."
+    "retry": "Tekrar dene"
   },
   "desktopAuth": {
     "titleConnect": "Verse Data Uploader'ı bağla",

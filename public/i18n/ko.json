@@ -4071,6 +4071,7 @@
         "es": "스페인어",
         "es-419": "스페인어(라틴 아메리카)",
         "fr": "프랑스어",
+        "hi": "힌디어",
         "it": "이탈리아어",
         "ja": "일본어",
         "ko": "한국어",
@@ -4079,8 +4080,7 @@
         "ru": "러시아어",
         "tr": "튀르키예어",
         "zh-Hans": "중국어(간체)",
-        "zh-Hant": "중국어(번체)",
-        "hi": "힌디어"
+        "zh-Hant": "중국어(번체)"
       },
       "regions": {
         "DE": "독일",
@@ -4607,7 +4607,6 @@
       },
       "cards": {
         "title": "플래시카드",
-        "next": "다음 카드",
         "cardAria": "{{total}}장 중 {{n}}번째 카드",
         "count": "{{n}} / {{total}}",
         "affectsOne": "텍스트 1개에 영향",
@@ -4620,6 +4619,7 @@
         "votes": "{{votes}}×",
         "quoted": "“{{text}}”",
         "forSubject": "“{{en}}”에 대해",
+        "next": "다음 카드",
         "notMine": "판단 넘기기",
         "goalCap": "일일 목표",
         "goalOf": "{{done}} / {{target}}",
@@ -5037,17 +5037,14 @@
     }
   },
   "desktopConnect": {
-    "title": "Verse Companion 연결",
     "authorizing": "세션을 확인하는 중…",
     "loginRequired": "먼저 로그인하세요. 로그인하면 자동으로 이곳으로 돌아와요.",
     "redirecting": "인증되었어요. 앱으로 토큰을 보내는 중…",
-    "redirectingHint": "잠시 후 이 창을 닫아도 돼요.",
+    "handedOverHint": "앱이 세션을 가져가는 중이니 이 창을 닫아도 돼요. 연결되지 않았다면 앱에서 연결을 다시 시작하세요.",
     "errorMissingParams": "콜백 또는 state 파라미터가 없어요.",
     "errorBadCallback": "콜백 URL이 예상 포트 범위의 127.0.0.1 루프백이 아니에요.",
     "errorNoToken": "세션에 액세스 토큰이 없어요.",
-    "retry": "다시 시도",
-    "handedOver": "앱으로 돌아가기",
-    "handedOverHint": "앱이 세션을 가져가는 중이니 이 창을 닫아도 돼요. 연결되지 않았다면 앱에서 연결을 다시 시작하세요."
+    "retry": "다시 시도"
   },
   "desktopAuth": {
     "titleConnect": "Verse Data Uploader 연결",

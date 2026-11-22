@@ -4071,6 +4071,7 @@
         "es": "Hiszpański",
         "es-419": "Amerykański hiszpański",
         "fr": "Francuski",
+        "hi": "Hindi",
         "it": "Włoski",
         "ja": "Japoński",
         "ko": "Koreański",
@@ -4079,8 +4080,7 @@
         "ru": "Rosyjski",
         "tr": "Turecki",
         "zh-Hans": "Chiński uproszczony",
-        "zh-Hant": "Chiński tradycyjny",
-        "hi": "Hindi"
+        "zh-Hant": "Chiński tradycyjny"
       },
       "regions": {
         "DE": "Niemcy",
@@ -4607,7 +4607,6 @@
       },
       "cards": {
         "title": "Fiszki",
-        "next": "Następna fiszka",
         "cardAria": "Fiszka {{n}} z {{total}}",
         "count": "{{n}} z {{total}}",
         "affectsOne": "dotyczy 1 tekstu",
@@ -4620,6 +4619,7 @@
         "votes": "{{votes}}×",
         "quoted": "„{{text}}”",
         "forSubject": "dla „{{en}}”",
+        "next": "Następna fiszka",
         "notMine": "Nie moja decyzja",
         "goalCap": "Cel dzienny",
         "goalOf": "{{done}} / {{target}}",
@@ -5037,17 +5037,14 @@
     }
   },
   "desktopConnect": {
-    "title": "Połącz Verse Companion",
     "authorizing": "Sprawdzanie twojej sesji…",
     "loginRequired": "Najpierw się zaloguj — automatycznie wrócisz tutaj.",
     "redirecting": "Autoryzowano. Wysyłanie tokenu do aplikacji…",
-    "redirectingHint": "Za chwilę możesz zamknąć to okno.",
+    "handedOverHint": "Aplikacja przejmuje twoją sesję, możesz zamknąć to okno. Jeśli się nie połączyła, uruchom połączenie ponownie w aplikacji.",
     "errorMissingParams": "Brak parametru callback lub state.",
     "errorBadCallback": "Adres callback nie jest pętlą zwrotną 127.0.0.1 w oczekiwanym zakresie portów.",
     "errorNoToken": "Brak tokenu dostępu w sesji.",
-    "retry": "Spróbuj ponownie",
-    "handedOver": "Wróć do aplikacji",
-    "handedOverHint": "Aplikacja przejmuje twoją sesję, możesz zamknąć to okno. Jeśli się nie połączyła, uruchom połączenie ponownie w aplikacji."
+    "retry": "Spróbuj ponownie"
   },
   "desktopAuth": {
     "titleConnect": "Połącz Verse Data Uploader",
