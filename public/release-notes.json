@@ -1,7 +1,39 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.297.0",
+  "current": "0.298.0",
   "releases": [
+    {
+      "version": "0.298.0",
+      "date": "2026-11-22",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Collaborators can review the AI translation flash cards on their own page (/collab/translations): pick the languages they speak, answer cards, judge single KI decisions and see the weekly board. Taking over a whole language at once stays with admins."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.297.1",
+      "date": "2026-11-22",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "App connect page (Data Uploader / Starscape): the checkmark now sits exactly between the two orbs and the streak burst starts from it; the glow that lay over the footer is gone."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.297.0",
       "date": "2026-11-22",
