@@ -197,11 +197,11 @@ export class CodexCraftDialogComponent {
   }
 
   good(stat: CraftStat, m: number): boolean {
-    return craftStatLowerIsBetter(stat) ? m < 1 - 1e-9 : m > 1 + 1e-9;
+    return craftStatLowerIsBetter(stat) ? m < 1 - 5e-4 : m > 1 + 5e-4;
   }
 
   bad(stat: CraftStat, m: number): boolean {
-    return craftStatLowerIsBetter(stat) ? m > 1 + 1e-9 : m < 1 - 1e-9;
+    return craftStatLowerIsBetter(stat) ? m > 1 + 5e-4 : m < 1 - 5e-4;
   }
 
   pct(m: number): string {
