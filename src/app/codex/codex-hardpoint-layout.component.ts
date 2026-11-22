@@ -43,6 +43,7 @@ import {
   shipModuleGroupOf,
 } from './ship-module-sections';
 import { trackingSignalOf } from './codex-missile';
+import { overallQuality } from './codex-crafting';
 import { displayItemName, formatNumber } from './codex-format';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
 import { ScActionDirective } from '../shared/action/sc-action.directive';
@@ -604,6 +605,15 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                       @if (row.slot.kind) {
                         <sc-item-path [kind]="row.slot.kind" [className]="row.slot.className" [name]="row.slot.name" />
                       }
+                      @if (craftable().has(row.slot.className)) {
+                        <button type="button" class="slot-craft" [class.set]="rowQuality(row) !== null"
+                                (click)="craftRow(row)"
+                                [attr.aria-label]="'codex.craft.open' | translate"
+                                [scTooltip]="'codex.craft.open' | translate" scTooltipTier="label">
+                          <span class="q-l">{{ 'codex.craft.chipLabel' | translate }}</span>
+                          {{ rowQuality(row) ?? ('codex.craft.chipStock' | translate) }}
+                        </button>
+                      }
                       @if (row.slot.draftState && row.slot.draftPaths?.length) {
                         <button type="button" scAction tier="tertiary" class="slot-revert" (click)="revertRow(row)"
                                 [attr.aria-label]="'codex.loadout.revert' | translate"
@@ -713,6 +723,15 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                             <span class="tools" [class.bare]="!kid.kind">
                               @if (kid.kind) {
                                 <sc-item-path [kind]="kid.kind" [className]="kid.className" [name]="kid.name" />
+                              }
+                              @if (kid.className && craftable().has(kid.className)) {
+                                <button type="button" class="slot-craft" [class.set]="kidQuality(row, kid) !== null"
+                                        (click)="craftKid(row, kid)"
+                                        [attr.aria-label]="'codex.craft.open' | translate"
+                                        [scTooltip]="'codex.craft.open' | translate" scTooltipTier="label">
+                                  <span class="q-l">{{ 'codex.craft.chipLabel' | translate }}</span>
+                                  {{ kidQuality(row, kid) ?? ('codex.craft.chipStock' | translate) }}
+                                </button>
                               }
                               <!-- #345: a swapped sub-slot (the gun in a gimbal) resets on its own, too. -->
                               @if (kid.draftState && kid.draftPaths?.length) {
@@ -1057,6 +1076,13 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
     .slot-empty { font-size: max(0.74rem, var(--sc-fs-floor)); color: var(--sc-fg-2); font-style: italic; }
     .kid-empty { font-size: 0.84rem; color: var(--sc-fg-2); }
 
+    .slot-craft { font: inherit; font-size: max(0.66rem, var(--sc-fs-floor)); line-height: 1; padding: 3px 7px; border-radius: 999px;
+      cursor: pointer; background: transparent; color: var(--sc-fg-2); border: 1px solid var(--sc-border); white-space: nowrap;
+      font-variant-numeric: tabular-nums; }
+    .slot-craft .q-l { opacity: 0.75; margin-right: 2px; }
+    .slot-craft.set { color: var(--sc-warning); border-color: var(--sc-warning); }
+    .slot-craft:hover { color: var(--sc-accent); border-color: var(--sc-accent); }
+    .slot-craft:focus-visible { outline: none; box-shadow: var(--sc-focus-ring); }
     .slot-stats { margin: 5px 0 0; padding: 5px 0 0; display: flex; flex-wrap: wrap;
       gap: 2px 14px;
       border-top: 1px solid color-mix(in srgb, var(--sc-border) 70%, transparent); }
@@ -1190,6 +1216,43 @@ export class CodexHardpointLayoutComponent {
   readonly expandAll = input<boolean>(false);
   /** Occupants grouped by section, for the folded-preview chips (MASTER §6). */
   readonly occupantsBySection = input<ReadonlyMap<ShipModuleSection, readonly SummaryOccupant[]>>(new Map());
+  /** Output class names that have a crafting recipe (they get a quality chip). */
+  readonly craftable = input<ReadonlyMap<string, string>>(new Map());
+  /** The pilot's crafting qualities per hardpoint key (`port` / `port>Class`). */
+  readonly craftQualities = input<ReadonlyMap<string, readonly number[]>>(new Map());
+  /** A quality chip was clicked: the hardpoints it stands for and the part. */
+  readonly craftRequested = output<{ slotKeys: string[]; className: string; name: string }>();
+
+  private rowCraftKeys(row: GroupedSlot<LayoutSlot>): string[] {
+    return this.rawPorts(row);
+  }
+
+  private kidCraftKeys(row: GroupedSlot<LayoutSlot>, kid: LayoutChild): string[] {
+    return this.rawPorts(row).map((p) => `${p}>${kid.className ?? ''}`);
+  }
+
+  private qualityOf(keys: readonly string[]): number | null {
+    const q = keys.length > 0 ? this.craftQualities().get(keys[0]) : undefined;
+    return q ? overallQuality(q, q.length) : null;
+  }
+
+  rowQuality(row: GroupedSlot<LayoutSlot>): number | null {
+    return this.qualityOf(this.rowCraftKeys(row));
+  }
+
+  kidQuality(row: GroupedSlot<LayoutSlot>, kid: LayoutChild): number | null {
+    return this.qualityOf(this.kidCraftKeys(row, kid));
+  }
+
+  craftRow(row: GroupedSlot<LayoutSlot>): void {
+    if (!row.slot.className) return;
+    this.craftRequested.emit({ slotKeys: this.rowCraftKeys(row), className: row.slot.className, name: row.slot.name ?? row.slot.className });
+  }
+
+  craftKid(row: GroupedSlot<LayoutSlot>, kid: LayoutChild): void {
+    if (!kid.className) return;
+    this.craftRequested.emit({ slotKeys: this.kidCraftKeys(row, kid), className: kid.className, name: kid.name ?? kid.className });
+  }
 
   private readonly swapSource = inject(CodexSwapCandidatesService);
   private readonly translate = inject(TranslateService);

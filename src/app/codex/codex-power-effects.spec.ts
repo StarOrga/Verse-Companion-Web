@@ -1,5 +1,5 @@
 import { computeKpiSheet, buildDefensivePanel, buildOffensivePanel } from './codex-loadout-stats';
-import { computePowerSheet, PowerLevels } from './codex-power';
+import { computePowerSheet, PowerLevels, withReserveShields } from './codex-power';
 import { applyPowerToOccupants, poweredPayloadQueues, bandModifier, computePowerEffects, distributeColumn, powerBands } from './codex-power-effects';
 import { RESOURCE_STATS_GROUP } from './codex.types';
 import type { SummaryOccupant } from './ship-summary-panels';
@@ -84,6 +84,17 @@ describe('power bands (P3)', () => {
   });
 });
 
+describe('withReserveShields', () => {
+  it('keeps two generators active, the rest reserve', () => {
+    const marked = withReserveShields([shield(3)]);
+    expect(marked.map((o) => o.passive === true)).toEqual([false, false, true]);
+  });
+  it('leaves a two-generator ship alone', () => {
+    const two = [shield(1), shield(1)];
+    expect(withReserveShields(two)).toBe(two);
+  });
+});
+
 describe('distributeColumn (P1)', () => {
   it('seeds every unit with its minimum, then deals the rest round-robin', () => {
     const units = [0, 1, 2].map(() => ({ segments: 2, minimum: 1 }));
@@ -97,33 +108,40 @@ describe('distributeColumn (P1)', () => {
 });
 
 describe('applyPowerToOccupants', () => {
+  // The live Nomad: three WEB generators, two run, the third is reserve.
   const occ = [reactor(14), shield(3)];
 
-  it('full shield pips leave HP and regen at the stock values', () => {
-    const powered = applyPowerToOccupants(occ, sheetFor(occ, { shields: 6 }));
-    const kpi = computeKpiSheet(powered, null);
+  it('runs two generators and keeps the third as pool HP only (erkul: 6 480 HP, 820/s)', () => {
+    const sheet = sheetFor(occ, { shields: 4 });
+    expect(sheet.groups.find((g) => g.key === 'shields')!.capacity).toBe(4);
+    const kpi = computeKpiSheet(applyPowerToOccupants(occ, sheet), null);
     expect(kpi.shieldHp).toBe(6480);
-    expect(kpi.shieldRegen).toBeCloseTo(1230, 3);
+    expect(kpi.shieldRegen).toBeCloseTo(820, 3);
   });
 
-  it('at the minimum every generator runs in the 0.85 band — same HP, slower regen', () => {
-    const powered = applyPowerToOccupants(occ, sheetFor(occ, { shields: 3 }));
-    const kpi = computeKpiSheet(powered, null);
+  it('at the minimum both active generators run in the 0.85 band — same HP, slower regen', () => {
+    const kpi = computeKpiSheet(applyPowerToOccupants(occ, sheetFor(occ, { shields: 2 })), null);
     expect(kpi.shieldHp).toBe(6480);
-    expect(kpi.shieldRegen).toBeCloseTo(3 * 410 * 0.85, 1);
+    expect(kpi.shieldRegen).toBeCloseTo(2 * 410 * 0.85, 1);
   });
 
-  it('below the minimum one generator drops out: HP and regen fall', () => {
-    const sheet = sheetFor(occ, { shields: 2 });
+  it('below the minimum only that generator drops out: HP and regen fall', () => {
+    const sheet = sheetFor(occ, { shields: 1 });
     const powered = applyPowerToOccupants(occ, sheet);
     const kpi = computeKpiSheet(powered, null);
-    expect(kpi.shieldHp).toBe(4320);
-    expect(kpi.shieldRegen).toBeCloseTo(2 * 410 * 0.85, 1);
+    expect(kpi.shieldHp).toBe(4320); // one active + the reserve
+    expect(kpi.shieldRegen).toBeCloseTo(410 * 0.85, 1);
     const def = buildDefensivePanel(powered, null, 11900);
     expect(def.shieldHp).toBe(4320);
     expect(def.effectiveHp).toBe(11900 + 4320);
-    const fx = computePowerEffects(occ, sheet)!;
-    expect(fx.occupants[1]!.units.map((u) => u.online)).toEqual([true, true, false]);
+  });
+
+  it('queues one powered payload per hardpoint for the loadout cards', () => {
+    const q = poweredPayloadQueues(occ, sheetFor(occ, { shields: 1 })).get('SHLD_SECO_S01_WEB_SCItem')!;
+    const read = (p: unknown, f: string) =>
+      (p as { stats: Record<string, Record<string, number>> }).stats['SCItemShieldGeneratorParams'][f];
+    expect(q.map((p) => read(p.payload, 'MaxShieldHealth'))).toEqual([2160, 0, 2160]);
+    expect(q.map((p) => read(p.payload, 'MaxShieldRegen'))[2]).toBe(0); // the reserve never regenerates
   });
 
   it('fewer weapon pips shrink the capacitor: burst stays, sustained drops', () => {
@@ -135,6 +153,16 @@ describe('applyPowerToOccupants', () => {
     expect(one.sustainedDps!).toBeLessThan(full.sustainedDps!);
   });
 
+  it('splits the damage by source: the pilot holds all three repeaters', () => {
+    const panel = buildOffensivePanel([repeaters(3)]);
+    expect(panel.sources.map((s) => s.key)).toEqual(['pilot', 'remoteTurrets', 'mannedTurrets']);
+    expect(panel.sources[0].weapons).toBe(3);
+    expect(panel.sources[0].alpha).toBeCloseTo(60, 6);
+    expect(panel.sources[0].burstDps).toBeCloseTo(panel.footerDps!, 6);
+    expect(panel.sources[1].weapons).toBe(0);
+    expect(panel.sources[1].alpha).toBeNull();
+  });
+
   it('zero weapon pips take the energy guns offline', () => {
     const guns = [reactor(14), repeaters(3)];
     const off = applyPowerToOccupants(guns, sheetFor(guns, { weapons: 0 }));
@@ -142,14 +170,10 @@ describe('applyPowerToOccupants', () => {
     expect(panel.footerDps ?? 0).toBe(0);
   });
 
-  it('queues one powered payload per hardpoint for the loadout cards', () => {
-    const q = poweredPayloadQueues(occ, sheetFor(occ, { shields: 2 })).get('SHLD_SECO_S01_WEB_SCItem')!;
-    const hp = (p: unknown) =>
-      (p as { stats: Record<string, Record<string, number>> }).stats['SCItemShieldGeneratorParams']['MaxShieldHealth'];
-    expect(q.map(hp)).toEqual([2160, 2160, 0]);
-  });
-
-  it('without a power sheet the occupants come back untouched', () => {
-    expect(applyPowerToOccupants(occ, null)).toBe(occ);
+  it('without a power sheet only the reserve rule applies', () => {
+    const guns = [reactor(14), repeaters(3)];
+    expect(applyPowerToOccupants(guns, null)).toBe(guns);
+    const kpi = computeKpiSheet(applyPowerToOccupants(occ, null), null);
+    expect(kpi.shieldRegen).toBeCloseTo(820, 3);
   });
 });

@@ -46,6 +46,7 @@ import {
   tractorBeamKey,
 } from './codex.types';
 import { isMissileRow, readCombatMetrics } from './codex-missile';
+import { sustainedDps, weaponParamsOf } from './codex-sustained-dps';
 
 /** How the UI renders a raw stat value (source units documented per case). */
 export type EquippedStatFormat =
@@ -579,7 +580,15 @@ function weaponStats(payload: unknown, ammoPayload: unknown): EquippedStat[] {
     ] ?? null,
   );
   push(out, 'codex.equipped.fireRate', fireRate, 'int');
-  push(out, 'codex.equipped.dps', damagePerSecond(alpha, fireRate), 'dec', true);
+  const burst = damagePerSecond(alpha, fireRate);
+  push(out, 'codex.equipped.dps', burst, 'dec', true);
+  // The fire cycle behind the sustained figure (erkul: "6s fire · 5.7s
+  // recharge"): how long the gun fires before its capacitor, magazine or heat
+  // forces a pause, and how long that pause lasts. Follows the energy pips.
+  const cycle = sustainedDps(burst, fireRate, weaponParamsOf(payload));
+  push(out, 'codex.equipped.sustainedDps', cycle.value, 'dec', true);
+  push(out, 'codex.equipped.fireTime', cycle.fireTime, 'seconds', true);
+  push(out, 'codex.equipped.pauseTime', cycle.downtime, 'seconds', true);
 
   const ammo = ammoPayload as { speed?: number | null; lifetime?: number | null } | undefined;
   push(out, 'codex.equipped.projectileSpeed', toFiniteNumber(ammo?.speed ?? null), 'mps');
@@ -608,6 +617,12 @@ function componentStats(kind: string, payload: unknown): EquippedStat[] {
         findStat(stats, SHIELD_STRUCT, ['MaxShieldRegen']),
         'perSec',
       );
+      {
+        // Empty to full at the current regen (erkul: "full charge").
+        const hp = usable(findStat(stats, SHIELD_STRUCT, ['MaxShieldHealth']));
+        const regen = usable(findStat(stats, SHIELD_STRUCT, ['MaxShieldRegen']));
+        push(out, 'codex.equipped.fullCharge', hp !== null && regen !== null && regen > 0 ? hp / regen : null, 'seconds', true);
+      }
       push(
         out,
         'codex.equipped.regenDelay',
@@ -685,6 +700,8 @@ function componentStats(kind: string, payload: unknown): EquippedStat[] {
         resourceStat(stats, 'coolant.generate', state),
         'dec',
       );
+      // Set by the energy dock when this cooler runs below full pips.
+      push(out, 'codex.equipped.coolingFull', resourceStat(stats, 'coolant.generateFull', state), 'dec');
       break;
     case 'Radar':
       // #842: LIVE 4.10 radars state no metre detection range. Detection is a
@@ -692,6 +709,8 @@ function componentStats(kind: string, payload: unknown): EquippedStat[] {
       // the one distance on the record is the aim-assist assignment range,
       // which is what the game's own stat sheets call the radar's range.
       push(out, 'codex.equipped.aimAssistRange', findStat(stats, RADAR_STRUCT, ['aimAssistRangeM']), 'metres');
+      // Set by the energy dock when the radar runs below full pips.
+      push(out, 'codex.equipped.aimAssistFull', findStat(stats, RADAR_STRUCT, ['aimAssistFullRangeM']), 'metres');
       push(out, 'codex.equipped.radarSensitivity', findStat(stats, RADAR_STRUCT, ['sensitivityIR']), 'percent');
       push(out, 'codex.equipped.pingCooldown', findStat(stats, RADAR_STRUCT, ['pingCooldownS']), 'seconds');
       break;
@@ -735,6 +754,8 @@ function missileStats(payload: unknown): EquippedStat[] {
 
 /** How many stats a single hardpoint row shows before it hurts readability. */
 export const MAX_STATS_PER_SLOT = 6;
+/** A gun card shows its fire cycle too (alpha, rate, burst, sustained, fire/pause, speed, range, pen). */
+export const MAX_GUN_STATS_PER_SLOT = 10;
 
 /** Input for {@link equippedStats} — one resolved hardpoint occupant. */
 export interface EquippedItem {
@@ -755,7 +776,7 @@ export interface EquippedItem {
  * handful, while a comparison table wants every column the type can fill, so
  * that surface passes `Infinity`.
  */
-export function equippedStats(item: EquippedItem, limit = MAX_STATS_PER_SLOT): EquippedStat[] {
+export function equippedStats(item: EquippedItem, limit?: number): EquippedStat[] {
   const { kind, payload, ammoPayload } = item;
   if (!payload || typeof payload !== 'object') return [];
   const entityKind = (payload as { entityKind?: string }).entityKind ?? kind ?? '';
@@ -771,7 +792,9 @@ export function equippedStats(item: EquippedItem, limit = MAX_STATS_PER_SLOT): E
     // Plain items (controllers, seats, racks…) carry no performance stats.
     rows = [];
   }
-  return Number.isFinite(limit) ? rows.slice(0, limit) : rows;
+  const gun = entityKind === 'weapon' && rows.some((r) => r.labelKey === 'codex.equipped.alphaDamage');
+  const cap = limit ?? (gun ? MAX_GUN_STATS_PER_SLOT : MAX_STATS_PER_SLOT);
+  return Number.isFinite(cap) ? rows.slice(0, cap) : rows;
 }
 
 // Type discriminators the extract fills in with a placeholder rather than

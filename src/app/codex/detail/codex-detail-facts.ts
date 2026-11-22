@@ -280,7 +280,7 @@ export function buildShipFactGroups(
     {
       titleKey: 'codex.analysis.ship.systems',
       rows: [
-        { labelKey: 'codex.kpi.quantumSpeed', value: num(sheet.quantumSpeed, 'km/s'), gapKey: 'codex.summary.gap.noQuantum' },
+        { labelKey: 'codex.kpi.quantumSpeed', value: num(sheet.quantumSpeed != null ? sheet.quantumSpeed / 1000 : null, 'km/s'), gapKey: 'codex.summary.gap.noQuantum' },
         { labelKey: 'codex.kpi.quantumRange', value: sheet.quantumRange != null ? `${formatNumber(sheet.quantumRange / 1_000_000)} Gm` : null, gapKey: 'codex.summary.gap.noQuantum' },
         { labelKey: 'codex.kpi.spool', value: num(sheet.spool, 's'), gapKey: 'codex.summary.gap.noQuantum' },
         // The two tank figures. They lived ONLY in the hero's fact tiles, so

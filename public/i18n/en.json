@@ -1030,7 +1030,6 @@
         "resetView": "Reset view",
         "viewHull": "Hull",
         "viewSchema": "Schema",
-        "view3d": "3D",
         "statsAria": "Ship values",
         "statsClose": "Close values",
         "sheetHandle": "Values sheet",
@@ -2387,7 +2386,12 @@
       "tractorAngle": "Max. angle",
       "tractorTetherBreak": "Tether break time",
       "tractorSpeed": "Max. move speed",
-      "tractorNoStats": "This tractor beam's range and pull are not in this extract yet — they arrive with the next re-extract."
+      "tractorNoStats": "This tractor beam's range and pull are not in this extract yet — they arrive with the next re-extract.",
+      "coolingFull": "at full pips",
+      "aimAssistFull": "Aim assist at full pips",
+      "fireTime": "Fire until pause",
+      "pauseTime": "Pause",
+      "fullCharge": "Full in"
     },
     "shipLink": {
       "add": "Add pledge link",
@@ -2617,7 +2621,16 @@
         "salvoNote": "One salvo of every missile at once — one-off damage, not part of the weapons DPS.",
         "salvoPartial": "Not every missile has warhead figures; the salvo counts only the known ones.",
         "noWarheadData": "The current data carries no warhead figures for these missiles yet.",
-        "hintMissiles": "{{value}} missile salvo"
+        "hintMissiles": "{{value}} missile salvo",
+        "bySource": "Damage by source",
+        "colSource": "Source",
+        "source": {
+          "pilot": "Pilot ({{count}} weapons)",
+          "remoteTurrets": "Remote turrets ({{count}})",
+          "mannedTurrets": "Manned turrets ({{count}})",
+          "missiles": "Missiles ({{count}})",
+          "salvoOnce": "one salvo, one-off damage"
+        }
       },
       "defensive": {
         "title": "Defence",
@@ -3212,6 +3225,39 @@
       "share": "Copy link to “{{name}}”",
       "shareCopied": "Link copied – whoever opens it sees this layout.",
       "shareFailed": "Couldn't copy the link."
+    },
+    "craft": {
+      "eyebrow": "Crafting",
+      "quality": "Quality",
+      "appliesTo": "applies to {{n}} identical parts",
+      "presets": "Quick pick",
+      "min": "MIN",
+      "max": "MAX",
+      "loading": "Loading recipe …",
+      "effect": "Effect on the part",
+      "apply": "Apply",
+      "stock": "Factory stock",
+      "cancel": "Cancel",
+      "open": "Set crafting quality",
+      "chipStock": "Stock",
+      "chipLabel": "Q",
+      "stat": {
+        "damage": "Damage",
+        "fireRate": "Fire rate",
+        "health": "Durability",
+        "shieldHp": "Shield HP",
+        "coolant": "Cooling",
+        "power": "Power generation",
+        "radarMin": "Aim assist from",
+        "radarMax": "Aim assist to",
+        "quantumSpeed": "Quantum speed",
+        "quantumFuel": "Quantum fuel use",
+        "tractorForce": "Pull force",
+        "tractorRange": "Range",
+        "tractorFull": "Full force up to",
+        "tractorVolume": "Max. volume",
+        "other": "Other property"
+      }
     }
   },
   "blueprint": {
@@ -7524,11 +7570,23 @@
       "lossesSub": "{{deaths}} deaths · {{ships}} ships destroyed · {{claims}} insurance claims",
       "costs": {
         "label": "Costs",
-        "fines": { "one": "{{n}} fine", "other": "{{n}} fines" },
+        "fines": {
+          "one": "{{n}} fine",
+          "other": "{{n}} fines"
+        },
         "fineAmount": "{{fines}} ({{amount}} aUEC)",
-        "injuries": { "one": "{{n}} injury", "other": "{{n}} injuries" },
-        "medbeds": { "one": "{{n}} medbed treatment", "other": "{{n}} medbed treatments" },
-        "claimRequests": { "one": "{{n}} insurance request", "other": "{{n}} insurance requests" }
+        "injuries": {
+          "one": "{{n}} injury",
+          "other": "{{n}} injuries"
+        },
+        "medbeds": {
+          "one": "{{n}} medbed treatment",
+          "other": "{{n}} medbed treatments"
+        },
+        "claimRequests": {
+          "one": "{{n}} insurance request",
+          "other": "{{n}} insurance requests"
+        }
       },
       "end": {
         "noQuit": "Ended without a quit (crash or app closed)",

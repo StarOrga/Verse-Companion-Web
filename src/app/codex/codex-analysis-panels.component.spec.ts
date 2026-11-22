@@ -10,6 +10,7 @@ import { formatNumber } from './codex-format';
 import type { DefensivePanel, OffensivePanel } from './codex-loadout-stats';
 
 const OFFENSIVE: OffensivePanel = {
+  sources: [],
   weaponCount: 2,
   weaponRows: [
     { className: 'BEHR_LaserCannon_S3', size: 3, alpha: 120, sustainedDps: 400, burstDps: 500 },
@@ -128,7 +129,7 @@ describe('analysis panels', () => {
         },
       });
       const el = root(fixture);
-      const tables = el.querySelectorAll('table.analysis-table');
+      const tables = el.querySelectorAll('table.analysis-table:not(.src-table)');
       expect(tables.length).toBe(2);
       const rows = Array.from(tables[1].querySelectorAll('tbody tr'));
       expect(rows.length).toBe(2);
@@ -151,7 +152,7 @@ describe('analysis panels', () => {
         },
       });
       const el = root(fixture);
-      const missiles = el.querySelectorAll('table.analysis-table')[1];
+      const missiles = el.querySelectorAll('table.analysis-table:not(.src-table)')[1];
       expect(missiles.querySelectorAll('thead th').length).toBe(4);
       expect(missiles.querySelector('tfoot')).toBeNull();
       expect(el.textContent).toContain('codex.analysis.offensive.noWarheadData');

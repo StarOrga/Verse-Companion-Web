@@ -33,8 +33,11 @@
 //     burst DPS (alpha × fire rate) stays, because the files carry no
 //     power-dependent fire rate. 0 weapon pips → every powered gun is offline.
 //     A gun without a regen block (ballistic) is untouched unless offline.
-// P6  Radar — DATA: aim-assist range runs from `aimAssistMinRangeM` at the
-//     radar's minimum to `aimAssistRangeM` at full draw, linear in between.
+// P6  Radar — DATA: aim-assist range runs from `aimAssistMinRangeM` to
+//     `aimAssistRangeM` by the share of the full draw (erkul: 2/5 pips of the
+//     Ecouter = 845 + 260 × 0.4 = 949 m).
+// P4b Reserve shields — RULE (`withReserveShields`): beyond two active
+//     generators the rest only adds HP ("POOL HP ONLY"): no power, no regen.
 // P7  Coolers: handled in `codex-power.ts` (F4), which already scales the
 //     coolant they produce with their pips.
 //
@@ -49,6 +52,7 @@ import {
   classifyPowerGroup,
   coolerUnitKey,
   occupantDraw,
+  withReserveShields,
 } from './codex-power';
 import { RESOURCE_STATS_GROUP, STANDARD_UNITS_PER_SEGMENT, resolveResourceState, resourceKey } from './codex.types';
 import type { SummaryOccupant } from './ship-summary-panels';
@@ -244,11 +248,27 @@ function setNumeric(fields: Record<string, unknown>, name: string, fn: (v: numbe
 function groupUnits(units: readonly UnitPower[]): { unit: UnitPower; count: number }[] {
   const out: { unit: UnitPower; count: number }[] = [];
   for (const u of units) {
-    const same = out.find((g) => g.unit.online === u.online && Math.abs(g.unit.modifier - u.modifier) < 1e-9);
+    const same = out.find(
+      (g) => g.unit.online === u.online && Math.abs(g.unit.modifier - u.modifier) < 1e-9 && Math.abs(g.unit.assigned - u.assigned) < 1e-9,
+    );
     if (same) same.count += 1;
     else out.push({ unit: u, count: 1 });
   }
   return out;
+}
+
+/** A reserve generator: its HP stays in the pool, it never regenerates. */
+function reserveShield(payload: unknown): unknown {
+  return patchStats(payload, 'shieldgenerator', (f) => setNumeric(f, 'MaxShieldRegen', () => 0));
+}
+
+/** Reserve generators with their regen zeroed — what the STOCK view reads too. */
+export function withReserveShieldPayloads(occupants: readonly SummaryOccupant[]): readonly SummaryOccupant[] {
+  const marked = withReserveShields(occupants);
+  if (!marked.some((o) => o.passive === true && classifyPowerGroup(o) === 'shields')) return marked;
+  return marked.map((o) =>
+    o.passive === true && classifyPowerGroup(o) === 'shields' ? { ...o, payload: reserveShield(o.payload) } : o,
+  );
 }
 
 function poweredShield(payload: unknown, unit: UnitPower): unknown {
@@ -270,9 +290,28 @@ function poweredRadar(payload: unknown, unit: UnitPower): unknown {
     if (!keyMax || !keyMin) return;
     const max = toFiniteNumber(f[keyMax]);
     const min = toFiniteNumber(f[keyMin]);
-    if (max === null || min === null || unit.segments <= unit.minimum) return;
-    const t = Math.max(0, Math.min(1, (unit.assigned - unit.minimum) / (unit.segments - unit.minimum)));
+    if (max === null || min === null || unit.segments <= 0) return;
+    // erkul 4.10.3, Ecouter (845–1105 m, 5 segments): 2 pips → 949 m, i.e. the
+    // share of the FULL draw, not of the span above the minimum.
+    const t = Math.max(0, Math.min(1, unit.assigned / unit.segments));
+    // keep the full-pip figure beside the current one: the card shows both.
+    f['aimAssistFullRangeM'] = max;
     f[keyMax] = min + (max - min) * t;
+  });
+}
+
+/** A cooler at fewer pips puts out its share of the stated coolant (F4). */
+function poweredCooler(payload: unknown, unit: UnitPower): unknown {
+  if (unit.segments <= 0) return payload;
+  const share = unit.online ? Math.max(0, Math.min(1, unit.assigned / unit.segments)) : 0;
+  if (share >= 1) return payload;
+  return patchStats(payload, 'itemresource', (f) => {
+    const key = Object.keys(f).find((k) => /\.coolant\.generate$/i.test(k));
+    if (!key) return;
+    const v = toFiniteNumber(f[key]);
+    if (v === null) return;
+    f[key.replace(/generate$/i, 'generateFull')] = v;
+    f[key] = v * share;
   });
 }
 
@@ -304,10 +343,11 @@ export function applyPowerToOccupants(
   occupants: readonly SummaryOccupant[],
   sheet: PowerSheet | null | undefined,
 ): readonly SummaryOccupant[] {
-  const effects = computePowerEffects(occupants, sheet);
-  if (!effects) return occupants;
+  const base = withReserveShieldPayloads(occupants);
+  const effects = computePowerEffects(base, sheet);
+  if (!effects) return base;
   const out: SummaryOccupant[] = [];
-  occupants.forEach((o, i) => {
+  base.forEach((o, i) => {
     const power = effects.occupants[i];
     const group = power ? classifyPowerGroup(o) : null;
     if (!power || !group) {
@@ -319,9 +359,10 @@ export function applyPowerToOccupants(
       out.push({ ...o, payload: poweredWeapon(o.payload, offline ? null : effects.weaponRatio, offline) });
       return;
     }
-    if (group === 'shields' || group === 'radar') {
+    if (group === 'shields' || group === 'radar' || group === 'coolers') {
       for (const { unit, count } of groupUnits(power.units)) {
-        const payload = group === 'shields' ? poweredShield(o.payload, unit) : poweredRadar(o.payload, unit);
+        const payload =
+          group === 'shields' ? poweredShield(o.payload, unit) : group === 'radar' ? poweredRadar(o.payload, unit) : poweredCooler(o.payload, unit);
         out.push({ ...o, count, payload });
       }
       return;
@@ -337,14 +378,20 @@ export function applyPowerToOccupants(
  * card takes the next entry for its class; a class the dock does not touch has
  * no queue and the card keeps its stock payload.
  */
+export interface PoweredItem {
+  payload: unknown;
+  ammoPayload?: unknown;
+}
+
 export function poweredPayloadQueues(
   occupants: readonly SummaryOccupant[],
   sheet: PowerSheet | null | undefined,
-): Map<string, unknown[]> {
-  const queues = new Map<string, unknown[]>();
-  const effects = computePowerEffects(occupants, sheet);
+): Map<string, PoweredItem[]> {
+  const queues = new Map<string, PoweredItem[]>();
+  const base = withReserveShieldPayloads(occupants);
+  const effects = computePowerEffects(base, sheet);
   if (!effects) return queues;
-  occupants.forEach((o, i) => {
+  base.forEach((o, i) => {
     const power = effects.occupants[i];
     const group = power ? classifyPowerGroup(o) : null;
     const className = (o.payload as { className?: string } | null)?.className;
@@ -353,10 +400,11 @@ export function poweredPayloadQueues(
     for (const unit of power.units) {
       if (group === 'weapons') {
         const offline = effects.weaponsOffline && drawsWeaponPower(o);
-        list.push(poweredWeapon(o.payload, offline ? null : effects.weaponRatio, offline));
-      } else if (group === 'shields') list.push(poweredShield(o.payload, unit));
-      else if (group === 'radar') list.push(poweredRadar(o.payload, unit));
-      else list.push(o.payload);
+        list.push({ payload: poweredWeapon(o.payload, offline ? null : effects.weaponRatio, offline), ammoPayload: o.ammoPayload });
+      } else if (group === 'shields') list.push({ payload: poweredShield(o.payload, unit), ammoPayload: o.ammoPayload });
+      else if (group === 'radar') list.push({ payload: poweredRadar(o.payload, unit), ammoPayload: o.ammoPayload });
+      else if (group === 'coolers') list.push({ payload: poweredCooler(o.payload, unit), ammoPayload: o.ammoPayload });
+      else list.push({ payload: o.payload, ammoPayload: o.ammoPayload });
     }
     queues.set(className, list);
   });

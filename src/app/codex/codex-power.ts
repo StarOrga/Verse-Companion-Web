@@ -329,6 +329,57 @@ export interface OccupantDraw {
   missing: boolean;
 }
 
+/**
+ * How many shield generators the game runs at once. Every further generator
+ * is a RESERVE: its HP counts towards the pool, but it draws no power and does
+ * not regenerate (erkul's "POOL HP ONLY"; SC Quick Guides "max 2 active, a 3rd
+ * as reserve"; Scopique 4.5 "only two regenerate, the two with the lowest
+ * power requirement"). Checked on erkul 4.10.3: Nomad 3× WEB → 2 active + 1
+ * pool-only (4 shield pips, regen 820/s); Idris-M 2× Holdstrong → both active.
+ * The game files carry no per-ship field for it, so this is a game RULE.
+ */
+export const MAX_ACTIVE_SHIELD_GENERATORS = 2;
+
+/**
+ * Mark the shield generators beyond {@link MAX_ACTIVE_SHIELD_GENERATORS} as
+ * reserve (`passive: true`). Kept active: the ones with the LOWEST power
+ * requirement, ties in hardpoint order. A generator the hardpoint already
+ * flags passive stays passive and does not count towards the two. Expects one
+ * occupant per hardpoint (count 1) — a grouped occupant is split first.
+ * Returns the input unchanged when nothing is marked.
+ */
+export function withReserveShields(occupants: readonly SummaryOccupant[]): readonly SummaryOccupant[] {
+  const units: { idx: number; segments: number }[] = [];
+  const expanded: SummaryOccupant[] = [];
+  for (const o of occupants) {
+    const count = Math.max(1, o.count || 1);
+    const isShield = classifyPowerGroup(o) === 'shields';
+    if (!isShield || count === 1) {
+      expanded.push(o);
+    } else {
+      for (let i = 0; i < count; i++) expanded.push({ ...o, count: 1 });
+    }
+  }
+  expanded.forEach((o, idx) => {
+    if (classifyPowerGroup(o) !== 'shields' || !o.payload || o.passive === true) return;
+    const d = occupantDraw(o);
+    if (d.missing) return;
+    const segments = d.consumeSegments + d.consumeUnits / STANDARD_UNITS_PER_SEGMENT;
+    if (segments <= 0) return;
+    units.push({ idx, segments });
+  });
+  if (units.length <= MAX_ACTIVE_SHIELD_GENERATORS) return expanded.length === occupants.length ? occupants : expanded;
+  const keep = new Set(
+    [...units]
+      .sort((a, b) => a.segments - b.segments || a.idx - b.idx)
+      .slice(0, MAX_ACTIVE_SHIELD_GENERATORS)
+      .map((u) => u.idx),
+  );
+  return expanded.map((o, idx) =>
+    units.some((u) => u.idx === idx) && !keep.has(idx) ? { ...o, passive: true } : o,
+  );
+}
+
 /** Read one occupant's resource draw. Absent fields read as 0, but `missing`
  * records that the item had no resource group at all so the sheet can tell
  * "genuinely draws nothing" from "the extract never looked". */
@@ -350,6 +401,16 @@ export function occupantDraw(occupant: SummaryOccupant, state?: string): Occupan
     irNominal: read('ir.nominal'),
   };
   const missing = resolved === null || Object.values(fields).every((v) => v === null);
+  // A reserve shield generator (passive hardpoint or beyond the active two)
+  // is off the grid: no power, no coolant, no regen, no emission.
+  if (occupant.passive === true && classifyPowerGroup(occupant) === 'shields') {
+    fields.consumeSegments = 0;
+    fields.consumeUnits = 0;
+    fields.coolantConsume = 0;
+    fields.shieldGenerate = 0;
+    fields.emNominal = 0;
+    fields.irNominal = 0;
+  }
   return {
     group: classifyPowerGroup(occupant),
     count,
@@ -737,6 +798,7 @@ export function computePowerSheet(input: PowerSheetInput): PowerSheet {
   const preset: PowerPreset = input.preset ?? 'auto';
   const cutGroups = new Set<PowerColumnKey>(input.cutGroups ?? []);
   const levels = input.levels ?? null;
+  input = { ...input, occupants: withReserveShields(input.occupants) };
   const columns = powerColumns(input.occupants);
   // Every draw with the column it charges to: the power plants (group null)
   // charge to no column and always run; a cooler unit's draw charges to its

@@ -100,6 +100,7 @@ function slot(over: Partial<LayoutSlot> & { port: string }): LayoutSlot {
 
 function offensivePanel(rows: OffensivePanel['weaponRows']): OffensivePanel {
   return {
+    sources: [],
     weaponCount: rows.length,
     weaponRows: rows,
     hasAlphaColumn: true,
