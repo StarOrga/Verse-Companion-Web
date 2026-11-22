@@ -24,6 +24,7 @@
 | 2026-09-05/06 | Twice in one night (`ae9f8cba` / PR #534, `a33ba528` / PR #531) the ✅ "live ansehen" reply went out ~1 min after the merge; the deployment was 9.5 min later, or missing entirely. | The review reply is posted only after the deployment for the merge SHA is observed green — via `npm run verify:ship-live`, never by hand. | `continuation.md` · core, STEP 4 |
 | 2026-09-06 | A run died at 98 % usage mid-verification after merging three PRs; no review reply was ever posted. | The `shipped` UPDATE sets `review_reply_pending`; query (f) is read first thing in every working run. | `continuation.md` · core, STEP 1 |
 | 2026-09-13 | An idle tick cost a full runbook read. | STEP 0 is one script call; an idle tick reports one line and never reads the runbook. | `gate.md` · core, STEP 0 |
+| 2026-11-21 | #394 (PR #1243) shipped with a note ending in "Soll eine Erstübersetzung schon vor der Freigabe möglich sein, antworte hier." while the board offered ✓ Abgenommen; the admin had to send it round again. | A topic is `shipped` only when the asked change is done; no ship message ends in a question or an offered alternative — decide the fork on its default and say so, or park `needs_input`. | core, "Bias to action" · `continuation.md` · headless prompt, contract 1 |
 
 ## 2026-07-30 → 2026-09-06 · The review gate and the panel's controls
 

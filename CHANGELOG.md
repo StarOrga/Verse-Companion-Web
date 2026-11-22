@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Translation cost estimates in the game-string pipeline used list prices for batch jobs and showed twice the real cost.
 
+## [0.293.1] - 2026-11-22
+
+### Changed
+- Feedback routine: a topic is marked shipped only when the requested change is done; a ship reply never ends in an open question (decided default stated as fact, or the topic is parked as a question instead).
+
 ## [0.293.0] - 2026-11-22
 
 ### Added
