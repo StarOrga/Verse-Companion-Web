@@ -45,9 +45,9 @@ describe('resolveLocale', () => {
   });
 
   it('skips unsupported browser languages but still uses their region', () => {
-    // French UI is not translated (issue #23) → English UI, French-Canadian
-    // region: the two axes really are independent.
-    const r = resolveLocale({ browser: { languages: ['fr-CA'] } });
+    // Swedish UI is not translated → English UI, Swedish-in-Canada region: the
+    // two axes really are independent.
+    const r = resolveLocale({ browser: { languages: ['sv-CA'] } });
     expect(r.language).toBe('en');
     expect(r.region).toBe('CA');
     expect(r.dateOrder).toBe('mdy');
@@ -92,12 +92,27 @@ describe('resolveLocale', () => {
 
   it('ignores junk in the stored/profile values instead of trusting it', () => {
     const r = resolveLocale({
-      profileLanguage: 'fr',
+      profileLanguage: 'xx',
       profileRegion: 'not-a-region',
       browser: { languages: ['de-DE'] },
     });
     expect(r.language).toBe('de');
     expect(r.region).toBe('DE');
+  });
+
+  it('resolves the game-string languages and hands Intl a valid tag', () => {
+    expect(resolveLocale({ browser: { languages: ['ja-JP'] } }).language).toBe('ja');
+    const latam = resolveLocale({ browser: { languages: ['es-MX'] } });
+    expect(latam.language).toBe('es-419');
+    expect(latam.intlLocale).toBe('es-MX');
+    const brazil = resolveLocale({ profileLanguage: 'pt-BR' });
+    expect(brazil.region).toBe('BR');
+    expect(brazil.intlLocale).toBe('pt-BR');
+    const taiwan = resolveLocale({ browser: { languages: ['zh-TW'] } });
+    expect(taiwan.language).toBe('zh-Hant');
+    expect(taiwan.intlLocale).toBe('zh-Hant-TW');
+    expect(() => new Intl.DateTimeFormat(taiwan.intlLocale)).not.toThrow();
+    expect(resolveLocale({ browser: { languages: ['sv-SE', 'fr-CA'] } }).language).toBe('fr');
   });
 
   it('normalizes case and separators of stored values', () => {

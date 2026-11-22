@@ -4,9 +4,27 @@
 // A wrong guess only costs one unused fetch: AppTranslateLoader then loads the
 // language it really needs. External file because the CSP forbids inline scripts.
 (function () {
+  // Mirrors normalizeLanguage() in src/app/core/locale/region.data.ts.
+  var PLAIN = ['de', 'en', 'fr', 'hi', 'it', 'ja', 'ko', 'pl', 'ru', 'tr'];
+  var LATAM = ['419', 'MX', 'AR', 'BO', 'CL', 'CO', 'CR', 'CU', 'DO', 'EC', 'GT', 'HN', 'NI', 'PA', 'PE', 'PR', 'PY', 'SV', 'US', 'UY', 'VE'];
+  var HANT = ['HANT', 'TW', 'HK', 'MO'];
+
+  function anyIn(list, values) {
+    for (var i = 0; i < values.length; i++) if (list.indexOf(values[i]) !== -1) return true;
+    return false;
+  }
+
   function normalize(raw) {
-    var primary = String(raw || '').trim().toLowerCase().split(/[-_]/)[0];
-    return primary === 'de' || primary === 'en' ? primary : null;
+    var parts = String(raw || '').trim().split(/[-_]/);
+    var primary = parts[0].toLowerCase();
+    var subtags = [];
+    for (var i = 1; i < parts.length; i++) subtags.push(parts[i].toUpperCase());
+    if (!primary) return null;
+    if (PLAIN.indexOf(primary) !== -1) return primary;
+    if (primary === 'es') return anyIn(LATAM, subtags) ? 'es-419' : 'es';
+    if (primary === 'pt') return 'pt-BR';
+    if (primary === 'zh') return anyIn(HANT, subtags) ? 'zh-Hant' : 'zh-Hans';
+    return null;
   }
 
   function resolve() {

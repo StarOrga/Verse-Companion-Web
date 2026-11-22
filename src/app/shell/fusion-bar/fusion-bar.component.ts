@@ -169,14 +169,16 @@ const MAX_TOKENS = 3;
           <div class="plate" [attr.inert]="mode() === 'stage' ? '' : null">
             <!-- Brandcrumb: the brand's name on line 1, the path below it. No second "Verse". -->
             <sc-brand-name class="cat" channel="inline" />
-            @if (trail().length) {
+            @if (trail().length || kindSwitch()) {
               <nav #trailNav class="trail" [attr.aria-label]="'pageHeader.crumbsAria' | translate"
                    [scTooltip]="trailFolded() ? trailText() : null" scTooltipTier="label">
                 <ol>
                   @for (c of trail(); track $index) {
-                    <li [class.fold]="c.fold">
+                    <li [class.fold]="c.fold" [class.ks]="$last && kindSwitch() === 'replace'">
                       @if (c.fold) {
                         <span aria-hidden="true">…</span><span class="sr-only">{{ trailText() }}</span>
+                      } @else if ($last && kindSwitch() === 'replace') {
+                        <ng-container [ngTemplateOutlet]="kindSwitchTpl" />
                       } @else if (c.link) {
                         <a [routerLink]="$any(c.link)" [queryParams]="$any(c.queryParams) ?? null" [fragment]="c.fragment ?? undefined">{{ c.label ?? (c.labelKey! | translate: (c.labelParams ?? undefined)) }}</a>
                       } @else {
@@ -184,27 +186,37 @@ const MAX_TOKENS = 3;
                       }
                     </li>
                   }
+                  @if (kindSwitch() === 'append') {
+                    <li class="ks"><ng-container [ngTemplateOutlet]="kindSwitchTpl" /></li>
+                  }
                 </ol>
               </nav>
               <ol #trailMeasure class="trail-measure" aria-hidden="true">
                 @for (c of fullTrail(); track $index) {
-                  <li>{{ c.label ?? (c.labelKey! | translate: (c.labelParams ?? undefined)) }}</li>
+                  <li [class.ks]="$last && kindSwitch() === 'replace'">{{ c.label ?? (c.labelKey! | translate: (c.labelParams ?? undefined)) }}</li>
+                }
+                @if (kindSwitch() === 'append' && segment(); as seg) {
+                  <li class="ks">{{ seg.labelKey | translate }}</li>
                 }
               </ol>
             }
           </div>
           <span class="div" aria-hidden="true"></span>
 
-          @if (mode() !== 'stage' && segment(); as seg) {
-            <button type="button" class="kindsw" [attr.aria-expanded]="panelOpen()" aria-controls="sc-bar-panel"
-                    [attr.aria-label]="'fusionBar.kindSwitch' | translate: { kind: (seg.labelKey | translate) }"
-                    (click)="togglePanel()">
-              <span class="ks-label">{{ seg.labelKey | translate }}</span>
-              @if (kindTotal() !== null) { <i>{{ kindTotal() }}</i> }
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                   stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
-            </button>
-          }
+          <!-- Codex tool pages: the kind switch is the path's last step ("Codex › Schiffe ▾"), so the
+               field starts and ends at the same spot on every page (no pill that pushes it). -->
+          <ng-template #kindSwitchTpl>
+            @if (segment(); as seg) {
+              <button type="button" class="kindsw" [attr.aria-expanded]="panelOpen()" aria-controls="sc-bar-panel"
+                      [attr.aria-label]="'fusionBar.kindSwitch' | translate: { kind: (seg.labelKey | translate) }"
+                      (click)="togglePanel()">
+                <span class="ks-label">{{ seg.labelKey | translate }}</span>
+                @if (kindTotal() !== null) { <i>{{ kindTotal() }}</i> }
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                     stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+              </button>
+            }
+          </ng-template>
 
         <sc-fusion-search class="search" [placement]="phone() && mode() !== 'stage' ? 'bottom' : 'top'"
                           [compact]="mode() === 'tool'"
@@ -230,12 +242,13 @@ const MAX_TOKENS = 3;
               }
             </span>
           }
+          <!-- The list's hit count sits inside the field's right end, so it never narrows the field. -->
+          @if (mode() !== 'stage' && hitCount() !== null) {
+            <span fsTrailing class="count" aria-live="polite">{{ 'fusionBar.hits' | translate: { count: hitCount() } }}</span>
+          }
         </sc-fusion-search>
 
         @if (mode() !== 'stage') {
-          @if (hitCount() !== null) {
-            <span class="count" aria-live="polite">{{ 'fusionBar.hits' | translate: { count: hitCount() } }}</span>
-          }
           <!-- Codex tool pages have no toolbar, only the kind switch + panel; on a phone the kind
                switch is hidden (the panel's kind row replaces it), so the filter button is the
                ONLY way to the panel there (found in a real phone viewport, d-filter). -->
@@ -422,6 +435,17 @@ export class FusionBarComponent {
     if (!this.segments()) return null;
     const id = activeSegmentOf(this.url());
     return CODEX_SEGMENTS.find((s) => s.id === id) ?? null;
+  });
+  /**
+   * Where the kind switch sits in the path: in place of the current page's own step
+   * ("Codex › Kommend" → "Codex › Kommend ▾"), or after a path that names only the
+   * area ("Codex" → "Codex › FPS ▾"); null off the Codex tool pages.
+   */
+  readonly kindSwitch = computed<'replace' | 'append' | null>(() => {
+    if (!this.segment()) return null;
+    const trail = this.fullTrail();
+    const last = trail.at(-1);
+    return trail.length > 1 && last && !last.link ? 'replace' : 'append';
   });
   readonly kindTotal = computed(() => this.filters()?.kindTotal ?? null);
   readonly hitCount = computed(() => this.filters()?.count ?? null);

@@ -37,6 +37,7 @@ import { CodexBuildDiffService } from '../codex-build-diff.service';
 import { PolyHitKind, PolySearchHit, toPolyHit } from '../codex-poly-search';
 import { mergeSuggestions } from '../codex-did-you-mean.component';
 import { humanizeClassName } from '../codex-format';
+import { fuzzyQuality } from '../search-quality';
 import { Lang, LoadoutEntry } from '../codex.types';
 import { stockLoadoutClassNames } from '../stock-loadout';
 import {
@@ -118,6 +119,11 @@ export class CodexSearchEngine {
   readonly counts = signal<GroupCounts>({});
   /** "Did you mean" names for a search that found nothing. */
   readonly didYouMean = signal<string[]>([]);
+  /**
+   * The name a typo was read as ("liberatr" -> "Liberator", #395): the term found nothing and the
+   * closest name is within the typo budget, so its hits stand in (ranked below any real match).
+   */
+  readonly correction = signal<string | null>(null);
   readonly recent = signal<string[]>(readRecentSearches(storage()));
   /** Ships new in this patch, offered while the field is empty. */
   readonly fresh = signal<PolySearchHit[]>([]);
@@ -135,7 +141,7 @@ export class CodexSearchEngine {
     const set = ownSetOf(chips);
     if (set) return ownSetGroups(this.ownSetEntries(set), this.searchText(), this.wishNames().nameOf);
     if (chips.some((c) => c.filter.ownOnly)) return [];
-    return groupHits(this.searchText(), this.hits(), this.totals(), this.perGroup(), this.counts());
+    return groupHits(this.correction() ?? this.searchText(), this.hits(), this.totals(), this.perGroup(), this.counts());
   });
   /** Server-filtered groups plus the unfiltered extras (candidates for the outside group). */
   private readonly mergedGroups = computed<CodexSearchGroup[]>(() => {
@@ -644,6 +650,7 @@ export class CodexSearchEngine {
     this.error.set(null);
     this.partialError.set(null);
     this.didYouMean.set([]);
+    this.correction.set(null);
     this.loading.set(false);
   }
 
@@ -662,6 +669,7 @@ export class CodexSearchEngine {
     this.error.set(null);
     this.partialError.set(null);
     this.didYouMean.set([]);
+    this.correction.set(null);
     try {
       const { hits, totals, distinct, read, failed, failure, facets } = await (hasAttrs ? this.codex.searchAll(term, this.perGroup(), attrs) : this.codex.searchAll(term, this.perGroup()));
       if (seq !== this.seq) return; // a newer search superseded this one
@@ -877,10 +885,31 @@ export class CodexSearchEngine {
       const lists = await Promise.all(
         (['ship', 'weapon', 'item'] as const).map((k) => this.codex.suggestNames(k, term)),
       );
-      if (seq === this.seq) this.didYouMean.set(mergeSuggestions(lists, 3));
+      if (seq !== this.seq) return;
+      const names = mergeSuggestions(lists, 3);
+      this.didYouMean.set(names);
+      await this.searchTypo(seq, term, names);
     } catch {
       /* suggestions are a courtesy */
     }
+  }
+
+  /**
+   * Typo tolerance (#395): when a suggested name is within the typo budget of the term (bounded
+   * edit distance per word, search-quality), search that name and show its hits. The "did you
+   * mean" line stays, so the reader sees what the search read.
+   */
+  private async searchTypo(seq: number, term: string, names: readonly string[]): Promise<void> {
+    const name = names.find((n) => fuzzyQuality(term, [n]) > 0);
+    if (!name || this.hits().length) return;
+    const res = await this.codex.searchAll(name, this.perGroup());
+    if (seq !== this.seq || !res.hits.length) return;
+    this.correction.set(name);
+    this.hits.set(res.hits);
+    this.requestFamilies(res.hits);
+    this.totals.set(res.totals);
+    this.counts.set({ distinct: res.distinct, read: res.read });
+    this.facets.set(res.facets ?? null);
   }
 
   private cancelTimer(): void {

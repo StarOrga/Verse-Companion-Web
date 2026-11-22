@@ -1,7 +1,165 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.292.0",
+  "current": "0.297.0",
   "releases": [
+    {
+      "version": "0.297.0",
+      "date": "2026-11-22",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "The web app speaks thirteen more languages: Spanish (Spain and Latin America), French, Hindi, Italian, Japanese, Korean, Polish, Brazilian Portuguese, Russian, Turkish, Simplified and Traditional Chinese. The browser language is detected; the choice is saved to the profile."
+            },
+            {
+              "title": "",
+              "text": "Desktop app language packs: Latin American Spanish, Turkish and Traditional Chinese, all packs proofread. Web and desktop app now offer the same languages."
+            }
+          ]
+        },
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Translation cost estimates in the game-string pipeline used list prices for batch jobs and showed twice the real cost."
+            },
+            {
+              "title": "",
+              "text": "The AI cost ledger of all server functions priced Claude Sonnet 5.5 and Opus 5.5 at twice their list price."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.296.0",
+      "date": "2026-11-22",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Subheader search: the field starts right after the brand and runs up to the icons, with the same width on every page. The Codex kind switch is now the last step of the path (\"Codex › Kommend ▾\"), and the hit count sits inside the field."
+            },
+            {
+              "title": "",
+              "text": "Phone: the closed search is a wide field with its placeholder instead of a lone magnifier."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.295.0",
+      "date": "2026-11-22",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Starscape sign-in now ends on the website's connect screen: after connecting, the browser tab shows \"Verbunden\" in the same stage as the Data Uploader instead of a bare Starscape page. Failures name their cause there (wrong sign-in session, no sign-in received). Needs Starscape 0.12.0; older versions keep their own page."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.294.0",
+      "date": "2026-11-22",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Search: groups are ordered by their best match (exact name > word > partial > typo), equal groups go ships > components > weapons > items; the page context only breaks ties and never buries an exact hit; own hangar hits lead when they match as well."
+            },
+            {
+              "title": "",
+              "text": "Search: typo tolerance per word (e.g. \"libertor\" finds the Liberator), always ranked below real matches; class-name-only hits rank below name hits."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.293.1",
+      "date": "2026-11-22",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Feedback routine: a topic is marked shipped only when the requested change is done; a ship reply never ends in an open question (decided default stated as fact, or the topic is parked as a question instead)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.293.0",
+      "date": "2026-11-22",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Admin → KI-Übersetzung → Karteikarten is now a card game: the Duell-Karte answers by tap, arrow keys or swipe, with undo through the app toast."
+            },
+            {
+              "title": "",
+              "text": "Languages you don't judge are decided by the KI with a German back-translation; you only veto. A sheet in the „Tagesziel & Sprachen“ box picks which languages stay in your deck."
+            },
+            {
+              "title": "",
+              "text": "Weekly points (20 per decision plus a daily-goal bonus), a streak and a leaderboard with names."
+            }
+          ]
+        },
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Spelling-only pairs, foreign bracket text and clear majorities no longer become cards; spelling patterns become one convention question for all languages, with a per-language exception."
+            },
+            {
+              "title": "",
+              "text": "The translation page's tabs move to a section rail at the page edge, like HQ; the crumb reads „Admin“."
+            },
+            {
+              "title": "",
+              "text": "„Nicht meine Entscheidung“ replaces skipping a card."
+            }
+          ]
+        },
+        {
+          "category": "Removed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "The old card RPCs, the stored English card question and the skipped card status (database migration)."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.292.0",
       "date": "2026-11-22",

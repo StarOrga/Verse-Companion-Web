@@ -25,7 +25,7 @@ import { fileURLToPath } from 'node:url';
 
 export const PACK_SCHEMA = 'scc-app-i18n/1';
 export const INDEX_SCHEMA = 'scc-app-i18n-index/1';
-const CODE = /^[a-z]{2}(-[A-Z]{2})?$/;
+const CODE = /^[a-z]{2}(-(?:[A-Z]{2}|[0-9]{3}))?$/;
 
 /** Validates an export: `{ name: text }` → `{ ok, errors, packs }` (packs = locale codes). */
 export function validateExport(files) {
