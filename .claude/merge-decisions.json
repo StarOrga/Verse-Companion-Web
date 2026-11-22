@@ -212,6 +212,16 @@
         "hunks": [
           "908f29aa78e4"
         ]
+      },
+      {
+        "ship": "feat/feedback-9311738d",
+        "by": "JerryT2T",
+        "value": "regenerated from the merged tree (gen-project-map)",
+        "decided": true,
+        "at": "2026-11-22T10:16:08.522Z",
+        "hunks": [
+          "1c6c7576e51c"
+        ]
       }
     ],
     ".claude/project-map.md›data-uploader/python/tests›count": [
