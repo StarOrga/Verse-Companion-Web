@@ -7,8 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.294.0] - 2026-11-22
 
 ### Added
-- The web app speaks the twelve game-string languages: Spanish (Spain and Latin America), French, Italian, Japanese, Korean, Polish, Brazilian Portuguese, Russian, Turkish, Simplified and Traditional Chinese. The browser language is detected; the choice is saved to the profile.
-- Desktop app language packs: Turkish and Traditional Chinese, all twelve packs proofread.
+- The web app speaks thirteen more languages: Spanish (Spain and Latin America), French, Hindi, Italian, Japanese, Korean, Polish, Brazilian Portuguese, Russian, Turkish, Simplified and Traditional Chinese. The browser language is detected; the choice is saved to the profile.
+- Desktop app language packs: Latin American Spanish, Turkish and Traditional Chinese, all packs proofread. Web and desktop app now offer the same languages.
 
 ### Fixed
 - Translation cost estimates in the game-string pipeline used list prices for batch jobs and showed twice the real cost.
