@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.298.1] - 2026-11-22
+
+### Fixed
+- Translation cards: a language row no longer says "54 offen" while its deck shows everything done. The board counts the same cards as the deck, and cards that wait for the next learn pass are shown as waiting.
+
 ## [0.298.0] - 2026-11-22
 
 ### Added
