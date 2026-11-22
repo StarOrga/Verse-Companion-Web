@@ -5037,17 +5037,25 @@
     }
   },
   "desktopConnect": {
-    "title": "Connect Verse Companion",
+    "titleConnect": "Connect Starscape",
+    "titleConnecting": "Connecting…",
+    "titleConnected": "Connected",
+    "titleFailed": "Connection failed",
     "authorizing": "Checking your session…",
-    "loginRequired": "Sign in first — we'll bounce you back here automatically.",
-    "redirecting": "Authorized. Sending token to the app…",
-    "redirectingHint": "You can close this window in a moment.",
+    "loginRequired": "Sign in, then your sign-in goes to Starscape automatically.",
+    "redirecting": "Handing your sign-in to Starscape.",
+    "handedOverHint": "The app is taking over your session, you can close this window. If it did not connect, start the connection again in the app.",
+    "connected": "Starscape is connected to your account. You can close this window.",
+    "start": "Start the sign-in from the Starscape tray menu – the app opens this page itself.",
     "errorMissingParams": "Missing callback or state parameter.",
     "errorBadCallback": "Callback URL is not a 127.0.0.1 loopback in the expected port range.",
     "errorNoToken": "No access token in session.",
     "retry": "Try again",
-    "handedOver": "Back to the app",
-    "handedOverHint": "The app is taking over your session, you can close this window. If it did not connect, start the connection again in the app."
+    "done": {
+      "csrf": "The sign-in did not belong to this Starscape session. Start it again from the tray menu.",
+      "noToken": "Starscape received no sign-in. Start it again from the tray menu.",
+      "failed": "Handing the sign-in to Starscape failed. Start it again from the tray menu."
+    }
   },
   "desktopAuth": {
     "titleConnect": "Connect Verse Data Uploader",
