@@ -11,6 +11,7 @@ import { PatchDossierComponent, sectionOrder } from './patch-dossier.component';
 import type { PatchOutline } from './patch-outline';
 import type { RoadmapPayload } from './roadmap';
 import { RoadmapService } from './roadmap.service';
+import { ChannelBuildVotesService } from './channel-build-votes.service';
 import deCatalog from '../../../public/i18n/de.json';
 
 /**
@@ -78,6 +79,9 @@ const LIVE_OUTLINE: PatchOutline = {
     { kind: 'bullet', text: 'Loot Generation & Drop Rates', depth: 0 },
     { kind: 'subheading', text: 'Ships & Vehicles', depth: 0 },
     { kind: 'bullet', text: 'Hydrogen & Quantum Fuel Rebalance', depth: 0 },
+    { kind: 'heading', text: 'Bug Fixes', depth: 0 },
+    { kind: 'subheading', text: 'Ships', depth: 0 },
+    { kind: 'bullet', text: 'Fixed a crash when stowing a weapon', depth: 0 },
     { kind: 'heading', text: 'Known Issues', depth: 0 },
     { kind: 'bullet', text: 'Quantum travel may desync in a party of 4+', depth: 0 },
   ],
@@ -139,6 +143,8 @@ describe('Patch dossier — one patch, opened (rethink Ⓚ)', () => {
         { provide: HttpClient, useValue: { get: () => of(FEED) } },
         { provide: ConsentService, useValue: { preferencesAllowed: () => false, statisticsAllowed: () => false } },
         { provide: RoadmapService, useValue: stub },
+        // The dossier asks the cloud for running test builds (RPC patch_channel_build_vote_state); the spec has none.
+        { provide: ChannelBuildVotesService, useValue: { ensure: () => undefined, forLine: () => [] } },
       ],
     });
     const translate = TestBed.inject(TranslateService);
@@ -165,44 +171,45 @@ describe('Patch dossier — one patch, opened (rethink Ⓚ)', () => {
   const root = () => fixture.nativeElement as HTMLElement;
   const text = (sel: string) => root().querySelector(sel)?.textContent?.replace(/\s+/g, ' ').trim() ?? '';
 
-  it('renders the live patch with all four sections behind a table of contents', async () => {
+  it('renders the live patch in ONE order: contents, then first steps, next, search', async () => {
     await render('4.10');
     expect(text('.scp-title')).toBe('Alpha 4.10');
     expect(text('.hero .status')).toBe('Live');
-    // Live: preparation is over, so it drops to the end; testing lines lead with it.
-    expect((Array.from(root().querySelectorAll('.toc a.stop .full')) as HTMLElement[]).map((a) => a.textContent?.trim())).toEqual([
-      'Was steckt drin?', 'Haben sie … gefixt?', 'Wann kommt der nächste?', 'Wie bereite ich mich vor?',
-    ]);
-    expect((Array.from(root().querySelectorAll('.col > section')) as HTMLElement[]).map((el) => el.id)).toEqual([
-      'pd-contents', 'pd-fixed', 'pd-next', 'pd-prep',
-    ]);
-    expect(root().querySelector('#pd-prep')).not.toBeNull();
-    expect(root().querySelector('#pd-contents')).not.toBeNull();
-    expect(root().querySelector('#pd-fixed')).not.toBeNull();
-    expect(root().querySelector('#pd-next')).not.toBeNull();
+    const ids = (Array.from(root().querySelectorAll('.col > section')) as HTMLElement[]).map((el) => el.id);
+    // Stability is no longer first; the preparation for the next major patch lives inside 'next'.
+    expect(ids[0]).toBe('pd-contents');
+    expect(ids.filter((i) => ['pd-contents', 'pd-first', 'pd-next', 'pd-fixed'].includes(i))).toEqual(['pd-contents', 'pd-first', 'pd-next', 'pd-fixed']);
+    expect(text('.toc a.stop .full')).toBe('Was steckt drin?');
+    expect(text('#pd-first h3')).toContain('Erste Schritte in diesem Patch');
     // Opening the overlay locks the page behind it.
     expect(document.body.style.overflow).toBe('hidden');
   });
 
-  it('orders the sections by one question: is the patch out yet?', () => {
-    // Not out yet — when does it come, and how do I get ready.
-    for (const status of ['next', 'evocati', 'ptu'] as const) {
-      expect(sectionOrder(status), status).toEqual(['next', 'prep', 'contents', 'fixed']);
-    }
-    // Landed — what is in it, is my bug gone; preparation is done and goes last.
-    for (const status of ['live', 'superseded', 'other'] as const) {
-      expect(sectionOrder(status), status).toEqual(['contents', 'fixed', 'next', 'prep']);
-    }
+  it('has one section order for every patch, stability right behind the contents', () => {
+    expect(sectionOrder()).toEqual(['contents', 'stabilitaet', 'community', 'urteil', 'builds', 'first', 'next', 'fixed']);
   });
 
-  it('reads the preparation facts and known issues out of the note', async () => {
+  it('first steps show the note facts; known issues sit under the contents, the general advice under "next"', async () => {
     await render('4.10');
-    const tiles = (Array.from(root().querySelectorAll('#pd-prep .prep li')) as HTMLElement[]);
+    const tiles = (Array.from(root().querySelectorAll('#pd-first .prep li')) as HTMLElement[]);
     expect(tiles.map((t) => t.querySelector('.pk-label')?.textContent)).toEqual(['Long Term Persistence', 'Starting aUEC']);
     expect(tiles[0].getAttribute('data-tone')).toBe('kept');
-    expect(text('#pd-prep')).toContain('Bekannte Probleme');
-    expect(text('#pd-prep')).toContain('Quantum travel may desync');
+    expect(text('#pd-first')).not.toContain('Gilt für jeden Patch');
+    expect(text('#pd-contents #pd-known-list')).toContain('Bekannte Probleme');
+    expect(text('#pd-contents #pd-known-list')).toContain('Quantum travel may desync');
+    expect(text('#pd-contents #pd-fixed-list')).toContain('Behoben');
+    expect(text('#pd-contents #pd-fixed-list')).toContain('Fixed a crash when stowing a weapon');
+    expect(text('#pd-next')).toContain('Vorbereitung auf den nächsten Hauptpatch');
     expect(root().querySelector('.wipe-tag')).toBeNull();
+  });
+
+  it('a tile without a picture runs text over the full width; the RSI link stays', async () => {
+    await render('4.10');
+    const cards = Array.from(root().querySelectorAll('#pd-contents .fc')) as HTMLElement[];
+    expect(cards.every((c) => c.classList.contains('noimg') && !c.querySelector('.img'))).toBe(true);
+    const rsi = root().querySelector('#pd-contents a.src-line') as HTMLAnchorElement;
+    expect(rsi.getAttribute('rel')).toBe('noopener noreferrer');
+    expect(rsi.href).toContain('/thread/l410');
   });
 
   it('puts the note bullets ON the matching roadmap cards and keeps the rest in a leftover line', async () => {
@@ -299,7 +306,7 @@ describe('Patch dossier — one patch, opened (rethink Ⓚ)', () => {
   it('picking a section from the table of contents lights it up', async () => {
     const frames = installFrameClock();
     await render('4.10');
-    const link = root().querySelectorAll('.toc a.stop')[2] as HTMLAnchorElement;
+    const link = root().querySelector('.toc a[href="#pd-next"]') as HTMLAnchorElement;
     link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 }));
     fixture.detectChanges();
     frames.runFrame();
@@ -307,11 +314,10 @@ describe('Patch dossier — one patch, opened (rethink Ⓚ)', () => {
     expect(root().querySelector('#pd-next')!.classList.contains('flash')).toBe(true);
   });
 
-  it('the preparation section is there even without an "Important Build Info" block', async () => {
+  it('first steps appear only when the note has something to do', async () => {
     await render('4.8');
-    const prep = root().querySelector('#pd-prep');
-    expect(prep, 'the question is always answerable').not.toBeNull();
-    expect(prep!.textContent).toContain('Gilt für jeden Patch');
+    expect(root().querySelector('#pd-first')).toBeNull();
+    expect(root().querySelector('#pd-prep')).toBeNull();
   });
 
   it('a superseded line is a finished stretch ending on its successor, with no usual marker and no today', async () => {
@@ -329,15 +335,14 @@ describe('Patch dossier — one patch, opened (rethink Ⓚ)', () => {
     expect(toc).toContain('Was kam danach?');
     expect(toc).toContain('Was war zu beachten?');
     expect(toc).not.toContain('Wann kommt der nächste?');
-    expect(toc).not.toContain('Wie bereite ich mich vor?');
     expect(text('#pd-next h3')).toBe('Was kam danach?');
-    expect(text('#pd-prep h3')).toContain('Was war zu beachten?');
+    expect(text('#pd-first h3')).toContain('Was war zu beachten?');
   });
 
   it('an announced line without a build leads with a section that answers in words, not with an axis', async () => {
     await render('4.12', '', ROADMAP_ANNOUNCED);
-    // "Wann kommt dieser Patch?" leads for a patch that is not out yet …
-    expect((Array.from(root().querySelectorAll('.col > section')) as HTMLElement[])[0].id).toBe('pd-next');
+    // "Wann kommt dieser Patch?" is there for a patch that is not out yet (one order for all, so not first any more) …
+    expect(root().querySelector('#pd-next h3')?.textContent).toContain('Wann kommt dieser Patch?');
     // … and it says something: the planned quarter, the projection, the caveat.
     const sentence = text('#pd-next .sentence');
     expect(sentence).toContain('Alpha 4.12 ist für Q3 2026 geplant.');

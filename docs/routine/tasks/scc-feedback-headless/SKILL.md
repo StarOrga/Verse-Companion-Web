@@ -16,7 +16,7 @@ FIXED RULES FOR THIS SESSION
 - Token: Supabase CLI PAT (Credential Manager, else env SUPABASE_ACCESS_TOKEN); never paste a token into a command.
 
 THE CONTRACT — every item you claim ends in exactly one of these before your turn ends:
-  1. `shipped`, PR merged, review reply posted.
+  1. `shipped`, PR merged, review reply posted — only when the change the thread asked for is done. No ship message ends in an open question or an offered alternative (the board offers "Abgenommen" next to it): decide a remaining fork on its default and state it as a fact, or park it as 2 instead (#394).
   2. `needs_input` with a system message that says what you need.
   3. `issue_created` with the issue URL.
   4. A review hold: `in_progress` with `ship_ref` = the PR, plus a system message that says why it waits. Only for sensitive changes (auth/RLS/secrets/payment, destructive migration).
@@ -76,7 +76,7 @@ STEP 4 — MERGE serially, oldest-first, one PR at a time. Per GREEN non-sensiti
   3. `git ls-remote --tags origin alpha/v<version>` — missing ⇒ annotated tag on the merge SHA, message `{"channel":"alpha","version":"<version>"}`, push it.
   4. out-of-band deploy if the area needs it (db push / functions deploy / desktop tag + release row) — a merge alone deploys nothing.
   5. `update public.admin_feedback set status='shipped', shipped_at=now(), ship_ref='<PR url>', processing_note=null, processed_at=now(), review_reply_pending=true where id=<id> and status='in_progress';` — confirm 1 row.
-  6. `npm run verify:ship-live -- --sha <merge sha> --pr <url> --changed "<one sentence>" --route <route, no leading slash>` (≤15 min polling; `--probe <needle>` only for a string the merge introduced, `--probe-url` without leading slash). Post its printed ✅/⏳ text verbatim as a system message, then `update admin_feedback set review_reply_pending=false where id=<id>`.
+  6. `npm run verify:ship-live -- --sha <merge sha> --pr <url> --changed "<one sentence>" --route <route, no leading slash>` (≤15 min polling; `--probe <needle>` only for a string the merge introduced, `--probe-url` without leading slash). Post its printed ✅/⏳ text verbatim as a system message, with no question or alternative appended and no extra note after it, then `update admin_feedback set review_reply_pending=false where id=<id>`.
   Sensitive ⇒ contract 4: `ship_ref='<PR url>'`, `processing_note='<why>'`, system message.
   Then remove the wave's scfb-* worktrees, each: `cmd //c "dir /AL <wt>"`, unlink a node_modules junction with `cmd //c "rmdir <wt>\node_modules"`, kill only node/esbuild processes whose CommandLine contains `<wt>`, then `git worktree remove <wt>`. The merged remote branch: `git push origin --delete <branch>` if ship_release left it.
 

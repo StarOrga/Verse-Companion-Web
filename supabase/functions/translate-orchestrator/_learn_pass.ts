@@ -14,7 +14,8 @@
 // for every contested term; it never finished once in production. Merging the parts gives exactly
 // what that run computed (pinned by tests that compare slice sizes).
 
-import { applyAnsweredCards } from './_cards.ts';
+import { submitBack } from './_back.ts';
+import { applyAnsweredCards, cleanupOpenCards, routeCards } from './_cards.ts';
 import { arbitrate } from './_arbiter.ts';
 import type { TmEntry } from './_diff.ts';
 import { TranslateError } from './_errors.ts';
@@ -122,7 +123,12 @@ async function start(d: D, pass: Pass): Promise<Pass | null> {
   const lang = pass.lang;
   const seed = (pass.state.seed ?? {}) as Partial<LearnSummary>;
   const sum: LearnSummary = { ...seed, lang, trigger: pass.reason as LearnTrigger, blocked: [] };
+  // karteikarten-neu: P14 once (marker-guarded), then the answers and the KI decisions nobody vetoed, then the
+  // KI path for cards sent there since the last pass (not-mine, veto, a language nobody judges any more).
+  const cleanup = await cleanupOpenCards(d);
+  if (!cleanup.skipped) sum.cleanup = cleanup;
   sum.cards = await applyAnsweredCards(d, lang);
+  sum.route = await routeCards(d, lang);
   const buildId = await d.learn.currentBuildId();
   const language = await d.db.getLanguage(lang);
   if (!buildId || !language) return done(d, pass, { ...sum, skipped: buildId ? 'lang_unknown' : 'no_build' });
@@ -386,6 +392,13 @@ async function submit(d: D, pass: Pass): Promise<Pass | null> {
       cur = await claimIntent(d, cur, 'web');
     }));
     if (state.web) await store.putJson(stateKey(lang), state);
+  }
+  // karteikarten-neu P6: German back-translations for the veto list.
+  if (!state.back) {
+    await create(d, () => cur, () => submitBack(d, lang, settings, state, sum, async () => {
+      cur = await claimIntent(d, cur, 'back');
+    }));
+    if (state.back) await store.putJson(stateKey(lang), state);
   }
   // The arbiter queue (conflicts from seed/sync) advances with every pass as well.
   if (await store.getJson(learnKey(lang, 'arbiter'))) sum.arbiter = await arbitrate(d, lang, []);

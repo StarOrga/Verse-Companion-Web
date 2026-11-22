@@ -4,6 +4,36 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.293.1] - 2026-11-22
+
+### Changed
+- Feedback routine: a topic is marked shipped only when the requested change is done; a ship reply never ends in an open question (decided default stated as fact, or the topic is parked as a question instead).
+
+## [0.293.0] - 2026-11-22
+
+### Added
+- Admin → KI-Übersetzung → Karteikarten is now a card game: the Duell-Karte answers by tap, arrow keys or swipe, with undo through the app toast.
+- Languages you don't judge are decided by the KI with a German back-translation; you only veto. A sheet in the „Tagesziel & Sprachen“ box picks which languages stay in your deck.
+- Weekly points (20 per decision plus a daily-goal bonus), a streak and a leaderboard with names.
+
+### Changed
+- Spelling-only pairs, foreign bracket text and clear majorities no longer become cards; spelling patterns become one convention question for all languages, with a per-language exception.
+- The translation page's tabs move to a section rail at the page edge, like HQ; the crumb reads „Admin“.
+- „Nicht meine Entscheidung“ replaces skipping a card.
+
+### Removed
+- The old card RPCs, the stored English card question and the `skipped` card status (database migration).
+
+## [0.292.0] - 2026-11-22
+
+### Added
+- Patch News: new "Live zuerst" board (Verse beta) with Live / PTU tabs, the newest live patch and the next live patch on top, a dated timeline with images, and every PTU build as its own row.
+- Patch News: read state per channel — new notes get a quiet badge, "Gelesen" keeps the content visible, "Nochmal lesen" brings it back. Stored in your account, or in the browser when signed out.
+
+### Changed
+- Patch dossier: one section order for every patch (contents, stability, community, your verdict, first steps, next patch), image-and-text tiles, a gallery, separate fixed / known-issue lists; the stability number is shown openly.
+- Backup: `PATCH_BOARD_V2` in `src/app/news/patch-board-flag.ts` set to `false` restores the previous board.
+
 ## [0.291.0] - 2026-11-22
 
 ### Changed

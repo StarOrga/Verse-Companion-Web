@@ -16,7 +16,7 @@ export const spendKey = (month: string) => `translation-work/learn-spend/${month
 export const monthOfDate = (d: Date) => `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-01`;
 
 /** translation_ledger.kind of job-less learning rows. */
-export type LearnKind = 'learn' | 'arbiter' | 'align' | 'haiku' | 'web';
+export type LearnKind = 'learn' | 'arbiter' | 'align' | 'haiku' | 'web' | 'back';
 
 export interface LearnBatch<T> {
   id: string;

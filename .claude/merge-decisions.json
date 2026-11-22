@@ -317,6 +317,16 @@
         "hunks": [
           "c61c3ffba591"
         ]
+      },
+      {
+        "ship": "claude/patch-display-improvement-3feb0e",
+        "by": "Mollywator",
+        "value": "regenerated for the merged tree",
+        "decided": true,
+        "at": "2026-11-22T00:13:33.980Z",
+        "hunks": [
+          "355190787eda"
+        ]
       }
     ],
     ".claude/project-map.md›docs/›count": [
@@ -420,6 +430,16 @@
         "hunks": [
           "6b16eacfc70d"
         ]
+      },
+      {
+        "ship": "claude/patch-display-improvement-3feb0e",
+        "by": "Mollywator",
+        "value": "regenerated for the merged tree",
+        "decided": true,
+        "at": "2026-11-22T00:13:33.980Z",
+        "hunks": [
+          "122c2ba22c9a"
+        ]
       }
     ],
     ".claude/project-map.md›file counts›value": [
@@ -507,6 +527,68 @@
         "at": "2026-11-15T04:52:34.188Z",
         "hunks": [
           "b4c95acad10d"
+        ]
+      }
+    ],
+    ".claude/project-map.md›generated›content": [
+      {
+        "ship": "claude/karteikarten-seite-rethink-59abdb",
+        "by": "JerryT2T",
+        "value": "regenerated from the merged tree (gen-project-map.mjs up-to-date)",
+        "decided": true,
+        "at": "2026-11-21T23:50:17.836Z",
+        "hunks": [
+          "7dda1e63d901"
+        ]
+      },
+      {
+        "ship": "claude/karteikarten-seite-rethink-59abdb",
+        "by": "JerryT2T",
+        "value": "regenerated from the merged tree (gen-project-map.mjs up-to-date)",
+        "decided": true,
+        "at": "2026-11-22T00:03:56.964Z",
+        "hunks": [
+          "0c29ba93cd75"
+        ]
+      },
+      {
+        "ship": "claude/karteikarten-seite-rethink-59abdb",
+        "by": "JerryT2T",
+        "value": "regenerated from the merged tree (gen-project-map.mjs)",
+        "decided": true,
+        "at": "2026-11-22T00:03:56.964Z",
+        "hunks": [
+          "21a6e8a1588a"
+        ]
+      },
+      {
+        "ship": "claude/karteikarten-seite-rethink-59abdb",
+        "by": "JerryT2T",
+        "value": "regenerated from the merged tree (gen-project-map.mjs up-to-date)",
+        "decided": true,
+        "at": "2026-11-22T00:32:15.799Z",
+        "hunks": [
+          "f54e0bfa9389"
+        ]
+      },
+      {
+        "ship": "claude/karteikarten-seite-rethink-59abdb",
+        "by": "JerryT2T",
+        "value": "regenerated from the merged tree (gen-project-map.mjs)",
+        "decided": true,
+        "at": "2026-11-22T00:32:15.799Z",
+        "hunks": [
+          "b4aeb49078fe"
+        ]
+      },
+      {
+        "ship": "claude/karteikarten-seite-rethink-59abdb",
+        "by": "JerryT2T",
+        "value": "regenerated from the merged tree (gen-project-map.mjs; package name is verse-companion)",
+        "decided": true,
+        "at": "2026-11-22T00:32:15.799Z",
+        "hunks": [
+          "8a3b448ec96d"
         ]
       }
     ],
@@ -825,6 +907,16 @@
         "hunks": [
           "1ac2ea1f3954"
         ]
+      },
+      {
+        "ship": "claude/patch-display-improvement-3feb0e",
+        "by": "Mollywator",
+        "value": "regenerated for the merged tree",
+        "decided": true,
+        "at": "2026-11-22T00:13:33.980Z",
+        "hunks": [
+          "ebb5c187568d"
+        ]
       }
     ],
     ".claude/project-map.md›ingest-catalog count›value": [
@@ -1124,6 +1216,18 @@
         ]
       }
     ],
+    ".claude/project-map.md›src/app/news›count": [
+      {
+        "ship": "claude/patch-display-improvement-3feb0e",
+        "by": "Mollywator",
+        "value": "regenerated for the merged tree",
+        "decided": true,
+        "at": "2026-11-22T00:13:33.980Z",
+        "hunks": [
+          "6f1f09fe2a6c"
+        ]
+      }
+    ],
     ".claude/project-map.md›src/app/shared/›file count": [
       {
         "ship": "claude/3d-view-component-visibility-27ac32",
@@ -1216,6 +1320,16 @@
         "at": "2026-11-15T04:18:13.845Z",
         "hunks": [
           "97ff2866726a"
+        ]
+      },
+      {
+        "ship": "claude/patch-display-improvement-3feb0e",
+        "by": "Mollywator",
+        "value": "regenerated for the merged tree",
+        "decided": true,
+        "at": "2026-11-22T00:13:33.980Z",
+        "hunks": [
+          "51daeae072a9"
         ]
       }
     ],

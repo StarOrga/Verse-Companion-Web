@@ -24,11 +24,7 @@ import { StabilityChipComponent, type StabilityChipData } from './stability-chip
           <b>{{ b.version }}</b>
           @if (b.wave !== null) { <span>· {{ 'verse.hub.wave' | translate: { n: b.wave } }}</span> }
         </h4>
-        @if (src().blind()) {
-          <span class="hidden">{{ 'stability.vote.blindTitle' | translate }}</span>
-        } @else {
-          <sc-stability-chip [data]="chip()" [linked]="false" />
-        }
+        <sc-stability-chip [data]="chip()" [linked]="false" />
       </header>
       <sc-community-verdict [line]="label()" [stability]="b.stability" [source]="src()" />
     </article>
@@ -40,7 +36,6 @@ import { StabilityChipComponent, type StabilityChipData } from './stability-chip
     h4 { margin: 0; display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 8px; font-size: max(0.95rem, var(--sc-fs-floor)); color: var(--sc-fg-0); }
     h4 small { font-size: max(0.72rem, var(--sc-fs-floor)); letter-spacing: 0.08em; text-transform: uppercase; color: var(--sc-accent); }
     h4 span { font-weight: 400; color: var(--sc-fg-2); font-size: max(0.8rem, var(--sc-fs-floor)); }
-    .hidden { color: var(--sc-fg-2); font-size: max(0.78rem, var(--sc-fs-floor)); }
   `],
 })
 export class BuildVerdictComponent {

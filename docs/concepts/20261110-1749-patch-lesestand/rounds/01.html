@@ -1,0 +1,346 @@
+<section data-iteration="1" data-iteration-template="design" data-tab-label="Runde 1" data-design-set="alternatives" data-viewports="desktop phone" data-baked data-unanswered>
+<style>
+:is([data-design], .design-ov-scale) .mock-pb{position:relative;min-height:100%;box-sizing:border-box;background:radial-gradient(ellipse 70% 40% at 50% 0%,#10293a 0%,#081622 55%,#050b13 100%);color:#cfe8f3;font:14px/1.45 "Segoe UI",system-ui,sans-serif;--a:#52c1e6;--ok:#3fd08a;--warn:#e2b04a;--ink:#eef9fd;--mut:#8fb0c2;--dim:#5f7f91;--line:rgba(82,193,230,.22);--panel:rgba(13,30,43,.72);--disp:"Orbitron","Eurostile","Segoe UI",system-ui,sans-serif;padding-bottom:56px}
+:is([data-design], .design-ov-scale) .mock-pb *{box-sizing:border-box}
+:is([data-design], .design-ov-scale) .mock-pb :where(h1,h2,h3,p,ul,ol,li){margin:0;padding:0;list-style:none;font-weight:inherit;font-size:inherit}
+:is([data-design], .design-ov-scale) .mock-pb .mock-btn{font:inherit;color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;min-height:36px;white-space:nowrap}
+:is([data-design], .design-ov-scale) .mock-pb .mock-btn:hover{border-color:var(--a);color:#fff}
+:is([data-design], .design-ov-scale) .mock-pb .mock-btn.mock-primary{background:var(--a);border-color:var(--a);color:#04121b;font-weight:600}
+:is([data-design], .design-ov-scale) .mock-pb .mock-btn.mock-quiet{border-color:transparent;color:var(--mut);padding-inline:8px}
+:is([data-design], .design-ov-scale) .mock-pb .mock-top{display:flex;align-items:center;gap:16px;padding:10px 24px;border-bottom:1px solid var(--line);background:rgba(5,11,19,.7);font-size:13px;color:var(--mut)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-top b{color:var(--ink);font-weight:600}
+:is([data-design], .design-ov-scale) .mock-pb .mock-top .mock-search{margin-left:auto;border:1px solid var(--line);border-radius:8px;padding:6px 12px;min-width:240px;color:var(--dim)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-page{max-width:1180px;margin:0 auto;padding:40px 24px 0;display:flex;flex-direction:column;gap:14px}
+:is([data-design], .design-ov-scale) .mock-pb .mock-stack{position:relative;display:flex;flex-direction:column;gap:14px;padding-left:36px}
+:is([data-design], .design-ov-scale) .mock-pb .mock-stack::before{content:'';position:absolute;left:16px;top:14px;bottom:14px;width:2px;border-radius:2px;background:linear-gradient(180deg,rgba(82,193,230,.55),var(--ok) 45%,rgba(95,127,145,.35))}
+:is([data-design], .design-ov-scale) .mock-pb .mock-node{position:relative}
+:is([data-design], .design-ov-scale) .mock-pb .mock-node::before{content:'';position:absolute;left:-26px;top:30px;width:10px;height:10px;border-radius:50%;background:var(--dim);border:2px solid #050b13}
+:is([data-design], .design-ov-scale) .mock-pb .mock-node.mock-live::before{width:14px;height:14px;left:-28px;top:28px;background:var(--ok);box-shadow:0 0 12px var(--ok)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-node.mock-next::before{background:var(--a)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-card{border:1px solid var(--line);border-radius:12px;background:var(--panel);overflow:hidden}
+:is([data-design], .design-ov-scale) .mock-pb .mock-live .mock-card{border-color:rgba(63,208,138,.55);background:linear-gradient(135deg,rgba(63,208,138,.1),var(--panel) 60%)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-next .mock-card{border-color:rgba(82,193,230,.45);background:linear-gradient(135deg,rgba(82,193,230,.1),var(--panel) 60%)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-old .mock-card{opacity:.86}
+:is([data-design], .design-ov-scale) .mock-pb .mock-ch{display:grid;grid-template-columns:116px 150px minmax(0,1fr) auto;align-items:center;gap:10px 18px;padding:14px 16px}
+:is([data-design], .design-ov-scale) .mock-pb .mock-live .mock-ch{padding-block:20px}
+:is([data-design], .design-ov-scale) .mock-pb .mock-status{display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 8px;border-radius:6px;font-family:var(--disp);font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;text-align:center;color:var(--dim);background:rgba(95,127,145,.16)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-status small{font-family:"Segoe UI",system-ui,sans-serif;font-weight:400;letter-spacing:0;text-transform:none;font-size:11px;opacity:.85;white-space:nowrap}
+:is([data-design], .design-ov-scale) .mock-pb .mock-live .mock-status{color:#04121b;background:var(--ok);box-shadow:0 0 18px rgba(63,208,138,.35)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-next .mock-status{color:var(--a);background:rgba(82,193,230,.2)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-ver{font-family:var(--disp);font-size:18px;font-weight:600;color:var(--ink)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-live .mock-ver{font-size:30px}
+:is([data-design], .design-ov-scale) .mock-pb .mock-next .mock-ver{font-size:23px}
+:is([data-design], .design-ov-scale) .mock-pb .mock-sent{display:flex;flex-direction:column;gap:4px;min-width:0;font-size:12.5px;color:var(--mut)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-sent b{color:var(--ink);font-weight:500;font-size:13.5px}
+:is([data-design], .design-ov-scale) .mock-pb .mock-teaser{display:flex;gap:6px;margin-top:4px;flex-wrap:wrap}
+:is([data-design], .design-ov-scale) .mock-pb .mock-teaser i{display:block;width:96px;height:60px;border-radius:6px;border:1px solid rgba(82,193,230,.35);background:linear-gradient(135deg,#123247,#0a1c2a 60%,#16405a)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-teaser i.mock-rest{width:40px;border-style:dashed;background:none;display:flex;align-items:center;justify-content:center;color:var(--mut);font-style:normal}
+:is([data-design], .design-ov-scale) .mock-pb .mock-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;border:1px solid rgba(63,208,138,.45);color:var(--ok);font-size:12px;white-space:nowrap}
+:is([data-design], .design-ov-scale) .mock-pb .mock-chip.mock-early{border-color:var(--line);color:var(--dim)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-inset{border-top:1px solid rgba(82,193,230,.12);padding:12px 16px 14px;display:flex;flex-direction:column;gap:8px;font-size:12.5px;color:var(--mut)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-inset b{color:var(--ink);font-weight:600}
+:is([data-design], .design-ov-scale) .mock-pb .mock-rail{position:relative;height:8px;border-radius:4px;background:rgba(95,127,145,.25)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-rail::before{content:'';position:absolute;inset:0 38% 0 0;border-radius:4px;background:linear-gradient(90deg,var(--ok),var(--a))}
+:is([data-design], .design-ov-scale) .mock-pb .mock-rail::after{content:'';position:absolute;right:14%;top:-4px;width:2px;height:16px;background:var(--ink)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-subs{position:relative;margin:0 16px 14px 150px;padding-left:16px;display:flex;flex-direction:column}
+:is([data-design], .design-ov-scale) .mock-pb .mock-subs::before{content:'';position:absolute;left:0;top:-4px;bottom:14px;width:2px;border-radius:2px;background:rgba(82,193,230,.35)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-subs-h{padding:0 0 4px 10px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-sv{position:relative;display:grid;grid-template-columns:14px 62px minmax(0,1fr) auto 104px 96px;gap:10px;align-items:center;padding:7px 10px;border-radius:8px;min-height:40px;font-size:13px;color:var(--mut);text-decoration:none}
+:is([data-design], .design-ov-scale) .mock-pb .mock-sv:hover{background:rgba(82,193,230,.08);color:var(--ink)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-sv .mock-sl{font-family:var(--disp);font-size:12.5px;color:var(--ink)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-sv .mock-svt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+:is([data-design], .design-ov-scale) .mock-pb .mock-sv time{text-align:right;font-size:12px;color:var(--dim);white-space:nowrap}
+:is([data-design], .design-ov-scale) .mock-pb .mock-sv em{font-style:normal;font-size:12px;color:var(--dim)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-tags{display:inline-flex;gap:6px}
+:is([data-design], .design-ov-scale) .mock-pb .mock-tag{display:inline-flex;align-items:center;padding:1px 8px;border-radius:999px;font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--mut);background:rgba(95,127,145,.22);white-space:nowrap}
+:is([data-design], .design-ov-scale) .mock-pb .mock-tag.mock-t-live{color:#04121b;background:var(--ok)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-tag.mock-t-ptu{color:var(--a);background:rgba(82,193,230,.2)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-dot{width:9px;height:9px;border-radius:50%;background:transparent;justify-self:center}
+:is([data-design], .design-ov-scale) .mock-pb .mock-dot.mock-unread{background:var(--a);box-shadow:0 0 8px var(--a)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-dot.mock-read{background:none;width:auto;height:auto;color:var(--dim);font-size:12px}
+:is([data-design], .design-ov-scale) .mock-pb .mock-sv.mock-is-unread .mock-svt,:is([data-design], .design-ov-scale) .mock-pb .mock-sv.mock-is-unread .mock-sl{color:#fff;font-weight:600}
+:is([data-design], .design-ov-scale) .mock-pb .mock-more{align-self:flex-start;font:inherit;font-size:12.5px;color:var(--mut);background:none;border:0;padding:8px 10px;cursor:pointer}
+:is([data-design], .design-ov-scale) .mock-pb .mock-more:hover{color:var(--a)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-bundle{margin:2px 0 0;border:1px dashed rgba(95,127,145,.45);border-radius:8px}
+:is([data-design], .design-ov-scale) .mock-pb .mock-bundle>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:8px 12px;font-size:12.5px;color:var(--mut)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-bundle>summary::-webkit-details-marker{display:none}
+:is([data-design], .design-ov-scale) .mock-pb .mock-bundle>summary::before{content:'›';color:var(--a);font-size:15px;transition:transform .16s}
+:is([data-design], .design-ov-scale) .mock-pb .mock-bundle[open]>summary::before{transform:rotate(90deg)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-bundle>summary b{color:var(--ink);font-weight:600}
+:is([data-design], .design-ov-scale) .mock-pb .mock-bundle>summary span{margin-left:auto;color:var(--dim)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-bundle>summary:hover{color:var(--ink)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-fold{display:flex;align-items:center;gap:8px;padding:10px 16px;border:1px dashed rgba(95,127,145,.4);border-radius:10px;color:var(--mut);font-size:12.5px}
+:is([data-design], .design-ov-scale) .mock-pb .mock-fold::before{content:'›';color:var(--a)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-new{display:inline-flex;align-items:center;padding:1px 8px;border-radius:999px;background:var(--a);color:#04121b;font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+:is([data-design], .design-ov-scale) .mock-pb .mock-list{display:flex;flex-direction:column;gap:5px;font-size:13.5px;color:#cfe8f3}
+:is([data-design], .design-ov-scale) .mock-pb .mock-list li{position:relative;padding-left:16px}
+:is([data-design], .design-ov-scale) .mock-pb .mock-list li::before{content:'';position:absolute;left:2px;top:9px;width:5px;height:5px;border-radius:50%;background:var(--a)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-list li.mock-fix::before{background:var(--ok)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-list li.mock-known::before{background:var(--warn)}
+:is([data-design], .design-ov-scale) .mock-pb .mock-kicker{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+
+/* ── d1: Neu-Leiste über dem Zeitstrahl ── */
+:is([data-design], .design-ov-scale) .mock-pb .d1-inbox{border:1px solid rgba(82,193,230,.6);border-radius:14px;background:linear-gradient(135deg,rgba(82,193,230,.16),rgba(13,30,43,.85) 55%);box-shadow:0 0 34px -14px var(--a);overflow:hidden}
+:is([data-design], .design-ov-scale) .mock-pb .d1-inbox-h{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line)}
+:is([data-design], .design-ov-scale) .mock-pb .d1-inbox-h h2{font-family:var(--disp);font-size:15px;letter-spacing:.08em;color:#fff}
+:is([data-design], .design-ov-scale) .mock-pb .d1-inbox-h .d1-count{color:var(--a);font-size:13px}
+:is([data-design], .design-ov-scale) .mock-pb .d1-inbox-h .mock-btn{margin-left:auto}
+:is([data-design], .design-ov-scale) .mock-pb .d1-hero{display:grid;grid-template-columns:190px minmax(0,1fr) auto;gap:18px;align-items:start;padding:16px}
+:is([data-design], .design-ov-scale) .mock-pb .d1-hero-v{display:flex;flex-direction:column;gap:6px}
+:is([data-design], .design-ov-scale) .mock-pb .d1-hero-v strong{font-family:var(--disp);font-size:30px;color:#fff;line-height:1}
+:is([data-design], .design-ov-scale) .mock-pb .d1-hero-v small{color:var(--mut);font-size:12px}
+:is([data-design], .design-ov-scale) .mock-pb .d1-hero-act{display:flex;flex-direction:column;gap:8px;align-items:stretch}
+:is([data-design], .design-ov-scale) .mock-pb .d1-item{display:grid;grid-template-columns:14px 62px minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:9px 16px;border-top:1px solid var(--line);font-size:13px;color:var(--mut)}
+:is([data-design], .design-ov-scale) .mock-pb .d1-item b{color:var(--ink);font-family:var(--disp);font-size:12.5px}
+:is([data-design], .design-ov-scale) .mock-pb .d1-done{display:flex;align-items:center;gap:12px;padding:10px 16px;border:1px solid rgba(63,208,138,.35);border-radius:12px;background:rgba(63,208,138,.07);color:var(--mut);font-size:13px}
+:is([data-design], .design-ov-scale) .mock-pb .d1-done b{color:var(--ok);font-weight:600}
+:is([data-design], .design-ov-scale) .mock-pb .d1-done .mock-btn{margin-left:auto}
+
+/* ── d2: Live-Karte zeigt den neuesten Stand ── */
+:is([data-design], .design-ov-scale) .mock-pb .d2-card{position:relative}
+:is([data-design], .design-ov-scale) .mock-pb .d2-card.d2-unread{box-shadow:inset 4px 0 0 var(--a),0 0 34px -16px var(--a)}
+:is([data-design], .design-ov-scale) .mock-pb .d2-ver{display:flex;flex-direction:column;gap:4px}
+:is([data-design], .design-ov-scale) .mock-pb .d2-ver small{font-family:"Segoe UI",system-ui,sans-serif;font-size:12px;font-weight:400;color:var(--mut)}
+:is([data-design], .design-ov-scale) .mock-pb .d2-ver small b{color:#fff;font-family:var(--disp);font-weight:600}
+:is([data-design], .design-ov-scale) .mock-pb .d2-delta{margin:0 16px 12px 150px;padding:14px 16px;border:1px solid rgba(82,193,230,.45);border-radius:10px;background:rgba(5,14,22,.6);display:flex;flex-direction:column;gap:10px}
+:is([data-design], .design-ov-scale) .mock-pb .d2-delta-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+:is([data-design], .design-ov-scale) .mock-pb .d2-delta-h h3{font-family:var(--disp);font-size:15px;color:#fff}
+:is([data-design], .design-ov-scale) .mock-pb .d2-delta-h time{margin-left:auto;font-size:12px;color:var(--dim)}
+:is([data-design], .design-ov-scale) .mock-pb .d2-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+:is([data-design], .design-ov-scale) .mock-pb .d2-cols h4{margin:0 0 6px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);font-weight:600}
+:is([data-design], .design-ov-scale) .mock-pb .d2-act{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+:is([data-design], .design-ov-scale) .mock-pb .d2-act span{margin-left:auto;font-size:12px;color:var(--dim)}
+:is([data-design], .design-ov-scale) .mock-pb .d2-trail{margin:0 16px 14px 150px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12.5px;color:var(--mut)}
+:is([data-design], .design-ov-scale) .mock-pb .d2-trail a{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;border:1px solid rgba(95,127,145,.4);color:var(--mut);text-decoration:none;font-family:var(--disp);font-size:11.5px}
+:is([data-design], .design-ov-scale) .mock-pb .d2-trail a:hover{border-color:var(--a);color:#fff}
+:is([data-design], .design-ov-scale) .mock-pb .d2-trail a.d2-cur{border-color:var(--a);color:#fff}
+:is([data-design], .design-ov-scale) .mock-pb .d2-trail a i{font-style:normal;color:var(--ok);font-family:"Segoe UI",system-ui,sans-serif}
+:is([data-design], .design-ov-scale) .mock-pb .d2-readline{margin:0 16px 12px 150px;display:flex;align-items:center;gap:12px;font-size:13px;color:var(--mut)}
+:is([data-design], .design-ov-scale) .mock-pb .d2-readline b{color:var(--ok);font-weight:600}
+:is([data-design], .design-ov-scale) .mock-pb .d2-readline .mock-btn{margin-left:auto}
+:is([data-design], .design-ov-scale) .mock-pb .d2-hint{display:inline-flex;align-items:center;gap:8px;margin-top:2px;font-size:12px;color:var(--a)}
+
+/* ── d3: Liste links, Lesen rechts ── */
+:is([data-design], .design-ov-scale) .mock-pb .d3-split{display:grid;grid-template-columns:320px minmax(0,1fr);gap:16px;align-items:start}
+:is([data-design], .design-ov-scale) .mock-pb .d3-side{border:1px solid var(--line);border-radius:12px;background:var(--panel);overflow:hidden}
+:is([data-design], .design-ov-scale) .mock-pb .d3-filter{display:flex;gap:6px;padding:10px;border-bottom:1px solid var(--line)}
+:is([data-design], .design-ov-scale) .mock-pb .d3-filter span{flex:1;text-align:center;padding:6px 8px;border-radius:999px;font-size:12.5px;color:var(--mut);border:1px solid transparent}
+:is([data-design], .design-ov-scale) .mock-pb .d3-filter span.d3-on{border-color:var(--a);color:#fff;background:rgba(82,193,230,.14)}
+:is([data-design], .design-ov-scale) .mock-pb .d3-group{padding:10px 12px 4px;display:flex;align-items:center;gap:8px;font-family:var(--disp);font-size:12px;color:var(--ink)}
+:is([data-design], .design-ov-scale) .mock-pb .d3-group .mock-tag{margin-left:auto}
+:is([data-design], .design-ov-scale) .mock-pb .d3-row{display:grid;grid-template-columns:12px 58px minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 12px;font-size:12.5px;color:var(--mut);border-left:3px solid transparent;text-decoration:none}
+:is([data-design], .design-ov-scale) .mock-pb .d3-row:hover{background:rgba(82,193,230,.08)}
+:is([data-design], .design-ov-scale) .mock-pb .d3-row b{font-family:var(--disp);font-size:12px;color:var(--ink);font-weight:500}
+:is([data-design], .design-ov-scale) .mock-pb .d3-row span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+:is([data-design], .design-ov-scale) .mock-pb .d3-row time{font-size:11.5px;color:var(--dim)}
+:is([data-design], .design-ov-scale) .mock-pb .d3-row.d3-sel{background:rgba(82,193,230,.14);border-left-color:var(--a);color:#fff}
+:is([data-design], .design-ov-scale) .mock-pb .d3-row.d3-unread b,:is([data-design], .design-ov-scale) .mock-pb .d3-row.d3-unread span{color:#fff;font-weight:600}
+:is([data-design], .design-ov-scale) .mock-pb .d3-side .mock-bundle{margin:4px 10px 8px}
+:is([data-design], .design-ov-scale) .mock-pb .d3-side .mock-fold{margin:8px 10px 10px;border-radius:8px}
+:is([data-design], .design-ov-scale) .mock-pb .d3-pane{border:1px solid rgba(82,193,230,.45);border-radius:12px;background:var(--panel);display:flex;flex-direction:column;min-height:560px}
+:is([data-design], .design-ov-scale) .mock-pb .d3-pane-h{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:16px 20px;border-bottom:1px solid var(--line)}
+:is([data-design], .design-ov-scale) .mock-pb .d3-pane-h h2{font-family:var(--disp);font-size:24px;color:#fff}
+:is([data-design], .design-ov-scale) .mock-pb .d3-pane-h time{margin-left:auto;font-size:12.5px;color:var(--dim)}
+:is([data-design], .design-ov-scale) .mock-pb .d3-body{padding:18px 20px;display:flex;flex-direction:column;gap:18px;flex:1}
+:is([data-design], .design-ov-scale) .mock-pb .d3-body h3{margin-bottom:8px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);font-weight:600}
+:is([data-design], .design-ov-scale) .mock-pb .d3-bar{display:flex;align-items:center;gap:10px;padding:12px 20px;border-top:1px solid var(--line);background:rgba(5,11,19,.6);border-radius:0 0 12px 12px}
+:is([data-design], .design-ov-scale) .mock-pb .d3-bar span{margin-left:auto;font-size:12px;color:var(--dim)}
+:is([data-design], .design-ov-scale) .mock-pb .d3-kbd{display:inline-block;padding:0 6px;border:1px solid var(--line);border-radius:4px;font-size:11px;color:var(--mut)}
+:is([data-design], .design-ov-scale) .mock-pb .d3-calm{align-items:center;justify-content:center;text-align:center;gap:14px}
+:is([data-design], .design-ov-scale) .mock-pb .d3-calm .d3-check{width:64px;height:64px;border-radius:50%;border:2px solid var(--ok);display:flex;align-items:center;justify-content:center;font-size:30px;color:var(--ok);box-shadow:0 0 26px -6px var(--ok)}
+:is([data-design], .design-ov-scale) .mock-pb .d3-calm h2{font-family:var(--disp);font-size:20px;color:#fff}
+:is([data-design], .design-ov-scale) .mock-pb .d3-calm p{color:var(--mut);max-width:46ch}
+:is([data-design], .design-ov-scale) .mock-pb .d3-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:100%;max-width:640px}
+:is([data-design], .design-ov-scale) .mock-pb .d3-facts div{border:1px solid var(--line);border-radius:10px;padding:10px 12px;text-align:left;font-size:12px;color:var(--mut)}
+:is([data-design], .design-ov-scale) .mock-pb .d3-facts b{display:block;color:var(--ink);font-family:var(--disp);font-size:15px;margin-bottom:2px}
+
+@container device (max-width: 520px){
+:is([data-design], .design-ov-scale) .mock-pb .mock-top{padding:10px 14px}
+:is([data-design], .design-ov-scale) .mock-pb .mock-top .mock-search{display:none}
+:is([data-design], .design-ov-scale) .mock-pb .mock-page{padding:14px 12px 0}
+:is([data-design], .design-ov-scale) .mock-pb .mock-stack{padding-left:18px}
+:is([data-design], .design-ov-scale) .mock-pb .mock-stack::before{left:5px}
+:is([data-design], .design-ov-scale) .mock-pb .mock-node::before{left:-17px;top:14px}
+:is([data-design], .design-ov-scale) .mock-pb .mock-node.mock-live::before{left:-19px;top:12px}
+:is([data-design], .design-ov-scale) .mock-pb .mock-ch{grid-template-columns:104px minmax(0,1fr);padding:12px}
+:is([data-design], .design-ov-scale) .mock-pb .mock-ch .mock-sent,:is([data-design], .design-ov-scale) .mock-pb .mock-ch .mock-chip{grid-column:1 / -1;justify-self:start}
+:is([data-design], .design-ov-scale) .mock-pb .mock-live .mock-ver{font-size:24px}
+:is([data-design], .design-ov-scale) .mock-pb .mock-teaser i{width:84px;height:52px}
+:is([data-design], .design-ov-scale) .mock-pb .mock-subs,:is([data-design], .design-ov-scale) .mock-pb .d2-delta,:is([data-design], .design-ov-scale) .mock-pb .d2-trail,:is([data-design], .design-ov-scale) .mock-pb .d2-readline{margin:0 12px 12px}
+:is([data-design], .design-ov-scale) .mock-pb .mock-sv{grid-template-columns:14px 56px minmax(0,1fr) auto}
+:is([data-design], .design-ov-scale) .mock-pb .mock-sv em,:is([data-design], .design-ov-scale) .mock-pb .mock-sv .mock-chip,:is([data-design], .design-ov-scale) .mock-pb .mock-sv time{display:none}
+:is([data-design], .design-ov-scale) .mock-pb .d1-hero{grid-template-columns:minmax(0,1fr)}
+:is([data-design], .design-ov-scale) .mock-pb .d1-hero-act{flex-direction:row;flex-wrap:wrap}
+:is([data-design], .design-ov-scale) .mock-pb .d1-item{grid-template-columns:14px 56px minmax(0,1fr)}
+:is([data-design], .design-ov-scale) .mock-pb .d1-item time,:is([data-design], .design-ov-scale) .mock-pb .d1-item .mock-btn{display:none}
+:is([data-design], .design-ov-scale) .mock-pb .d1-inbox-h{flex-wrap:wrap}
+:is([data-design], .design-ov-scale) .mock-pb .d2-cols{grid-template-columns:minmax(0,1fr)}
+:is([data-design], .design-ov-scale) .mock-pb .d3-split{grid-template-columns:minmax(0,1fr)}
+:is([data-design], .design-ov-scale) .mock-pb .d3-pane{min-height:0}
+:is([data-design], .design-ov-scale) .mock-pb .d3-facts{grid-template-columns:minmax(0,1fr)}
+:is([data-design], .design-ov-scale) .mock-pb .d3-bar{flex-wrap:wrap}
+}
+</style>
+<header class="iteration-intro"><h2>{{iteration.tab}} 1 · Wo steht das Neue, und was passiert nach dem Lesen?</h2><p>Drei Wege für dieselbe Lage: 4.10 ist live und gelesen, 4.10.3 ist neu. Fest steht in allen dreien: der Lesestand hängt am Konto (alle Geräte, ohne Anmeldung nur in diesem Browser), gelesen wird je Patch-Note, und die kleinen Patches unter dem neuesten sind gebündelt.</p></header>
+
+<section data-design="d1" data-nav-label="Neu-Leiste oben" data-design-active="true" data-screen-fit="full" data-design-motto="Leiste „Neu für dich“ über dem Zeitstrahl" data-design-traits="Eigene Leiste ganz oben sammelt alles Ungelesene, der Zeitstrahl darunter bleibt wie heute|Ein Knopf „Alles gelesen“ für die ganze Leiste, danach schrumpft sie auf eine Zeile|Neueste Note groß mit 4 Stichpunkten, weitere Neuigkeiten als kurze Zeilen darunter" data-design-icon="&lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot;&gt;&lt;rect x=&quot;3&quot; y=&quot;3&quot; width=&quot;18&quot; height=&quot;6&quot; rx=&quot;2&quot;/&gt;&lt;path d=&quot;M5 14h14M5 18h14&quot;/&gt;&lt;/svg&gt;" data-design-color="#e2b04a" data-ov-fit="component" data-ov-demo=".d1-inbox">
+<section id="d1-s1" data-nav-label="Neues ungelesen" data-screen data-screen-active="true"><div class="mock-pb d1"><div class="mock-top"><span>Verse</span><span>›</span><b>Patches</b><span class="mock-search">Patches durchsuchen …</span></div><div class="mock-page">
+  <section class="d1-inbox" data-m="inbox">
+    <div class="d1-inbox-h"><h2>NEU FÜR DICH</h2><span class="d1-count">2 ungelesen seit deinem letzten Besuch (3. Nov.)</span><a class="mock-btn" data-screen-link="next" data-m="all-read">✓ Alles gelesen</a></div>
+    <div class="d1-hero">
+      <div class="d1-hero-v"><span class="mock-tags"><span class="mock-tag mock-t-ptu">PTU</span><span class="mock-new">Neu</span></span><strong>4.10.3</strong><small>PTU Patch Notes · vor 2 Std.</small></div>
+      <ul class="mock-list"><li>Neue Waffe: LBCO Skarnov Rifle</li><li class="mock-fix">Performance und Feinschliff für IAE und Vanduul Incursion</li><li class="mock-fix">4-GB-Grenze des Vulkan-Pipeline-Caches entfernt</li><li class="mock-known">mobiGlas-Karte ruckelt in Pyro</li><li style="color:var(--mut)">+ 2 weitere Änderungen</li></ul>
+      <div class="d1-hero-act"><a class="mock-btn mock-primary">Ganz lesen →</a><a class="mock-btn" data-screen-link="next">✓ Gelesen</a></div>
+    </div>
+    <div class="d1-item"><span class="mock-dot mock-unread"></span><b>4.11</b><span>2 neue Roadmap-Einträge: „Engineering Tier 0“, „Genesis-Wolken auf Hurston“</span><time>gestern</time><a class="mock-btn mock-quiet">✓</a></div>
+  </section>
+  <div class="mock-stack">
+    <div class="mock-node mock-next"><div class="mock-card">
+  <div class="mock-ch"><span class="mock-status">Als Nächstes<small>Q4 2026</small></span><span class="mock-ver">Alpha 4.11</span>
+    <span class="mock-sent"><b>PTU erwartet in ~3 Wochen</b><span class="mock-teaser"><i></i><i></i><i></i><i></i><i></i><i class="mock-rest">…</i></span></span><span></span></div>
+  <div class="mock-inset"><span><b>Nächster Live-Patch ~ 16. Dez.</b> · in ~5 Wochen · im üblichen Takt</span><div class="mock-rail"></div><span>Alpha 4.10 live seit 7. Okt. · üblich 68 Tage · Alpha 4.11</span></div>
+</div></div>
+    <div class="mock-node mock-live"><div class="mock-card"><div class="mock-ch"><span class="mock-status">Live<small>seit 34 Tagen</small></span><span class="mock-ver">Alpha 4.10</span>
+    <span class="mock-sent"><b>Seit 7. Okt. live</b><span>2 Hotfixes, letzter 29. Okt. · nächster Live-Patch in ~5 Wochen (Schätzung)</span></span><span class="mock-chip">78 % stabil</span></div>
+      <div class="mock-subs"><span class="mock-subs-h">Versionen von 4.10</span>
+        <a class="mock-sv mock-is-unread" data-m="row-new"><span class="mock-dot mock-unread"></span><span class="mock-sl">4.10.3</span><span class="mock-svt">Alpha 4.10.3 PTU Patch Notes</span><span class="mock-tags"><span class="mock-tag mock-t-ptu">PTU</span></span><em>noch früh</em><time>vor 2 Std.</time></a>
+        <details class="mock-bundle" data-m="bundle"><summary><b>4 frühere Updates der 4.10</b> 4.10.2 Hotfix · 4.10.2 · 4.10.1 · 4.10.0<span>alle gelesen ✓</span></summary><a class="mock-sv"><span class="mock-dot mock-read">✓</span><span class="mock-sl">4.10.2</span><span class="mock-svt">Alpha 4.10.2 Hotfix</span><span class="mock-tags"><span class="mock-tag mock-t-live">Live</span><span class="mock-tag">Hotfix</span></span><span class="mock-chip">81 %</span><time>vor 12 Tagen</time></a><a class="mock-sv"><span class="mock-dot mock-read">✓</span><span class="mock-sl">4.10.2</span><span class="mock-svt">Alpha 4.10.2 LIVE Patch Notes</span><span class="mock-tags"><span class="mock-tag mock-t-live">Live</span></span><span class="mock-chip">74 %</span><time>vor 3 Wochen</time></a><a class="mock-sv"><span class="mock-dot mock-read">✓</span><span class="mock-sl">4.10.1</span><span class="mock-svt">Alpha 4.10.1 LIVE Patch Notes</span><span class="mock-tags"><span class="mock-tag mock-t-live">Live</span></span><span class="mock-chip">69 %</span><time>vor 4 Wochen</time></a><a class="mock-sv"><span class="mock-dot mock-read">✓</span><span class="mock-sl">4.10.0</span><span class="mock-svt">Alpha 4.10.0 LIVE Release Notes</span><span class="mock-tags"><span class="mock-tag mock-t-live">Live</span></span><span class="mock-chip">62 %</span><time>vor 5 Wochen</time></a><span class="mock-more">5 frühere Test-Builds anzeigen</span></details>
+      </div></div></div>
+    <div class="mock-node mock-old"><div class="mock-card">
+  <div class="mock-ch"><span class="mock-status">Abgelöst<small>am 7. Okt.</small></span><span class="mock-ver">Alpha 4.9</span>
+    <span class="mock-sent"><b>Live 12. Aug. – 7. Okt.</b><span>3 Hotfixes, letzter 24. Sept.</span></span><span class="mock-chip">84 % stabil</span></div>
+  <div class="mock-subs"><span class="mock-more">6 Versionen anzeigen</span></div>
+</div></div><div class="mock-node"><div class="mock-fold">Ältere Patches · 4.8 · 4.7 · 4.6</div></div>
+  </div></div></div>
+<div class="anno-layer" data-anno-layer><div class="anno" data-anno="r1-d1-s1-a1" data-anno-side="bottom" data-anno-target="[data-m=&quot;all-read&quot;]" style="--anno-x:50%;--anno-y:40%"><button class="anno-pin" type="button" data-anno-pin="r1-d1-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d1-s1-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r1-d1-s1-a1" data-anno-bubble="r1-d1-s1-a1" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r1-d1-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d1-s1-a1"><span class="anno-bubble-question">Reicht dir ein Knopf „Alles gelesen“, oder willst du jede Patch-Note einzeln abhaken können (beides ist hier drin)?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d1-s1-a1" data-annotation="r1-d1-s1-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d1-s1-a1"></div></div></div></div><div class="anno" data-anno="r1-d1-s1-a2" data-anno-side="right" data-anno-target="[data-m=&quot;row-new&quot;] .mock-sl" style="--anno-x:50%;--anno-y:40%"><button class="anno-pin" type="button" data-anno-pin="r1-d1-s1-a2" aria-expanded="false" aria-controls="anno-bubble-r1-d1-s1-a2" aria-label="{{anno.pin_label}}">2</button><div class="anno-bubble" id="anno-bubble-r1-d1-s1-a2" data-anno-bubble="r1-d1-s1-a2" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r1-d1-s1-a2" aria-expanded="false" aria-controls="anno-bubble-r1-d1-s1-a2"><span class="anno-bubble-question">4.10.3 ist erst im PTU. Soll oben immer der neueste Build stehen (auch PTU), oder nur, was schon live spielbar ist?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d1-s1-a2" data-annotation="r1-d1-s1-a2" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d1-s1-a2"></div></div></div></div><div class="anno" data-anno="r1-d1-s1-a3" data-anno-side="bottom" data-anno-target="[data-m=&quot;bundle&quot;] summary b" style="--anno-x:50%;--anno-y:40%"><button class="anno-pin" type="button" data-anno-pin="r1-d1-s1-a3" aria-expanded="false" aria-controls="anno-bubble-r1-d1-s1-a3" aria-label="{{anno.pin_label}}">3</button><div class="anno-bubble" id="anno-bubble-r1-d1-s1-a3" data-anno-bubble="r1-d1-s1-a3" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r1-d1-s1-a3" aria-expanded="false" aria-controls="anno-bubble-r1-d1-s1-a3"><span class="anno-bubble-question">Die kleinen Patches darunter sind zu einer Zeile gebündelt (Klick klappt auf). Reicht die Liste, oder willst du zusätzlich eine zusammengefasste Änderungsliste über alle vier?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d1-s1-a3" data-annotation="r1-d1-s1-a3" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d1-s1-a3"></div></div></div></div></div></section>
+<section id="d1-s2" data-nav-label="Alles gelesen" data-screen hidden><div class="mock-pb d1"><div class="mock-top"><span>Verse</span><span>›</span><b>Patches</b><span class="mock-search">Patches durchsuchen …</span></div><div class="mock-page">
+  <div class="d1-done" data-m="done"><b>✓ Du bist auf Stand</b><span>Zuletzt gelesen: 4.10.3 · heute 17:52</span><a class="mock-btn mock-quiet" data-screen-link="prev">Rückgängig</a></div>
+  <div class="mock-stack">
+    <div class="mock-node mock-next"><div class="mock-card">
+  <div class="mock-ch"><span class="mock-status">Als Nächstes<small>Q4 2026</small></span><span class="mock-ver">Alpha 4.11</span>
+    <span class="mock-sent"><b>PTU erwartet in ~3 Wochen</b><span class="mock-teaser"><i></i><i></i><i></i><i></i><i></i><i class="mock-rest">…</i></span></span><span></span></div>
+  <div class="mock-inset"><span><b>Nächster Live-Patch ~ 16. Dez.</b> · in ~5 Wochen · im üblichen Takt</span><div class="mock-rail"></div><span>Alpha 4.10 live seit 7. Okt. · üblich 68 Tage · Alpha 4.11</span></div>
+</div></div>
+    <div class="mock-node mock-live"><div class="mock-card"><div class="mock-ch"><span class="mock-status">Live<small>seit 34 Tagen</small></span><span class="mock-ver">Alpha 4.10</span>
+    <span class="mock-sent"><b>Seit 7. Okt. live</b><span>2 Hotfixes, letzter 29. Okt. · nächster Live-Patch in ~5 Wochen (Schätzung)</span></span><span class="mock-chip">78 % stabil</span></div>
+      <div class="mock-subs"><span class="mock-subs-h">Versionen von 4.10</span>
+        <a class="mock-sv"><span class="mock-dot mock-read">✓</span><span class="mock-sl">4.10.3</span><span class="mock-svt">Alpha 4.10.3 PTU Patch Notes</span><span class="mock-tags"><span class="mock-tag mock-t-ptu">PTU</span></span><em>noch früh</em><time>vor 2 Std.</time></a>
+        <details class="mock-bundle" data-m="bundle"><summary><b>4 frühere Updates der 4.10</b> 4.10.2 Hotfix · 4.10.2 · 4.10.1 · 4.10.0<span>alle gelesen ✓</span></summary><a class="mock-sv"><span class="mock-dot mock-read">✓</span><span class="mock-sl">4.10.2</span><span class="mock-svt">Alpha 4.10.2 Hotfix</span><span class="mock-tags"><span class="mock-tag mock-t-live">Live</span><span class="mock-tag">Hotfix</span></span><span class="mock-chip">81 %</span><time>vor 12 Tagen</time></a><a class="mock-sv"><span class="mock-dot mock-read">✓</span><span class="mock-sl">4.10.2</span><span class="mock-svt">Alpha 4.10.2 LIVE Patch Notes</span><span class="mock-tags"><span class="mock-tag mock-t-live">Live</span></span><span class="mock-chip">74 %</span><time>vor 3 Wochen</time></a><a class="mock-sv"><span class="mock-dot mock-read">✓</span><span class="mock-sl">4.10.1</span><span class="mock-svt">Alpha 4.10.1 LIVE Patch Notes</span><span class="mock-tags"><span class="mock-tag mock-t-live">Live</span></span><span class="mock-chip">69 %</span><time>vor 4 Wochen</time></a><a class="mock-sv"><span class="mock-dot mock-read">✓</span><span class="mock-sl">4.10.0</span><span class="mock-svt">Alpha 4.10.0 LIVE Release Notes</span><span class="mock-tags"><span class="mock-tag mock-t-live">Live</span></span><span class="mock-chip">62 %</span><time>vor 5 Wochen</time></a><span class="mock-more">5 frühere Test-Builds anzeigen</span></details>
+      </div></div></div>
+    <div class="mock-node mock-old"><div class="mock-card">
+  <div class="mock-ch"><span class="mock-status">Abgelöst<small>am 7. Okt.</small></span><span class="mock-ver">Alpha 4.9</span>
+    <span class="mock-sent"><b>Live 12. Aug. – 7. Okt.</b><span>3 Hotfixes, letzter 24. Sept.</span></span><span class="mock-chip">84 % stabil</span></div>
+  <div class="mock-subs"><span class="mock-more">6 Versionen anzeigen</span></div>
+</div></div><div class="mock-node"><div class="mock-fold">Ältere Patches · 4.8 · 4.7 · 4.6</div></div>
+  </div></div></div>
+<div class="anno-layer" data-anno-layer><div class="anno" data-anno="r1-d1-s2-a1" data-anno-side="bottom" data-anno-target="[data-m=&quot;done&quot;] b" style="--anno-x:50%;--anno-y:40%"><button class="anno-pin" type="button" data-anno-pin="r1-d1-s2-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d1-s2-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r1-d1-s2-a1" data-anno-bubble="r1-d1-s2-a1" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r1-d1-s2-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d1-s2-a1"><span class="anno-bubble-question">Wenn alles gelesen ist, schrumpft die Leiste auf diese eine Zeile. Soll sie dann ganz verschwinden, oder ist die Bestätigung so richtig?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d1-s2-a1" data-annotation="r1-d1-s2-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d1-s2-a1"></div></div></div></div></div></section>
+</section>
+
+<section data-design="d2" data-nav-label="Live-Karte mit neuestem Stand" hidden data-screen-fit="full" data-design-motto="Die Live-Karte zeigt, was 4.10.3 ändert" data-design-traits="Keine Extra-Leiste: die Änderungen stehen in drei Spalten direkt auf der Live-Karte|Nach „Gelesen“ fällt die Karte auf zwei Zeilen zusammen|Frühere kleine Patches als eine Zeile aus Marken mit Haken statt als Tabelle" data-design-icon="&lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot;&gt;&lt;rect x=&quot;3&quot; y=&quot;5&quot; width=&quot;18&quot; height=&quot;14&quot; rx=&quot;2&quot;/&gt;&lt;path d=&quot;M7 10h10M7 14h6&quot;/&gt;&lt;/svg&gt;" data-design-color="#3fd08a" data-ov-fit="component" data-ov-demo=".d2-card">
+<section id="d2-s1" data-nav-label="Neues ungelesen" data-screen data-screen-active="true"><div class="mock-pb d2"><div class="mock-top"><span>Verse</span><span>›</span><b>Patches</b><span class="mock-search">Patches durchsuchen …</span></div><div class="mock-page">
+  <div class="mock-stack">
+    <div class="mock-node mock-next"><div class="mock-card">
+  <div class="mock-ch"><span class="mock-status">Als Nächstes<small>Q4 2026</small></span><span class="mock-ver">Alpha 4.11</span>
+    <span class="mock-sent"><b>PTU erwartet in ~3 Wochen</b><span class="d2-hint"><span class="mock-new">Neu</span> 2 Roadmap-Einträge seit deinem letzten Besuch</span><span class="mock-teaser"><i></i><i></i><i></i><i></i><i></i><i class="mock-rest">…</i></span></span><span></span></div>
+  <div class="mock-inset"><span><b>Nächster Live-Patch ~ 16. Dez.</b> · in ~5 Wochen · im üblichen Takt</span><div class="mock-rail"></div><span>Alpha 4.10 live seit 7. Okt. · üblich 68 Tage · Alpha 4.11</span></div>
+</div></div>
+    <div class="mock-node mock-live"><div class="mock-card d2-card d2-unread"><div class="mock-ch"><span class="mock-status">Live<small>seit 34 Tagen</small></span><span class="mock-ver d2-ver">Alpha 4.10<small>neuester Stand <b>4.10.3</b></small></span>
+    <span class="mock-sent"><b>Seit 7. Okt. live</b><span>2 Hotfixes, letzter 29. Okt. · nächster Live-Patch in ~5 Wochen (Schätzung)</span></span><span class="mock-chip">78 % stabil</span></div>
+      <div class="d2-delta" data-m="delta">
+        <div class="d2-delta-h"><span class="mock-new">Neu für dich</span><h3>Das ändert 4.10.3</h3><span class="mock-tag mock-t-ptu">PTU</span><time>vor 2 Std.</time></div>
+        <div class="d2-cols">
+          <div><h4>Neu · 2</h4><ul class="mock-list"><li>Neue Waffe: LBCO Skarnov Rifle</li><li>Neue Missionen: Vanduul Incursion</li></ul></div>
+          <div><h4>Behoben · 2</h4><ul class="mock-list"><li class="mock-fix">Performance und Feinschliff für IAE und Vanduul Incursion</li><li class="mock-fix">4-GB-Grenze des Vulkan-Pipeline-Caches entfernt</li></ul></div>
+          <div><h4>Bekannte Probleme · 2</h4><ul class="mock-list"><li class="mock-known">mobiGlas-Karte ruckelt in Pyro</li><li class="mock-known">ASOP-Terminal braucht teils zwei Versuche</li></ul></div>
+        </div>
+        <div class="d2-act"><a class="mock-btn mock-primary" data-screen-link="next" data-m="read">✓ Gelesen</a><a class="mock-btn">Im Dossier lesen →</a><span>Lesezeit ~1 Min.</span></div>
+      </div>
+      <div class="d2-trail" data-m="trail"><span>Verlauf:</span><a class="d2-cur">4.10.3 </a><a>4.10.2 Hotfix <i>✓</i></a><a>4.10.2 <i>✓</i></a><a>4.10.1 <i>✓</i></a><a>4.10.0 <i>✓</i></a><span class="mock-more" style="padding:0 4px">+ 5 Test-Builds</span></div>
+    </div></div>
+    <div class="mock-node mock-old"><div class="mock-card">
+  <div class="mock-ch"><span class="mock-status">Abgelöst<small>am 7. Okt.</small></span><span class="mock-ver">Alpha 4.9</span>
+    <span class="mock-sent"><b>Live 12. Aug. – 7. Okt.</b><span>3 Hotfixes, letzter 24. Sept.</span></span><span class="mock-chip">84 % stabil</span></div>
+  <div class="mock-subs"><span class="mock-more">6 Versionen anzeigen</span></div>
+</div></div><div class="mock-node"><div class="mock-fold">Ältere Patches · 4.8 · 4.7 · 4.6</div></div>
+  </div></div></div>
+<div class="anno-layer" data-anno-layer><div class="anno" data-anno="r1-d2-s1-a1" data-anno-side="top" data-anno-target="[data-m=&quot;delta&quot;] h3" style="--anno-x:50%;--anno-y:40%"><button class="anno-pin" type="button" data-anno-pin="r1-d2-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d2-s1-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r1-d2-s1-a1" data-anno-bubble="r1-d2-s1-a1" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r1-d2-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d2-s1-a1"><span class="anno-bubble-question">Die Änderungen stehen direkt auf der Karte, ohne Klick ins Dossier. Sind drei Spalten (Neu / Behoben / Bekannte Probleme) die richtige Kürzung, oder willst du hier den vollen Text?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d2-s1-a1" data-annotation="r1-d2-s1-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d2-s1-a1"></div></div></div></div><div class="anno" data-anno="r1-d2-s1-a2" data-anno-side="right" data-anno-target="[data-m=&quot;read&quot;]" style="--anno-x:50%;--anno-y:40%"><button class="anno-pin" type="button" data-anno-pin="r1-d2-s1-a2" aria-expanded="false" aria-controls="anno-bubble-r1-d2-s1-a2" aria-label="{{anno.pin_label}}">2</button><div class="anno-bubble" id="anno-bubble-r1-d2-s1-a2" data-anno-bubble="r1-d2-s1-a2" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r1-d2-s1-a2" aria-expanded="false" aria-controls="anno-bubble-r1-d2-s1-a2"><span class="anno-bubble-question">Soll „gelesen“ erst mit diesem Klick gelten, oder schon automatisch, sobald du die Seite ein paar Sekunden offen hattest?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d2-s1-a2" data-annotation="r1-d2-s1-a2" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d2-s1-a2"></div></div></div></div><div class="anno" data-anno="r1-d2-s1-a3" data-anno-side="bottom" data-anno-target="[data-m=&quot;trail&quot;] span" style="--anno-x:50%;--anno-y:40%"><button class="anno-pin" type="button" data-anno-pin="r1-d2-s1-a3" aria-expanded="false" aria-controls="anno-bubble-r1-d2-s1-a3" aria-label="{{anno.pin_label}}">3</button><div class="anno-bubble" id="anno-bubble-r1-d2-s1-a3" data-anno-bubble="r1-d2-s1-a3" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r1-d2-s1-a3" aria-expanded="false" aria-controls="anno-bubble-r1-d2-s1-a3"><span class="anno-bubble-question">Die früheren kleinen Patches sind nur noch eine Zeile aus Marken. Reicht das, oder brauchst du pro Version wieder Stabilität und Datum wie heute?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d2-s1-a3" data-annotation="r1-d2-s1-a3" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d2-s1-a3"></div></div></div></div></div></section>
+<section id="d2-s2" data-nav-label="Alles gelesen" data-screen hidden><div class="mock-pb d2"><div class="mock-top"><span>Verse</span><span>›</span><b>Patches</b><span class="mock-search">Patches durchsuchen …</span></div><div class="mock-page">
+  <div class="mock-stack">
+    <div class="mock-node mock-next"><div class="mock-card">
+  <div class="mock-ch"><span class="mock-status">Als Nächstes<small>Q4 2026</small></span><span class="mock-ver">Alpha 4.11</span>
+    <span class="mock-sent"><b>PTU erwartet in ~3 Wochen</b><span class="mock-teaser"><i></i><i></i><i></i><i></i><i></i><i class="mock-rest">…</i></span></span><span></span></div>
+  <div class="mock-inset"><span><b>Nächster Live-Patch ~ 16. Dez.</b> · in ~5 Wochen · im üblichen Takt</span><div class="mock-rail"></div><span>Alpha 4.10 live seit 7. Okt. · üblich 68 Tage · Alpha 4.11</span></div>
+</div></div>
+    <div class="mock-node mock-live"><div class="mock-card d2-card"><div class="mock-ch"><span class="mock-status">Live<small>seit 34 Tagen</small></span><span class="mock-ver d2-ver">Alpha 4.10<small>neuester Stand <b>4.10.3</b></small></span>
+    <span class="mock-sent"><b>Seit 7. Okt. live</b><span>2 Hotfixes, letzter 29. Okt. · nächster Live-Patch in ~5 Wochen (Schätzung)</span></span><span class="mock-chip">78 % stabil</span></div>
+      <div class="d2-readline" data-m="readline"><b>✓ 4.10.3 gelesen</b><span>heute 17:52 · seitdem nichts Neues</span><a class="mock-btn mock-quiet" data-screen-link="prev">Nochmal lesen</a></div>
+      <div class="d2-trail" data-m="trail"><span>Verlauf:</span><a class="">4.10.3 <i>✓</i></a><a>4.10.2 Hotfix <i>✓</i></a><a>4.10.2 <i>✓</i></a><a>4.10.1 <i>✓</i></a><a>4.10.0 <i>✓</i></a><span class="mock-more" style="padding:0 4px">+ 5 Test-Builds</span></div>
+    </div></div>
+    <div class="mock-node mock-old"><div class="mock-card">
+  <div class="mock-ch"><span class="mock-status">Abgelöst<small>am 7. Okt.</small></span><span class="mock-ver">Alpha 4.9</span>
+    <span class="mock-sent"><b>Live 12. Aug. – 7. Okt.</b><span>3 Hotfixes, letzter 24. Sept.</span></span><span class="mock-chip">84 % stabil</span></div>
+  <div class="mock-subs"><span class="mock-more">6 Versionen anzeigen</span></div>
+</div></div><div class="mock-node"><div class="mock-fold">Ältere Patches · 4.8 · 4.7 · 4.6</div></div>
+  </div></div></div>
+<div class="anno-layer" data-anno-layer><div class="anno" data-anno="r1-d2-s2-a1" data-anno-side="bottom" data-anno-target="[data-m=&quot;readline&quot;] b" style="--anno-x:50%;--anno-y:40%"><button class="anno-pin" type="button" data-anno-pin="r1-d2-s2-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d2-s2-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r1-d2-s2-a1" data-anno-bubble="r1-d2-s2-a1" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r1-d2-s2-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d2-s2-a1"><span class="anno-bubble-question">Nach dem Lesen fällt die Karte auf zwei Zeilen zusammen. Zu wenig (du willst die drei Spalten weiter sehen), oder genau richtig ruhig?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d2-s2-a1" data-annotation="r1-d2-s2-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d2-s2-a1"></div></div></div></div></div></section>
+</section>
+
+<section data-design="d3" data-nav-label="Liste links, Lesen rechts" hidden data-screen-fit="full" data-design-motto="Zwei Spalten wie ein Postfach" data-design-traits="Links alle Versionen als schmale Liste mit Ungelesen-Punkten, rechts der volle Text|„Gelesen &amp; weiter“ springt zur nächsten ungelesenen Note, Tasten J / K blättern|Filter Ungelesen / Alle, kleine Patches als Spanne 4.10.0 – 4.10.2" data-design-icon="&lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot;&gt;&lt;rect x=&quot;3&quot; y=&quot;4&quot; width=&quot;18&quot; height=&quot;16&quot; rx=&quot;2&quot;/&gt;&lt;path d=&quot;M9 4v16M12 9h6M12 13h6&quot;/&gt;&lt;/svg&gt;" data-design-color="#c58af9" data-ov-fit="component" data-ov-demo=".d3-split">
+<section id="d3-s1" data-nav-label="Neues ungelesen" data-screen data-screen-active="true"><div class="mock-pb d3"><div class="mock-top"><span>Verse</span><span>›</span><b>Patches</b><span class="mock-search">Patches durchsuchen …</span></div><div class="mock-page"><div class="d3-split">
+  <aside class="d3-side">
+    <div class="d3-filter" data-m="filter"><span class="d3-on">Ungelesen · 2</span><span class="">Alle</span></div>
+    <div class="d3-group">Alpha 4.11 <span class="mock-tag mock-t-ptu">Als Nächstes</span></div>
+    <a class="d3-row d3-unread"><span class="mock-dot mock-unread"></span><b>4.11</b><span>2 neue Roadmap-Einträge</span><time>gestern</time></a>
+    <div class="d3-group">Alpha 4.10 <span class="mock-tag mock-t-live">Live</span></div>
+    <a class="d3-row d3-unread d3-sel" data-m="row-sel"><span class="mock-dot mock-unread"></span><b>4.10.3</b><span>PTU Patch Notes</span><time>2 Std.</time></a>
+    <details class="mock-bundle" data-m="bundle"><summary><b>4.10.0 – 4.10.2</b><span>4 gelesen ✓</span></summary>
+      <a class="d3-row"><span class="mock-dot"></span><b>4.10.2</b><span>Hotfix</span><time>12 Tg.</time></a>
+      <a class="d3-row"><span class="mock-dot"></span><b>4.10.2</b><span>LIVE Patch Notes</span><time>3 Wo.</time></a>
+      <a class="d3-row"><span class="mock-dot"></span><b>4.10.1</b><span>LIVE Patch Notes</span><time>4 Wo.</time></a>
+      <a class="d3-row"><span class="mock-dot"></span><b>4.10.0</b><span>LIVE Release Notes</span><time>5 Wo.</time></a>
+    </details>
+    <div class="d3-group">Alpha 4.9 <span class="mock-tag">Abgelöst</span></div>
+    <details class="mock-bundle"><summary><b>4.9.0 – 4.9.2</b><span>6 gelesen ✓</span></summary></details>
+    <div class="mock-fold">Ältere Patches · 4.8 · 4.7 · 4.6</div>
+  </aside>
+  <article class="d3-pane">
+    <div class="d3-pane-h"><h2>Alpha 4.10.3</h2><span class="mock-tag mock-t-ptu">PTU</span><span class="mock-chip mock-early">Stabilität: noch früh</span><time>veröffentlicht vor 2 Std.</time></div>
+    <div class="d3-body">
+      <div><h3>Neu · 2</h3><ul class="mock-list"><li>Neue Waffe: LBCO Skarnov Rifle</li><li>Neue Missionen: Vanduul Incursion</li></ul></div>
+      <div><h3>Behoben · 2</h3><ul class="mock-list"><li class="mock-fix">Performance und Feinschliff für IAE und Vanduul Incursion</li><li class="mock-fix">4-GB-Grenze des Vulkan-Pipeline-Caches entfernt</li></ul></div>
+      <div><h3>Bekannte Probleme · 2</h3><ul class="mock-list"><li class="mock-known">mobiGlas-Karte ruckelt in Pyro</li><li class="mock-known">ASOP-Terminal braucht teils zwei Versuche</li></ul></div>
+      <div><a class="mock-btn mock-quiet">Original auf Spectrum ↗</a><a class="mock-btn mock-quiet">Ganzes Dossier zu 4.10 →</a></div>
+    </div>
+    <div class="d3-bar" data-m="bar"><a class="mock-btn mock-primary" data-screen-link="next" data-m="next">✓ Gelesen &amp; weiter</a><a class="mock-btn">Später</a><span>1 von 2 ungelesen · <i class="d3-kbd">J</i> <i class="d3-kbd">K</i> blättern</span></div>
+  </article>
+</div></div></div>
+<div class="anno-layer" data-anno-layer><div class="anno" data-anno="r1-d3-s1-a1" data-anno-side="top" data-anno-target="[data-m=&quot;next&quot;]" style="--anno-x:50%;--anno-y:40%"><button class="anno-pin" type="button" data-anno-pin="r1-d3-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d3-s1-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r1-d3-s1-a1" data-anno-bubble="r1-d3-s1-a1" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r1-d3-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d3-s1-a1"><span class="anno-bubble-question">„Gelesen &amp; weiter“ hakt ab und springt zur nächsten ungelesenen Note. Willst du so durchklicken, oder lieber frei in der Liste wählen und nur abhaken?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d3-s1-a1" data-annotation="r1-d3-s1-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d3-s1-a1"></div></div></div></div><div class="anno" data-anno="r1-d3-s1-a2" data-anno-side="right" data-anno-target="[data-m=&quot;filter&quot;] span" style="--anno-x:50%;--anno-y:40%"><button class="anno-pin" type="button" data-anno-pin="r1-d3-s1-a2" aria-expanded="false" aria-controls="anno-bubble-r1-d3-s1-a2" aria-label="{{anno.pin_label}}">2</button><div class="anno-bubble" id="anno-bubble-r1-d3-s1-a2" data-anno-bubble="r1-d3-s1-a2" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r1-d3-s1-a2" aria-expanded="false" aria-controls="anno-bubble-r1-d3-s1-a2"><span class="anno-bubble-question">Die Liste startet auf „Ungelesen“. Richtig so, oder soll sie immer alle Versionen zeigen und Ungelesenes nur hervorheben?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d3-s1-a2" data-annotation="r1-d3-s1-a2" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d3-s1-a2"></div></div></div></div><div class="anno" data-anno="r1-d3-s1-a3" data-anno-side="right" data-anno-target="[data-m=&quot;bundle&quot;] summary b" style="--anno-x:50%;--anno-y:40%"><button class="anno-pin" type="button" data-anno-pin="r1-d3-s1-a3" aria-expanded="false" aria-controls="anno-bubble-r1-d3-s1-a3" aria-label="{{anno.pin_label}}">3</button><div class="anno-bubble" id="anno-bubble-r1-d3-s1-a3" data-anno-bubble="r1-d3-s1-a3" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r1-d3-s1-a3" aria-expanded="false" aria-controls="anno-bubble-r1-d3-s1-a3"><span class="anno-bubble-question">Kleine Patches sind als Spanne „4.10.0 – 4.10.2“ gebündelt. Soll ein Klick darauf rechts eine zusammengefasste Sicht aller vier zeigen, oder nur die Liste aufklappen?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d3-s1-a3" data-annotation="r1-d3-s1-a3" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d3-s1-a3"></div></div></div></div></div></section>
+<section id="d3-s2" data-nav-label="Alles gelesen" data-screen hidden><div class="mock-pb d3"><div class="mock-top"><span>Verse</span><span>›</span><b>Patches</b><span class="mock-search">Patches durchsuchen …</span></div><div class="mock-page"><div class="d3-split">
+  <aside class="d3-side">
+    <div class="d3-filter" data-m="filter"><span class="">Ungelesen · 0</span><span class="d3-on">Alle</span></div>
+    <div class="d3-group">Alpha 4.11 <span class="mock-tag mock-t-ptu">Als Nächstes</span></div>
+    <a class="d3-row"><span class="mock-dot"></span><b>4.11</b><span>2 neue Roadmap-Einträge</span><time>gestern</time></a>
+    <div class="d3-group">Alpha 4.10 <span class="mock-tag mock-t-live">Live</span></div>
+    <a class="d3-row" data-m="row-sel"><span class="mock-dot"></span><b>4.10.3</b><span>PTU Patch Notes</span><time>2 Std.</time></a>
+    <details class="mock-bundle" data-m="bundle"><summary><b>4.10.0 – 4.10.2</b><span>4 gelesen ✓</span></summary>
+      <a class="d3-row"><span class="mock-dot"></span><b>4.10.2</b><span>Hotfix</span><time>12 Tg.</time></a>
+      <a class="d3-row"><span class="mock-dot"></span><b>4.10.2</b><span>LIVE Patch Notes</span><time>3 Wo.</time></a>
+      <a class="d3-row"><span class="mock-dot"></span><b>4.10.1</b><span>LIVE Patch Notes</span><time>4 Wo.</time></a>
+      <a class="d3-row"><span class="mock-dot"></span><b>4.10.0</b><span>LIVE Release Notes</span><time>5 Wo.</time></a>
+    </details>
+    <div class="d3-group">Alpha 4.9 <span class="mock-tag">Abgelöst</span></div>
+    <details class="mock-bundle"><summary><b>4.9.0 – 4.9.2</b><span>6 gelesen ✓</span></summary></details>
+    <div class="mock-fold">Ältere Patches · 4.8 · 4.7 · 4.6</div>
+  </aside>
+  <article class="d3-pane">
+    <div class="d3-body d3-calm" data-m="calm">
+      <span class="d3-check">✓</span><h2>Alles gelesen</h2>
+      <p>Du kennst jeden Stand bis 4.10.3. Sobald RSI etwas Neues veröffentlicht, steht es hier oben.</p>
+      <div class="d3-facts"><div><b>4.10 live</b>seit 34 Tagen · 78 % stabil</div><div><b>~ 16. Dez.</b>nächster Live-Patch (Schätzung)</div><div><b>4.11</b>PTU erwartet in ~3 Wochen</div></div>
+      <a class="mock-btn mock-quiet" data-screen-link="prev">4.10.3 nochmal öffnen</a>
+    </div>
+  </article>
+</div></div></div>
+<div class="anno-layer" data-anno-layer><div class="anno" data-anno="r1-d3-s2-a1" data-anno-side="top" data-anno-target="[data-m=&quot;calm&quot;] h2" style="--anno-x:50%;--anno-y:40%"><button class="anno-pin" type="button" data-anno-pin="r1-d3-s2-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d3-s2-a1" aria-label="{{anno.pin_label}}">1</button><div class="anno-bubble" id="anno-bubble-r1-d3-s2-a1" data-anno-bubble="r1-d3-s2-a1" data-open="false"><button type="button" class="anno-bubble-summary" data-anno-summary="r1-d3-s2-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d3-s2-a1"><span class="anno-bubble-question">Ist alles gelesen, zeigt die rechte Seite den Lagebericht (Live-Stand, nächster Patch). Passt das, oder soll dort immer die neueste Note offen bleiben?</span></button><div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d3-s2-a1" data-annotation="r1-d3-s2-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d3-s2-a1"></div></div></div></div></div></section>
+</section>
+</section>
