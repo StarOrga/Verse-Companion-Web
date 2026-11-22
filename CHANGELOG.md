@@ -4,6 +4,12 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.297.2] - 2026-11-22
+
+### Fixed
+- Game strings of a new build reach the server one language at a time. For 4.10.3 the step had died after the upload, so no language arrived and every AI translation of that build failed with "English source texts missing".
+- AI translation: a full run on a build without English texts is refused at once instead of creating a job that fails. Jobs ended by hand show "Ended by hand" instead of "Unknown error".
+
 ## [0.297.1] - 2026-11-22
 
 ### Fixed

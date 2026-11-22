@@ -4542,6 +4542,7 @@
       },
       "jobErrors": {
         "unknown": "Unknown error in the translation job.",
+        "manual": "Ended by hand, outside the pipeline.",
         "base_build_missing": "The comparison build is missing.",
         "conflict": "The job was changed in parallel. Please reload.",
         "english_missing": "The English source strings are missing.",
