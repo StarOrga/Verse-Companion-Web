@@ -58,8 +58,13 @@ export const WORLD_RECTS: Readonly<Record<'planet' | 'news' | 'patches' | 'galle
 };
 
 const VERSE: CameraPose = { s: 1, x: -100, y: -50 };
-/** News: the planet big at the left edge (mock `d5-news-cam` end). */
-const NEWS: CameraPose = { s: 7.8571, x: -106.756, y: -81.801 };
+/**
+ * News, Patches, Galerie: the door planet at the left edge, only its rim inside the page
+ * (patch board concept 20261110-1749, round 4 mock at 1895 px: 580 px wide, left -400 px,
+ * top 70 px = frame x -21.1 vw, y 3.7 vw, w 30.6 vw). The owner asked for exactly that size
+ * on News and Patches alike (2026-11-22, "damit wir wieder einheitlich sind").
+ */
+const NEWS: CameraPose = { s: 5.1, x: -107.575, y: -82.2125 };
 
 /**
  * The pose that puts `rect` where the News pose puts the News planet (big,
@@ -79,7 +84,7 @@ export function framedLikeNews(rect: readonly [number, number, number, number]):
  * planet grows to the LEFT: its right (inner) edge and its vertical centre stay
  * where the News frame puts them, so it never moves further under the page.
  */
-export const PATCHES_PLANET_GROW = 1.3;
+export const PATCHES_PLANET_GROW = 1;
 
 /**
  * How far the grown Patches planet steps OUT of the page, as a share of the News
@@ -88,7 +93,7 @@ export const PATCHES_PLANET_GROW = 1.3;
  * 2026-11-21: it covered the first letters of the 4.10.3 bullets), so its inner
  * edge moves outwards — never further in.
  */
-export const PATCHES_PLANET_OUT = 0.06;
+export const PATCHES_PLANET_OUT = 0;
 
 /** Screen frame of a door planet: News-like, grown leftwards around its centre line, inner edge moved out by `out`. */
 function grownFrame(grow: number, out = 0): { x: number; y: number; w: number } {
