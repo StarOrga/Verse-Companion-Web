@@ -1,7 +1,53 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.293.0",
+  "current": "0.294.0",
   "releases": [
+    {
+      "version": "0.294.0",
+      "date": "2026-11-22",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "The web app speaks thirteen more languages: Spanish (Spain and Latin America), French, Hindi, Italian, Japanese, Korean, Polish, Brazilian Portuguese, Russian, Turkish, Simplified and Traditional Chinese. The browser language is detected; the choice is saved to the profile."
+            },
+            {
+              "title": "",
+              "text": "Desktop app language packs: Latin American Spanish, Turkish and Traditional Chinese, all packs proofread. Web and desktop app now offer the same languages."
+            }
+          ]
+        },
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Translation cost estimates in the game-string pipeline used list prices for batch jobs and showed twice the real cost."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.293.1",
+      "date": "2026-11-22",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Feedback routine: a topic is marked shipped only when the requested change is done; a ship reply never ends in an open question (decided default stated as fact, or the topic is parked as a question instead)."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.293.0",
       "date": "2026-11-22",
