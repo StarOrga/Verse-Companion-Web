@@ -6893,6 +6893,62 @@
           "scrap": "Zerlegen",
           "actions": "Aktionen"
         }
+      },
+      "here": {
+        "none": "Kein Standort",
+        "title": "Mein Standort",
+        "field": "Ort suchen",
+        "clear": "Kein Standort",
+        "appWins": "Die App meldet deinen Ort. Ein Ort von Hand gilt, bis die App wieder einen meldet.",
+        "tipNone": "Kein Standort: Setz ihn hier, dann reiht die Suche nach Flugminuten.",
+        "tipApp": "Live aus der App: {{place}}",
+        "tipManual": "Von dir gesetzt: {{place}}. Gilt, bis du ihn änderst."
+      },
+      "lager": {
+        "aria": "Lager durchsuchen",
+        "item": "Gegenstand oder Ort",
+        "ort": "Ort",
+        "qty": "Menge ({{unit}})",
+        "add": "Einlagern",
+        "out": "Rausnehmen",
+        "addTip": "{{qty}} {{name}} in {{place}} einlagern",
+        "outTip": "{{qty}} {{name}} aus {{place}} rausnehmen",
+        "why": {
+          "noItem": "Erst einen Gegenstand eingeben",
+          "unknown": "Unbekannter Gegenstand: Nur Namen aus deinem Lager. Neues über „Gegenstand hinzufügen“.",
+          "noPlace": "Kein Ort: Feld Ort füllen oder oben deinen Standort setzen",
+          "tooMuch": "In {{place}} liegen nur {{have}}",
+          "nothingThere": "In {{place}} liegt kein {{name}}"
+        },
+        "from": {
+          "ort": "Gemessen ab {{place}} (Ort aus der Suche)",
+          "app": "Gemessen ab {{place}} (Standort live aus der App)",
+          "manual": "Gemessen ab {{place}} (Standort von Hand)",
+          "none": "Ohne Standort: Orte nach Menge geordnet"
+        },
+        "filterAria": "Filter der Mengen-Suche",
+        "maxStops": "Höchstens Stopps",
+        "balance": "Abwägung",
+        "bal": {
+          "oneStop": "Lieber ein Stopp",
+          "balanced": "Ausgewogen",
+          "shortest": "Kürzester Weg"
+        },
+        "results": "Treffer im Lager",
+        "total": "{{qty}} an {{n}} Orten",
+        "min": "≈ {{n}} min",
+        "minSplit": "Flug {{fly}} · Anflug {{appr}}",
+        "multi": "{{n}} Stopps · hier musst du {{n}}× fliegen",
+        "more": "{{n}} weitere",
+        "short": "Nur {{total}} von {{want}} im Lager",
+        "places": "Orte von {{name}}",
+        "none": "Nichts im Lager passt dazu.",
+        "editAria": "{{name}} in {{place}} ändern",
+        "editHave": "{{qty}} in {{place}}",
+        "editAmount": "Menge",
+        "addHere": "Hier einlagern",
+        "doneAdd": "{{qty}} {{name}} in {{place}} eingelagert",
+        "doneOut": "{{qty}} {{name}} aus {{place}} rausgenommen"
       }
     },
     "nachschub": {

@@ -6893,6 +6893,62 @@
           "scrap": "Dismantle",
           "actions": "Actions"
         }
+      },
+      "here": {
+        "none": "No location",
+        "title": "My location",
+        "field": "Find a place",
+        "clear": "No location",
+        "appWins": "The app reports your place. A place set by hand holds until the app reports one again.",
+        "tipNone": "No location: set it here and the search ranks by flight minutes.",
+        "tipApp": "Live from the app: {{place}}",
+        "tipManual": "Set by you: {{place}}. Holds until you change it."
+      },
+      "lager": {
+        "aria": "Search storage",
+        "item": "Item or place",
+        "ort": "Place",
+        "qty": "Amount ({{unit}})",
+        "add": "Store",
+        "out": "Take out",
+        "addTip": "Store {{qty}} {{name}} at {{place}}",
+        "outTip": "Take {{qty}} {{name}} out of {{place}}",
+        "why": {
+          "noItem": "Enter an item first",
+          "unknown": "Unknown item: only names from your storage. Add new ones via “Add item”.",
+          "noPlace": "No place: fill the Place field or set your location at the top",
+          "tooMuch": "Only {{have}} at {{place}}",
+          "nothingThere": "No {{name}} at {{place}}"
+        },
+        "from": {
+          "ort": "Measured from {{place}} (place from the search)",
+          "app": "Measured from {{place}} (location live from the app)",
+          "manual": "Measured from {{place}} (location set by hand)",
+          "none": "No location: places ordered by amount"
+        },
+        "filterAria": "Amount search filter",
+        "maxStops": "Max stops",
+        "balance": "Balance",
+        "bal": {
+          "oneStop": "Prefer one stop",
+          "balanced": "Balanced",
+          "shortest": "Shortest route"
+        },
+        "results": "Storage results",
+        "total": "{{qty}} at {{n}} places",
+        "min": "≈ {{n}} min",
+        "minSplit": "Flight {{fly}} · approach {{appr}}",
+        "multi": "{{n}} stops · you fly {{n}}×",
+        "more": "{{n}} more",
+        "short": "Only {{total}} of {{want}} in storage",
+        "places": "Places of {{name}}",
+        "none": "Nothing in storage matches.",
+        "editAria": "Change {{name}} at {{place}}",
+        "editHave": "{{qty}} at {{place}}",
+        "editAmount": "Amount",
+        "addHere": "Store here",
+        "doneAdd": "Stored {{qty}} {{name}} at {{place}}",
+        "doneOut": "Took {{qty}} {{name}} out of {{place}}"
       }
     },
     "nachschub": {
