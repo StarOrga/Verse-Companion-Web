@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.297.1] - 2026-11-22
+
+### Fixed
+- App connect page (Data Uploader / Starscape): the checkmark now sits exactly between the two orbs and the streak burst starts from it; the glow that lay over the footer is gone.
+
 ## [0.297.0] - 2026-11-22
 
 ### Added
