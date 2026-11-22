@@ -13,7 +13,17 @@ import { mintDesktopSession } from './desktop-session.util';
 
 const HANDED_OVER_MS = 2500;
 
-type AuthStatus = 'authorizing' | 'login_required' | 'redirecting' | 'error';
+type AuthStatus = 'authorizing' | 'login_required' | 'redirecting' | 'connected' | 'start' | 'error';
+
+/**
+ * Outcomes Starscape's loopback reports back via `?done=` after the hand-off
+ * (`wallpaper-app/src/auth.rs` → `handoff_redirect_url`). Anything else (e.g.
+ * `origin`) falls to the generic failure text.
+ */
+const DONE_ERRORS: Record<string, string> = {
+  csrf: 'desktopConnect.done.csrf',
+  no_token: 'desktopConnect.done.noToken',
+};
 
 /**
  * Desktop read-auth handoff — open to ANY signed-in user (no role gate).
@@ -31,6 +41,10 @@ type AuthStatus = 'authorizing' | 'login_required' | 'redirecting' | 'error';
  *     from Chrome's Private/Local Network Access block on subresource fetches).
  *     expires_at is the Supabase session.expires_at in UNIX SECONDS as a string;
  *     the app calls Number() on it.
+ *  4. Shows the outcome when the loopback sends the tab back here as
+ *     `?done=<outcome>` (Starscape ≥ 0.12.0, `wallpaper-app/src/auth.rs`), so
+ *     the hand-off ends in this stage, not on a bare loopback page. Older
+ *     builds still answer with their own page; nothing here depends on them.
  *
  * Distinct from /uploader/auth (collaborator-gated).  No RoleService import.
  */
@@ -41,7 +55,8 @@ type AuthStatus = 'authorizing' | 'login_required' | 'redirecting' | 'error';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <sc-app-link-stage app="starscape" [phase]="phase()">
-      <h1>{{ 'desktopConnect.title' | translate }}</h1>
+      <!-- Every state reads the same: one title (the call to action), one line of info, at most one action. -->
+      <h1>{{ title() | translate }}</h1>
       @switch (status()) {
         @case ('authorizing') {
           <p>{{ 'desktopConnect.authorizing' | translate }}</p>
@@ -55,19 +70,21 @@ type AuthStatus = 'authorizing' | 'login_required' | 'redirecting' | 'error';
           </div>
         }
         @case ('redirecting') {
-          @if (handedOver()) {
-            <p class="ok">{{ 'desktopConnect.handedOver' | translate }}</p>
-            <p class="hint">{{ 'desktopConnect.handedOverHint' | translate }}</p>
-          } @else {
-            <p class="ok">{{ 'desktopConnect.redirecting' | translate }}</p>
-            <p class="hint">{{ 'desktopConnect.redirectingHint' | translate }}</p>
-          }
+          <p>{{ (handedOver() ? 'desktopConnect.handedOverHint' : 'desktopConnect.redirecting') | translate }}</p>
+        }
+        @case ('connected') {
+          <p>{{ 'desktopConnect.connected' | translate }}</p>
+        }
+        @case ('start') {
+          <p>{{ 'desktopConnect.start' | translate }}</p>
         }
         @case ('error') {
           <p class="err">{{ errorMsg()! | translate }}</p>
-          <div class="actions">
-            <a scAction tier="secondary" [href]="returnUrl || '/'">{{ 'desktopConnect.retry' | translate }}</a>
-          </div>
+          @if (returnUrl) {
+            <div class="actions">
+              <a scAction tier="secondary" [href]="returnUrl">{{ 'desktopConnect.retry' | translate }}</a>
+            </div>
+          }
         }
       }
     </sc-app-link-stage>
@@ -88,8 +105,18 @@ export class DesktopReadAuthComponent implements OnInit {
     switch (this.status()) {
       case 'authorizing': return 'checking';
       case 'redirecting': return this.handedOver() ? 'done' : 'linking';
+      case 'connected': return 'done';
       case 'error': return 'error';
       default: return 'ready';
+    }
+  });
+  /** The stage's one heading — the call to action while it waits, the outcome once it has one. */
+  protected readonly title = computed(() => {
+    switch (this.status()) {
+      case 'redirecting': return this.handedOver() ? 'desktopConnect.titleConnected' : 'desktopConnect.titleConnecting';
+      case 'connected': return 'desktopConnect.titleConnected';
+      case 'error': return 'desktopConnect.titleFailed';
+      default: return 'desktopConnect.titleConnect';
     }
   });
   /** i18n key, never raw text. */
@@ -100,6 +127,21 @@ export class DesktopReadAuthComponent implements OnInit {
   returnUrl = '';
 
   async ngOnInit() {
+    const q = this.route.snapshot.queryParamMap;
+
+    // Back from Starscape's loopback (`?done=<outcome>`): the hand-off is over,
+    // so show its outcome in this stage — no session, no cb/state needed.
+    const done = q.get('done');
+    if (done) {
+      if (done === 'ok') this.status.set('connected');
+      else if (done === 'start') this.status.set('start');
+      else {
+        this.errorMsg.set(DONE_ERRORS[done] ?? 'desktopConnect.done.failed');
+        this.status.set('error');
+      }
+      return;
+    }
+
     // A token handoff must never run under a presentation overlay — see the
     // identical guard in DesktopAuthComponent for the full rationale.
     if (this.imp.activeOrPending()) {
@@ -107,7 +149,6 @@ export class DesktopReadAuthComponent implements OnInit {
       return;
     }
 
-    const q = this.route.snapshot.queryParamMap;
     this.cb = q.get('cb') ?? '';
     this.state = q.get('state') ?? '';
 

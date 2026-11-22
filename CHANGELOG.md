@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.295.0] - 2026-11-22
+
+### Changed
+- Starscape sign-in now ends on the website's connect screen: after connecting, the browser tab shows "Verbunden" in the same stage as the Data Uploader instead of a bare Starscape page. Failures name their cause there (wrong sign-in session, no sign-in received). Needs Starscape 0.12.0; older versions keep their own page.
+
 ## [0.294.0] - 2026-11-22
 
 ### Changed
