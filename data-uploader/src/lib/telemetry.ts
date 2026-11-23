@@ -253,3 +253,18 @@ export function signCrashRequest(
     },
   };
 }
+
+/** What telemetry an `ingest-bundle` upload result calls for. */
+export type UploadFailureReport = 'timeout' | 'upload-failed' | null;
+
+/**
+ * Decide how a finished bundle upload is telemetried. `duplicate` (409: the
+ * server already holds this bundle) is the bundle stage's goal met, not a
+ * failure — reporting it flooded error tracking with non-errors (#391). A
+ * timeout gets its own crash type; every other `!ok` (HTTP 4xx/5xx, network
+ * error) stays `upload-failed`.
+ */
+export function classifyUploadFailure(result: { ok: boolean; error?: string }): UploadFailureReport {
+  if (result.ok || result.error === 'duplicate') return null;
+  return result.error === 'timeout' ? 'timeout' : 'upload-failed';
+}
