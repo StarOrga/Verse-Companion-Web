@@ -5577,6 +5577,7 @@
     "search": {
       "label": "Search feedback",
       "placeholder": "Search … topic, whole thread or #number",
+      "placeholderShort": "Search or #no.",
       "clear": "Clear search",
       "results": "{{count}} results · by relevance",
       "empty": "No results for “{{query}}”.",
