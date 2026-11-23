@@ -57,6 +57,22 @@
  *   --timeout <sec>    give up after this long  (default: 900 = 15 min)
  *   --interval <sec>   poll every               (default: 30)
  *   --once             single check, no polling — for a quick status read
+ *   --web              verify the site even when the merge touched no web file
+ *
+ * Not a web change (2026-11-23, feedback #391/#393). A merge that touches nothing
+ * the site is built from (src/, public/, angular.json, vercel.json, …) — a Data
+ * Uploader fix, a workflow, an edge function, a migration — has nothing to
+ * look at on the website, so there is nothing to wait for: the script prints
+ * the "merged, ships through its own channel" reply at once and exits 0. The
+ * routine posts it right after that channel's own check (release build,
+ * function deploy, `db push`). Before, such an item sat through the full
+ * 15-min web poll first, and the thread stayed silent the whole time.
+ *
+ * A NEWER version counts as live: the version probe used to want the exact
+ * version of the merge it verified. In a wave the next merge goes live before
+ * the earlier item is verified, the site then serves the newer version, and the
+ * exact match never comes — #391 timed out after 888 s on a deployment that was
+ * green. Main is linear, so a newer `current` carries the older merge.
  *
  * Exit code: 0 only when the deployment for the SHA was observed `success`.
  */
@@ -171,10 +187,51 @@ const siteUrl = (value) => {
 const explicitProbe = flag('probe');
 const version = explicitProbe ? null : versionAt(sha);
 /** What "served" means: the explicit needle as a substring, else the version line. */
-const escapeRe = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-const probe = explicitProbe ?? (version ? new RegExp(`"current"\\s*:\\s*"${escapeRe(version)}"`) : null);
+/** The version probe: `"current"` at the merge's version OR NEWER (see the header). */
+const versionProbe = (wanted) => ({
+  test: (text) => {
+    const m = /"current"\s*:\s*"([^"]+)"/.exec(text);
+    return !!m && compareVersions(m[1], wanted) >= 0;
+  },
+  toString: () => `"current" >= "${wanted}"`,
+});
+const probe = explicitProbe ?? (version ? versionProbe(version) : null);
 const probeUrl = siteUrl(flag('probe-url', explicitProbe ? 'i18n/de.json' : 'release-notes.json'));
 if (!explicitProbe && !version) log('   no --probe and no package.json version at that commit — deployment status only');
+/**
+ * What the site is built from. Anything else in a merge (data-uploader/,
+ * supabase/, .github/, docs/, CHANGELOG.md, package.json's version bump) does
+ * not change what a visitor sees.
+ */
+const WEB_PATH_RE = /^(src\/|public\/|angular\.json$|vercel\.json$|tsconfig[^/]*\.json$|ngsw-config\.json$|scripts\/vercel-)/;
+const changedFiles = (commit) => {
+  try {
+    return git('diff-tree', '--no-commit-id', '--name-only', '-r', `${commit}^`, commit).split('\n').filter(Boolean);
+  } catch {
+    /* not in this clone */
+  }
+  try {
+    return (gh(`repos/${REPO}/commits/${commit}`).files ?? []).map((f) => f.filename);
+  } catch {
+    return null;
+  }
+};
+/** True when the merge touched a web file — or when that cannot be told (then verify, never guess). */
+const touchesWeb = (commit) => {
+  const files = changedFiles(commit);
+  if (!files || !files.length) return true;
+  return files.some((f) => WEB_PATH_RE.test(f));
+};
+/** Numeric compare of dotted versions (`0.85.10` > `0.85.9`); non-numeric parts compare as 0. */
+const compareVersions = (a, b) => {
+  const pa = String(a).split(/[.+-]/).map((n) => Number.parseInt(n, 10) || 0);
+  const pb = String(b).split(/[.+-]/).map((n) => Number.parseInt(n, 10) || 0);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const d = (pa[i] ?? 0) - (pb[i] ?? 0);
+    if (d) return Math.sign(d);
+  }
+  return 0;
+};
 const timeoutMs = Number(flag('timeout', '900')) * 1000;
 const intervalMs = Number(flag('interval', '30')) * 1000;
 
@@ -229,6 +286,17 @@ const replyLive = (at, deployment) =>
     'im Thread — die Routine nimmt das Thema dann automatisch wieder auf.',
   ].join('\n');
 
+const replyNotWeb = () =>
+  [
+    `✅ Gemerged in ${pr}. Geändert: ${changed}`,
+    '',
+    'Die Änderung betrifft nicht die Website, dort gibt es nichts nachzuladen — sie',
+    'wird über ihren eigenen Weg ausgeliefert (Release, Workflow, Function oder Migration).',
+    '',
+    'Passt etwas nicht, oder willst du weiter dran arbeiten? Antworte einfach hier',
+    'im Thread — die Routine nimmt das Thema dann automatisch wieder auf.',
+  ].join('\n');
+
 const replyNotLive = (at, deployment) =>
   [
     `✅ Gemerged in ${pr}. Geändert: ${changed}`,
@@ -252,8 +320,14 @@ const replyNotLive = (at, deployment) =>
  */
 async function main() {
   const started = Date.now();
+  if (!has('web') && !touchesWeb(sha)) {
+    log(`verify-ship-live: ${sha.slice(0, 7)} touched no web file — no site to wait for (--web forces it)`);
+    console.log(replyNotWeb());
+    process.exitCode = 0;
+    return;
+  }
   log(`verify-ship-live: ${sha.slice(0, 7)} → ${SITE}${route}`);
-  if (probe) log(`   probe: ${typeof probe === 'string' ? JSON.stringify(probe) : probe} in ${probeUrl}`);
+  if (probe) log(`   probe: ${typeof probe === 'string' ? JSON.stringify(probe) : String(probe)} in ${probeUrl}`);
 
   let deployment = null;
   for (;;) {
