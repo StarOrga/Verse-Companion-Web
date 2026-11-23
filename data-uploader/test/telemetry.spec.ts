@@ -7,6 +7,7 @@ import {
   toCrashInput,
   buildExtractAbort,
   classifyExtractAbort,
+  classifyUploadFailure,
   EXTRACT_ABORT_ERROR_TYPE,
   EXTRACT_ABORT_NAME,
   PRODUCT,
@@ -231,5 +232,25 @@ describe('signCrashRequest', () => {
     const a = signCrashRequest('https://x.co', 'k', '1', hmacHex, 42, meta, [crash]);
     const b = signCrashRequest('https://x.co', 'k', '1', hmacHex, 42, meta, [crash]);
     expect(a.headers['x-scc-signature']).toBe(b.headers['x-scc-signature']);
+  });
+});
+
+describe('classifyUploadFailure', () => {
+  it('reports nothing for a successful upload', () => {
+    expect(classifyUploadFailure({ ok: true })).toBeNull();
+  });
+
+  it('reports nothing for a duplicate bundle — the server already has it (#391)', () => {
+    expect(classifyUploadFailure({ ok: false, error: 'duplicate' })).toBeNull();
+  });
+
+  it('reports a timeout as its own crash type', () => {
+    expect(classifyUploadFailure({ ok: false, error: 'timeout' })).toBe('timeout');
+  });
+
+  it('keeps reporting real failures as upload-failed', () => {
+    expect(classifyUploadFailure({ ok: false, error: 'ingest_failed' })).toBe('upload-failed');
+    expect(classifyUploadFailure({ ok: false, error: 'HTTP 500' })).toBe('upload-failed');
+    expect(classifyUploadFailure({ ok: false })).toBe('upload-failed');
   });
 });

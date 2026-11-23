@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.298.4] - 2026-11-23
+
+### Fixed
+- Data Uploader 0.85.1: a bundle the server already holds (`duplicate`) is no longer reported to error telemetry as a failed upload; real upload failures still are.
+
 ## [0.298.3] - 2026-11-23
 
 ### Changed
