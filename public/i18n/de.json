@@ -5577,6 +5577,7 @@
     "search": {
       "label": "Feedback durchsuchen",
       "placeholder": "Suchen … Thema, ganzer Thread oder #Nummer",
+      "placeholderShort": "Suchen oder #Nr.",
       "clear": "Suche löschen",
       "results": "{{count}} Treffer · nach Relevanz",
       "empty": "Keine Treffer für „{{query}}“.",
