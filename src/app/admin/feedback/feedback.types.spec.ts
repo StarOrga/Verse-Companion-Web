@@ -1238,7 +1238,7 @@ describe('review gate', () => {
     expect(isArchived(m)).toBe(false);
   });
 
-  it('a merged topic whose review reply is still owed is the routine's turn, not a sign-off (#391/#393)', () => {
+  it('a merged topic whose review reply is still owed is the routine\'s turn, not a sign-off (#391/#393)', () => {
     const m = shipped({ review_reply_pending: true });
     expect(awaitsReviewReply(m)).toBe(true);
     expect(awaitsReview(m)).toBe(false);
@@ -1260,7 +1260,7 @@ describe('review gate', () => {
     expect(adminAsk(m)).toBe('review');
   });
 
-  it('a post-ship reply beats a pending review reply — the admin's message reopens it', () => {
+  it('a post-ship reply beats a pending review reply — the admin\'s message reopens it', () => {
     const m = shipped({ review_reply_pending: true });
     const replies = [msg('h1', 's', false, '2026-07-21T11:00:00Z')];
     expect(isContinuedAfterShip(m, replies)).toBe(true);
