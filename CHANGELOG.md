@@ -4,6 +4,21 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.298.5] - 2026-11-23
+
+### Fixed
+- Data Uploader release workflow: tag-push and manual release runs now queue behind each other and refuse to overwrite another build of the same version, so one version is never published twice with two release tokens.
+
+## [0.298.4] - 2026-11-23
+
+### Fixed
+- Data Uploader 0.85.1: a bundle the server already holds (`duplicate`) is no longer reported to error telemetry as a failed upload; real upload failures still are.
+
+## [0.298.3] - 2026-11-23
+
+### Changed
+- Holotable deck plan: the line under the plan that named the picked room is gone; the room now sits in the top line beside the bow mark and the deck ("▲ Bug · Deck 01 · Maschinenraum").
+
 ## [0.298.2] - 2026-11-22
 
 ### Changed

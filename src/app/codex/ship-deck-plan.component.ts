@@ -66,7 +66,9 @@ let nextDeckPlanId = 0;
 
         @if (deck(); as d) {
           @if (bare()) {
-            <p class="bare-nose">▲ {{ 'codex.deckPlan.nose' | translate }} · {{ d.label }}</p>
+            <!-- On the holo table the plan itself shows the pick, so the picked room only joins
+                 this line as a third entry (feedback #399) instead of a readout below. -->
+            <p class="bare-nose">▲ {{ 'codex.deckPlan.nose' | translate }} · {{ d.label }}@if (activeLabel(); as room) {<span class="bare-room"> · {{ room }}@if (activeConnects().length) { · {{ 'codex.deckPlan.connects' | translate: { decks: activeConnects().join(', ') } }}}</span>}</p>
           }
           <div class="stage" [attr.id]="uid + '-panel'" [attr.role]="set.decks.length > 1 ? 'tabpanel' : null"
                [attr.aria-labelledby]="set.decks.length > 1 ? uid + '-tab-' + deckIndex() : null">
@@ -157,13 +159,15 @@ let nextDeckPlanId = 0;
             </svg>
           </div>
           <!-- The active room in words: a tooltip needs a long press on touch,
-               this line answers a plain tap too. -->
+               this line answers a plain tap too. Bare (holo table) names it in the nose line. -->
+          @if (!bare()) {
           <p class="readout" [class.empty]="!activeLabel()">
             {{ activeLabel() || ('codex.deckPlan.readoutIdle' | translate) }}
             @if (activeConnects().length) {
               · {{ 'codex.deckPlan.connects' | translate: { decks: activeConnects().join(', ') } }}
             }
           </p>
+          }
           <!-- Every room by name: the plan's own labels only fit the larger
                rooms, and a list reads on a phone where hovering does not. -->
           @if (!bare()) {
@@ -195,6 +199,7 @@ let nextDeckPlanId = 0;
     .bare .stage { flex: 1; min-height: 0; background: transparent; border: 0; padding: 0; }
     .bare svg { height: 100%; max-height: 100%; }
     .bare-nose { margin: 0 0 6px; text-align: center; font-size: max(0.7rem, var(--sc-fs-floor)); letter-spacing: 0.08em; color: var(--sc-fg-2); }
+    .bare-room { color: var(--sc-accent); }
     .dp-head h2 { margin: 0; }
     .dp-title { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 0 0 10px; }
 
