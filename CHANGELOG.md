@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.298.5] - 2026-11-23
+
+### Fixed
+- Data Uploader release workflow: tag-push and manual release runs now queue behind each other and refuse to overwrite another build of the same version, so one version is never published twice with two release tokens.
+
 ## [0.298.4] - 2026-11-23
 
 ### Fixed
