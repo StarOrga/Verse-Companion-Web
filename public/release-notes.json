@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.298.5",
+  "current": "0.298.6",
   "releases": [
+    {
+      "version": "0.298.6",
+      "date": "2026-11-23",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Feedback panel on phones: one 12px side gutter for the whole sheet, topic titles on two lines, \"Neues Thema\" takes over the sheet, area chips in one scrollable row, the Alt+click admin tip hidden on touch screens, the send key stays beside \"Abgenommen\", and drawn search/filter icons replace broken font glyphs."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.298.5",
       "date": "2026-11-23",
