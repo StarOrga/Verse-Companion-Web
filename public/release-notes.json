@@ -1,7 +1,75 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.298.1",
+  "current": "0.298.5",
   "releases": [
+    {
+      "version": "0.298.5",
+      "date": "2026-11-23",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Data Uploader release workflow: tag-push and manual release runs now queue behind each other and refuse to overwrite another build of the same version, so one version is never published twice with two release tokens."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.298.4",
+      "date": "2026-11-23",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Data Uploader 0.85.1: a bundle the server already holds (duplicate) is no longer reported to error telemetry as a failed upload; real upload failures still are."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.298.3",
+      "date": "2026-11-23",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Holotable deck plan: the line under the plan that named the picked room is gone; the room now sits in the top line beside the bow mark and the deck (\"▲ Bug · Deck 01 · Maschinenraum\")."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.298.2",
+      "date": "2026-11-22",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Release mirror references point at the renamed StarOrga/Verse-Companion-Binaries repo."
+            },
+            {
+              "title": "",
+              "text": "Visible \"SCC\" / \"Star Citizen Companion\" text renamed to \"VC\" / \"Verse Companion\" (UI strings in all locales, Starscape label, docs)."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.298.1",
       "date": "2026-11-22",
