@@ -83,6 +83,19 @@ describe('ShipDeckPlanComponent', () => {
     expect(el.querySelector('.readout')!.classList).toContain('empty');
   });
 
+  it('bare (holo table) names the picked room in the nose line, not in a readout (#399)', () => {
+    fixture.componentRef.setInput('bare', true);
+    const el = render(DECKS);
+    expect(el.querySelector('.readout')).toBeNull();
+    expect(el.querySelector('.bare-room')).toBeNull();
+    const g = el.querySelectorAll<SVGGElement>('g.room')[1];
+    g.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    fixture.detectChanges();
+    expect(el.querySelector('.readout')).toBeNull();
+    expect(el.querySelector('.bare-room')!.textContent!.trim()).toBe('· Galley');
+    expect(el.querySelector('.bare-nose')!.textContent).toContain('Main Deck');
+  });
+
   it('lists every room by name and a chip lights its room', () => {
     const el = render(DECKS);
     const chips = Array.from(el.querySelectorAll<HTMLButtonElement>('.legend .chip'));
