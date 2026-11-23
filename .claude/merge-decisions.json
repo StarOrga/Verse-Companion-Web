@@ -2379,6 +2379,16 @@
         "hunks": [
           "5e88739b719e"
         ]
+      },
+      {
+        "ship": "claude/strange-goldstine-4b0999",
+        "by": "JerryT2T",
+        "value": "0.298.7 (this release, generated)",
+        "decided": true,
+        "at": "2026-11-23T21:59:04.325Z",
+        "hunks": [
+          "8372aff307e3"
+        ]
       }
     ],
     "public/release-notes.json›current›version": [
