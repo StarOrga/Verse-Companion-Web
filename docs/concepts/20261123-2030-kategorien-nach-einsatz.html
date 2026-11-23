@@ -6619,12 +6619,12 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
     <a data-briefing-topic="t-rolle" data-share="40">Einsatz als Standard</a>
     <a data-briefing-topic="t-werte" data-share="35">Werte je Einsatz</a>
     <a data-briefing-topic="t-tiefe" data-share="25">Alle Werte</a>
-    <p data-briefing-duration>≈ 6 min</p>
+    <p data-briefing-duration>≈ 7 min</p>
     <div data-alevel="1" data-title="Briefing">
       <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"32 → 8","unit":"Zahlen"}'></div></div>
       <div data-slot="long">
         <div data-viz="bars" data-viz-spec='{"items":[{"label":"heute: Zahlen im ersten Blick","value":32},{"label":"Entwurf: Zahlen im ersten Blick","value":8}],"unit":"","text":"Der erste Blick sinkt von 32 auf etwa 8 Zahlen."}'></div>
-        <p>Gezählt am Gladius: vier Kacheln mit je Leitwert, drei Unterwerten, P-Wert im Kopf und im Ring und zwei P-Werten im Satz. Die drei Entwürfe zeigen etwa acht Zahlen und lassen den Rest hinter „Alle Werte“. Die Fragen hier gelten für jeden Entwurf.</p>
+        <p>Gezählt am Gladius: vier Kacheln mit je Leitwert, drei Unterwerten, P-Wert im Kopf und im Ring und zwei P-Werten im Satz. Dazu dein Screenshot: gleich hohe Spalten mit leeren Flächen, acht gleiche Waffenzeilen und zerbrochene Spaltenköpfe in „Alle Werte“. Die Entwürfe zeigen etwa acht Zahlen, die Fragen gelten für jeden Entwurf.</p>
       </div>
     </div>
   </section>
@@ -6821,7 +6821,7 @@ Transport · C2    → Fracht 696 SCU, dann Verteidigung, Bewegung</pre></div>
         data-label="Platz der Fracht" data-rec="own" data-rec-why="Für Transport und Reisen ist der Laderaum die erste Frage; unter Bewegung ist er falsch einsortiert." data-applies-to="Schiffe mit Frachtgitter" data-finding="f-d-fracht">
       <p data-applies>Gilt für: Schiffe mit Frachtgitter</p>
       
-      <p data-situation>Die 696 SCU der Hercules stehen heute unter „Bewegung“, neben SCM und Masse; wer Fracht sucht, findet sie dort nicht.</p>
+      <p data-situation>Wer Fracht sucht, findet sie unter „Bewegung“: dort heißt es „Stärkste Achse FRACHT (P72)“, als wäre Laderaum ein Flugwert.</p>
       <h3 data-question>Wo stehen Laderaum und Frachtdecks?</h3>
       
       
@@ -6855,15 +6855,15 @@ Transport · C2    → Fracht 696 SCU, dann Verteidigung, Bewegung</pre></div>
           <div data-viz="compare" data-viz-spec='{"before":{"label":"heute: Unterwert in Bewegung","value":3},"after":{"label":"eigene Kategorie: Leitwert","value":1},"unit":". Rang im Blick","text":"Fracht rückt vom dritten Unterwert zum Leitwert."}'></div>
           
         </div>
-        <div data-example><pre>Heute   Bewegung: 125 m/s SCM · Boost · 696 SCU
-Danach  Fracht: 696 SCU · Hauptdeck 576 · Unterdeck 120</pre></div>
+        <div data-example><pre>Heute   BEWEGUNG P33 · 270 m/s Boost · „Stärkste Achse FRACHT (P72), schwächste SCM (P8)“
+Danach  FRACHT · 696 SCU · Hauptdeck 576 · Unterdeck 120</pre></div>
       </div>
     </section>
     <section id="d-rang" data-nav-label="Bedeutung des Rangs" data-decision="d-rang" data-decision-mode="single"
         data-label="Bedeutung des Rangs" data-rec="lead" data-rec-why="„besser als 78 % von 38“ sagt, gegen wen und worin; ein Mittel über vier Achsen sagt keins von beidem." data-applies-to="jede Kategorie" data-finding="f-d-rang">
       <p data-applies>Gilt für: jede Kategorie</p>
       
-      <p data-situation>Vier Rangangaben pro Kachel, drei davon verschieden: „P63“ steht zweimal und ist das Mittel aus vier Achsen, der Satz nennt zwei weitere.</p>
+      <p data-situation>Vier Rangangaben pro Kachel, drei davon verschieden: „P91“ steht zweimal und ist ein Mittel mehrerer Achsen, der Satz nennt zwei weitere.</p>
       <h3 data-question>Wofür steht der Rang einer Kategorie?</h3>
       
       
@@ -6897,8 +6897,8 @@ Danach  Fracht: 696 SCU · Hauptdeck 576 · Unterdeck 120</pre></div>
           <div data-viz="bars" data-viz-spec='{"items":[{"label":"P im Kopf","value":1},{"label":"P im Ring","value":1},{"label":"P im Satz (stärkste)","value":1},{"label":"P im Satz (schwächste)","value":1}],"unit":"×","text":"Vier Rangangaben pro Kachel, drei davon verschieden."}'></div>
           
         </div>
-        <div data-example><pre>Heute   OFFENSIVE P63 · Ring P63 · „Über dem Median … stärkste Achse Burst (P81), schwächste Raketen (P55)“
-Danach  OFFENSIVE · 1.180 Dauer-DPS · besser als 78 % von 38 leichten Jägern</pre></div>
+        <div data-example><pre>Heute   VERTEIDIGUNG P91 · Ring P91 · „Top-Quartil … Stärkste Achse RUMPF HP (P96), schwächste SCHILD HP (P85)“
+Danach  VERTEIDIGUNG · 211.200 Schild HP · besser als 91 % von 38 Schiffen</pre></div>
       </div>
     </section>
   </section>
@@ -6911,7 +6911,7 @@ Danach  OFFENSIVE · 1.180 Dauer-DPS · besser als 78 % von 38 leichten Jägern<
         data-label="Inhalt von Alle Werte" data-rec="unified" data-rec-why="Eine einheitliche Liste je Kategorie vermeidet doppelte Überschriften und den Mix, den Bewegung heute öffnet." data-applies-to="„Alle Werte“ jeder Kategorie" data-finding="f-d-detail">
       <p data-applies>Gilt für: „Alle Werte“ jeder Kategorie</p>
       
-      <p data-situation>„Alle Werte“ öffnet heute das alte Analyse-Panel samt eigenem Kopf; unter Bewegung erscheinen auch Rumpf und Signatur, Signatur hat keins.</p>
+      <p data-situation>In der Viertelspalte bricht „Alle Werte“ seine Spaltenköpfe („GRÖ SSE“, „ALP HA“) und öffnet einen zweiten Kopf; Bewegung zeigt Rumpf und Signatur mit.</p>
       <h3 data-question>Was steht in „Alle Werte“ einer Kategorie?</h3>
       
       
@@ -6945,8 +6945,51 @@ Danach  OFFENSIVE · 1.180 Dauer-DPS · besser als 78 % von 38 leichten Jägern<
           <div data-viz="bars" data-viz-spec='{"items":[{"label":"Offensive","value":14},{"label":"Verteidigung","value":12},{"label":"Bewegung","value":22},{"label":"Signatur","value":0}],"unit":" Werte","hl":"Bewegung","text":"Bewegung öffnet 22 Werte aus drei Bereichen, Signatur gar keine."}'></div>
           
         </div>
-        <div data-example><pre>Heute   Bewegung ▸ Alle Werte → Flugleistung · Masse · Systeme · Signatur · Rumpf
+        <div data-example><pre>Heute   OFFENSIVE ▸ Alle Werte → Kasten „OFFENSIVE · zum Lesen aufklappen“ → WAFFE | GRÖ SSE | ALP HA
+        BEWEGUNG ▸ Alle Werte → „SCHIFF“: Flugleistung · Masse · Systeme · Signatur · Rumpf
 Danach  Bewegung ▸ Alle Werte → Flugleistung · Quantum · Masse</pre></div>
+      </div>
+    </section>
+    <section id="d-gruppe" data-nav-label="Gleiche Waffen" data-decision="d-gruppe" data-decision-mode="single"
+        data-label="Gleiche Waffen" data-rec="group" data-rec-why="Die Summe pro Waffentyp ist die Zahl, die man vergleicht; einzelne Halterungen braucht man selten." data-applies-to="Waffentabelle in „Alle Werte“" data-finding="f-d-gruppe">
+      <p data-applies>Gilt für: Waffentabelle in „Alle Werte“</p>
+      
+      <p data-situation>Acht gleiche „KLWE Laser Repeater S3“ stehen als acht Zeilen untereinander; die Summe, die zählt, muss man selbst bilden.</p>
+      <h3 data-question>Wie stehen gleiche Waffen in der Waffentabelle?</h3>
+      
+      
+      <div data-options>
+        <label data-opt="group" data-recommended>
+          <input type="radio" name="dm-d-gruppe" value="group" checked>
+          <span data-opt-label>Gleiche zusammenfassen mit Anzahl</span>
+          <span data-opt-consequence>Eine Zeile „8 × KLWE Laser Repeater S3“ mit Summe, aufklappbar zu den Plätzen.</span>
+        </label>
+        <label data-opt="size">
+          <input type="radio" name="dm-d-gruppe" value="size">
+          <span data-opt-label>Nach Größe bündeln</span>
+          <span data-opt-consequence>Ein Block je Größe (S3-Waffen, S5-Türme) mit Zwischensumme.</span>
+        </label>
+        <label data-opt="mount">
+          <input type="radio" name="dm-d-gruppe" value="mount">
+          <span data-opt-label>Je Halterung eine Zeile wie heute</span>
+          <span data-opt-consequence>Jeder Platz sichtbar, die Tabelle bleibt so lang wie heute.</span>
+        </label>
+      </div>
+      
+      <textarea data-comment="d-gruppe-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-gruppe-none" value="">
+      <input type="hidden" name="dm-d-gruppe-hes" value="">
+      <input type="hidden" name="dm-d-gruppe-touched" value="">
+      <input type="hidden" name="dm-d-gruppe-issue" value="">
+      <input type="hidden" name="dm-d-gruppe-epic" value="">
+      <div data-alevel="3" data-title="Gleiche Waffen">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Gleiche Waffen stehen heute je Halterung einzeln da."}'>Gleiche Waffen stehen heute je Halterung einzeln da.</div></div>
+        <div data-slot="long">
+          <div data-viz="compare" data-viz-spec='{"before":{"label":"heute: Zeilen für 8 gleiche Waffen","value":8},"after":{"label":"zusammengefasst","value":1},"unit":" Zeilen","text":"Acht gleiche Waffen werden zu einer Zeile."}'></div>
+          
+        </div>
+        <div data-example><pre>Heute   KLWE Laser Repeater S3 | S3 | 43,65 | 75,97 | 545,63   (8 Zeilen)
+Danach  8 × KLWE Laser Repeater S3 | S3 | 349 | 608 | 4.365   ▸ Plätze</pre></div>
       </div>
     </section>
     <section id="d-luecken" data-nav-label="Fehlende Werte" data-decision="d-luecken" data-decision-mode="single"
