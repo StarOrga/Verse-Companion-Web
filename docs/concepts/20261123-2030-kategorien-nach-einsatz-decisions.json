@@ -1,0 +1,66 @@
+[
+  {
+    "iteration": 1,
+    "action": "iterate",
+    "general": "ne ganz falsche ransatz, die spaltenlogik in der leiste sollen bleiben, bitte nur in den spalten überarbeiten!",
+    "favorite": null,
+    "fidelity": "live",
+    "decisions": [
+      {
+        "id": "d-default",
+        "value": "role",
+        "untouched": true
+      },
+      {
+        "id": "d-alles",
+        "value": "strength",
+        "untouched": true
+      },
+      {
+        "id": "d-ohnedaten",
+        "value": "honest",
+        "untouched": true
+      },
+      {
+        "id": "d-leitwert",
+        "value": "ok",
+        "untouched": true
+      },
+      {
+        "id": "d-fracht",
+        "value": "own",
+        "untouched": true
+      },
+      {
+        "id": "d-rang",
+        "value": "lead",
+        "untouched": true
+      },
+      {
+        "id": "d-detail",
+        "value": "unified",
+        "untouched": true
+      },
+      {
+        "id": "d-gruppe",
+        "value": "group",
+        "untouched": true
+      },
+      {
+        "id": "d-luecken",
+        "value": "count",
+        "untouched": true
+      },
+      {
+        "id": "d-doppel",
+        "value": "split",
+        "untouched": true
+      },
+      {
+        "id": "d-messen",
+        "value": "ok",
+        "untouched": true
+      }
+    ]
+  }
+]
