@@ -3381,6 +3381,7 @@
       "upcomingTitle": "Coming up in the 'verse",
       "aria": "Running and upcoming in-game events",
       "allPosts": "All event posts",
+      "imageOpen": "Open the official picture of {{name}} full size",
       "runningUntil": "Running · until {{date}}",
       "endsToday": "Running · ends today",
       "startsTomorrow": "From tomorrow, {{date}}",

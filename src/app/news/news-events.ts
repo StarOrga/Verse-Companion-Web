@@ -29,6 +29,35 @@ export interface VerseEvent {
   /** RSI comm-link announcing it; '' when none is known yet. */
   readonly url: string;
   readonly summary: { readonly en: string; readonly de: string };
+  /**
+   * The event's official RSI picture (`sc_events.extra.image`, found by `sc-events-sync`, feedback #400): the
+   * edition's schedule artwork when RSI published one, else the event post's header image. Null while none is known.
+   */
+  readonly image: VerseEventImage | null;
+}
+
+export interface VerseEventImage {
+  readonly url: string;
+  /** `schedule` = the dated rental/hall plan (shown whole); `hero`/`admin` = header artwork (cropped to fit). */
+  readonly kind: 'schedule' | 'hero' | 'admin';
+  /** The RSI article the picture comes from. */
+  readonly from: string;
+}
+
+const RSI_IMAGE_HOSTS = new Set(['robertsspaceindustries.com', 'media.robertsspaceindustries.com']);
+
+/** `extra.image` as stored → a picture the CSP allows, or null (the column is jsonb, so nothing about it is trusted). */
+export function eventImageOf(extra: unknown): VerseEventImage | null {
+  const raw = (extra as { image?: unknown } | null)?.image as { url?: unknown; kind?: unknown; from?: unknown } | undefined;
+  if (!raw || typeof raw.url !== 'string') return null;
+  try {
+    const u = new URL(raw.url);
+    if (u.protocol !== 'https:' || !RSI_IMAGE_HOSTS.has(u.hostname)) return null;
+  } catch {
+    return null;
+  }
+  const kind = raw.kind === 'schedule' || raw.kind === 'admin' ? raw.kind : 'hero';
+  return { url: raw.url, kind, from: typeof raw.from === 'string' ? raw.from : '' };
 }
 
 /** Mirror of the family patterns in sc-events-sync/matcher.ts (FAMILIES[].pattern). */
