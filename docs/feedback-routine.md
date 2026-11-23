@@ -518,6 +518,26 @@ shared seam-file collisions (i18n keys, version bump) deterministically:
   alpha/v<version>`); `ship_promote` reads that message. An error result is
   *state unknown* — `gh pr view` first, then the tag, never a blind retry.
 
+**The thread is never silent between merge and reply** (2026-11-23, #391/#393,
+history in [`history.md`](feedback-routine/history.md)):
+
+- **Say "merged" at once.** In the same breath as the `shipped` UPDATE, post a
+  short system message: `🔀 Gemerged in <PR> — <Deploy|Release> läuft, die
+  Bestätigung folgt hier.` The ✅/⏳ review reply follows when the check is done.
+  The board reads `review_reply_pending = true` as the routine's turn
+  ("Wird ausgeliefert · Bestätigung folgt"), never as "Du bist dran" — the
+  admin is asked for a sign-off only once there is a reply to sign off.
+- **Only web changes wait for the web.** `verify:ship-live` returns at once for
+  a merge that touches no web file (nothing under `src/`, `public/`, the Angular
+  / Vercel config): a Data Uploader fix, a workflow, an edge function or a
+  migration is confirmed by its own check — release build green and release row
+  written, `functions:deploy` done, `db push` done — and its reply goes out right
+  after that check, not after a 15-minute site poll it can never affect.
+- **No item waits behind another.** A wave's web verifies run in the background,
+  each started right after its own merge; each reply is posted as soon as that
+  item's verify exits. A newer version on the site counts as live, so a later
+  merge's deploy confirms every earlier merge of the wave too.
+
 Two hazards: **spawning sub-workers can reset a shared worktree to
 `origin/main` mid-flight**, so the orchestrator never edits code while workers
 run, every worker gets its own `git worktree add <sibling> feat/feedback-<id>`,
