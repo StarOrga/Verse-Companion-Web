@@ -1,0 +1,1123 @@
+<section data-iteration="1" data-iteration-template="design" data-design-set="alternatives">
+<style>
+  .mock-root { --mk-bg0:#0d2635; --mk-bg1:#123246; --mk-bg2:#103246; --mk-bg3:#164664; --mk-fg0:#e8ebed; --mk-fg1:#9fb3c8; --mk-fg2:#84a0b6;
+    --mk-acc:#52c1e6; --mk-line:rgba(82,193,230,.18); --mk-warn:#f0c27b; --mk-ok:#5fd698;
+    --mk-off:#e5484d; --mk-def:#5b8def; --mk-mov:#9b8cc8; --mk-sig:#7cd4ef; --mk-car:#a9c77a; --mk-min:#d3a6e6;
+    --mk-disp:'Orbitron','Segoe UI',sans-serif; --mk-mono:'Share Tech Mono',Consolas,monospace;
+    max-width: 1280px; margin: 0 auto; display: grid; gap: 12px; padding: 16px; box-sizing: border-box;
+    background: linear-gradient(180deg, #0b2230, #0d2635); color: var(--mk-fg0); font: 13px/1.45 Inter,'Segoe UI',sans-serif; border-radius: 8px; }
+  .mock-root * { box-sizing: border-box; }
+  .mock-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .mock-title { display: grid; }
+  .mock-mfr { font: 13px var(--mk-disp); letter-spacing: .2em; text-transform: uppercase; color: var(--mk-fg2); }
+  .mock-name { font-size: 26px; font-weight: 300; }
+  .mock-chips { display: flex; gap: 4px; flex-wrap: wrap; }
+  .mock-chip { border: 1px solid var(--mk-line); border-radius: 4px; padding: 2px 8px; color: var(--mk-fg1); }
+  .mock-table { height: 72px; display: grid; place-items: center; border: 1px dashed var(--mk-line); border-radius: 8px; }
+  .mock-table svg { height: 64px; fill: rgba(82,193,230,.12); stroke: rgba(82,193,230,.35); }
+  .mock-sym { color: var(--p); font-size: 14px; width: 16px; display: inline-grid; place-items: center; }
+  .mock-num { font: 32px/1 var(--mk-mono); font-variant-numeric: tabular-nums; }
+  .mock-numtxt { font-size: 24px; }
+  .mock-unit, .mock-root small { color: var(--mk-fg2); font-size: 13px; text-transform: none; }
+  .mock-delta { font: 13px var(--mk-mono); color: var(--mk-ok); background: rgba(95,214,152,.14); padding: 1px 6px; border-radius: 2px; }
+  .mock-rank { display: flex; align-items: center; gap: 8px; color: var(--mk-fg1); }
+  .mock-rank.lo { color: var(--mk-warn); }
+  .mock-rankbar { position: relative; display: inline-block; width: 120px; height: 4px; border-radius: 2px; background: rgba(132,160,182,.22); }
+  .mock-rankbar i { position: absolute; inset: 0 auto 0 0; border-radius: 2px; background: var(--p, var(--mk-acc)); }
+  .mock-rankbar b { position: absolute; left: 50%; top: -3px; width: 1px; height: 10px; background: var(--mk-fg2); }
+  .mock-rankbar.lo i { background: var(--mk-warn); }
+  .mock-rankbar.mock-mini { width: 52px; }
+  .mock-k { color: var(--mk-fg2); font-size: 13px; }
+  .mock-v { font: 15px var(--mk-mono); }
+  .mock-more { color: var(--mk-acc); cursor: pointer; font: 13px var(--mk-disp); letter-spacing: .12em; text-transform: uppercase; justify-self: start; }
+  .mock-gapcount { color: var(--mk-fg2); font-size: 13px; border-top: 1px dashed var(--mk-line); padding-top: 8px; }
+  .mock-strip { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: center; padding: 8px 12px; border: 1px solid var(--mk-line); border-radius: 8px; background: rgba(13,38,53,.9); }
+  .mock-einsatz { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+  .mock-lab { color: var(--mk-fg2); font: 13px var(--mk-disp); letter-spacing: .14em; text-transform: uppercase; margin-right: 4px; }
+  .mock-mis { padding: 2px 8px; border-radius: 999px; border: 1px solid var(--mk-line); color: var(--mk-fg1); cursor: pointer; }
+  .mock-mis.mock-on { color: var(--mk-acc); border-color: var(--mk-acc); background: rgba(82,193,230,.14); }
+  .mock-sareas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; opacity: .7; }
+  .mock-sa { display: grid; font: 13px var(--mk-mono); color: var(--mk-fg1); border-left: 2px solid var(--p); padding-left: 8px; }
+  .mock-sal { color: var(--p); font-family: var(--mk-disp); letter-spacing: .1em; text-transform: uppercase; }
+  .mock-tbl { width: 100%; border-collapse: collapse; font: 13px var(--mk-mono); }
+  .mock-tbl th { text-align: left; color: var(--mk-fg2); font: 13px var(--mk-disp); letter-spacing: .08em; text-transform: uppercase; border-bottom: 1px solid var(--mk-line); padding: 4px; }
+  .mock-tbl td { padding: 4px; border-bottom: 1px solid rgba(82,193,230,.08); }
+  .mock-tbl .mock-sum td { color: var(--mk-fg0); border-top: 1px solid var(--mk-line); }
+  .mock-tbl .mock-key { color: var(--mk-acc); }
+  .mock-kvg { display: grid; gap: 4px; align-content: start; }
+  .mock-kvg h5 { margin: 0 0 4px; font: 13px var(--mk-disp); letter-spacing: .12em; text-transform: uppercase; color: var(--mk-fg1); }
+  .mock-kv { display: flex; justify-content: space-between; gap: 8px; padding: 2px 4px; border-radius: 2px; }
+  .mock-kv b { font: 13px var(--mk-mono); font-weight: 400; }
+  .mock-keyrow { background: rgba(82,193,230,.08); }
+  .mock-keyrow span::before { content: '★ '; color: var(--mk-acc); }
+
+  /* D1 · Fokus und Leiste */
+  .mock-d1-zone { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 12px; align-items: start; }
+  .mock-d1-spot { display: grid; gap: 12px; padding: 16px; border: 1px solid color-mix(in srgb, var(--p) 45%, transparent); border-radius: 8px; background: linear-gradient(180deg, color-mix(in srgb, var(--p) 8%, #123246), #0d2635); box-shadow: inset 3px 0 0 var(--p); }
+  .mock-d1-sh { display: flex; align-items: center; gap: 8px; font: 13px var(--mk-disp); letter-spacing: .14em; text-transform: uppercase; }
+  .mock-d1-for { margin-left: auto; color: var(--mk-fg2); letter-spacing: .08em; }
+  .mock-d1-hero { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .mock-d1-gap { color: var(--mk-warn); border: 1px dashed rgba(240,194,123,.5); border-radius: 4px; padding: 8px; }
+  .mock-d1-subs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .mock-d1-sub { display: grid; gap: 4px; padding: 8px; border-radius: 4px; background: rgba(5,13,20,.35); }
+  .mock-d1-list { display: grid; gap: 4px; padding: 8px; border: 1px solid var(--mk-line); border-radius: 8px; }
+  .mock-d1-lh { color: var(--mk-fg2); font: 13px var(--mk-disp); letter-spacing: .14em; text-transform: uppercase; padding: 4px; }
+  .mock-d1-row { display: grid; grid-template-columns: 16px 1fr auto 84px 52px; align-items: center; gap: 8px; padding: 8px; border-radius: 4px; cursor: pointer; border-left: 2px solid var(--p); }
+  .mock-d1-row:hover { background: rgba(82,193,230,.06); }
+  .mock-d1-quietrow { opacity: .62; }
+  .mock-d1-rn { color: var(--mk-fg1); }
+  .mock-d1-rv { font: 15px var(--mk-mono); }
+  .mock-d1-rw { color: var(--mk-fg1); font-size: 13px; text-align: right; }
+  .mock-d1-rw.lo { color: var(--mk-warn); }
+  .mock-d1-off { color: var(--mk-fg2); font-size: 13px; padding: 4px 8px; border-top: 1px dashed var(--mk-line); }
+  .mock-d1-detail { display: grid; gap: 12px; border-top: 1px solid var(--mk-line); padding-top: 12px; }
+  .mock-d1-dh { display: flex; justify-content: space-between; color: var(--mk-fg1); font: 13px var(--mk-disp); letter-spacing: .12em; text-transform: uppercase; }
+  .mock-d1-mark { color: var(--mk-acc); letter-spacing: .04em; text-transform: none; font-family: Inter,'Segoe UI',sans-serif; }
+  .mock-d1-dgrid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 16px; }
+
+  /* D2 · Fragen zum Einsatz */
+  .mock-d2-zone { display: grid; gap: 8px; padding: 12px 16px; border: 1px solid var(--mk-line); border-radius: 8px; background: #0f2c3d; }
+  .mock-d2-head { display: flex; align-items: baseline; gap: 12px; }
+  .mock-d2-ht { font: 15px var(--mk-disp); letter-spacing: .12em; text-transform: uppercase; color: var(--mk-acc); }
+  .mock-d2-cohort { color: var(--mk-fg2); flex: 1; }
+  .mock-d2-list, .mock-d2-also ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+  .mock-d2-row { display: grid; grid-template-columns: 16px minmax(0, 1.4fr) minmax(0, 1fr) 140px 120px 16px; align-items: center; gap: 12px; padding: 12px; border-radius: 4px; background: rgba(5,13,20,.3); cursor: pointer; }
+  .mock-d2-row:hover { background: rgba(82,193,230,.07); }
+  .mock-d2-q { font-size: 15px; }
+  .mock-d2-v { font: 20px var(--mk-mono); }
+  .mock-gapv { font-size: 15px; color: var(--mk-warn); }
+  .mock-d2-rw { color: var(--mk-fg1); text-align: right; }
+  .mock-d2-rw.lo { color: var(--mk-warn); }
+  .mock-d2-caret { color: var(--mk-fg2); }
+  .mock-d2-open { background: rgba(82,193,230,.08); cursor: default; }
+  .mock-d2-src { grid-column: 2 / -1; display: grid; gap: 8px; padding-top: 8px; border-top: 1px solid var(--mk-line); }
+  .mock-d2-srch { color: var(--mk-fg1); font: 13px var(--mk-disp); letter-spacing: .1em; text-transform: uppercase; }
+  .mock-d2-srcnote { color: var(--mk-fg2); display: flex; gap: 12px; }
+  .mock-d2-also { display: grid; gap: 4px; padding-top: 8px; border-top: 1px dashed var(--mk-line); }
+  .mock-d2-ah { color: var(--mk-fg2); font: 13px var(--mk-disp); letter-spacing: .14em; text-transform: uppercase; }
+  .mock-d2-arow { display: grid; grid-template-columns: 16px 1fr auto 100px; gap: 12px; align-items: center; padding: 4px 12px; color: var(--mk-fg1); }
+  .mock-d2-arow .mock-d2-v { font-size: 15px; }
+  .mock-d2-none { display: block; color: var(--mk-fg2); }
+
+  /* D3 · Vier Kacheln, entschlackt */
+  .mock-d3-zone { display: grid; gap: 8px; }
+  .mock-d3-line { display: flex; justify-content: space-between; align-items: baseline; }
+  .mock-d3-ctx { color: var(--mk-fg2); }
+  .mock-d3-row { display: grid; gap: 0; border: 1px solid var(--mk-line); border-radius: 16px; overflow: hidden; background: linear-gradient(180deg, #0f2c3d, #0d2635); }
+  .mock-d3-tile { display: grid; gap: 8px; align-content: start; padding: 12px; border-left: 1px solid var(--mk-line); box-shadow: inset 0 2px 0 var(--p); min-width: 0; }
+  .mock-d3-tile:first-child { border-left: 0; }
+  .mock-d3-main { background: color-mix(in srgb, var(--p) 7%, transparent); }
+  .mock-d3-th { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 6px; font: 13px var(--mk-disp); letter-spacing: .12em; text-transform: uppercase; min-width: 0; }
+  .mock-d3-word { margin-left: auto; font-family: Inter,'Segoe UI',sans-serif; letter-spacing: 0; text-transform: none; color: var(--mk-fg1); }
+  .mock-d3-word.lo { color: var(--mk-warn); }
+  .mock-d3-hero { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+  .mock-d3-hero .mock-num { font-size: 26px; }
+  .mock-d3-tile:not(.mock-d3-main) .mock-num { font-size: 22px; }
+  .mock-d3-tile .mock-rankbar { width: 84px; }
+  .mock-d3-tile .mock-rank span { font-size: 13px; }
+  .mock-d3-gap { color: var(--mk-warn); font-size: 13px; }
+  .mock-d3-subs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .mock-d3-sub { display: grid; padding: 4px 8px; border-radius: 2px; background: rgba(5,13,20,.35); }
+  .mock-d3-quiet { opacity: .6; }
+  .mock-d3-quiet .mock-d3-word { margin-left: 0; }
+  .mock-d3-qv { font: 15px var(--mk-mono); }
+  .mock-d3-off { color: var(--mk-fg2); padding: 0 12px; }
+  .mock-d3-drawer { display: grid; gap: 12px; padding: 12px 16px; border: 1px solid var(--mk-line); border-radius: 8px; background: #0f2c3d; }
+  .mock-d3-tabs { display: flex; gap: 4px; align-items: center; border-bottom: 1px solid var(--mk-line); }
+  .mock-d3-tab { padding: 6px 12px; color: var(--mk-fg1); border-bottom: 2px solid transparent; }
+  .mock-d3-tab.mock-on { color: var(--mk-fg0); border-bottom-color: var(--p); }
+  .mock-d3-tabs .mock-more { margin-left: auto; }
+  .mock-d3-dbody { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 16px; }
+
+  /* Analysis tables */
+  .mock-atbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .mock-atbl th, .mock-atbl td { text-align: left; padding: 3px 6px; border-bottom: 1px solid rgba(127,127,127,.25); }
+  .mock-fest { font-size: 13px; opacity: .8; }
+</style>
+<header class="iteration-intro">
+  <h2>Runde 1 · Kategorien nach Einsatz</h2>
+  <p>Drei Wege, die Kategorien je Einsatz zu ordnen; dieselben vier Schiffe in jedem Entwurf, Zahlen beispielhaft.</p>
+</header>
+<section data-design="d1" data-nav-label="Fokus und Leiste" data-design-active="true"
+    data-design-motto="Ein Fokus, der Rest leise" data-design-traits="Einsatz-Kategorie groß im Fokus|Übrige Kategorien als Einzeilen|Alle Werte im Fokus-Kasten" data-design-icon="compass" data-design-color="#e0a458">
+  <section id="d1-s1" data-nav-label="Gladius · Kampf" data-screen data-screen-active="true">
+    <div class="mock-root mock-d1"><div class="mock-head">
+      <div class="mock-title"><span class="mock-mfr">Aegis Dynamics</span><span class="mock-name">Gladius</span></div>
+      <div class="mock-chips"><span class="mock-chip">Kampf</span><span class="mock-chip">Leichter Jäger</span><span class="mock-chip">S</span><span class="mock-chip">1 Crew</span></div>
+    </div>
+    <div class="mock-table" aria-hidden="true"><svg viewBox="0 0 400 90"><path d="M200 8 L216 40 L300 62 L300 72 L222 66 L216 82 L200 78 L184 82 L178 66 L100 72 L100 62 L184 40 Z"/></svg></div><div class="mock-d1-zone">
+      <article class="mock-d1-spot" style="--p:var(--mk-off)">
+        <header class="mock-d1-sh"><span class="mock-sym" style="--p:var(--mk-off)">◆</span><span class="mock-d1-st">Offensive</span><span class="mock-d1-for">Fokus für Kampf</span></header>
+        <div class="mock-d1-hero"><span class="mock-num">1.180</span><span class="mock-unit">Dauer-DPS</span><span class="mock-delta">+60 seit 4.3.1</span></div>
+       <div class="mock-rank "><span class="mock-rankbar  "><i style="width:78%"></i><b></b></span><span>besser als 78 % von 38 leichten Jägern</span></div><div class="mock-d1-subs"><div class="mock-d1-sub"><span class="mock-k">Burst-DPS</span><span class="mock-v">1.640</span><span class="mock-rankbar mock-mini "><i style="width:81%"></i><b></b></span></div><div class="mock-d1-sub"><span class="mock-k">Alpha</span><span class="mock-v">412</span><span class="mock-rankbar mock-mini "><i style="width:64%"></i><b></b></span></div><div class="mock-d1-sub"><span class="mock-k">Raketen</span><span class="mock-v">6 × S2</span><span class="mock-rankbar mock-mini "><i style="width:55%"></i><b></b></span></div></div>
+        <span class="mock-more" data-screen-link="d1-s5">Alle Werte ▾</span>
+        
+      </article>
+      <div class="mock-d1-list"><div class="mock-d1-lh">Weitere Kategorien</div><span class="mock-d1-row" style="--p:var(--mk-def)"><span class="mock-sym" style="--p:var(--mk-def)">⬢</span><span class="mock-d1-rn">Verteidigung</span><span class="mock-d1-rv">4.320 <small>Schild HP</small></span><span class="mock-d1-rw ">über Mittel</span><span class="mock-rankbar mock-mini "><i style="width:61%"></i><b></b></span></span><span class="mock-d1-row" style="--p:var(--mk-mov)"><span class="mock-sym" style="--p:var(--mk-mov)">➤</span><span class="mock-d1-rn">Bewegung</span><span class="mock-d1-rv">236 <small>m/s SCM</small></span><span class="mock-d1-rw ">stark</span><span class="mock-rankbar mock-mini "><i style="width:84%"></i><b></b></span></span><span class="mock-d1-row mock-d1-quietrow" style="--p:var(--mk-sig)"><span class="mock-sym" style="--p:var(--mk-sig)">≋</span><span class="mock-d1-rn">Signatur & Kühlung</span><span class="mock-d1-rv">6.400 <small>IR</small></span><span class="mock-d1-rw ">über Mittel</span><span class="mock-rankbar mock-mini "><i style="width:72%"></i><b></b></span></span><div class="mock-d1-off">Nicht für Kampf: kein Frachtgitter</div></div>
+    </div><div class="mock-strip"><div class="mock-einsatz"><span class="mock-lab">Einsatz</span><span class="mock-mis">Alles</span><span class="mock-mis mock-on" data-screen-link="d1-s1">Kampf</span><span class="mock-mis" data-screen-link="d1-s2">Transport</span><span class="mock-mis" data-screen-link="d1-s3">Reisen</span><span class="mock-mis">Schleichen</span><span class="mock-mis" data-screen-link="d1-s4">Bergbau</span><span class="mock-mis">Bergung</span></div><div class="mock-sareas"><div class="mock-sa" style="--p:var(--mk-off)"><span class="mock-sal">◆ Offensive</span><span>Dauer-DPS 1.180</span><span>Alpha 412</span></div><div class="mock-sa" style="--p:var(--mk-def)"><span class="mock-sal">⬢ Verteidigung</span><span>Schild 4.320</span><span>Rumpf 3.950</span></div><div class="mock-sa" style="--p:var(--mk-mov)"><span class="mock-sal">➤ Bewegung</span><span>SCM 236</span><span>Q 1,9 Gm</span></div><div class="mock-sa" style="--p:var(--mk-sig)"><span class="mock-sal">≋ Signatur & Kühlung</span><span>IR 6.400</span><span>EM 11.200</span></div></div></div></div>
+    <div class="anno-layer" data-anno-layer><div class="anno" data-anno="d1-s1-a1" data-anno-side="right" data-anno-target=".mock-d1-spot .mock-rank span" style="--anno-x:50%;--anno-y:30%">
+        <button class="anno-pin" type="button" data-anno-pin="d1-s1-a1" aria-expanded="false" aria-controls="anno-bubble-d1-s1-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-d1-s1-a1" data-anno-bubble="d1-s1-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="d1-s1-a1" aria-expanded="false" aria-controls="anno-bubble-d1-s1-a1">
+            <span class="anno-bubble-question">Reicht „besser als 78 % von 38 leichten Jägern“ als Rang, ohne Ring und ohne P-Zahl?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-d1-s1-a1" data-annotation="d1-s1-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-d1-s1-a1"></div>
+          </div>
+        </div>
+      </div>
+<div class="anno" data-anno="d1-s1-a2" data-anno-side="right" data-anno-target=".mock-d1-lh" style="--anno-x:50%;--anno-y:30%">
+        <button class="anno-pin" type="button" data-anno-pin="d1-s1-a2" aria-expanded="false" aria-controls="anno-bubble-d1-s1-a2" aria-label="{{anno.pin_label}}">2</button>
+        <div class="anno-bubble" id="anno-bubble-d1-s1-a2" data-anno-bubble="d1-s1-a2" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="d1-s1-a2" aria-expanded="false" aria-controls="anno-bubble-d1-s1-a2">
+            <span class="anno-bubble-question">Genügt den übrigen Kategorien je ein Leitwert plus Rangwort, oder fehlt ein zweiter Wert?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-d1-s1-a2" data-annotation="d1-s1-a2" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-d1-s1-a2"></div>
+          </div>
+        </div>
+      </div>
+<div class="anno" data-anno="d1-s1-a3" data-anno-side="bottom" data-anno-target=".mock-d1-off" style="--anno-x:50%;--anno-y:30%">
+        <button class="anno-pin" type="button" data-anno-pin="d1-s1-a3" aria-expanded="false" aria-controls="anno-bubble-d1-s1-a3" aria-label="{{anno.pin_label}}">3</button>
+        <div class="anno-bubble" id="anno-bubble-d1-s1-a3" data-anno-bubble="d1-s1-a3" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="d1-s1-a3" aria-expanded="false" aria-controls="anno-bubble-d1-s1-a3">
+            <span class="anno-bubble-question">Soll „Nicht für Kampf: kein Frachtgitter“ sichtbar bleiben oder ganz wegfallen?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-d1-s1-a3" data-annotation="d1-s1-a3" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-d1-s1-a3"></div>
+          </div>
+        </div>
+      </div></div>
+  </section>
+  <section id="d1-s2" data-nav-label="C2 · Transport" data-screen hidden>
+    <div class="mock-root mock-d1"><div class="mock-head">
+      <div class="mock-title"><span class="mock-mfr">Crusader Industries</span><span class="mock-name">C2 Hercules Starlifter</span></div>
+      <div class="mock-chips"><span class="mock-chip">Transport</span><span class="mock-chip">Schwerer Frachter</span><span class="mock-chip">L</span><span class="mock-chip">2 Crew</span><span class="mock-chip">696 SCU</span></div>
+    </div>
+    <div class="mock-table" aria-hidden="true"><svg viewBox="0 0 400 90"><path d="M200 8 L216 40 L300 62 L300 72 L222 66 L216 82 L200 78 L184 82 L178 66 L100 72 L100 62 L184 40 Z"/></svg></div><div class="mock-d1-zone">
+      <article class="mock-d1-spot" style="--p:var(--mk-car)">
+        <header class="mock-d1-sh"><span class="mock-sym" style="--p:var(--mk-car)">▤</span><span class="mock-d1-st">Fracht</span><span class="mock-d1-for">Fokus für Transport</span></header>
+        <div class="mock-d1-hero"><span class="mock-num">696</span><span class="mock-unit">SCU Laderaum</span></div>
+       <div class="mock-rank "><span class="mock-rankbar  "><i style="width:93%"></i><b></b></span><span>besser als 93 % von 14 großen Frachtern</span></div><div class="mock-d1-subs"><div class="mock-d1-sub"><span class="mock-k">Hauptdeck</span><span class="mock-v">576 SCU</span></div><div class="mock-d1-sub"><span class="mock-k">Unterdeck</span><span class="mock-v">120 SCU</span></div><div class="mock-d1-sub"><span class="mock-k">Rampe</span><span class="mock-v">Heck</span></div></div>
+        <span class="mock-more" data-screen-link="d1-s5">Alle Werte ▾</span>
+        
+      </article>
+      <div class="mock-d1-list"><div class="mock-d1-lh">Weitere Kategorien</div><span class="mock-d1-row" style="--p:var(--mk-def)"><span class="mock-sym" style="--p:var(--mk-def)">⬢</span><span class="mock-d1-rn">Verteidigung</span><span class="mock-d1-rv">62.000 <small>Rumpf HP</small></span><span class="mock-d1-rw ">über Mittel</span><span class="mock-rankbar mock-mini "><i style="width:70%"></i><b></b></span></span><span class="mock-d1-row" style="--p:var(--mk-mov)"><span class="mock-sym" style="--p:var(--mk-mov)">➤</span><span class="mock-d1-rn">Bewegung</span><span class="mock-d1-rv">11,4 <small>Gm Q-Reichweite</small></span><span class="mock-d1-rw ">über Mittel</span><span class="mock-rankbar mock-mini "><i style="width:66%"></i><b></b></span></span><span class="mock-d1-row" style="--p:var(--mk-sig)"><span class="mock-sym" style="--p:var(--mk-sig)">≋</span><span class="mock-d1-rn">Signatur & Kühlung</span><span class="mock-d1-rv">92 <small>m Querschnitt</small></span><span class="mock-d1-rw lo">schwach</span><span class="mock-rankbar mock-mini lo"><i style="width:20%"></i><b></b></span></span><span class="mock-d1-row mock-d1-quietrow" style="--p:var(--mk-off)"><span class="mock-sym" style="--p:var(--mk-off)">◆</span><span class="mock-d1-rn">Offensive</span><span class="mock-d1-rv">2.860 <small>Dauer-DPS</small></span><span class="mock-d1-rw ">unter Mittel</span><span class="mock-rankbar mock-mini "><i style="width:35%"></i><b></b></span></span></div>
+    </div><div class="mock-strip"><div class="mock-einsatz"><span class="mock-lab">Einsatz</span><span class="mock-mis">Alles</span><span class="mock-mis" data-screen-link="d1-s1">Kampf</span><span class="mock-mis mock-on" data-screen-link="d1-s2">Transport</span><span class="mock-mis" data-screen-link="d1-s3">Reisen</span><span class="mock-mis">Schleichen</span><span class="mock-mis" data-screen-link="d1-s4">Bergbau</span><span class="mock-mis">Bergung</span></div><div class="mock-sareas"><div class="mock-sa" style="--p:var(--mk-off)"><span class="mock-sal">◆ Offensive</span><span>Dauer-DPS 2.860</span><span>Alpha 640</span></div><div class="mock-sa" style="--p:var(--mk-def)"><span class="mock-sal">⬢ Verteidigung</span><span>Schild 31.500</span><span>Rumpf 62.000</span></div><div class="mock-sa" style="--p:var(--mk-mov)"><span class="mock-sal">➤ Bewegung</span><span>SCM 125</span><span>Q 11,4 Gm</span></div><div class="mock-sa" style="--p:var(--mk-sig)"><span class="mock-sal">≋ Signatur & Kühlung</span><span>IR 21.300</span><span>EM 38.900</span></div></div></div></div>
+    <div class="anno-layer" data-anno-layer><div class="anno" data-anno="d1-s2-a1" data-anno-side="bottom" data-anno-target=".mock-d1-list > .mock-d1-row:last-of-type" style="--anno-x:50%;--anno-y:30%">
+        <button class="anno-pin" type="button" data-anno-pin="d1-s2-a1" aria-expanded="false" aria-controls="anno-bubble-d1-s2-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-d1-s2-a1" data-anno-bubble="d1-s2-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="d1-s2-a1" aria-expanded="false" aria-controls="anno-bubble-d1-s2-a1">
+            <span class="anno-bubble-question">Darf ein Klick auf eine Zeile sie in den Fokus holen, ohne den Einsatz zu ändern?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-d1-s2-a1" data-annotation="d1-s2-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-d1-s2-a1"></div>
+          </div>
+        </div>
+      </div></div>
+  </section>
+  <section id="d1-s3" data-nav-label="Carrack · Reisen" data-screen hidden>
+    <div class="mock-root mock-d1"><div class="mock-head">
+      <div class="mock-title"><span class="mock-mfr">Anvil Aerospace</span><span class="mock-name">Carrack</span></div>
+      <div class="mock-chips"><span class="mock-chip">Erkundung</span><span class="mock-chip">Expedition</span><span class="mock-chip">L</span><span class="mock-chip">4 Crew</span><span class="mock-chip">456 SCU</span></div>
+    </div>
+    <div class="mock-table" aria-hidden="true"><svg viewBox="0 0 400 90"><path d="M200 8 L216 40 L300 62 L300 72 L222 66 L216 82 L200 78 L184 82 L178 66 L100 72 L100 62 L184 40 Z"/></svg></div><div class="mock-d1-zone">
+      <article class="mock-d1-spot" style="--p:var(--mk-mov)">
+        <header class="mock-d1-sh"><span class="mock-sym" style="--p:var(--mk-mov)">➤</span><span class="mock-d1-st">Bewegung</span><span class="mock-d1-for">Fokus für Reisen</span></header>
+        <div class="mock-d1-hero"><span class="mock-num">82</span><span class="mock-unit">Gm Q-Reichweite</span></div>
+       <div class="mock-rank "><span class="mock-rankbar  "><i style="width:100%"></i><b></b></span><span>besser als 100 % von 9 Erkundungsschiffen</span></div><div class="mock-d1-subs"><div class="mock-d1-sub"><span class="mock-k">Q-Tempo</span><span class="mock-v">283 Mm/s</span><span class="mock-rankbar mock-mini "><i style="width:78%"></i><b></b></span></div><div class="mock-d1-sub"><span class="mock-k">Spool</span><span class="mock-v">6,2 s</span><span class="mock-rankbar mock-mini "><i style="width:60%"></i><b></b></span></div><div class="mock-d1-sub"><span class="mock-k">SCM</span><span class="mock-v">110 m/s</span><span class="mock-rankbar mock-mini "><i style="width:33%"></i><b></b></span></div></div>
+        <span class="mock-more" data-screen-link="d1-s5">Alle Werte ▾</span>
+        
+      </article>
+      <div class="mock-d1-list"><div class="mock-d1-lh">Weitere Kategorien</div><span class="mock-d1-row" style="--p:var(--mk-def)"><span class="mock-sym" style="--p:var(--mk-def)">⬢</span><span class="mock-d1-rn">Verteidigung</span><span class="mock-d1-rv">118.000 <small>Rumpf HP</small></span><span class="mock-d1-rw ">stark</span><span class="mock-rankbar mock-mini "><i style="width:92%"></i><b></b></span></span><span class="mock-d1-row" style="--p:var(--mk-car)"><span class="mock-sym" style="--p:var(--mk-car)">▤</span><span class="mock-d1-rn">Fracht</span><span class="mock-d1-rv">456 <small>SCU Laderaum</small></span><span class="mock-d1-rw ">stark</span><span class="mock-rankbar mock-mini "><i style="width:88%"></i><b></b></span></span><span class="mock-d1-row mock-d1-quietrow" style="--p:var(--mk-sig)"><span class="mock-sym" style="--p:var(--mk-sig)">≋</span><span class="mock-d1-rn">Signatur & Kühlung</span><span class="mock-d1-rv">126 <small>m Querschnitt</small></span><span class="mock-d1-rw lo">schwach</span><span class="mock-rankbar mock-mini lo"><i style="width:11%"></i><b></b></span></span><span class="mock-d1-row mock-d1-quietrow" style="--p:var(--mk-off)"><span class="mock-sym" style="--p:var(--mk-off)">◆</span><span class="mock-d1-rn">Offensive</span><span class="mock-d1-rv">3.400 <small>Dauer-DPS</small></span><span class="mock-d1-rw ">über Mittel</span><span class="mock-rankbar mock-mini "><i style="width:70%"></i><b></b></span></span></div>
+    </div><div class="mock-strip"><div class="mock-einsatz"><span class="mock-lab">Einsatz</span><span class="mock-mis">Alles</span><span class="mock-mis" data-screen-link="d1-s1">Kampf</span><span class="mock-mis" data-screen-link="d1-s2">Transport</span><span class="mock-mis mock-on" data-screen-link="d1-s3">Reisen</span><span class="mock-mis">Schleichen</span><span class="mock-mis" data-screen-link="d1-s4">Bergbau</span><span class="mock-mis">Bergung</span></div><div class="mock-sareas"><div class="mock-sa" style="--p:var(--mk-off)"><span class="mock-sal">◆ Offensive</span><span>Dauer-DPS 3.400</span><span>Alpha 900</span></div><div class="mock-sa" style="--p:var(--mk-def)"><span class="mock-sal">⬢ Verteidigung</span><span>Schild 56.000</span><span>Rumpf 118.000</span></div><div class="mock-sa" style="--p:var(--mk-mov)"><span class="mock-sal">➤ Bewegung</span><span>SCM 110</span><span>Q 82 Gm</span></div><div class="mock-sa" style="--p:var(--mk-sig)"><span class="mock-sal">≋ Signatur & Kühlung</span><span>IR 24.800</span><span>EM 41.000</span></div></div></div></div>
+    <div class="anno-layer" data-anno-layer><div class="anno" data-anno="d1-s3-a1" data-anno-side="top" data-anno-target=".mock-einsatz .mock-on" style="--anno-x:50%;--anno-y:30%">
+        <button class="anno-pin" type="button" data-anno-pin="d1-s3-a1" aria-expanded="false" aria-controls="anno-bubble-d1-s3-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-d1-s3-a1" data-anno-bubble="d1-s3-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="d1-s3-a1" aria-expanded="false" aria-controls="anno-bubble-d1-s3-a1">
+            <span class="anno-bubble-question">Heißt der Einsatz weiter „Reisen“ oder „Erkundung“ wie die Schiffsrolle der Carrack?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-d1-s3-a1" data-annotation="d1-s3-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-d1-s3-a1"></div>
+          </div>
+        </div>
+      </div></div>
+  </section>
+  <section id="d1-s4" data-nav-label="Prospector · Bergbau" data-screen hidden>
+    <div class="mock-root mock-d1"><div class="mock-head">
+      <div class="mock-title"><span class="mock-mfr">MISC</span><span class="mock-name">Prospector</span></div>
+      <div class="mock-chips"><span class="mock-chip">Industrie</span><span class="mock-chip">Bergbau</span><span class="mock-chip">S</span><span class="mock-chip">1 Crew</span><span class="mock-chip">32 SCU</span></div>
+    </div>
+    <div class="mock-table" aria-hidden="true"><svg viewBox="0 0 400 90"><path d="M200 8 L216 40 L300 62 L300 72 L222 66 L216 82 L200 78 L184 82 L178 66 L100 72 L100 62 L184 40 Z"/></svg></div><div class="mock-d1-zone">
+      <article class="mock-d1-spot" style="--p:var(--mk-min)">
+        <header class="mock-d1-sh"><span class="mock-sym" style="--p:var(--mk-min)">⛏</span><span class="mock-d1-st">Bergbau</span><span class="mock-d1-for">Fokus für Bergbau</span></header>
+        <div class="mock-d1-hero"><span class="mock-num mock-numtxt">Arbor MH1</span><span class="mock-unit">S1 · Bergbaulaser</span></div>
+       <div class="mock-d1-gap">Laserleistung, Instabilität und Widerstand fehlen in den Spieldaten.</div><div class="mock-d1-subs"><div class="mock-d1-sub"><span class="mock-k">Bergbau-Hardpoints</span><span class="mock-v">1 × S1</span></div><div class="mock-d1-sub"><span class="mock-k">Erz-Laderaum</span><span class="mock-v">32 SCU</span><span class="mock-rankbar mock-mini "><i style="width:50%"></i><b></b></span></div></div>
+        <span class="mock-more" data-screen-link="d1-s5">Alle Werte ▾</span>
+        
+      </article>
+      <div class="mock-d1-list"><div class="mock-d1-lh">Weitere Kategorien</div><span class="mock-d1-row" style="--p:var(--mk-sig)"><span class="mock-sym" style="--p:var(--mk-sig)">≋</span><span class="mock-d1-rn">Signatur & Kühlung</span><span class="mock-d1-rv">72 <small>% Kühllast</small></span><span class="mock-d1-rw ">unter Mittel</span><span class="mock-rankbar mock-mini "><i style="width:45%"></i><b></b></span></span><span class="mock-d1-row" style="--p:var(--mk-def)"><span class="mock-sym" style="--p:var(--mk-def)">⬢</span><span class="mock-d1-rn">Verteidigung</span><span class="mock-d1-rv">2.400 <small>Schild HP</small></span><span class="mock-d1-rw ">stark</span><span class="mock-rankbar mock-mini "><i style="width:75%"></i><b></b></span></span><span class="mock-d1-row mock-d1-quietrow" style="--p:var(--mk-mov)"><span class="mock-sym" style="--p:var(--mk-mov)">➤</span><span class="mock-d1-rn">Bewegung</span><span class="mock-d1-rv">2,6 <small>Gm Q-Reichweite</small></span><span class="mock-d1-rw ">über Mittel</span><span class="mock-rankbar mock-mini "><i style="width:50%"></i><b></b></span></span><div class="mock-d1-off">Nicht für Bergbau: keine Waffen</div></div>
+    </div><div class="mock-strip"><div class="mock-einsatz"><span class="mock-lab">Einsatz</span><span class="mock-mis">Alles</span><span class="mock-mis" data-screen-link="d1-s1">Kampf</span><span class="mock-mis" data-screen-link="d1-s2">Transport</span><span class="mock-mis" data-screen-link="d1-s3">Reisen</span><span class="mock-mis">Schleichen</span><span class="mock-mis mock-on" data-screen-link="d1-s4">Bergbau</span><span class="mock-mis">Bergung</span></div><div class="mock-sareas"><div class="mock-sa" style="--p:var(--mk-off)"><span class="mock-sal">◆ Offensive</span><span>—</span><span>keine Waffen</span></div><div class="mock-sa" style="--p:var(--mk-def)"><span class="mock-sal">⬢ Verteidigung</span><span>Schild 2.400</span><span>Rumpf 5.100</span></div><div class="mock-sa" style="--p:var(--mk-mov)"><span class="mock-sal">➤ Bewegung</span><span>SCM 165</span><span>Q 2,6 Gm</span></div><div class="mock-sa" style="--p:var(--mk-sig)"><span class="mock-sal">≋ Signatur & Kühlung</span><span>IR 9.800</span><span>EM 14.100</span></div></div></div></div>
+    <div class="anno-layer" data-anno-layer><div class="anno" data-anno="d1-s4-a1" data-anno-side="right" data-anno-target=".mock-d1-gap" style="--anno-x:50%;--anno-y:30%">
+        <button class="anno-pin" type="button" data-anno-pin="d1-s4-a1" aria-expanded="false" aria-controls="anno-bubble-d1-s4-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-d1-s4-a1" data-anno-bubble="d1-s4-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="d1-s4-a1" aria-expanded="false" aria-controls="anno-bubble-d1-s4-a1">
+            <span class="anno-bubble-question">Reicht der Lasername als Leitwert, solange Leistung und Widerstand in den Spieldaten fehlen?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-d1-s4-a1" data-annotation="d1-s4-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-d1-s4-a1"></div>
+          </div>
+        </div>
+      </div></div>
+  </section>
+  <section id="d1-s5" data-nav-label="Alle Werte offen" data-screen hidden>
+    <div class="mock-root mock-d1"><div class="mock-head">
+      <div class="mock-title"><span class="mock-mfr">Aegis Dynamics</span><span class="mock-name">Gladius</span></div>
+      <div class="mock-chips"><span class="mock-chip">Kampf</span><span class="mock-chip">Leichter Jäger</span><span class="mock-chip">S</span><span class="mock-chip">1 Crew</span></div>
+    </div>
+    <div class="mock-table" aria-hidden="true"><svg viewBox="0 0 400 90"><path d="M200 8 L216 40 L300 62 L300 72 L222 66 L216 82 L200 78 L184 82 L178 66 L100 72 L100 62 L184 40 Z"/></svg></div><div class="mock-d1-zone">
+      <article class="mock-d1-spot" style="--p:var(--mk-off)">
+        <header class="mock-d1-sh"><span class="mock-sym" style="--p:var(--mk-off)">◆</span><span class="mock-d1-st">Offensive</span><span class="mock-d1-for">Fokus für Kampf</span></header>
+        <div class="mock-d1-hero"><span class="mock-num">1.180</span><span class="mock-unit">Dauer-DPS</span><span class="mock-delta">+60 seit 4.3.1</span></div>
+       <div class="mock-rank "><span class="mock-rankbar  "><i style="width:78%"></i><b></b></span><span>besser als 78 % von 38 leichten Jägern</span></div><div class="mock-d1-subs"><div class="mock-d1-sub"><span class="mock-k">Burst-DPS</span><span class="mock-v">1.640</span><span class="mock-rankbar mock-mini "><i style="width:81%"></i><b></b></span></div><div class="mock-d1-sub"><span class="mock-k">Alpha</span><span class="mock-v">412</span><span class="mock-rankbar mock-mini "><i style="width:64%"></i><b></b></span></div><div class="mock-d1-sub"><span class="mock-k">Raketen</span><span class="mock-v">6 × S2</span><span class="mock-rankbar mock-mini "><i style="width:55%"></i><b></b></span></div></div>
+        <span class="mock-more" data-screen-link="d1-s1">Alle Werte ▴</span>
+        <div class="mock-d1-detail"><div class="mock-d1-dh"><span>Alle Werte · Offensive</span><span class="mock-d1-mark">★ für Kampf wichtig</span></div>
+        <div class="mock-d1-dgrid"><div class="mock-kvg"><h5>Waffen</h5><table class="mock-tbl mock-d1-tbl">
+      <thead><tr><th>Waffe</th><th>Größe</th><th>Alpha</th><th>Dauer</th><th>Burst</th></tr></thead>
+      <tbody>
+        <tr><td>2 × CF-337 Panther</td><td>S3</td><td>116</td><td class="mock-key">640</td><td>900</td></tr>
+        <tr><td>1 × Attrition-3</td><td>S3</td><td>296</td><td class="mock-key">540</td><td>740</td></tr>
+        <tr class="mock-sum"><td>Summe</td><td></td><td>412</td><td class="mock-key">1.180</td><td>1.640</td></tr>
+      </tbody></table></div><div class="mock-kvg"><h5>Schaden & Reichweite</h5><div class="mock-kv"><span>Energie-Anteil</span><b>100 %</b></div><div class="mock-kv mock-keyrow"><span>Wirkreichweite</span><b>1.950 m</b></div><div class="mock-kv"><span>Geschosstempo</span><b>1.400 m/s</b></div></div><div class="mock-kvg"><h5>Raketen</h5><div class="mock-kv"><span>6 × Ignite II</span><b>S2 · IR</b></div><div class="mock-kv mock-keyrow"><span>Salve</span><b>15.600</b></div><div class="mock-kv"><span>Aufschalten</span><b>2,5 s</b></div><div class="mock-kv"><span>Reichweite</span><b>5.000 m</b></div></div></div>
+        <div class="mock-gapcount">2 Werte fehlen in den Spieldaten ▾</div></div>
+      </article>
+      <div class="mock-d1-list"><div class="mock-d1-lh">Weitere Kategorien</div><span class="mock-d1-row" style="--p:var(--mk-def)"><span class="mock-sym" style="--p:var(--mk-def)">⬢</span><span class="mock-d1-rn">Verteidigung</span><span class="mock-d1-rv">4.320 <small>Schild HP</small></span><span class="mock-d1-rw ">über Mittel</span><span class="mock-rankbar mock-mini "><i style="width:61%"></i><b></b></span></span><span class="mock-d1-row" style="--p:var(--mk-mov)"><span class="mock-sym" style="--p:var(--mk-mov)">➤</span><span class="mock-d1-rn">Bewegung</span><span class="mock-d1-rv">236 <small>m/s SCM</small></span><span class="mock-d1-rw ">stark</span><span class="mock-rankbar mock-mini "><i style="width:84%"></i><b></b></span></span><span class="mock-d1-row mock-d1-quietrow" style="--p:var(--mk-sig)"><span class="mock-sym" style="--p:var(--mk-sig)">≋</span><span class="mock-d1-rn">Signatur & Kühlung</span><span class="mock-d1-rv">6.400 <small>IR</small></span><span class="mock-d1-rw ">über Mittel</span><span class="mock-rankbar mock-mini "><i style="width:72%"></i><b></b></span></span><div class="mock-d1-off">Nicht für Kampf: kein Frachtgitter</div></div>
+    </div><div class="mock-strip"><div class="mock-einsatz"><span class="mock-lab">Einsatz</span><span class="mock-mis">Alles</span><span class="mock-mis mock-on" data-screen-link="d1-s1">Kampf</span><span class="mock-mis" data-screen-link="d1-s2">Transport</span><span class="mock-mis" data-screen-link="d1-s3">Reisen</span><span class="mock-mis">Schleichen</span><span class="mock-mis" data-screen-link="d1-s4">Bergbau</span><span class="mock-mis">Bergung</span></div><div class="mock-sareas"><div class="mock-sa" style="--p:var(--mk-off)"><span class="mock-sal">◆ Offensive</span><span>Dauer-DPS 1.180</span><span>Alpha 412</span></div><div class="mock-sa" style="--p:var(--mk-def)"><span class="mock-sal">⬢ Verteidigung</span><span>Schild 4.320</span><span>Rumpf 3.950</span></div><div class="mock-sa" style="--p:var(--mk-mov)"><span class="mock-sal">➤ Bewegung</span><span>SCM 236</span><span>Q 1,9 Gm</span></div><div class="mock-sa" style="--p:var(--mk-sig)"><span class="mock-sal">≋ Signatur & Kühlung</span><span>IR 6.400</span><span>EM 11.200</span></div></div></div></div>
+    <div class="anno-layer" data-anno-layer><div class="anno" data-anno="d1-s5-a1" data-anno-side="left" data-anno-target=".mock-d1-mark" style="--anno-x:50%;--anno-y:30%">
+        <button class="anno-pin" type="button" data-anno-pin="d1-s5-a1" aria-expanded="false" aria-controls="anno-bubble-d1-s5-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-d1-s5-a1" data-anno-bubble="d1-s5-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="d1-s5-a1" aria-expanded="false" aria-controls="anno-bubble-d1-s5-a1">
+            <span class="anno-bubble-question">Hilft die ★-Markierung der für den Einsatz wichtigen Zeilen beim Lesen der vollen Liste?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-d1-s5-a1" data-annotation="d1-s5-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-d1-s5-a1"></div>
+          </div>
+        </div>
+      </div></div>
+  </section>
+  </section>
+<section data-design="d2" data-nav-label="Fragen zum Einsatz" hidden
+    data-design-motto="Fragen statt Kategorien" data-design-traits="Zeilen beantworten Einsatz-Fragen|Kategorie nur noch als Symbol|Zeile klappt ihre Quelle auf" data-design-icon="list" data-design-color="#8fd18b">
+  <section id="d2-s1" data-nav-label="Gladius · Kampf" data-screen data-screen-active="true">
+    <div class="mock-root mock-d2"><div class="mock-head">
+      <div class="mock-title"><span class="mock-mfr">Aegis Dynamics</span><span class="mock-name">Gladius</span></div>
+      <div class="mock-chips"><span class="mock-chip">Kampf</span><span class="mock-chip">Leichter Jäger</span><span class="mock-chip">S</span><span class="mock-chip">1 Crew</span></div>
+    </div>
+    <div class="mock-table" aria-hidden="true"><svg viewBox="0 0 400 90"><path d="M200 8 L216 40 L300 62 L300 72 L222 66 L216 82 L200 78 L184 82 L178 66 L100 72 L100 62 L184 40 Z"/></svg></div><div class="mock-d2-zone">
+      <header class="mock-d2-head"><span class="mock-d2-ht">Für Kampf wichtig</span><span class="mock-d2-cohort">verglichen mit 38 leichten Jägern</span><span class="mock-more">Alle Werte</span></header>
+      <ol class="mock-d2-list"><li class="mock-d2-row" style="--p:var(--mk-off)" data-screen-link="d2-s5">
+      <span class="mock-sym" style="--p:var(--mk-off)">◆</span><span class="mock-d2-q">Wie viel Schaden pro Sekunde?</span><span class="mock-d2-v">1.180 <small>Dauer-DPS</small></span><span class="mock-d2-bar"><span class="mock-rankbar  "><i style="width:78%"></i><b></b></span></span><span class="mock-d2-rw ">stark · 78 %</span><span class="mock-d2-caret">▸</span>
+      
+    </li><li class="mock-d2-row" style="--p:var(--mk-def)" data-screen-link="d2-s5">
+      <span class="mock-sym" style="--p:var(--mk-def)">⬢</span><span class="mock-d2-q">Wie viel hält sie aus?</span><span class="mock-d2-v">8.270 <small>HP Schild + Rumpf</small></span><span class="mock-d2-bar"><span class="mock-rankbar  "><i style="width:55%"></i><b></b></span></span><span class="mock-d2-rw ">über Mittel · 55 %</span><span class="mock-d2-caret">▸</span>
+      
+    </li><li class="mock-d2-row" style="--p:var(--mk-mov)" data-screen-link="d2-s5">
+      <span class="mock-sym" style="--p:var(--mk-mov)">➤</span><span class="mock-d2-q">Wie wendig ist sie?</span><span class="mock-d2-v">236 <small>m/s SCM</small></span><span class="mock-d2-bar"><span class="mock-rankbar  "><i style="width:84%"></i><b></b></span></span><span class="mock-d2-rw ">stark · 84 %</span><span class="mock-d2-caret">▸</span>
+      
+    </li><li class="mock-d2-row" style="--p:var(--mk-def)" data-screen-link="d2-s5">
+      <span class="mock-sym" style="--p:var(--mk-def)">⬢</span><span class="mock-d2-q">Wie schnell ist der Schild wieder voll?</span><span class="mock-d2-v">20 <small>s</small></span><span class="mock-d2-bar"><span class="mock-rankbar  "><i style="width:66%"></i><b></b></span></span><span class="mock-d2-rw ">über Mittel · 66 %</span><span class="mock-d2-caret">▸</span>
+      
+    </li></ol>
+      <div class="mock-d2-also"><div class="mock-d2-ah">Auch gut zu wissen</div><ul><li class="mock-d2-arow" style="--p:var(--mk-sig)"><span class="mock-sym" style="--p:var(--mk-sig)">≋</span><span class="mock-d2-q">Wie leicht wird sie entdeckt?</span><span class="mock-d2-v">6.400 <small>IR</small></span><span class="mock-d2-rw ">über Mittel</span></li><li class="mock-d2-arow" style="--p:var(--mk-mov)"><span class="mock-sym" style="--p:var(--mk-mov)">➤</span><span class="mock-d2-q">Wie weit springt sie?</span><span class="mock-d2-v">1,9 <small>Gm</small></span><span class="mock-d2-rw ">unter Mittel</span></li><li class="mock-d2-arow mock-d2-none">Fracht: kein Frachtgitter</li></ul></div>
+    </div><div class="mock-strip"><div class="mock-einsatz"><span class="mock-lab">Einsatz</span><span class="mock-mis">Alles</span><span class="mock-mis mock-on" data-screen-link="d2-s1">Kampf</span><span class="mock-mis" data-screen-link="d2-s2">Transport</span><span class="mock-mis" data-screen-link="d2-s3">Reisen</span><span class="mock-mis">Schleichen</span><span class="mock-mis" data-screen-link="d2-s4">Bergbau</span><span class="mock-mis">Bergung</span></div><div class="mock-sareas"><div class="mock-sa" style="--p:var(--mk-off)"><span class="mock-sal">◆ Offensive</span><span>Dauer-DPS 1.180</span><span>Alpha 412</span></div><div class="mock-sa" style="--p:var(--mk-def)"><span class="mock-sal">⬢ Verteidigung</span><span>Schild 4.320</span><span>Rumpf 3.950</span></div><div class="mock-sa" style="--p:var(--mk-mov)"><span class="mock-sal">➤ Bewegung</span><span>SCM 236</span><span>Q 1,9 Gm</span></div><div class="mock-sa" style="--p:var(--mk-sig)"><span class="mock-sal">≋ Signatur & Kühlung</span><span>IR 6.400</span><span>EM 11.200</span></div></div></div></div>
+    <div class="anno-layer" data-anno-layer><div class="anno" data-anno="d2-s1-a1" data-anno-side="top" data-anno-target=".mock-d2-row .mock-d2-q" style="--anno-x:50%;--anno-y:30%">
+        <button class="anno-pin" type="button" data-anno-pin="d2-s1-a1" aria-expanded="false" aria-controls="anno-bubble-d2-s1-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-d2-s1-a1" data-anno-bubble="d2-s1-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="d2-s1-a1" aria-expanded="false" aria-controls="anno-bubble-d2-s1-a1">
+            <span class="anno-bubble-question">Fragen als Zeilentitel, oder lieber die Kennzahl-Namen (Dauer-DPS, Schild HP)?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-d2-s1-a1" data-annotation="d2-s1-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-d2-s1-a1"></div>
+          </div>
+        </div>
+      </div>
+<div class="anno" data-anno="d2-s1-a2" data-anno-side="top" data-anno-target=".mock-d2-row .mock-sym" style="--anno-x:50%;--anno-y:30%">
+        <button class="anno-pin" type="button" data-anno-pin="d2-s1-a2" aria-expanded="false" aria-controls="anno-bubble-d2-s1-a2" aria-label="{{anno.pin_label}}">2</button>
+        <div class="anno-bubble" id="anno-bubble-d2-s1-a2" data-anno-bubble="d2-s1-a2" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="d2-s1-a2" aria-expanded="false" aria-controls="anno-bubble-d2-s1-a2">
+            <span class="anno-bubble-question">Bleiben die vier Bereiche mit dem Symbol allein erkennbar genug?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-d2-s1-a2" data-annotation="d2-s1-a2" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-d2-s1-a2"></div>
+          </div>
+        </div>
+      </div>
+<div class="anno" data-anno="d2-s1-a3" data-anno-side="top" data-anno-target=".mock-d2-also" style="--anno-x:50%;--anno-y:30%">
+        <button class="anno-pin" type="button" data-anno-pin="d2-s1-a3" aria-expanded="false" aria-controls="anno-bubble-d2-s1-a3" aria-label="{{anno.pin_label}}">3</button>
+        <div class="anno-bubble" id="anno-bubble-d2-s1-a3" data-anno-bubble="d2-s1-a3" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="d2-s1-a3" aria-expanded="false" aria-controls="anno-bubble-d2-s1-a3">
+            <span class="anno-bubble-question">„Auch gut zu wissen“ mit zwei offenen Zeilen, oder eingeklappt?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-d2-s1-a3" data-annotation="d2-s1-a3" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-d2-s1-a3"></div>
+          </div>
+        </div>
+      </div></div>
+  </section>
+  <section id="d2-s2" data-nav-label="C2 · Transport" data-screen hidden>
+    <div class="mock-root mock-d2"><div class="mock-head">
+      <div class="mock-title"><span class="mock-mfr">Crusader Industries</span><span class="mock-name">C2 Hercules Starlifter</span></div>
+      <div class="mock-chips"><span class="mock-chip">Transport</span><span class="mock-chip">Schwerer Frachter</span><span class="mock-chip">L</span><span class="mock-chip">2 Crew</span><span class="mock-chip">696 SCU</span></div>
+    </div>
+    <div class="mock-table" aria-hidden="true"><svg viewBox="0 0 400 90"><path d="M200 8 L216 40 L300 62 L300 72 L222 66 L216 82 L200 78 L184 82 L178 66 L100 72 L100 62 L184 40 Z"/></svg></div><div class="mock-d2-zone">
+      <header class="mock-d2-head"><span class="mock-d2-ht">Für Transport wichtig</span><span class="mock-d2-cohort">verglichen mit 14 großen Frachtern</span><span class="mock-more">Alle Werte</span></header>
+      <ol class="mock-d2-list"><li class="mock-d2-row" style="--p:var(--mk-car)" data-screen-link="d2-s5">
+      <span class="mock-sym" style="--p:var(--mk-car)">▤</span><span class="mock-d2-q">Wie viel passt rein?</span><span class="mock-d2-v">696 <small>SCU</small></span><span class="mock-d2-bar"><span class="mock-rankbar  "><i style="width:93%"></i><b></b></span></span><span class="mock-d2-rw ">stark · 93 %</span><span class="mock-d2-caret">▸</span>
+      
+    </li><li class="mock-d2-row" style="--p:var(--mk-mov)" data-screen-link="d2-s5">
+      <span class="mock-sym" style="--p:var(--mk-mov)">➤</span><span class="mock-d2-q">Wie weit kommt sie pro Sprung?</span><span class="mock-d2-v">11,4 <small>Gm</small></span><span class="mock-d2-bar"><span class="mock-rankbar  "><i style="width:66%"></i><b></b></span></span><span class="mock-d2-rw ">über Mittel · 66 %</span><span class="mock-d2-caret">▸</span>
+      
+    </li><li class="mock-d2-row" style="--p:var(--mk-def)" data-screen-link="d2-s5">
+      <span class="mock-sym" style="--p:var(--mk-def)">⬢</span><span class="mock-d2-q">Wie viel hält sie aus?</span><span class="mock-d2-v">93.500 <small>HP Schild + Rumpf</small></span><span class="mock-d2-bar"><span class="mock-rankbar  "><i style="width:70%"></i><b></b></span></span><span class="mock-d2-rw ">über Mittel · 70 %</span><span class="mock-d2-caret">▸</span>
+      
+    </li><li class="mock-d2-row" style="--p:var(--mk-sig)" data-screen-link="d2-s5">
+      <span class="mock-sym" style="--p:var(--mk-sig)">≋</span><span class="mock-d2-q">Wie auffällig ist sie?</span><span class="mock-d2-v">92 <small>m Querschnitt</small></span><span class="mock-d2-bar"><span class="mock-rankbar  lo"><i style="width:20%"></i><b></b></span></span><span class="mock-d2-rw lo">schwach · 20 %</span><span class="mock-d2-caret">▸</span>
+      
+    </li></ol>
+      <div class="mock-d2-also"><div class="mock-d2-ah">Auch gut zu wissen</div><ul><li class="mock-d2-arow" style="--p:var(--mk-off)"><span class="mock-sym" style="--p:var(--mk-off)">◆</span><span class="mock-d2-q">Kann sie sich wehren?</span><span class="mock-d2-v">2.860 <small>Dauer-DPS</small></span><span class="mock-d2-rw ">unter Mittel</span></li><li class="mock-d2-arow" style="--p:var(--mk-mov)"><span class="mock-sym" style="--p:var(--mk-mov)">➤</span><span class="mock-d2-q">Wie schnell im Gefecht?</span><span class="mock-d2-v">125 <small>m/s SCM</small></span><span class="mock-d2-rw ">unter Mittel</span></li></ul></div>
+    </div><div class="mock-strip"><div class="mock-einsatz"><span class="mock-lab">Einsatz</span><span class="mock-mis">Alles</span><span class="mock-mis" data-screen-link="d2-s1">Kampf</span><span class="mock-mis mock-on" data-screen-link="d2-s2">Transport</span><span class="mock-mis" data-screen-link="d2-s3">Reisen</span><span class="mock-mis">Schleichen</span><span class="mock-mis" data-screen-link="d2-s4">Bergbau</span><span class="mock-mis">Bergung</span></div><div class="mock-sareas"><div class="mock-sa" style="--p:var(--mk-off)"><span class="mock-sal">◆ Offensive</span><span>Dauer-DPS 2.860</span><span>Alpha 640</span></div><div class="mock-sa" style="--p:var(--mk-def)"><span class="mock-sal">⬢ Verteidigung</span><span>Schild 31.500</span><span>Rumpf 62.000</span></div><div class="mock-sa" style="--p:var(--mk-mov)"><span class="mock-sal">➤ Bewegung</span><span>SCM 125</span><span>Q 11,4 Gm</span></div><div class="mock-sa" style="--p:var(--mk-sig)"><span class="mock-sal">≋ Signatur & Kühlung</span><span>IR 21.300</span><span>EM 38.900</span></div></div></div></div>
+    
+  </section>
+  <section id="d2-s3" data-nav-label="Carrack · Reisen" data-screen hidden>
+    <div class="mock-root mock-d2"><div class="mock-head">
+      <div class="mock-title"><span class="mock-mfr">Anvil Aerospace</span><span class="mock-name">Carrack</span></div>
+      <div class="mock-chips"><span class="mock-chip">Erkundung</span><span class="mock-chip">Expedition</span><span class="mock-chip">L</span><span class="mock-chip">4 Crew</span><span class="mock-chip">456 SCU</span></div>
+    </div>
+    <div class="mock-table" aria-hidden="true"><svg viewBox="0 0 400 90"><path d="M200 8 L216 40 L300 62 L300 72 L222 66 L216 82 L200 78 L184 82 L178 66 L100 72 L100 62 L184 40 Z"/></svg></div><div class="mock-d2-zone">
+      <header class="mock-d2-head"><span class="mock-d2-ht">Für Reisen wichtig</span><span class="mock-d2-cohort">verglichen mit 9 Erkundungsschiffen</span><span class="mock-more">Alle Werte</span></header>
+      <ol class="mock-d2-list"><li class="mock-d2-row" style="--p:var(--mk-mov)" data-screen-link="d2-s5">
+      <span class="mock-sym" style="--p:var(--mk-mov)">➤</span><span class="mock-d2-q">Wie weit springt sie?</span><span class="mock-d2-v">82 <small>Gm</small></span><span class="mock-d2-bar"><span class="mock-rankbar  "><i style="width:100%"></i><b></b></span></span><span class="mock-d2-rw ">stark · 100 %</span><span class="mock-d2-caret">▸</span>
+      
+    </li><li class="mock-d2-row" style="--p:var(--mk-mov)" data-screen-link="d2-s5">
+      <span class="mock-sym" style="--p:var(--mk-mov)">➤</span><span class="mock-d2-q">Wie schnell im Quantum?</span><span class="mock-d2-v">283 <small>Mm/s</small></span><span class="mock-d2-bar"><span class="mock-rankbar  "><i style="width:78%"></i><b></b></span></span><span class="mock-d2-rw ">stark · 78 %</span><span class="mock-d2-caret">▸</span>
+      
+    </li><li class="mock-d2-row" style="--p:var(--mk-def)" data-screen-link="d2-s5">
+      <span class="mock-sym" style="--p:var(--mk-def)">⬢</span><span class="mock-d2-q">Wie viel hält sie aus?</span><span class="mock-d2-v">174.000 <small>HP Schild + Rumpf</small></span><span class="mock-d2-bar"><span class="mock-rankbar  "><i style="width:92%"></i><b></b></span></span><span class="mock-d2-rw ">stark · 92 %</span><span class="mock-d2-caret">▸</span>
+      
+    </li><li class="mock-d2-row" style="--p:var(--mk-car)" data-screen-link="d2-s5">
+      <span class="mock-sym" style="--p:var(--mk-car)">▤</span><span class="mock-d2-q">Wie viel Platz für Funde?</span><span class="mock-d2-v">456 <small>SCU</small></span><span class="mock-d2-bar"><span class="mock-rankbar  "><i style="width:88%"></i><b></b></span></span><span class="mock-d2-rw ">stark · 88 %</span><span class="mock-d2-caret">▸</span>
+      
+    </li></ol>
+      <div class="mock-d2-also"><div class="mock-d2-ah">Auch gut zu wissen</div><ul><li class="mock-d2-arow" style="--p:var(--mk-sig)"><span class="mock-sym" style="--p:var(--mk-sig)">≋</span><span class="mock-d2-q">Wie auffällig ist sie?</span><span class="mock-d2-v">126 <small>m Querschnitt</small></span><span class="mock-d2-rw lo">schwach</span></li><li class="mock-d2-arow" style="--p:var(--mk-off)"><span class="mock-sym" style="--p:var(--mk-off)">◆</span><span class="mock-d2-q">Kann sie sich wehren?</span><span class="mock-d2-v">3.400 <small>Dauer-DPS</small></span><span class="mock-d2-rw ">über Mittel</span></li></ul></div>
+    </div><div class="mock-strip"><div class="mock-einsatz"><span class="mock-lab">Einsatz</span><span class="mock-mis">Alles</span><span class="mock-mis" data-screen-link="d2-s1">Kampf</span><span class="mock-mis" data-screen-link="d2-s2">Transport</span><span class="mock-mis mock-on" data-screen-link="d2-s3">Reisen</span><span class="mock-mis">Schleichen</span><span class="mock-mis" data-screen-link="d2-s4">Bergbau</span><span class="mock-mis">Bergung</span></div><div class="mock-sareas"><div class="mock-sa" style="--p:var(--mk-off)"><span class="mock-sal">◆ Offensive</span><span>Dauer-DPS 3.400</span><span>Alpha 900</span></div><div class="mock-sa" style="--p:var(--mk-def)"><span class="mock-sal">⬢ Verteidigung</span><span>Schild 56.000</span><span>Rumpf 118.000</span></div><div class="mock-sa" style="--p:var(--mk-mov)"><span class="mock-sal">➤ Bewegung</span><span>SCM 110</span><span>Q 82 Gm</span></div><div class="mock-sa" style="--p:var(--mk-sig)"><span class="mock-sal">≋ Signatur & Kühlung</span><span>IR 24.800</span><span>EM 41.000</span></div></div></div></div>
+    
+  </section>
+  <section id="d2-s4" data-nav-label="Prospector · Bergbau" data-screen hidden>
+    <div class="mock-root mock-d2"><div class="mock-head">
+      <div class="mock-title"><span class="mock-mfr">MISC</span><span class="mock-name">Prospector</span></div>
+      <div class="mock-chips"><span class="mock-chip">Industrie</span><span class="mock-chip">Bergbau</span><span class="mock-chip">S</span><span class="mock-chip">1 Crew</span><span class="mock-chip">32 SCU</span></div>
+    </div>
+    <div class="mock-table" aria-hidden="true"><svg viewBox="0 0 400 90"><path d="M200 8 L216 40 L300 62 L300 72 L222 66 L216 82 L200 78 L184 82 L178 66 L100 72 L100 62 L184 40 Z"/></svg></div><div class="mock-d2-zone">
+      <header class="mock-d2-head"><span class="mock-d2-ht">Für Bergbau wichtig</span><span class="mock-d2-cohort">verglichen mit 4 Bergbauschiffen</span><span class="mock-more">Alle Werte</span></header>
+      <ol class="mock-d2-list"><li class="mock-d2-row" style="--p:var(--mk-min)" data-screen-link="d2-s5">
+      <span class="mock-sym" style="--p:var(--mk-min)">⛏</span><span class="mock-d2-q">Wie stark ist der Laser?</span><span class="mock-d2-v mock-gapv">Arbor MH1 <small>Leistung fehlt in den Spieldaten</small></span><span class="mock-d2-bar"></span><span class="mock-d2-rw">—</span><span class="mock-d2-caret">▸</span>
+      
+    </li><li class="mock-d2-row" style="--p:var(--mk-min)" data-screen-link="d2-s5">
+      <span class="mock-sym" style="--p:var(--mk-min)">⛏</span><span class="mock-d2-q">Wie viel Erz passt rein?</span><span class="mock-d2-v">32 <small>SCU</small></span><span class="mock-d2-bar"><span class="mock-rankbar  "><i style="width:50%"></i><b></b></span></span><span class="mock-d2-rw ">über Mittel · 50 %</span><span class="mock-d2-caret">▸</span>
+      
+    </li><li class="mock-d2-row" style="--p:var(--mk-sig)" data-screen-link="d2-s5">
+      <span class="mock-sym" style="--p:var(--mk-sig)">≋</span><span class="mock-d2-q">Wie viel Wärme verträgt sie?</span><span class="mock-d2-v">72 <small>% Kühllast</small></span><span class="mock-d2-bar"><span class="mock-rankbar  "><i style="width:45%"></i><b></b></span></span><span class="mock-d2-rw ">unter Mittel · 45 %</span><span class="mock-d2-caret">▸</span>
+      
+    </li><li class="mock-d2-row" style="--p:var(--mk-def)" data-screen-link="d2-s5">
+      <span class="mock-sym" style="--p:var(--mk-def)">⬢</span><span class="mock-d2-q">Wie viel hält sie aus?</span><span class="mock-d2-v">7.500 <small>HP Schild + Rumpf</small></span><span class="mock-d2-bar"><span class="mock-rankbar  "><i style="width:75%"></i><b></b></span></span><span class="mock-d2-rw ">stark · 75 %</span><span class="mock-d2-caret">▸</span>
+      
+    </li></ol>
+      <div class="mock-d2-also"><div class="mock-d2-ah">Auch gut zu wissen</div><ul><li class="mock-d2-arow" style="--p:var(--mk-mov)"><span class="mock-sym" style="--p:var(--mk-mov)">➤</span><span class="mock-d2-q">Wie weit springt sie?</span><span class="mock-d2-v">2,6 <small>Gm</small></span><span class="mock-d2-rw ">über Mittel</span></li><li class="mock-d2-arow mock-d2-none">Offensive: keine Waffen</li></ul></div>
+    </div><div class="mock-strip"><div class="mock-einsatz"><span class="mock-lab">Einsatz</span><span class="mock-mis">Alles</span><span class="mock-mis" data-screen-link="d2-s1">Kampf</span><span class="mock-mis" data-screen-link="d2-s2">Transport</span><span class="mock-mis" data-screen-link="d2-s3">Reisen</span><span class="mock-mis">Schleichen</span><span class="mock-mis mock-on" data-screen-link="d2-s4">Bergbau</span><span class="mock-mis">Bergung</span></div><div class="mock-sareas"><div class="mock-sa" style="--p:var(--mk-off)"><span class="mock-sal">◆ Offensive</span><span>—</span><span>keine Waffen</span></div><div class="mock-sa" style="--p:var(--mk-def)"><span class="mock-sal">⬢ Verteidigung</span><span>Schild 2.400</span><span>Rumpf 5.100</span></div><div class="mock-sa" style="--p:var(--mk-mov)"><span class="mock-sal">➤ Bewegung</span><span>SCM 165</span><span>Q 2,6 Gm</span></div><div class="mock-sa" style="--p:var(--mk-sig)"><span class="mock-sal">≋ Signatur & Kühlung</span><span>IR 9.800</span><span>EM 14.100</span></div></div></div></div>
+    
+  </section>
+  <section id="d2-s5" data-nav-label="Alle Werte offen" data-screen hidden>
+    <div class="mock-root mock-d2"><div class="mock-head">
+      <div class="mock-title"><span class="mock-mfr">Aegis Dynamics</span><span class="mock-name">Gladius</span></div>
+      <div class="mock-chips"><span class="mock-chip">Kampf</span><span class="mock-chip">Leichter Jäger</span><span class="mock-chip">S</span><span class="mock-chip">1 Crew</span></div>
+    </div>
+    <div class="mock-table" aria-hidden="true"><svg viewBox="0 0 400 90"><path d="M200 8 L216 40 L300 62 L300 72 L222 66 L216 82 L200 78 L184 82 L178 66 L100 72 L100 62 L184 40 Z"/></svg></div><div class="mock-d2-zone">
+      <header class="mock-d2-head"><span class="mock-d2-ht">Für Kampf wichtig</span><span class="mock-d2-cohort">verglichen mit 38 leichten Jägern</span><span class="mock-more">Alle Werte</span></header>
+      <ol class="mock-d2-list"><li class="mock-d2-row mock-d2-open" style="--p:var(--mk-off)">
+      <span class="mock-sym" style="--p:var(--mk-off)">◆</span><span class="mock-d2-q">Wie viel Schaden pro Sekunde?</span><span class="mock-d2-v">1.180 <small>Dauer-DPS</small></span><span class="mock-d2-bar"><span class="mock-rankbar  "><i style="width:78%"></i><b></b></span></span><span class="mock-d2-rw ">stark · 78 %</span><span class="mock-d2-caret">▾</span>
+      <div class="mock-d2-src"><div class="mock-d2-srch">Woher die 1.180 Dauer-DPS kommen</div><table class="mock-tbl mock-d2-tbl">
+      <thead><tr><th>Waffe</th><th>Größe</th><th>Alpha</th><th>Dauer</th><th>Burst</th></tr></thead>
+      <tbody>
+        <tr><td>2 × CF-337 Panther</td><td>S3</td><td>116</td><td class="mock-key">640</td><td>900</td></tr>
+        <tr><td>1 × Attrition-3</td><td>S3</td><td>296</td><td class="mock-key">540</td><td>740</td></tr>
+        <tr class="mock-sum"><td>Summe</td><td></td><td>412</td><td class="mock-key">1.180</td><td>1.640</td></tr>
+      </tbody></table><div class="mock-d2-srcnote">Raketen zählen nicht zum Dauer-DPS · <span class="mock-more" data-screen-link="d2-s1">Zuklappen ▴</span></div></div>
+    </li><li class="mock-d2-row" style="--p:var(--mk-def)" data-screen-link="d2-s5">
+      <span class="mock-sym" style="--p:var(--mk-def)">⬢</span><span class="mock-d2-q">Wie viel hält sie aus?</span><span class="mock-d2-v">8.270 <small>HP Schild + Rumpf</small></span><span class="mock-d2-bar"><span class="mock-rankbar  "><i style="width:55%"></i><b></b></span></span><span class="mock-d2-rw ">über Mittel · 55 %</span><span class="mock-d2-caret">▸</span>
+      
+    </li><li class="mock-d2-row" style="--p:var(--mk-mov)" data-screen-link="d2-s5">
+      <span class="mock-sym" style="--p:var(--mk-mov)">➤</span><span class="mock-d2-q">Wie wendig ist sie?</span><span class="mock-d2-v">236 <small>m/s SCM</small></span><span class="mock-d2-bar"><span class="mock-rankbar  "><i style="width:84%"></i><b></b></span></span><span class="mock-d2-rw ">stark · 84 %</span><span class="mock-d2-caret">▸</span>
+      
+    </li><li class="mock-d2-row" style="--p:var(--mk-def)" data-screen-link="d2-s5">
+      <span class="mock-sym" style="--p:var(--mk-def)">⬢</span><span class="mock-d2-q">Wie schnell ist der Schild wieder voll?</span><span class="mock-d2-v">20 <small>s</small></span><span class="mock-d2-bar"><span class="mock-rankbar  "><i style="width:66%"></i><b></b></span></span><span class="mock-d2-rw ">über Mittel · 66 %</span><span class="mock-d2-caret">▸</span>
+      
+    </li></ol>
+      <div class="mock-d2-also"><div class="mock-d2-ah">Auch gut zu wissen</div><ul><li class="mock-d2-arow" style="--p:var(--mk-sig)"><span class="mock-sym" style="--p:var(--mk-sig)">≋</span><span class="mock-d2-q">Wie leicht wird sie entdeckt?</span><span class="mock-d2-v">6.400 <small>IR</small></span><span class="mock-d2-rw ">über Mittel</span></li><li class="mock-d2-arow" style="--p:var(--mk-mov)"><span class="mock-sym" style="--p:var(--mk-mov)">➤</span><span class="mock-d2-q">Wie weit springt sie?</span><span class="mock-d2-v">1,9 <small>Gm</small></span><span class="mock-d2-rw ">unter Mittel</span></li><li class="mock-d2-arow mock-d2-none">Fracht: kein Frachtgitter</li></ul></div>
+    </div><div class="mock-strip"><div class="mock-einsatz"><span class="mock-lab">Einsatz</span><span class="mock-mis">Alles</span><span class="mock-mis mock-on" data-screen-link="d2-s1">Kampf</span><span class="mock-mis" data-screen-link="d2-s2">Transport</span><span class="mock-mis" data-screen-link="d2-s3">Reisen</span><span class="mock-mis">Schleichen</span><span class="mock-mis" data-screen-link="d2-s4">Bergbau</span><span class="mock-mis">Bergung</span></div><div class="mock-sareas"><div class="mock-sa" style="--p:var(--mk-off)"><span class="mock-sal">◆ Offensive</span><span>Dauer-DPS 1.180</span><span>Alpha 412</span></div><div class="mock-sa" style="--p:var(--mk-def)"><span class="mock-sal">⬢ Verteidigung</span><span>Schild 4.320</span><span>Rumpf 3.950</span></div><div class="mock-sa" style="--p:var(--mk-mov)"><span class="mock-sal">➤ Bewegung</span><span>SCM 236</span><span>Q 1,9 Gm</span></div><div class="mock-sa" style="--p:var(--mk-sig)"><span class="mock-sal">≋ Signatur & Kühlung</span><span>IR 6.400</span><span>EM 11.200</span></div></div></div></div>
+    <div class="anno-layer" data-anno-layer><div class="anno" data-anno="d2-s5-a1" data-anno-side="right" data-anno-target=".mock-d2-src .mock-d2-srch" style="--anno-x:50%;--anno-y:30%">
+        <button class="anno-pin" type="button" data-anno-pin="d2-s5-a1" aria-expanded="false" aria-controls="anno-bubble-d2-s5-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-d2-s5-a1" data-anno-bubble="d2-s5-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="d2-s5-a1" aria-expanded="false" aria-controls="anno-bubble-d2-s5-a1">
+            <span class="anno-bubble-question">Reicht es, wenn eine Zeile ihre Quelle aufklappt, statt einer eigenen Liste „Alle Werte“?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-d2-s5-a1" data-annotation="d2-s5-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-d2-s5-a1"></div>
+          </div>
+        </div>
+      </div></div>
+  </section>
+  </section>
+<section data-design="d3" data-nav-label="Vier Kacheln, entschlackt" hidden
+    data-design-motto="Die Reihe bleibt, wird leiser" data-design-traits="Kachelreihe bleibt, sortiert nach Einsatz|Nachrangiges schrumpft auf einen Wert|Alle Werte als Fach mit Reitern" data-design-icon="grid" data-design-color="#c58fe0">
+  <section id="d3-s1" data-nav-label="Gladius · Kampf" data-screen data-screen-active="true">
+    <div class="mock-root mock-d3"><div class="mock-head">
+      <div class="mock-title"><span class="mock-mfr">Aegis Dynamics</span><span class="mock-name">Gladius</span></div>
+      <div class="mock-chips"><span class="mock-chip">Kampf</span><span class="mock-chip">Leichter Jäger</span><span class="mock-chip">S</span><span class="mock-chip">1 Crew</span></div>
+    </div>
+    <div class="mock-table" aria-hidden="true"><svg viewBox="0 0 400 90"><path d="M200 8 L216 40 L300 62 L300 72 L222 66 L216 82 L200 78 L184 82 L178 66 L100 72 L100 62 L184 40 Z"/></svg></div><div class="mock-d3-zone"><div class="mock-d3-line"><span class="mock-d3-ctx">Sortiert für Kampf · verglichen mit 38 leichten Jägern</span><span class="mock-more" data-screen-link="d3-s5">Alle Werte ▾</span></div>
+      <div class="mock-d3-row" style="grid-template-columns:1.5fr 1fr 1fr 0.7fr"><article class="mock-d3-tile mock-d3-main" style="--p:var(--mk-off)">
+      <header class="mock-d3-th"><span class="mock-sym" style="--p:var(--mk-off)">◆</span><span>Offensive</span><span class="mock-d3-word ">stark</span></header>
+      <div class="mock-d3-hero"><span class="mock-num">1.180</span><small>Dauer-DPS</small><span class="mock-delta">+60 seit 4.3.1</span></div><div class="mock-rank "><span class="mock-rankbar  "><i style="width:78%"></i><b></b></span><span>besser als 78 % von 38 leichten Jägern</span></div>
+      <div class="mock-d3-subs"><div class="mock-d3-sub"><span class="mock-k">Burst-DPS</span><span class="mock-v">1.640</span></div><div class="mock-d3-sub"><span class="mock-k">Alpha</span><span class="mock-v">412</span></div></div>
+    </article><article class="mock-d3-tile" style="--p:var(--mk-def)">
+      <header class="mock-d3-th"><span class="mock-sym" style="--p:var(--mk-def)">⬢</span><span>Verteidigung</span><span class="mock-d3-word ">über Mittel</span></header>
+      <div class="mock-d3-hero"><span class="mock-num">4.320</span><small>Schild HP</small></div><div class="mock-rank "><span class="mock-rankbar  "><i style="width:61%"></i><b></b></span><span>besser als 61 % von 38 leichten Jägern</span></div>
+      <div class="mock-d3-subs"><div class="mock-d3-sub"><span class="mock-k">Rumpf HP</span><span class="mock-v">3.950</span></div><div class="mock-d3-sub"><span class="mock-k">Schild-Regen</span><span class="mock-v">216/s</span></div></div>
+    </article><article class="mock-d3-tile" style="--p:var(--mk-mov)">
+      <header class="mock-d3-th"><span class="mock-sym" style="--p:var(--mk-mov)">➤</span><span>Bewegung</span><span class="mock-d3-word ">stark</span></header>
+      <div class="mock-d3-hero"><span class="mock-num">236</span><small>m/s SCM</small></div><div class="mock-rank "><span class="mock-rankbar  "><i style="width:84%"></i><b></b></span><span>besser als 84 % von 38 leichten Jägern</span></div>
+      <div class="mock-d3-subs"><div class="mock-d3-sub"><span class="mock-k">Boost</span><span class="mock-v">1.140 m/s</span></div><div class="mock-d3-sub"><span class="mock-k">Q-Reichweite</span><span class="mock-v">1,9 Gm</span></div></div>
+    </article><article class="mock-d3-tile mock-d3-quiet" style="--p:var(--mk-sig)"><header class="mock-d3-th"><span class="mock-sym" style="--p:var(--mk-sig)">≋</span><span>Signatur & Kühlung</span></header>
+        <div class="mock-d3-qv">6.400 <small>IR</small></div><span class="mock-d3-word ">über Mittel</span></article></div><div class="mock-d3-off">Fracht: kein Frachtgitter</div></div><div class="mock-strip"><div class="mock-einsatz"><span class="mock-lab">Einsatz</span><span class="mock-mis">Alles</span><span class="mock-mis mock-on" data-screen-link="d3-s1">Kampf</span><span class="mock-mis" data-screen-link="d3-s2">Transport</span><span class="mock-mis" data-screen-link="d3-s3">Reisen</span><span class="mock-mis">Schleichen</span><span class="mock-mis" data-screen-link="d3-s4">Bergbau</span><span class="mock-mis">Bergung</span></div><div class="mock-sareas"><div class="mock-sa" style="--p:var(--mk-off)"><span class="mock-sal">◆ Offensive</span><span>Dauer-DPS 1.180</span><span>Alpha 412</span></div><div class="mock-sa" style="--p:var(--mk-def)"><span class="mock-sal">⬢ Verteidigung</span><span>Schild 4.320</span><span>Rumpf 3.950</span></div><div class="mock-sa" style="--p:var(--mk-mov)"><span class="mock-sal">➤ Bewegung</span><span>SCM 236</span><span>Q 1,9 Gm</span></div><div class="mock-sa" style="--p:var(--mk-sig)"><span class="mock-sal">≋ Signatur & Kühlung</span><span>IR 6.400</span><span>EM 11.200</span></div></div></div></div>
+    <div class="anno-layer" data-anno-layer><div class="anno" data-anno="d3-s1-a1" data-anno-side="top" data-anno-target=".mock-d3-row" style="--anno-x:50%;--anno-y:40%">
+        <button class="anno-pin" type="button" data-anno-pin="d3-s1-a1" aria-expanded="false" aria-controls="anno-bubble-d3-s1-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-d3-s1-a1" data-anno-bubble="d3-s1-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="d3-s1-a1" aria-expanded="false" aria-controls="anno-bubble-d3-s1-a1">
+            <span class="anno-bubble-question">Darf die Reihe je Einsatz umsortieren, obwohl die Leiste darunter fest bei Offensive beginnt?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-d3-s1-a1" data-annotation="d3-s1-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-d3-s1-a1"></div>
+          </div>
+        </div>
+      </div>
+<div class="anno" data-anno="d3-s1-a2" data-anno-side="left" data-anno-target=".mock-d3-quiet" style="--anno-x:50%;--anno-y:30%">
+        <button class="anno-pin" type="button" data-anno-pin="d3-s1-a2" aria-expanded="false" aria-controls="anno-bubble-d3-s1-a2" aria-label="{{anno.pin_label}}">2</button>
+        <div class="anno-bubble" id="anno-bubble-d3-s1-a2" data-anno-bubble="d3-s1-a2" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="d3-s1-a2" aria-expanded="false" aria-controls="anno-bubble-d3-s1-a2">
+            <span class="anno-bubble-question">Nachrangige Kachel: schmal mit einem Wert, oder ganz ausblenden?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-d3-s1-a2" data-annotation="d3-s1-a2" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-d3-s1-a2"></div>
+          </div>
+        </div>
+      </div>
+<div class="anno" data-anno="d3-s1-a3" data-anno-side="bottom" data-anno-target=".mock-d3-main .mock-d3-word" style="--anno-x:50%;--anno-y:30%">
+        <button class="anno-pin" type="button" data-anno-pin="d3-s1-a3" aria-expanded="false" aria-controls="anno-bubble-d3-s1-a3" aria-label="{{anno.pin_label}}">3</button>
+        <div class="anno-bubble" id="anno-bubble-d3-s1-a3" data-anno-bubble="d3-s1-a3" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="d3-s1-a3" aria-expanded="false" aria-controls="anno-bubble-d3-s1-a3">
+            <span class="anno-bubble-question">Rangwort plus Balken statt Ring mit P-Zahl: liest sich das schneller?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-d3-s1-a3" data-annotation="d3-s1-a3" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-d3-s1-a3"></div>
+          </div>
+        </div>
+      </div></div>
+  </section>
+  <section id="d3-s2" data-nav-label="C2 · Transport" data-screen hidden>
+    <div class="mock-root mock-d3"><div class="mock-head">
+      <div class="mock-title"><span class="mock-mfr">Crusader Industries</span><span class="mock-name">C2 Hercules Starlifter</span></div>
+      <div class="mock-chips"><span class="mock-chip">Transport</span><span class="mock-chip">Schwerer Frachter</span><span class="mock-chip">L</span><span class="mock-chip">2 Crew</span><span class="mock-chip">696 SCU</span></div>
+    </div>
+    <div class="mock-table" aria-hidden="true"><svg viewBox="0 0 400 90"><path d="M200 8 L216 40 L300 62 L300 72 L222 66 L216 82 L200 78 L184 82 L178 66 L100 72 L100 62 L184 40 Z"/></svg></div><div class="mock-d3-zone"><div class="mock-d3-line"><span class="mock-d3-ctx">Sortiert für Transport · verglichen mit 14 großen Frachtern</span><span class="mock-more" data-screen-link="d3-s5">Alle Werte ▾</span></div>
+      <div class="mock-d3-row" style="grid-template-columns:1.5fr 1fr 1fr 1fr 0.7fr"><article class="mock-d3-tile mock-d3-main" style="--p:var(--mk-car)">
+      <header class="mock-d3-th"><span class="mock-sym" style="--p:var(--mk-car)">▤</span><span>Fracht</span><span class="mock-d3-word ">stark</span></header>
+      <div class="mock-d3-hero"><span class="mock-num">696</span><small>SCU Laderaum</small></div><div class="mock-rank "><span class="mock-rankbar  "><i style="width:93%"></i><b></b></span><span>besser als 93 % von 14 großen Frachtern</span></div>
+      <div class="mock-d3-subs"><div class="mock-d3-sub"><span class="mock-k">Hauptdeck</span><span class="mock-v">576 SCU</span></div><div class="mock-d3-sub"><span class="mock-k">Unterdeck</span><span class="mock-v">120 SCU</span></div></div>
+    </article><article class="mock-d3-tile" style="--p:var(--mk-def)">
+      <header class="mock-d3-th"><span class="mock-sym" style="--p:var(--mk-def)">⬢</span><span>Verteidigung</span><span class="mock-d3-word ">über Mittel</span></header>
+      <div class="mock-d3-hero"><span class="mock-num">62.000</span><small>Rumpf HP</small></div><div class="mock-rank "><span class="mock-rankbar  "><i style="width:70%"></i><b></b></span><span>besser als 70 % von 14 großen Frachtern</span></div>
+      <div class="mock-d3-subs"><div class="mock-d3-sub"><span class="mock-k">Schild HP</span><span class="mock-v">31.500</span></div><div class="mock-d3-sub"><span class="mock-k">Schild-Regen</span><span class="mock-v">540/s</span></div></div>
+    </article><article class="mock-d3-tile" style="--p:var(--mk-mov)">
+      <header class="mock-d3-th"><span class="mock-sym" style="--p:var(--mk-mov)">➤</span><span>Bewegung</span><span class="mock-d3-word ">über Mittel</span></header>
+      <div class="mock-d3-hero"><span class="mock-num">11,4</span><small>Gm Q-Reichweite</small></div><div class="mock-rank "><span class="mock-rankbar  "><i style="width:66%"></i><b></b></span><span>besser als 66 % von 14 großen Frachtern</span></div>
+      <div class="mock-d3-subs"><div class="mock-d3-sub"><span class="mock-k">SCM</span><span class="mock-v">125 m/s</span></div><div class="mock-d3-sub"><span class="mock-k">Q-Tempo</span><span class="mock-v">212 Mm/s</span></div></div>
+    </article><article class="mock-d3-tile" style="--p:var(--mk-sig)">
+      <header class="mock-d3-th"><span class="mock-sym" style="--p:var(--mk-sig)">≋</span><span>Signatur & Kühlung</span><span class="mock-d3-word lo">schwach</span></header>
+      <div class="mock-d3-hero"><span class="mock-num">92</span><small>m Querschnitt</small></div><div class="mock-rank lo"><span class="mock-rankbar  lo"><i style="width:20%"></i><b></b></span><span>besser als 20 % von 14 großen Frachtern</span></div>
+      <div class="mock-d3-subs"><div class="mock-d3-sub"><span class="mock-k">IR</span><span class="mock-v">21.300</span></div><div class="mock-d3-sub"><span class="mock-k">EM</span><span class="mock-v">38.900</span></div></div>
+    </article><article class="mock-d3-tile mock-d3-quiet" style="--p:var(--mk-off)"><header class="mock-d3-th"><span class="mock-sym" style="--p:var(--mk-off)">◆</span><span>Offensive</span></header>
+        <div class="mock-d3-qv">2.860 <small>Dauer-DPS</small></div><span class="mock-d3-word ">unter Mittel</span></article></div></div><div class="mock-strip"><div class="mock-einsatz"><span class="mock-lab">Einsatz</span><span class="mock-mis">Alles</span><span class="mock-mis" data-screen-link="d3-s1">Kampf</span><span class="mock-mis mock-on" data-screen-link="d3-s2">Transport</span><span class="mock-mis" data-screen-link="d3-s3">Reisen</span><span class="mock-mis">Schleichen</span><span class="mock-mis" data-screen-link="d3-s4">Bergbau</span><span class="mock-mis">Bergung</span></div><div class="mock-sareas"><div class="mock-sa" style="--p:var(--mk-off)"><span class="mock-sal">◆ Offensive</span><span>Dauer-DPS 2.860</span><span>Alpha 640</span></div><div class="mock-sa" style="--p:var(--mk-def)"><span class="mock-sal">⬢ Verteidigung</span><span>Schild 31.500</span><span>Rumpf 62.000</span></div><div class="mock-sa" style="--p:var(--mk-mov)"><span class="mock-sal">➤ Bewegung</span><span>SCM 125</span><span>Q 11,4 Gm</span></div><div class="mock-sa" style="--p:var(--mk-sig)"><span class="mock-sal">≋ Signatur & Kühlung</span><span>IR 21.300</span><span>EM 38.900</span></div></div></div></div>
+    
+  </section>
+  <section id="d3-s3" data-nav-label="Carrack · Reisen" data-screen hidden>
+    <div class="mock-root mock-d3"><div class="mock-head">
+      <div class="mock-title"><span class="mock-mfr">Anvil Aerospace</span><span class="mock-name">Carrack</span></div>
+      <div class="mock-chips"><span class="mock-chip">Erkundung</span><span class="mock-chip">Expedition</span><span class="mock-chip">L</span><span class="mock-chip">4 Crew</span><span class="mock-chip">456 SCU</span></div>
+    </div>
+    <div class="mock-table" aria-hidden="true"><svg viewBox="0 0 400 90"><path d="M200 8 L216 40 L300 62 L300 72 L222 66 L216 82 L200 78 L184 82 L178 66 L100 72 L100 62 L184 40 Z"/></svg></div><div class="mock-d3-zone"><div class="mock-d3-line"><span class="mock-d3-ctx">Sortiert für Reisen · verglichen mit 9 Erkundungsschiffen</span><span class="mock-more" data-screen-link="d3-s5">Alle Werte ▾</span></div>
+      <div class="mock-d3-row" style="grid-template-columns:1.5fr 1fr 1fr 0.7fr 0.7fr"><article class="mock-d3-tile mock-d3-main" style="--p:var(--mk-mov)">
+      <header class="mock-d3-th"><span class="mock-sym" style="--p:var(--mk-mov)">➤</span><span>Bewegung</span><span class="mock-d3-word ">stark</span></header>
+      <div class="mock-d3-hero"><span class="mock-num">82</span><small>Gm Q-Reichweite</small></div><div class="mock-rank "><span class="mock-rankbar  "><i style="width:100%"></i><b></b></span><span>besser als 100 % von 9 Erkundungsschiffen</span></div>
+      <div class="mock-d3-subs"><div class="mock-d3-sub"><span class="mock-k">Q-Tempo</span><span class="mock-v">283 Mm/s</span></div><div class="mock-d3-sub"><span class="mock-k">Spool</span><span class="mock-v">6,2 s</span></div></div>
+    </article><article class="mock-d3-tile" style="--p:var(--mk-def)">
+      <header class="mock-d3-th"><span class="mock-sym" style="--p:var(--mk-def)">⬢</span><span>Verteidigung</span><span class="mock-d3-word ">stark</span></header>
+      <div class="mock-d3-hero"><span class="mock-num">118.000</span><small>Rumpf HP</small></div><div class="mock-rank "><span class="mock-rankbar  "><i style="width:92%"></i><b></b></span><span>besser als 92 % von 9 Erkundungsschiffen</span></div>
+      <div class="mock-d3-subs"><div class="mock-d3-sub"><span class="mock-k">Schild HP</span><span class="mock-v">56.000</span></div><div class="mock-d3-sub"><span class="mock-k">Schild-Regen</span><span class="mock-v">900/s</span></div></div>
+    </article><article class="mock-d3-tile" style="--p:var(--mk-car)">
+      <header class="mock-d3-th"><span class="mock-sym" style="--p:var(--mk-car)">▤</span><span>Fracht</span><span class="mock-d3-word ">stark</span></header>
+      <div class="mock-d3-hero"><span class="mock-num">456</span><small>SCU Laderaum</small></div><div class="mock-rank "><span class="mock-rankbar  "><i style="width:88%"></i><b></b></span><span>besser als 88 % von 9 Erkundungsschiffen</span></div>
+      <div class="mock-d3-subs"><div class="mock-d3-sub"><span class="mock-k">Frachtdeck</span><span class="mock-v">456 SCU</span></div></div>
+    </article><article class="mock-d3-tile mock-d3-quiet" style="--p:var(--mk-sig)"><header class="mock-d3-th"><span class="mock-sym" style="--p:var(--mk-sig)">≋</span><span>Signatur & Kühlung</span></header>
+        <div class="mock-d3-qv">126 <small>m Querschnitt</small></div><span class="mock-d3-word lo">schwach</span></article><article class="mock-d3-tile mock-d3-quiet" style="--p:var(--mk-off)"><header class="mock-d3-th"><span class="mock-sym" style="--p:var(--mk-off)">◆</span><span>Offensive</span></header>
+        <div class="mock-d3-qv">3.400 <small>Dauer-DPS</small></div><span class="mock-d3-word ">über Mittel</span></article></div></div><div class="mock-strip"><div class="mock-einsatz"><span class="mock-lab">Einsatz</span><span class="mock-mis">Alles</span><span class="mock-mis" data-screen-link="d3-s1">Kampf</span><span class="mock-mis" data-screen-link="d3-s2">Transport</span><span class="mock-mis mock-on" data-screen-link="d3-s3">Reisen</span><span class="mock-mis">Schleichen</span><span class="mock-mis" data-screen-link="d3-s4">Bergbau</span><span class="mock-mis">Bergung</span></div><div class="mock-sareas"><div class="mock-sa" style="--p:var(--mk-off)"><span class="mock-sal">◆ Offensive</span><span>Dauer-DPS 3.400</span><span>Alpha 900</span></div><div class="mock-sa" style="--p:var(--mk-def)"><span class="mock-sal">⬢ Verteidigung</span><span>Schild 56.000</span><span>Rumpf 118.000</span></div><div class="mock-sa" style="--p:var(--mk-mov)"><span class="mock-sal">➤ Bewegung</span><span>SCM 110</span><span>Q 82 Gm</span></div><div class="mock-sa" style="--p:var(--mk-sig)"><span class="mock-sal">≋ Signatur & Kühlung</span><span>IR 24.800</span><span>EM 41.000</span></div></div></div></div>
+    
+  </section>
+  <section id="d3-s4" data-nav-label="Prospector · Bergbau" data-screen hidden>
+    <div class="mock-root mock-d3"><div class="mock-head">
+      <div class="mock-title"><span class="mock-mfr">MISC</span><span class="mock-name">Prospector</span></div>
+      <div class="mock-chips"><span class="mock-chip">Industrie</span><span class="mock-chip">Bergbau</span><span class="mock-chip">S</span><span class="mock-chip">1 Crew</span><span class="mock-chip">32 SCU</span></div>
+    </div>
+    <div class="mock-table" aria-hidden="true"><svg viewBox="0 0 400 90"><path d="M200 8 L216 40 L300 62 L300 72 L222 66 L216 82 L200 78 L184 82 L178 66 L100 72 L100 62 L184 40 Z"/></svg></div><div class="mock-d3-zone"><div class="mock-d3-line"><span class="mock-d3-ctx">Sortiert für Bergbau · verglichen mit 4 Bergbauschiffen</span><span class="mock-more" data-screen-link="d3-s5">Alle Werte ▾</span></div>
+      <div class="mock-d3-row" style="grid-template-columns:1.5fr 1fr 1fr 0.7fr"><article class="mock-d3-tile mock-d3-main" style="--p:var(--mk-min)">
+      <header class="mock-d3-th"><span class="mock-sym" style="--p:var(--mk-min)">⛏</span><span>Bergbau</span></header>
+      <div class="mock-d3-hero"><span class="mock-num mock-numtxt">Arbor MH1</span><small>S1 · Bergbaulaser</small></div><div class="mock-d3-gap">Laserleistung fehlt in den Spieldaten</div>
+      <div class="mock-d3-subs"><div class="mock-d3-sub"><span class="mock-k">Bergbau-Hardpoints</span><span class="mock-v">1 × S1</span></div><div class="mock-d3-sub"><span class="mock-k">Erz-Laderaum</span><span class="mock-v">32 SCU</span></div></div>
+    </article><article class="mock-d3-tile" style="--p:var(--mk-sig)">
+      <header class="mock-d3-th"><span class="mock-sym" style="--p:var(--mk-sig)">≋</span><span>Signatur & Kühlung</span><span class="mock-d3-word ">unter Mittel</span></header>
+      <div class="mock-d3-hero"><span class="mock-num">72</span><small>% Kühllast</small></div><div class="mock-rank "><span class="mock-rankbar  "><i style="width:45%"></i><b></b></span><span>besser als 45 % von 4 Bergbauschiffen</span></div>
+      <div class="mock-d3-subs"><div class="mock-d3-sub"><span class="mock-k">IR</span><span class="mock-v">9.800</span></div><div class="mock-d3-sub"><span class="mock-k">EM</span><span class="mock-v">14.100</span></div></div>
+    </article><article class="mock-d3-tile" style="--p:var(--mk-def)">
+      <header class="mock-d3-th"><span class="mock-sym" style="--p:var(--mk-def)">⬢</span><span>Verteidigung</span><span class="mock-d3-word ">stark</span></header>
+      <div class="mock-d3-hero"><span class="mock-num">2.400</span><small>Schild HP</small></div><div class="mock-rank "><span class="mock-rankbar  "><i style="width:75%"></i><b></b></span><span>besser als 75 % von 4 Bergbauschiffen</span></div>
+      <div class="mock-d3-subs"><div class="mock-d3-sub"><span class="mock-k">Rumpf HP</span><span class="mock-v">5.100</span></div></div>
+    </article><article class="mock-d3-tile mock-d3-quiet" style="--p:var(--mk-mov)"><header class="mock-d3-th"><span class="mock-sym" style="--p:var(--mk-mov)">➤</span><span>Bewegung</span></header>
+        <div class="mock-d3-qv">2,6 <small>Gm Q-Reichweite</small></div><span class="mock-d3-word ">über Mittel</span></article></div><div class="mock-d3-off">Offensive: keine Waffen</div></div><div class="mock-strip"><div class="mock-einsatz"><span class="mock-lab">Einsatz</span><span class="mock-mis">Alles</span><span class="mock-mis" data-screen-link="d3-s1">Kampf</span><span class="mock-mis" data-screen-link="d3-s2">Transport</span><span class="mock-mis" data-screen-link="d3-s3">Reisen</span><span class="mock-mis">Schleichen</span><span class="mock-mis mock-on" data-screen-link="d3-s4">Bergbau</span><span class="mock-mis">Bergung</span></div><div class="mock-sareas"><div class="mock-sa" style="--p:var(--mk-off)"><span class="mock-sal">◆ Offensive</span><span>—</span><span>keine Waffen</span></div><div class="mock-sa" style="--p:var(--mk-def)"><span class="mock-sal">⬢ Verteidigung</span><span>Schild 2.400</span><span>Rumpf 5.100</span></div><div class="mock-sa" style="--p:var(--mk-mov)"><span class="mock-sal">➤ Bewegung</span><span>SCM 165</span><span>Q 2,6 Gm</span></div><div class="mock-sa" style="--p:var(--mk-sig)"><span class="mock-sal">≋ Signatur & Kühlung</span><span>IR 9.800</span><span>EM 14.100</span></div></div></div></div>
+    
+  </section>
+  <section id="d3-s5" data-nav-label="Alle Werte offen" data-screen hidden>
+    <div class="mock-root mock-d3"><div class="mock-head">
+      <div class="mock-title"><span class="mock-mfr">Aegis Dynamics</span><span class="mock-name">Gladius</span></div>
+      <div class="mock-chips"><span class="mock-chip">Kampf</span><span class="mock-chip">Leichter Jäger</span><span class="mock-chip">S</span><span class="mock-chip">1 Crew</span></div>
+    </div>
+    <div class="mock-table" aria-hidden="true"><svg viewBox="0 0 400 90"><path d="M200 8 L216 40 L300 62 L300 72 L222 66 L216 82 L200 78 L184 82 L178 66 L100 72 L100 62 L184 40 Z"/></svg></div><div class="mock-d3-zone"><div class="mock-d3-line"><span class="mock-d3-ctx">Sortiert für Kampf · verglichen mit 38 leichten Jägern</span><span class="mock-more" data-screen-link="d3-s1">Alle Werte ▴</span></div>
+      <div class="mock-d3-row" style="grid-template-columns:1.5fr 1fr 1fr 0.7fr"><article class="mock-d3-tile mock-d3-main" style="--p:var(--mk-off)">
+      <header class="mock-d3-th"><span class="mock-sym" style="--p:var(--mk-off)">◆</span><span>Offensive</span><span class="mock-d3-word ">stark</span></header>
+      <div class="mock-d3-hero"><span class="mock-num">1.180</span><small>Dauer-DPS</small><span class="mock-delta">+60 seit 4.3.1</span></div><div class="mock-rank "><span class="mock-rankbar  "><i style="width:78%"></i><b></b></span><span>besser als 78 % von 38 leichten Jägern</span></div>
+      <div class="mock-d3-subs"><div class="mock-d3-sub"><span class="mock-k">Burst-DPS</span><span class="mock-v">1.640</span></div><div class="mock-d3-sub"><span class="mock-k">Alpha</span><span class="mock-v">412</span></div></div>
+    </article><article class="mock-d3-tile" style="--p:var(--mk-def)">
+      <header class="mock-d3-th"><span class="mock-sym" style="--p:var(--mk-def)">⬢</span><span>Verteidigung</span><span class="mock-d3-word ">über Mittel</span></header>
+      <div class="mock-d3-hero"><span class="mock-num">4.320</span><small>Schild HP</small></div><div class="mock-rank "><span class="mock-rankbar  "><i style="width:61%"></i><b></b></span><span>besser als 61 % von 38 leichten Jägern</span></div>
+      <div class="mock-d3-subs"><div class="mock-d3-sub"><span class="mock-k">Rumpf HP</span><span class="mock-v">3.950</span></div><div class="mock-d3-sub"><span class="mock-k">Schild-Regen</span><span class="mock-v">216/s</span></div></div>
+    </article><article class="mock-d3-tile" style="--p:var(--mk-mov)">
+      <header class="mock-d3-th"><span class="mock-sym" style="--p:var(--mk-mov)">➤</span><span>Bewegung</span><span class="mock-d3-word ">stark</span></header>
+      <div class="mock-d3-hero"><span class="mock-num">236</span><small>m/s SCM</small></div><div class="mock-rank "><span class="mock-rankbar  "><i style="width:84%"></i><b></b></span><span>besser als 84 % von 38 leichten Jägern</span></div>
+      <div class="mock-d3-subs"><div class="mock-d3-sub"><span class="mock-k">Boost</span><span class="mock-v">1.140 m/s</span></div><div class="mock-d3-sub"><span class="mock-k">Q-Reichweite</span><span class="mock-v">1,9 Gm</span></div></div>
+    </article><article class="mock-d3-tile mock-d3-quiet" style="--p:var(--mk-sig)"><header class="mock-d3-th"><span class="mock-sym" style="--p:var(--mk-sig)">≋</span><span>Signatur & Kühlung</span></header>
+        <div class="mock-d3-qv">6.400 <small>IR</small></div><span class="mock-d3-word ">über Mittel</span></article></div><div class="mock-d3-off">Fracht: kein Frachtgitter</div><div class="mock-d3-drawer"><div class="mock-d3-tabs"><span class="mock-d3-tab mock-on" style="--p:var(--mk-off)">◆ Offensive</span><span class="mock-d3-tab" style="--p:var(--mk-def)">⬢ Verteidigung</span><span class="mock-d3-tab" style="--p:var(--mk-mov)">➤ Bewegung</span><span class="mock-d3-tab" style="--p:var(--mk-sig)">≋ Signatur & Kühlung</span><span class="mock-more" data-screen-link="d3-s1">Schließen ▴</span></div>
+        <div class="mock-d3-dbody"><div class="mock-kvg mock-d3-wide"><h5>Waffen</h5><table class="mock-tbl mock-d3-tbl">
+      <thead><tr><th>Waffe</th><th>Größe</th><th>Alpha</th><th>Dauer</th><th>Burst</th></tr></thead>
+      <tbody>
+        <tr><td>2 × CF-337 Panther</td><td>S3</td><td>116</td><td class="mock-key">640</td><td>900</td></tr>
+        <tr><td>1 × Attrition-3</td><td>S3</td><td>296</td><td class="mock-key">540</td><td>740</td></tr>
+        <tr class="mock-sum"><td>Summe</td><td></td><td>412</td><td class="mock-key">1.180</td><td>1.640</td></tr>
+      </tbody></table></div><div class="mock-kvg"><h5>Schaden & Reichweite</h5><div class="mock-kv"><span>Energie-Anteil</span><b>100 %</b></div><div class="mock-kv mock-keyrow"><span>Wirkreichweite</span><b>1.950 m</b></div><div class="mock-kv"><span>Geschosstempo</span><b>1.400 m/s</b></div></div><div class="mock-kvg"><h5>Raketen</h5><div class="mock-kv"><span>6 × Ignite II</span><b>S2 · IR</b></div><div class="mock-kv mock-keyrow"><span>Salve</span><b>15.600</b></div><div class="mock-kv"><span>Aufschalten</span><b>2,5 s</b></div><div class="mock-kv"><span>Reichweite</span><b>5.000 m</b></div></div></div>
+        <div class="mock-gapcount">2 Werte fehlen in den Spieldaten ▾</div></div></div><div class="mock-strip"><div class="mock-einsatz"><span class="mock-lab">Einsatz</span><span class="mock-mis">Alles</span><span class="mock-mis mock-on" data-screen-link="d3-s1">Kampf</span><span class="mock-mis" data-screen-link="d3-s2">Transport</span><span class="mock-mis" data-screen-link="d3-s3">Reisen</span><span class="mock-mis">Schleichen</span><span class="mock-mis" data-screen-link="d3-s4">Bergbau</span><span class="mock-mis">Bergung</span></div><div class="mock-sareas"><div class="mock-sa" style="--p:var(--mk-off)"><span class="mock-sal">◆ Offensive</span><span>Dauer-DPS 1.180</span><span>Alpha 412</span></div><div class="mock-sa" style="--p:var(--mk-def)"><span class="mock-sal">⬢ Verteidigung</span><span>Schild 4.320</span><span>Rumpf 3.950</span></div><div class="mock-sa" style="--p:var(--mk-mov)"><span class="mock-sal">➤ Bewegung</span><span>SCM 236</span><span>Q 1,9 Gm</span></div><div class="mock-sa" style="--p:var(--mk-sig)"><span class="mock-sal">≋ Signatur & Kühlung</span><span>IR 6.400</span><span>EM 11.200</span></div></div></div></div>
+    <div class="anno-layer" data-anno-layer><div class="anno" data-anno="d3-s5-a1" data-anno-side="bottom" data-anno-target=".mock-d3-tabs" style="--anno-x:50%;--anno-y:30%">
+        <button class="anno-pin" type="button" data-anno-pin="d3-s5-a1" aria-expanded="false" aria-controls="anno-bubble-d3-s5-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-d3-s5-a1" data-anno-bubble="d3-s5-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="d3-s5-a1" aria-expanded="false" aria-controls="anno-bubble-d3-s5-a1">
+            <span class="anno-bubble-question">Eine Kategorie zur Zeit im Fach, oder alle untereinander zum Scrollen?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-d3-s5-a1" data-annotation="d3-s5-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-d3-s5-a1"></div>
+          </div>
+        </div>
+      </div></div>
+  </section>
+  </section>
+<section data-view="analyse" data-view-kind="analysis" data-analysis="full" data-nav-label="Analyse" hidden>
+  <section id="briefing" data-analysis-briefing data-nav-label="Briefing">
+    <p data-briefing-what>Die vier Kategorie-Kacheln zeigen jedem Schiff dieselben Werte gleich laut: bis zu 32 Zahlen, Rangangaben doppelt, und der Einsatz ändert daran nichts.</p>
+    <p data-briefing-why>Wer eine Hercules ansieht, sucht Fracht und Reichweite; heute steht DPS gleich laut daneben, und die 696 SCU stecken unter Bewegung.</p>
+    <div data-briefing-potential data-viz="kpi" data-viz-spec='{"value":"32 → 8","unit":"Zahlen","label":"im ersten Blick"}'>32 → 8 Zahlen</div>
+    <a data-briefing-topic="t-rolle" data-share="40">Einsatz als Standard</a>
+    <a data-briefing-topic="t-werte" data-share="35">Werte je Einsatz</a>
+    <a data-briefing-topic="t-tiefe" data-share="25">Alle Werte</a>
+    <p data-briefing-duration>≈ 6 min</p>
+    <div data-alevel="1" data-title="Briefing">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"32 → 8","unit":"Zahlen"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="bars" data-viz-spec='{"items":[{"label":"heute: Zahlen im ersten Blick","value":32},{"label":"Entwurf: Zahlen im ersten Blick","value":8}],"unit":"","text":"Der erste Blick sinkt von 32 auf etwa 8 Zahlen."}'></div>
+        <p>Gezählt am Gladius: vier Kacheln mit je Leitwert, drei Unterwerten, P-Wert im Kopf und im Ring und zwei P-Werten im Satz. Die drei Entwürfe zeigen etwa acht Zahlen und lassen den Rest hinter „Alle Werte“. Die Fragen hier gelten für jeden Entwurf.</p>
+      </div>
+    </div>
+  </section>
+  <section id="t-rolle" data-topic data-nav-label="Einsatz als Standard">
+    <div data-alevel="2" data-title="Einsatz als Standard">
+      <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Der Einsatz wird zum Standard, nicht zur versteckten Wahl."}'>Der Einsatz wird zum Standard, nicht zur versteckten Wahl.</div></div>
+      <div data-slot="long"><div data-viz="compare" data-viz-spec='{"before":{"label":"heute: Schiffe, die mit passendem Einsatz öffnen","value":0},"after":{"label":"mit Rolle aus den Spieldaten","value":100},"unit":" %","text":"Heute öffnet kein Schiff mit seinem Einsatz."}'></div><p>Die Schiffsrolle steht bereits in den Spieldaten und im Schiffskopf. Offen ist, wie der Einsatz beim Öffnen gesetzt wird und was ohne Daten passiert.</p></div>
+    </div>
+    <section id="d-default" data-nav-label="Einsatz beim Öffnen" data-decision="d-default" data-decision-mode="single"
+        data-label="Einsatz beim Öffnen" data-rec="role" data-rec-why="Die Schiffsrolle steht in den Spieldaten, und eine gemerkte Wahl pro Schiff gibt es schon." data-applies-to="jede Schiffsseite (Holotisch)" data-finding="f-d-default">
+      <p data-applies>Gilt für: jede Schiffsseite (Holotisch)</p>
+      <p class="mock-fest">Fest steht: Die Kategorien richten sich nach dem Einsatz (dein Auftrag). Offen ist nur, welcher Einsatz beim Öffnen gilt.</p>
+      <p data-situation>Jedes Schiff öffnet auf „Alles“: Eine Hercules zeigt zuerst 2.860 DPS, ihre 696 SCU stehen als dritter Unterwert unter Bewegung.</p>
+      <h3 data-question>Mit welchem Einsatz öffnet eine Schiffsseite?</h3>
+      
+      <p data-stakes>Was jeder Besucher zuerst sieht, ohne etwas anzuklicken.</p>
+      <div data-options>
+        <label data-opt="role" data-recommended>
+          <input type="radio" name="dm-d-default" value="role" checked>
+          <span data-opt-label>Aus der Schiffsrolle ableiten</span>
+          <span data-opt-consequence>Hercules öffnet auf Transport, Gladius auf Kampf; deine Wahl pro Schiff bleibt gemerkt.</span>
+        </label>
+        <label data-opt="last">
+          <input type="radio" name="dm-d-default" value="last">
+          <span data-opt-label>Zuletzt gewählten Einsatz übernehmen</span>
+          <span data-opt-consequence>Wer Frachter vergleicht, bleibt auf Transport, auch beim nächsten Jäger.</span>
+        </label>
+        <label data-opt="all">
+          <input type="radio" name="dm-d-default" value="all">
+          <span data-opt-label>Immer auf „Alles“ öffnen</span>
+          <span data-opt-consequence>Wie heute; der Einsatz bleibt ein Schritt, den man kennen muss.</span>
+        </label>
+      </div>
+      
+      <textarea data-comment="d-default-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-default-none" value="">
+      <input type="hidden" name="dm-d-default-hes" value="">
+      <input type="hidden" name="dm-d-default-touched" value="">
+      <input type="hidden" name="dm-d-default-issue" value="">
+      <input type="hidden" name="dm-d-default-epic" value="">
+      <div data-alevel="3" data-title="Einsatz beim Öffnen">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Heute öffnet jedes Schiff auf „Alles“, egal welche Rolle es hat."}'>Heute öffnet jedes Schiff auf „Alles“, egal welche Rolle es hat.</div></div>
+        <div data-slot="long">
+          <div data-viz="compare" data-viz-spec='{"before":{"label":"heute: Rang von Fracht im Blick","value":7},"after":{"label":"mit Rolle: Rang von Fracht","value":1},"unit":". Stelle","text":"Bei der Hercules rückt die Fracht von der 7. an die 1. Stelle."}'></div>
+          
+        </div>
+        <div data-example><pre>Heute   C2 Hercules → Einsatz „Alles“ → 1. Offensive 2.860 Dauer-DPS
+Danach  C2 Hercules → Einsatz „Transport“ → 1. Fracht 696 SCU</pre></div>
+      </div>
+    </section>
+    <section id="d-alles" data-nav-label="Bedeutung von „Alles“" data-decision="d-alles" data-decision-mode="single"
+        data-label="Bedeutung von „Alles“" data-rec="strength" data-rec-why="Ohne Einsatz ist die beste Antwort, worin das Schiff gut ist; die Reihenfolge trägt dann die Aussage." data-applies-to="Einsatz „Alles“ und Schiffe ohne klare Rolle" data-finding="f-d-alles">
+      <p data-applies>Gilt für: Einsatz „Alles“ und Schiffe ohne klare Rolle</p>
+      
+      <p data-situation>Ohne Einsatz stehen vier Kategorien gleich laut nebeneinander; wer ein Mehrzweckschiff öffnet, muss die Stärke selbst suchen.</p>
+      <h3 data-question>Was zeigt der Einsatz „Alles“ zuerst?</h3>
+      
+      
+      <div data-options>
+        <label data-opt="strength" data-recommended>
+          <input type="radio" name="dm-d-alles" value="strength" checked>
+          <span data-opt-label>Stärkste Kategorie zuerst</span>
+          <span data-opt-consequence>Die Kategorie mit dem höchsten Rang steht vorn, der Rest nach Rang.</span>
+        </label>
+        <label data-opt="equal">
+          <input type="radio" name="dm-d-alles" value="equal">
+          <span data-opt-label>Alle gleich, feste Reihenfolge</span>
+          <span data-opt-consequence>Offensive, Verteidigung, Bewegung, Signatur wie heute, nur entschlackt.</span>
+        </label>
+        <label data-opt="pick">
+          <input type="radio" name="dm-d-alles" value="pick">
+          <span data-opt-label>Erst einen Einsatz wählen lassen</span>
+          <span data-opt-consequence>Statt Werten steht eine Einsatz-Wahl; ein Klick mehr für jeden.</span>
+        </label>
+      </div>
+      
+      <textarea data-comment="d-alles-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-alles-none" value="">
+      <input type="hidden" name="dm-d-alles-hes" value="">
+      <input type="hidden" name="dm-d-alles-touched" value="">
+      <input type="hidden" name="dm-d-alles-issue" value="">
+      <input type="hidden" name="dm-d-alles-epic" value="">
+      <div data-alevel="3" data-title="Bedeutung von „Alles“">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Bei „Alles“ fehlt heute jede Gewichtung."}'>Bei „Alles“ fehlt heute jede Gewichtung.</div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Bewegung","value":84},{"label":"Offensive","value":78},{"label":"Signatur","value":72},{"label":"Verteidigung","value":61}],"unit":" %","hl":"Bewegung","text":"Beim Gladius wäre Bewegung die stärkste Kategorie."}'></div>
+          <p>Rang je Kategorie beim Gladius, gemessen am Leitwert.</p>
+        </div>
+        <div data-example><pre>„Alles“ · Gladius, nach Stärke:
+  1. Bewegung      236 m/s SCM   stark
+  2. Offensive   1.180 Dauer-DPS stark
+  3. Signatur    6.400 IR        über Mittel
+  4. Verteidigung 4.320 Schild HP über Mittel</pre></div>
+      </div>
+    </section>
+    <section id="d-ohnedaten" data-nav-label="Einsatz ohne Werte" data-decision="d-ohnedaten" data-decision-mode="single"
+        data-label="Einsatz ohne Werte" data-rec="honest" data-rec-why="Was bekannt ist (Hardpoints, Laser, Laderaum), hilft schon; die Lücke offen zu nennen schützt vor falschen Schlüssen." data-applies-to="Bergbau und Bergung" data-finding="f-d-ohnedaten">
+      <p data-applies>Gilt für: Bergbau und Bergung</p>
+      
+      <p data-situation>Für Bergbau und Bergung fehlen Laserleistung und Bergungswerte in den Spieldaten; heute zeigt der Einsatz dann einfach die Kampfwerte.</p>
+      <h3 data-question>Was zeigt ein Einsatz, dessen Kernwerte fehlen?</h3>
+      
+      
+      <div data-options>
+        <label data-opt="honest" data-recommended>
+          <input type="radio" name="dm-d-ohnedaten" value="honest" checked>
+          <span data-opt-label>Bekanntes zeigen, Lücke benennen</span>
+          <span data-opt-consequence>Prospector: Laser Arbor MH1, 1 × S1, 32 SCU, dazu „Leistung fehlt“.</span>
+        </label>
+        <label data-opt="fallback">
+          <input type="radio" name="dm-d-ohnedaten" value="fallback">
+          <span data-opt-label>Auf „Alles“ zurückfallen</span>
+          <span data-opt-consequence>Der Einsatz wählt sich, zeigt aber dieselben Werte wie ohne ihn.</span>
+        </label>
+        <label data-opt="hide">
+          <input type="radio" name="dm-d-ohnedaten" value="hide">
+          <span data-opt-label>Einsatz erst anbieten, wenn Werte da sind</span>
+          <span data-opt-consequence>Bergbau und Bergung fehlen in der Auswahl, bis der Extrakt sie liefert.</span>
+        </label>
+      </div>
+      
+      <textarea data-comment="d-ohnedaten-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-ohnedaten-none" value="">
+      <input type="hidden" name="dm-d-ohnedaten-hes" value="">
+      <input type="hidden" name="dm-d-ohnedaten-touched" value="">
+      <input type="hidden" name="dm-d-ohnedaten-issue" value="">
+      <input type="hidden" name="dm-d-ohnedaten-epic" value="">
+      <div data-alevel="3" data-title="Einsatz ohne Werte">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Bergbau und Bergung haben heute keine eigenen Kennzahlen."}'>Bergbau und Bergung haben heute keine eigenen Kennzahlen.</div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Kampf","value":6},{"label":"Transport","value":6},{"label":"Reisen","value":6},{"label":"Schleichen","value":6},{"label":"Bergbau","value":0},{"label":"Bergung","value":0}],"unit":" eigene Werte","hl":"Bergbau","text":"Bergbau und Bergung haben keine eigenen Kennzahlen."}'></div>
+          
+        </div>
+        <div data-example><pre>Heute   Prospector · Bergbau → 1.180 Alpha, Burst-DPS … (Kampfwerte)
+Danach  Prospector · Bergbau → Arbor MH1 · S1 · 32 SCU · „Leistung fehlt in den Spieldaten“</pre></div>
+      </div>
+    </section>
+  </section>
+  <section id="t-werte" data-topic data-nav-label="Werte je Einsatz">
+    <div data-alevel="2" data-title="Werte je Einsatz">
+      <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Jeder Einsatz bestimmt Reihenfolge, Leitwert und Rang."}'>Jeder Einsatz bestimmt Reihenfolge, Leitwert und Rang.</div></div>
+      <div data-slot="long"><div data-viz="bars" data-viz-spec='{"items":[{"label":"feste Leitwerte heute","value":4},{"label":"Leitwerte je Einsatz","value":7}],"unit":"","text":"Aus vier festen Leitwerten werden sieben Einsatz-Profile."}'></div><p>Heute wählt der Code den ersten vorhandenen Wert einer festen Liste. Künftig wählt der Einsatz, welche Kategorie führt und welcher Wert dort groß steht.</p></div>
+    </div>
+    <section id="d-leitwert" data-nav-label="Leitwert je Einsatz" data-decision="d-leitwert" data-decision-mode="verify"
+        data-label="Leitwert je Einsatz" data-rec="ok" data-rec-why="Die Zuordnung folgt den Kennzahlen, die der Einsatz heute schon im Kennzahlenband zeigt." data-applies-to="alle sieben Einsätze" data-finding="f-d-leitwert">
+      <p data-applies>Gilt für: alle sieben Einsätze</p>
+      
+      <p data-situation>Ein Frachter und ein Jäger bekommen je Kategorie denselben Leitwert; was für ihren Einsatz zählt, entscheidet niemand.</p>
+      <h3 data-question>Stimmt diese Zuordnung von Kategorie und Leitwert je Einsatz?</h3>
+      <p data-context>Korrekturen einzelner Zeilen schreibst du ins Feld „Was stimmt nicht?“.</p>
+      
+      <div data-options>
+        <label data-opt="ok" data-recommended>
+          <input type="radio" name="dm-d-leitwert" value="ok" checked>
+          <span data-opt-label>Stimmt</span>
+          <span data-opt-consequence>Diese Tabelle wird die Vorgabe für Reihenfolge und Leitwerte.</span>
+        </label>
+        <label data-opt="partial">
+          <input type="radio" name="dm-d-leitwert" value="partial">
+          <span data-opt-label>Teilweise</span>
+          <span data-opt-consequence>Ich korrigiere einzelne Zeilen im Feld darunter.</span>
+        </label>
+        <label data-opt="wrong">
+          <input type="radio" name="dm-d-leitwert" value="wrong">
+          <span data-opt-label>Stimmt nicht</span>
+          <span data-opt-consequence>Die Zuordnung muss neu gedacht werden.</span>
+        </label>
+      </div>
+      <input type="text" name="dm-d-leitwert-fix" value="" placeholder="Was stimmt nicht?">
+      <textarea data-comment="d-leitwert-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-leitwert-none" value="">
+      <input type="hidden" name="dm-d-leitwert-hes" value="">
+      <input type="hidden" name="dm-d-leitwert-touched" value="">
+      <input type="hidden" name="dm-d-leitwert-issue" value="">
+      <input type="hidden" name="dm-d-leitwert-epic" value="">
+      <div data-alevel="3" data-title="Leitwert je Einsatz">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Je Einsatz eine führende Kategorie mit ihrem Leitwert."}'>Je Einsatz eine führende Kategorie mit ihrem Leitwert.</div></div>
+        <div data-slot="long">
+          <div data-viz="table" data-viz-spec='{"columns":["Zuerst (Leitwert)","Danach","Leise"],"rows":[],"text":"Jeder Einsatz hat eine führende Kategorie mit Leitwert."}'><table class="mock-atbl"><thead><tr><th>Einsatz</th><th>Zuerst (Leitwert)</th><th>Danach</th><th>Leise</th></tr></thead><tbody>
+      <tr><td>Kampf</td><td>Offensive (Dauer-DPS)</td><td>Verteidigung, Bewegung (SCM)</td><td>Signatur</td></tr>
+      <tr><td>Transport</td><td>Fracht (SCU)</td><td>Verteidigung (Rumpf HP), Bewegung (Q-Reichweite)</td><td>Signatur, Offensive</td></tr>
+      <tr><td>Reisen</td><td>Bewegung (Q-Reichweite)</td><td>Verteidigung, Fracht</td><td>Signatur, Offensive</td></tr>
+      <tr><td>Schleichen</td><td>Signatur (IR)</td><td>Bewegung (SCM), Verteidigung</td><td>Offensive</td></tr>
+      <tr><td>Bergbau</td><td>Bergbau (Laser)</td><td>Signatur (Kühllast), Verteidigung</td><td>Bewegung</td></tr>
+      <tr><td>Bergung</td><td>Bergung (Werkzeug)</td><td>Fracht, Verteidigung</td><td>Signatur</td></tr>
+      <tr><td>Alles</td><td colspan="3">nach Antwort auf „Bedeutung von Alles“</td></tr></tbody></table></div>
+          
+        </div>
+        <div data-example><pre>Kampf · Gladius   → Offensive 1.180 Dauer-DPS, dann Verteidigung, Bewegung
+Transport · C2    → Fracht 696 SCU, dann Verteidigung, Bewegung</pre></div>
+      </div>
+    </section>
+    <section id="d-fracht" data-nav-label="Platz der Fracht" data-decision="d-fracht" data-decision-mode="single"
+        data-label="Platz der Fracht" data-rec="own" data-rec-why="Für Transport und Reisen ist der Laderaum die erste Frage; unter Bewegung ist er falsch einsortiert." data-applies-to="Schiffe mit Frachtgitter" data-finding="f-d-fracht">
+      <p data-applies>Gilt für: Schiffe mit Frachtgitter</p>
+      
+      <p data-situation>Die 696 SCU der Hercules stehen heute unter „Bewegung“, neben SCM und Masse; wer Fracht sucht, findet sie dort nicht.</p>
+      <h3 data-question>Wo stehen Laderaum und Frachtdecks?</h3>
+      
+      
+      <div data-options>
+        <label data-opt="own" data-recommended>
+          <input type="radio" name="dm-d-fracht" value="own" checked>
+          <span data-opt-label>Eigene Kategorie „Fracht“ ab 1 SCU</span>
+          <span data-opt-consequence>Laderaum als Leitwert, Frachtdecks darunter; Schiffe ohne Gitter haben sie nicht.</span>
+        </label>
+        <label data-opt="move">
+          <input type="radio" name="dm-d-fracht" value="move">
+          <span data-opt-label>Bei Transport Leitwert von Bewegung</span>
+          <span data-opt-consequence>Bewegung zeigt dann 696 SCU groß; bei Kampf wieder SCM.</span>
+        </label>
+        <label data-opt="head">
+          <input type="radio" name="dm-d-fracht" value="head">
+          <span data-opt-label>Nur als Chip im Schiffskopf</span>
+          <span data-opt-consequence>Der Kopf zeigt „696 SCU“, die Kategorien bleiben bei vier.</span>
+        </label>
+      </div>
+      
+      <textarea data-comment="d-fracht-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-fracht-none" value="">
+      <input type="hidden" name="dm-d-fracht-hes" value="">
+      <input type="hidden" name="dm-d-fracht-touched" value="">
+      <input type="hidden" name="dm-d-fracht-issue" value="">
+      <input type="hidden" name="dm-d-fracht-epic" value="">
+      <div data-alevel="3" data-title="Platz der Fracht">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Laderaum steckt heute als Unterwert in Bewegung."}'>Laderaum steckt heute als Unterwert in Bewegung.</div></div>
+        <div data-slot="long">
+          <div data-viz="compare" data-viz-spec='{"before":{"label":"heute: Unterwert in Bewegung","value":3},"after":{"label":"eigene Kategorie: Leitwert","value":1},"unit":". Rang im Blick","text":"Fracht rückt vom dritten Unterwert zum Leitwert."}'></div>
+          
+        </div>
+        <div data-example><pre>Heute   Bewegung: 125 m/s SCM · Boost · 696 SCU
+Danach  Fracht: 696 SCU · Hauptdeck 576 · Unterdeck 120</pre></div>
+      </div>
+    </section>
+    <section id="d-rang" data-nav-label="Bedeutung des Rangs" data-decision="d-rang" data-decision-mode="single"
+        data-label="Bedeutung des Rangs" data-rec="lead" data-rec-why="„besser als 78 % von 38“ sagt, gegen wen und worin; ein Mittel über vier Achsen sagt keins von beidem." data-applies-to="jede Kategorie" data-finding="f-d-rang">
+      <p data-applies>Gilt für: jede Kategorie</p>
+      
+      <p data-situation>Vier Rangangaben pro Kachel, drei davon verschieden: „P63“ steht zweimal und ist das Mittel aus vier Achsen, der Satz nennt zwei weitere.</p>
+      <h3 data-question>Wofür steht der Rang einer Kategorie?</h3>
+      
+      
+      <div data-options>
+        <label data-opt="lead" data-recommended>
+          <input type="radio" name="dm-d-rang" value="lead" checked>
+          <span data-opt-label>Rang des Leitwerts in der Klasse</span>
+          <span data-opt-consequence>„besser als 78 % von 38 leichten Jägern“, bezogen auf Dauer-DPS.</span>
+        </label>
+        <label data-opt="mean">
+          <input type="radio" name="dm-d-rang" value="mean">
+          <span data-opt-label>Mittel aller Achsen wie heute</span>
+          <span data-opt-consequence>Eine Zahl je Kategorie, die nicht sagt, welcher Wert sie trägt.</span>
+        </label>
+        <label data-opt="word">
+          <input type="radio" name="dm-d-rang" value="word">
+          <span data-opt-label>Nur ein Rangwort ohne Zahl</span>
+          <span data-opt-consequence>„stark“, „über Mittel“, „schwach“; die Prozente erst in Alle Werte.</span>
+        </label>
+      </div>
+      
+      <textarea data-comment="d-rang-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-rang-none" value="">
+      <input type="hidden" name="dm-d-rang-hes" value="">
+      <input type="hidden" name="dm-d-rang-touched" value="">
+      <input type="hidden" name="dm-d-rang-issue" value="">
+      <input type="hidden" name="dm-d-rang-epic" value="">
+      <div data-alevel="3" data-title="Bedeutung des Rangs">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"P-Werte erscheinen heute bis zu viermal je Kachel."}'>P-Werte erscheinen heute bis zu viermal je Kachel.</div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"P im Kopf","value":1},{"label":"P im Ring","value":1},{"label":"P im Satz (stärkste)","value":1},{"label":"P im Satz (schwächste)","value":1}],"unit":"×","text":"Vier Rangangaben pro Kachel, drei davon verschieden."}'></div>
+          
+        </div>
+        <div data-example><pre>Heute   OFFENSIVE P63 · Ring P63 · „Über dem Median … stärkste Achse Burst (P81), schwächste Raketen (P55)“
+Danach  OFFENSIVE · 1.180 Dauer-DPS · besser als 78 % von 38 leichten Jägern</pre></div>
+      </div>
+    </section>
+  </section>
+  <section id="t-tiefe" data-topic data-nav-label="Alle Werte">
+    <div data-alevel="2" data-title="Alle Werte">
+      <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Die volle Liste wird einheitlich und kürzer."}'>Die volle Liste wird einheitlich und kürzer.</div></div>
+      <div data-slot="long"><div data-viz="bars" data-viz-spec='{"items":[{"label":"Offensive","value":14},{"label":"Verteidigung","value":12},{"label":"Bewegung","value":22},{"label":"Signatur","value":0}],"unit":" Werte","hl":"Bewegung","text":"Die Detail-Ebene ist je Kategorie verschieden gebaut."}'></div><p>Die zweite Ebene entscheidet, ob die erste leicht bleiben kann: Wer alles sucht, muss es dort sicher finden.</p></div>
+    </div>
+    <section id="d-detail" data-nav-label="Inhalt von Alle Werte" data-decision="d-detail" data-decision-mode="single"
+        data-label="Inhalt von Alle Werte" data-rec="unified" data-rec-why="Eine einheitliche Liste je Kategorie vermeidet doppelte Überschriften und den Mix, den Bewegung heute öffnet." data-applies-to="„Alle Werte“ jeder Kategorie" data-finding="f-d-detail">
+      <p data-applies>Gilt für: „Alle Werte“ jeder Kategorie</p>
+      
+      <p data-situation>„Alle Werte“ öffnet heute das alte Analyse-Panel samt eigenem Kopf; unter Bewegung erscheinen auch Rumpf und Signatur, Signatur hat keins.</p>
+      <h3 data-question>Was steht in „Alle Werte“ einer Kategorie?</h3>
+      
+      
+      <div data-options>
+        <label data-opt="unified" data-recommended>
+          <input type="radio" name="dm-d-detail" value="unified" checked>
+          <span data-opt-label>Eine Werteliste je Kategorie, Einsatz-Werte markiert</span>
+          <span data-opt-consequence>Gleiche Gliederung für alle fünf, ohne zweiten Kopf; die Waffentabelle bleibt.</span>
+        </label>
+        <label data-opt="panels">
+          <input type="radio" name="dm-d-detail" value="panels">
+          <span data-opt-label>Die heutigen Analyse-Panels</span>
+          <span data-opt-consequence>Kein Umbau, aber Mischinhalt und doppelte Köpfe bleiben.</span>
+        </label>
+        <label data-opt="filtered">
+          <input type="radio" name="dm-d-detail" value="filtered">
+          <span data-opt-label>Nur Einsatz-Werte, Rest eingeklappt</span>
+          <span data-opt-consequence>Kürzer, doch wer einen anderen Wert sucht, klappt zweimal.</span>
+        </label>
+      </div>
+      
+      <textarea data-comment="d-detail-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-detail-none" value="">
+      <input type="hidden" name="dm-d-detail-hes" value="">
+      <input type="hidden" name="dm-d-detail-touched" value="">
+      <input type="hidden" name="dm-d-detail-issue" value="">
+      <input type="hidden" name="dm-d-detail-epic" value="">
+      <div data-alevel="3" data-title="Inhalt von Alle Werte">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Alle Werte zeigt heute je Kategorie etwas anderes."}'>Alle Werte zeigt heute je Kategorie etwas anderes.</div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Offensive","value":14},{"label":"Verteidigung","value":12},{"label":"Bewegung","value":22},{"label":"Signatur","value":0}],"unit":" Werte","hl":"Bewegung","text":"Bewegung öffnet 22 Werte aus drei Bereichen, Signatur gar keine."}'></div>
+          
+        </div>
+        <div data-example><pre>Heute   Bewegung ▸ Alle Werte → Flugleistung · Masse · Systeme · Signatur · Rumpf
+Danach  Bewegung ▸ Alle Werte → Flugleistung · Quantum · Masse</pre></div>
+      </div>
+    </section>
+    <section id="d-luecken" data-nav-label="Fehlende Werte" data-decision="d-luecken" data-decision-mode="single"
+        data-label="Fehlende Werte" data-rec="count" data-rec-why="Strich-Zeilen machen die Liste länger, ohne etwas zu sagen; ein Zähler hält die Lücke sichtbar." data-applies-to="„Alle Werte“ jeder Kategorie" data-finding="f-d-luecken">
+      <p data-applies>Gilt für: „Alle Werte“ jeder Kategorie</p>
+      
+      <p data-situation>Fehlt ein Wert in den Spieldaten, steht heute eine Zeile mit „—“ da; bei der Verteidigung sind das bis zu 4 von 12 Zeilen.</p>
+      <h3 data-question>Wie erscheinen Werte, die in den Spieldaten fehlen?</h3>
+      
+      
+      <div data-options>
+        <label data-opt="count" data-recommended>
+          <input type="radio" name="dm-d-luecken" value="count" checked>
+          <span data-opt-label>Ausblenden, unten „n Werte fehlen“</span>
+          <span data-opt-consequence>Die Liste zeigt nur, was da ist; ein Klick listet die fehlenden mit Grund.</span>
+        </label>
+        <label data-opt="dash">
+          <input type="radio" name="dm-d-luecken" value="dash">
+          <span data-opt-label>Als Zeile mit Strich und Grund</span>
+          <span data-opt-consequence>Wie heute; vollständig, aber jede Lücke kostet eine Zeile.</span>
+        </label>
+      </div>
+      
+      <textarea data-comment="d-luecken-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-luecken-none" value="">
+      <input type="hidden" name="dm-d-luecken-hes" value="">
+      <input type="hidden" name="dm-d-luecken-touched" value="">
+      <input type="hidden" name="dm-d-luecken-issue" value="">
+      <input type="hidden" name="dm-d-luecken-epic" value="">
+      <div data-alevel="3" data-title="Fehlende Werte">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Bis zu ein Drittel der Zeilen ist heute ein Strich."}'>Bis zu ein Drittel der Zeilen ist heute ein Strich.</div></div>
+        <div data-slot="long">
+          <div data-viz="donut" data-viz-spec='{"parts":[{"label":"mit Wert","value":8},{"label":"Strich","value":4}],"text":"Verteidigung: 4 von 12 Zeilen sind Lücken."}'></div>
+          
+        </div>
+        <div data-example><pre>Heute   Effektive HP — · Panzerung phys. — · Deflection — · Distortion —
+Danach  … Rumpf HP 3.950 · Schild-Regen 216/s   [4 Werte fehlen ▾]</pre></div>
+      </div>
+    </section>
+    <section id="d-doppel" data-nav-label="Leiste und Kategorien" data-decision="d-doppel" data-decision-mode="single"
+        data-label="Leiste und Kategorien" data-rec="split" data-rec-why="Die Leiste reagiert auf Energie und Bauteile; die Kategorien ordnen ein. Zwei Aufgaben, also nicht zweimal dieselbe Zahl." data-applies-to="Leiste am unteren Rand und die Kategorien darüber" data-finding="f-d-doppel">
+      <p data-applies>Gilt für: Leiste am unteren Rand und die Kategorien darüber</p>
+      
+      <p data-situation>Leiste und Kategorien zeigen dieselben Werte zweimal übereinander: Dauer-DPS, Schild HP, SCM und IR stehen am Seitenende doppelt.</p>
+      <h3 data-question>Welche Aufgabe hat die Leiste neben den Kategorien?</h3>
+      
+      
+      <div data-options>
+        <label data-opt="split" data-recommended>
+          <input type="radio" name="dm-d-doppel" value="split" checked>
+          <span data-opt-label>Leiste live, Kategorien ordnen ein</span>
+          <span data-opt-consequence>Leiste: Werte, die sich mit Energie ändern. Kategorien: Rang und Einsatz-Werte.</span>
+        </label>
+        <label data-opt="cats">
+          <input type="radio" name="dm-d-doppel" value="cats">
+          <span data-opt-label>Kategorien ersetzen die Leisten-Werte</span>
+          <span data-opt-consequence>Die Leiste trägt nur noch Einsatz und Energie, ohne Kennzahlen.</span>
+        </label>
+        <label data-opt="both">
+          <input type="radio" name="dm-d-doppel" value="both">
+          <span data-opt-label>Beide zeigen weiter alles</span>
+          <span data-opt-consequence>Keine Änderung; die Dopplung bleibt.</span>
+        </label>
+      </div>
+      
+      <textarea data-comment="d-doppel-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-doppel-none" value="">
+      <input type="hidden" name="dm-d-doppel-hes" value="">
+      <input type="hidden" name="dm-d-doppel-touched" value="">
+      <input type="hidden" name="dm-d-doppel-issue" value="">
+      <input type="hidden" name="dm-d-doppel-epic" value="">
+      <div data-alevel="3" data-title="Leiste und Kategorien">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Vier Werte stehen am Seitenende doppelt."}'>Vier Werte stehen am Seitenende doppelt.</div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"nur Leiste","value":4},{"label":"doppelt","value":4},{"label":"nur Kategorien","value":8}],"unit":" Werte","hl":"doppelt","text":"Vier Werte stehen in Leiste und Kategorien zugleich."}'></div>
+          
+        </div>
+        <div data-example><pre>Leiste      Offensive  Dauer-DPS 1.180 · Alpha 412
+Kategorie   Offensive  1.180 Dauer-DPS … Alpha 412</pre></div>
+      </div>
+    </section>
+    <section id="d-messen" data-nav-label="Messung der Nutzung" data-decision="d-messen" data-decision-mode="verify"
+        data-label="Messung der Nutzung" data-rec="ok" data-rec-why="Ohne diese zwei Ereignisse lässt sich nicht prüfen, ob der Einsatz-Standard trifft und ob Alle Werte gebraucht wird." data-applies-to="Analytics (PostHog)" data-finding="f-d-messen" data-no-example="Ereignisse sind unsichtbar; der Befund zeigt sie als Liste.">
+      <p data-applies>Gilt für: Analytics (PostHog)</p>
+      
+      <p data-situation>Ob die Einsatz-Vorgabe trifft, bliebe unbekannt: Nichts misst, welchen Einsatz Besucher wählen oder ob sie „Alle Werte“ öffnen.</p>
+      <h3 data-question>Stimmen diese zwei neuen Ereignisse samt Dashboard-Kachel?</h3>
+      
+      
+      <div data-options>
+        <label data-opt="ok" data-recommended>
+          <input type="radio" name="dm-d-messen" value="ok" checked>
+          <span data-opt-label>Stimmt</span>
+          <span data-opt-consequence>Beide Ereignisse kommen in den Katalog und auf das Codex-Dashboard.</span>
+        </label>
+        <label data-opt="partial">
+          <input type="radio" name="dm-d-messen" value="partial">
+          <span data-opt-label>Teilweise</span>
+          <span data-opt-consequence>Ich korrigiere einzelne Zeilen im Feld darunter.</span>
+        </label>
+        <label data-opt="wrong">
+          <input type="radio" name="dm-d-messen" value="wrong">
+          <span data-opt-label>Stimmt nicht</span>
+          <span data-opt-consequence>Die Zuordnung muss neu gedacht werden.</span>
+        </label>
+      </div>
+      <input type="text" name="dm-d-messen-fix" value="" placeholder="Was stimmt nicht?">
+      <textarea data-comment="d-messen-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-messen-none" value="">
+      <input type="hidden" name="dm-d-messen-hes" value="">
+      <input type="hidden" name="dm-d-messen-touched" value="">
+      <input type="hidden" name="dm-d-messen-issue" value="">
+      <input type="hidden" name="dm-d-messen-epic" value="">
+      <div data-alevel="3" data-title="Messung der Nutzung">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Zwei Ereignisse und eine Dashboard-Kachel."}'>Zwei Ereignisse und eine Dashboard-Kachel.</div></div>
+        <div data-slot="long">
+          <div data-viz="text" data-viz-spec='{"text":"codex:einsatz_select {mission, source: default|user} · codex:category_detail_open {category, mission} · Kachel „Einsatz-Wahl und Alle Werte“ im Codex-Dashboard"}'><p><code>codex:einsatz_select</code> {mission, source: default | user}<br><code>codex:category_detail_open</code> {category, mission}<br>Kachel „Einsatz-Wahl und Alle Werte“ im Codex-Dashboard</p></div>
+          
+        </div>
+        
+      </div>
+    </section>
+  </section>
+</section>
+</section>
