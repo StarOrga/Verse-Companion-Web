@@ -338,7 +338,11 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
       /* The sheet fills the screen (see .sc-sheet), so its head IS the app bar
          while it is open: give it the height a thumb expects and drop the
          maximize control — there is nothing left to maximize to. */
-      .panel-head { padding: 10px 14px; }
+      /* The title starts on the sheet's one side gutter (--sc-pad-1, the
+         same edge the content below uses) and the minimize button — a full
+         touch target on a phone — sits in the corner instead of 14px in, so
+         the bar stays one control tall. */
+      .panel-head { min-height: 52px; padding: 2px 2px 2px var(--sc-pad-1); }
       .panel-maximize { display: none; }
       /* A panel left maximized at the desk would keep its 16px inset here and
          out-specify .sc-sheet's inset: 0. On a sheet the two states are the

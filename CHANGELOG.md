@@ -4,10 +4,15 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.298.6] - 2026-11-23
+## [0.298.7] - 2026-11-23
 
 ### Fixed
 - Ship page (holotable, beta view): no jump when scrolling back to the top, the panel tabs and the room chips are no longer cut off, no double frames on the area tiles, more room around the parts list; on tablet and phone the bottom strip and the view row no longer sit under the floating buttons.
+
+## [0.298.6] - 2026-11-23
+
+### Fixed
+- Feedback panel on phones: one 12px side gutter for the whole sheet, topic titles on two lines, "Neues Thema" takes over the sheet, area chips in one scrollable row, the Alt+click admin tip hidden on touch screens, the send key stays beside "Abgenommen", and drawn search/filter icons replace broken font glyphs.
 
 ## [0.298.5] - 2026-11-23
 
