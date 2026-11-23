@@ -297,6 +297,11 @@ type UserFeedbackTab = 'compose' | 'mine';
       box-sizing: border-box;
       overflow-y: auto;
     }
+    /* Phone sheet: the content starts on the same side gutter as the sheet's
+       head (--sc-pad-1), one edge for the whole sheet. */
+    @media (max-width: 720px) {
+      .panel-root { padding-inline: var(--sc-pad-1); }
+    }
 
     .tabs { display: flex; gap: 6px; }
     .tab {

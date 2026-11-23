@@ -289,7 +289,11 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
         bottom: calc(var(--sc-fab-inset) + env(safe-area-inset-bottom, 0px) + var(--sc-launcher-lift, 0px));
         gap: 10px;
       }
-      .panel-head { padding: 10px 14px; }
+      /* The title starts on the sheet's one side gutter (--sc-pad-1, the
+         same edge the content below uses) and the minimize button — a full
+         touch target on a phone — sits in the corner instead of 14px in, so
+         the bar stays one control tall. */
+      .panel-head { min-height: 52px; padding: 2px 2px 2px var(--sc-pad-1); }
       /* The launcher must not float on top of its own full-screen sheet; the
          sheet's minimize button is the way out and brings it back. */
       .panel:not(.minimized) ~ .fab { display: none; }

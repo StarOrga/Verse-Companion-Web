@@ -1,6 +1,8 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
+  afterRenderEffect,
   effect,
   inject,
   model,
@@ -97,10 +99,29 @@ import { FeedbackArea, FeedbackAreaView, feedbackAreaLabelKey, feedbackViewLabel
       color: var(--sc-accent);
       background: rgba(0, 212, 255, 0.1);
     }
+    /* Phone: ONE row that scrolls sideways instead of three rows of 48px
+       pills — the wrapped row took a third of the sheet before the field even
+       started. The selected chip is scrolled into view (see the constructor),
+       and the row fades out at its right edge so the cut reads as "more".
+       ds-ok: scroll-fade mask on a chip strip, local to this picker. */
+    @media (max-width: 720px) {
+      .area-row {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        scrollbar-width: none;
+        -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+        mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+        padding-right: 24px;
+      }
+      .area-row::-webkit-scrollbar { display: none; }
+      .area-label, .chip { flex: 0 0 auto; white-space: nowrap; }
+    }
   `],
 })
 export class FeedbackAreaPickerComponent {
   readonly areas = inject(FeedbackAreaService);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   /** The tag that travels with the topic. `null` = "not decided yet, follow the route". */
   readonly area = model<FeedbackArea | null>(null);
@@ -113,6 +134,21 @@ export class FeedbackAreaPickerComponent {
   readonly pinned = model(false);
 
   constructor() {
+    // On a phone the row scrolls sideways (see the styles): the pre-selected
+    // chip comes from the route and may sit past the right edge, where the
+    // sender would never see what was picked. Bring it into the row's view —
+    // horizontally only, never scrolling the sheet around it. A no-op where
+    // the row wraps and nothing overflows.
+    afterRenderEffect(() => {
+      this.area();
+      const row = this.host.nativeElement.querySelector<HTMLElement>('.area-row');
+      const chip = row?.querySelector<HTMLElement>('.chip.active');
+      if (!row || !chip || row.scrollWidth <= row.clientWidth) return;
+      const left = chip.offsetLeft - row.offsetLeft;
+      const right = left + chip.offsetWidth;
+      if (left < row.scrollLeft) row.scrollLeft = left;
+      else if (right > row.scrollLeft + row.clientWidth - 24) row.scrollLeft = right - row.clientWidth + 24;
+    });
     effect(() => {
       const detected = this.areas.current();
       const current = this.area();
