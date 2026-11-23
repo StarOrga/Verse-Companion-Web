@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.298.7",
+  "current": "0.298.8",
   "releases": [
+    {
+      "version": "0.298.8",
+      "date": "2026-11-23",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Ship page (holotable, beta view): no jump when scrolling back to the top, the panel tabs and the room chips are no longer cut off, no double frames on the area tiles, more room around the parts list; on tablet and phone the bottom strip and the view row no longer sit under the floating buttons."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.298.7",
       "date": "2026-11-23",
@@ -12,7 +28,7 @@
           "items": [
             {
               "title": "",
-              "text": "Ship page (holotable, beta view): no jump when scrolling back to the top, the panel tabs and the room chips are no longer cut off, no double frames on the area tiles, more room around the parts list; on tablet and phone the bottom strip and the view row no longer sit under the floating buttons."
+              "text": "Admin feedback board: a shipped topic whose confirmation is still being posted reads \"Wird ausgeliefert · Bestätigung folgt\" instead of waiting for the admin's sign-off."
             }
           ]
         }
