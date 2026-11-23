@@ -6,6 +6,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AnalyticsService } from '../core/analytics.service';
 import { AuthService } from '../auth/auth.service';
 import { ScActionDirective } from '../shared/action/sc-action.directive';
+import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
 import { daysUntil, eventPhase, type VerseEvent } from './news-events';
 import { VerseEventsService } from './verse-events.service';
 
@@ -37,7 +38,7 @@ interface TeaserRow {
 @Component({
   selector: 'sc-events-teaser',
   standalone: true,
-  imports: [RouterLink, TranslatePipe, ScActionDirective, NgTemplateOutlet],
+  imports: [RouterLink, TranslatePipe, ScActionDirective, ScTooltipDirective, NgTemplateOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '[attr.data-variant]': 'variant()', '[class.empty]': '!visible()' },
   template: `
@@ -57,10 +58,19 @@ interface TeaserRow {
         </h2>
         <ul class="ev-list">
           @for (r of rows(); track r.event.id) {
-            <li class="ev-i" [attr.data-phase]="r.phase">
+            <li class="ev-i" [attr.data-phase]="r.phase" [class.with-img]="!!r.event.image" [attr.data-img]="r.event.image?.kind ?? null">
+              @if (r.event.image; as img) {
+                <!-- The official RSI picture opens full size in its own tab: a schedule is read up close, not in a tile. -->
+                <a class="ev-img" [href]="img.url" target="_blank" rel="noopener noreferrer"
+                   [attr.aria-label]="'news.events.imageOpen' | translate: { name: r.event.name }"
+                   [scTooltip]="'news.events.imageOpen' | translate: { name: r.event.name }" scTooltipTier="label"
+                   (click)="opened(r, 'image')" (auxclick)="opened(r, 'image')">
+                  <img [src]="img.url" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" />
+                </a>
+              }
               @if (r.event.url) {
                 <a class="ev-a" [href]="r.event.url" target="_blank" rel="noopener noreferrer"
-                   (click)="opened(r)" (auxclick)="opened(r)">
+                   (click)="opened(r, 'post')" (auxclick)="opened(r, 'post')">
                   <ng-container [ngTemplateOutlet]="body" [ngTemplateOutletContext]="{ $implicit: r }" />
                 </a>
               } @else {
@@ -131,6 +141,26 @@ interface TeaserRow {
     .ev-sum {
       font-size: max(0.78rem, var(--sc-fs-floor)); color: var(--sc-fg-1); line-height: 1.45;
     }
+    /* An event with its official RSI picture: picture and text share one frame, the frame carries the border. */
+    .ev-i.with-img {
+      display: flex; flex-direction: column; overflow: hidden;
+      border: 1px solid var(--sc-border); border-radius: 8px;
+      background: color-mix(in srgb, var(--sc-bg-1) 55%, transparent);
+      transition: border-color 0.18s;
+    }
+    .ev-i.with-img[data-phase='running'] { border-color: color-mix(in srgb, var(--sc-accent) 40%, var(--sc-border)); }
+    .ev-i.with-img:has(a:hover) { border-color: color-mix(in srgb, var(--sc-accent) 55%, var(--sc-border)); }
+    .ev-i.with-img .ev-a { border: 0; border-radius: 0; background: transparent; flex: 1 1 auto; }
+    .ev-img { display: block; line-height: 0; background: var(--sc-bg-0); }
+    .ev-img:focus-visible, .ev-i.with-img a.ev-a:focus-visible { outline: 1px solid transparent; box-shadow: var(--sc-focus-ring-inset); }
+    .ev-img img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+    /* A schedule is a dated plan: shown whole, across the full row, so its dates stay legible. */
+    .ev-i[data-img='schedule'] { grid-column: 1 / -1; }
+    .ev-i[data-img='schedule'] .ev-img img { object-fit: contain; }
+    @media (min-width: 760px) {
+      .ev-i[data-img='schedule'] { flex-direction: row; }
+      .ev-i[data-img='schedule'] .ev-img { flex: 0 0 min(62%, 760px); }
+    }
     .ev-state { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; color: var(--sc-fg-1); font-size: max(0.8rem, var(--sc-fs-floor)); }
     @keyframes ev-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
     @media (prefers-reduced-motion: reduce) { .ev-live { animation: none; } }
@@ -187,8 +217,8 @@ export class EventsTeaserComponent {
     void this.svc.load(true);
   }
 
-  opened(r: TeaserRow): void {
-    this.analytics.track('news:event_open', { surface: this.variant(), phase: r.phase });
+  opened(r: TeaserRow, target: 'post' | 'image'): void {
+    this.analytics.track('news:event_open', { surface: this.variant(), phase: r.phase, target });
   }
 
   summaryOf(e: VerseEvent): string {

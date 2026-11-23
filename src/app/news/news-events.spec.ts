@@ -1,11 +1,11 @@
-import { daysUntil, eventPhase, eventStem, eventTeaser, isEventNews, type VerseEvent } from './news-events';
+import { daysUntil, eventImageOf, eventPhase, eventStem, eventTeaser, isEventNews, type VerseEvent } from './news-events';
 
 const NOW = Date.parse('2026-11-21T14:00:00Z');
 
 function ev(id: string, start: string, end: string, extra: Partial<VerseEvent> = {}): VerseEvent {
   return {
     id, kind: 'expo', name: id, start, end, dateStatus: 'confirmed', freeFly: false, url: '',
-    summary: { en: '', de: '' }, ...extra,
+    summary: { en: '', de: '' }, image: null, ...extra,
   };
 }
 
@@ -48,5 +48,16 @@ describe('news events (feedback #389)', () => {
     ], NOW);
     expect(t.running.map((e) => e.id)).toEqual(['soon-end', 'late-run']);
     expect(t.upcoming.map((e) => e.id)).toEqual(['first', 'next']);
+  });
+
+  it('reads the official RSI picture from extra.image and drops anything off RSI (feedback #400)', () => {
+    const url = 'https://robertsspaceindustries.com/i/99f7/ADdP/iae2956-schedule-16x9-72dpi.jpg';
+    expect(eventImageOf({ image: { url, kind: 'schedule', from: 'https://robertsspaceindustries.com/comm-link/transmission/21389-x' } }))
+      .toEqual({ url, kind: 'schedule', from: 'https://robertsspaceindustries.com/comm-link/transmission/21389-x' });
+    expect(eventImageOf({ image: { url, kind: 'weird' } })).toEqual({ url, kind: 'hero', from: '' });
+    expect(eventImageOf({ image: { url: 'https://evil.example/x.jpg', kind: 'schedule' } })).toBeNull();
+    expect(eventImageOf({ image: { url: 'http://robertsspaceindustries.com/x.jpg' } })).toBeNull();
+    expect(eventImageOf({})).toBeNull();
+    expect(eventImageOf(null)).toBeNull();
   });
 });
