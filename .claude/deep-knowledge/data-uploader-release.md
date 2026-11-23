@@ -58,6 +58,17 @@ were unknown to the feed (`401 invalid_or_revoked_release_token`) and could neve
 update again; the uploader showed the raw HttpError.
 
 Fixes now in place:
+- One concurrency group `data-uploader-release` for every release run (tag push
+  and dispatch), no cancel: the second run of a version starts only after the
+  first has finished, so its guards see the first one's tag and release. PR and
+  main-push runs keep their per-ref group (a PR cancels its superseded run).
+  Note GitHub keeps only ONE pending run per group — a third release run queued
+  behind a pending one replaces it.
+- "Refuse to overwrite another build of this version" (right before both
+  publish steps): a dispatch whose tag appeared while it was building, or any
+  run whose mirror release already has assets, fails instead of uploading. A
+  half-uploaded mirror release is therefore never re-run over — bump
+  `data-uploader/package.json` (or finish it by hand, see below).
 - `release-guard` job: a tag whose source release already exists is not
   built again. A dispatch also refuses a version that is already on the mirror.
 - "Verify the public mirror serves THIS build": the run fails when the mirror's
