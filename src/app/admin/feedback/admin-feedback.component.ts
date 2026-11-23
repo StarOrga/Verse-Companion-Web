@@ -2394,7 +2394,7 @@ export class AdminFeedbackComponent implements OnInit {
       .from('admin_feedback')
       // `author.role` colours the avatar; admins may read every profile
       // (policy profiles_admin_read_all), so no projection is needed.
-      .select('id, seq, author_id, origin, body, status, ship_ref, processing_note, created_at, updated_at, shipped_at, processed_at, reviewed_at, source, triaged, decision_note, area, summary, complex, author:profiles(display_name, username, role)')
+      .select('id, seq, author_id, origin, body, status, ship_ref, processing_note, created_at, updated_at, shipped_at, processed_at, reviewed_at, review_reply_pending, source, triaged, decision_note, area, summary, complex, author:profiles(display_name, username, role)')
       .order('created_at', { ascending: true });
     if (error) {
       this.errorMsg.set(toErrorKey('admin-feedback', 'load board', error));

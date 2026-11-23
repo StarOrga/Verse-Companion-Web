@@ -9,6 +9,7 @@ import {
   matchDeclineReason,
   bucketLabelStatus,
   awaitsReview,
+  awaitsReviewReply,
   awaitsDeploy,
   computePace,
   computeStats,
@@ -1235,6 +1236,36 @@ describe('review gate', () => {
     });
     expect(feedbackBucket(m)).toBe('review');
     expect(isArchived(m)).toBe(false);
+  });
+
+  it('a merged topic whose review reply is still owed is the routine's turn, not a sign-off (#391/#393)', () => {
+    const m = shipped({ review_reply_pending: true });
+    expect(awaitsReviewReply(m)).toBe(true);
+    expect(awaitsReview(m)).toBe(false);
+    expect(feedbackBucket(m)).toBe('in_progress');
+    expect(isArchived(m)).toBe(false);
+    expect(turnOf(m)).toBe('routine');
+    expect(adminAsk(m)).toBeNull();
+    const pos = flightPosition(m);
+    expect(pos.station).toBe('delivered');
+    expect(pos.confirming).toBe(true);
+    expect(stationLabelKey(pos)).toBe('adminFeedback.station.confirming');
+  });
+
+  it('once the reply is posted the same topic enters the sign-off gate', () => {
+    const m = shipped({ review_reply_pending: false });
+    expect(awaitsReviewReply(m)).toBe(false);
+    expect(awaitsReview(m)).toBe(true);
+    expect(turnOf(m)).toBe('admin');
+    expect(adminAsk(m)).toBe('review');
+  });
+
+  it('a post-ship reply beats a pending review reply — the admin's message reopens it', () => {
+    const m = shipped({ review_reply_pending: true });
+    const replies = [msg('h1', 's', false, '2026-07-21T11:00:00Z')];
+    expect(isContinuedAfterShip(m, replies)).toBe(true);
+    expect(awaitsReviewReply(m, replies)).toBe(false);
+    expect(feedbackBucket(m, replies)).toBe('todo');
   });
 
   it('archives the topic once an admin signed it off', () => {

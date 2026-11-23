@@ -5832,6 +5832,7 @@
       "declined": "Nicht umgesetzt",
       "rejected": "Verworfen",
       "loop": "Nachbesserung",
+      "confirming": "Wird ausgeliefert · Bestätigung folgt",
       "pathLabel": "Stand: {{station}}",
       "step": {
         "contract": "Eingereicht · Freigabe steht aus",

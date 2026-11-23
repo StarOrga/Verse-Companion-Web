@@ -5832,6 +5832,7 @@
       "declined": "Not implemented",
       "rejected": "Rejected",
       "loop": "Follow-up",
+      "confirming": "Shipping · confirmation follows",
       "pathLabel": "Status: {{station}}",
       "step": {
         "contract": "Filed · release pending",
