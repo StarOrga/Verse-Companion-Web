@@ -57,6 +57,8 @@ const MAX_HUB_ARTICLES = 8;
 /** Article reads per run for event pictures (2 requests each), across all events. */
 const MAX_IMAGE_ARTICLES = 10;
 const PAGE_TIMEOUT_MS = 12_000;
+/** All RSI page requests of one run together (hub list, articles, pictures). */
+const RSI_BUDGET_MS = 70_000;
 /** An event's picture is looked up again at most this often. */
 const IMAGE_RECHECK_MS = 20 * 60 * 60_000;
 
@@ -108,9 +110,14 @@ async function fetchCommLinks(): Promise<{ links: CommLink[]; rawCount: number; 
 
 // ------------------------------------------------------------------ RSI pages (rsi-pages.ts)
 
-async function fetchText(url: string, init: RequestInit = {}, timeoutMs = PAGE_TIMEOUT_MS): Promise<string> {
+/** Shared wall clock for every RSI page request of one run (set by the handler): a slow RSI never outlives the worker. */
+let rsiDeadline = 0;
+
+async function fetchText(url: string, init: RequestInit = {}): Promise<string> {
+  const left = rsiDeadline - Date.now();
+  if (left < 1000) throw new Error('rsi page budget spent');
   const headers = { 'User-Agent': USER_AGENT, ...(init.headers as Record<string, string> | undefined) };
-  const res = await fetch(url, { ...init, headers, signal: AbortSignal.timeout(timeoutMs) });
+  const res = await fetch(url, { ...init, headers, signal: AbortSignal.timeout(Math.min(PAGE_TIMEOUT_MS, left)) });
   if (!res.ok) throw new Error(`HTTP ${res.status} for ${url.split('?')[0]}`);
   return await res.text();
 }
@@ -338,6 +345,7 @@ Deno.serve(withPosthog('sc-events-sync', async (req) => {
     const { links, rawCount, invalid, errors } = await fetchCommLinks();
     // RSI's own list fills what the mirror has not picked up yet: event-titled posts only, their bodies read from RSI.
     const rsiErrors: string[] = [];
+    rsiDeadline = Date.now() + RSI_BUDGET_MS;
     const hub = await fetchHub(rsiErrors);
     const read = articleReader();
     const mirrored = new Set(links.map((l) => l.id));
