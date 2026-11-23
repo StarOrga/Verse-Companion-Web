@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Ship page (holotable, beta view): no jump when scrolling back to the top, the panel tabs and the room chips are no longer cut off, no double frames on the area tiles, more room around the parts list; on tablet and phone the bottom strip and the view row no longer sit under the floating buttons.
 
+## [0.298.7] - 2026-11-23
+
+### Fixed
+- Admin feedback board: a shipped topic whose confirmation is still being posted reads "Wird ausgeliefert · Bestätigung folgt" instead of waiting for the admin's sign-off.
+
 ## [0.298.6] - 2026-11-23
 
 ### Fixed

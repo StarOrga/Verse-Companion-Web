@@ -69,9 +69,26 @@ const REVIEWABLE_STATUSES: readonly FeedbackStatus[] = ['shipped', 'issue_create
 export function awaitsReview(row: FeedbackRow, replies?: readonly FeedbackMessage[]): boolean {
   if (!REVIEWABLE_STATUSES.includes(row.status)) return false;
   if (row.reviewed_at !== null) return false;
+  // Merged, but the routine has not confirmed it live and posted its ✅/⏳
+  // reply yet — nothing to look at, so no sign-off is asked for (#391/#393).
+  if (awaitsReviewReply(row, replies)) return false;
   // A post-ship continuation is already back in the work loop; asking for a
   // sign-off on top of it would be a second, contradictory prompt.
   return !isContinuedAfterShip(row, replies);
+}
+
+/**
+ * True while a shipped topic still owes its ✅/⏳ review reply
+ * (`review_reply_pending`, migration 20260913131500): the change is merged and
+ * the routine is still checking the deploy/release before it reports back.
+ * That is the ROUTINE's turn, not the admin's — the board showed such topics as
+ * "Du bist dran" for ~19 minutes on 2026-11-23 (#391/#393) with no message in
+ * the thread, which read as a sign-off nobody had been given anything for.
+ * `undefined` (column not selected) is not pending, like `reviewed_at`. A
+ * post-ship continuation wins: the admin's newer reply put it back in the loop.
+ */
+export function awaitsReviewReply(row: FeedbackRow, replies?: readonly FeedbackMessage[]): boolean {
+  return row.status === 'shipped' && row.review_reply_pending === true && !isContinuedAfterShip(row, replies);
 }
 
 /**
@@ -86,7 +103,8 @@ export function isArchived(row: FeedbackRow, replies?: readonly FeedbackMessage[
   return (
     ARCHIVE_STATUSES.includes(row.status) &&
     !isContinuedAfterShip(row, replies) &&
-    !awaitsReview(row, replies)
+    !awaitsReview(row, replies) &&
+    !awaitsReviewReply(row, replies)
   );
 }
 
@@ -179,6 +197,11 @@ export interface FeedbackRow {
    * the column are not read as "pending" — see {@link awaitsReview}.
    */
   reviewed_at?: string | null;
+  /**
+   * The routine still owes the ✅/⏳ review reply of a shipped topic (migration
+   * 20260913131500) — see {@link awaitsReviewReply}. Optional: absent = not pending.
+   */
+  review_reply_pending?: boolean;
   /**
    * Which part of the app the topic is about — set by the sender's composer
    * from the page they were on, correctable there (admin feedback 835fec58,
@@ -445,6 +468,8 @@ export function feedbackBucket(
       // Terminal at rest, but a human reply after the ship reopens it as a
       // continuation → back on the routine's pile → ToDo (see isContinuedAfterShip).
       if (isContinuedAfterShip(row, replies)) return 'todo';
+      // Merged, deploy/release still being confirmed → the routine is still on it.
+      if (awaitsReviewReply(row, replies)) return 'in_progress';
       return awaitsReview(row, replies) ? 'review' : 'shipped';
     case 'in_progress':
       return 'in_progress';
@@ -1692,6 +1717,11 @@ export interface FlightPosition {
    * 1d013d69).
    */
   question: boolean;
+  /**
+   * Shipped, but the routine is still confirming the deploy/release before it
+   * posts its reply (see {@link awaitsReviewReply}). Set only when true.
+   */
+  confirming?: boolean;
 }
 
 /**
@@ -1705,6 +1735,7 @@ export function flightPosition(row: FeedbackRow, replies?: readonly FeedbackMess
   const at = (station: FeedbackStation, branch: FeedbackBranch, extra: Partial<FlightPosition> = {}): FlightPosition =>
     ({ station, branch, loop: false, queued: false, answered: false, question: false, ...extra });
   if (awaitsTriage(row) && bucket === 'todo') return at('inbox', null);
+  if (awaitsReviewReply(row, replies)) return at('delivered', null, { confirming: true });
   switch (bucket) {
     case 'declined':
       return at('work', 'declined');
@@ -1784,6 +1815,7 @@ export function turnLabelKey(turn: FeedbackTurn): string {
 /** i18n key naming the place on the path, branch and loop included. */
 export function stationLabelKey(pos: FlightPosition): string {
   if (pos.branch) return `adminFeedback.station.${pos.branch}`;
+  if (pos.confirming) return 'adminFeedback.station.confirming';
   if (pos.loop) return 'adminFeedback.station.loop';
   if (pos.answered) return 'adminFeedback.station.answered';
   if (pos.queued) return 'adminFeedback.station.queued';
