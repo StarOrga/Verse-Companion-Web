@@ -836,8 +836,10 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
       .silhouette-frame.phone-full { --imm-pl: env(safe-area-inset-left, 0px); --imm-pb: calc(64px + env(safe-area-inset-bottom, 0px)); }
     }
     @media (max-width: 640px) {
-      /* The model takes what the screen leaves under the header and above the sheet (clamped); never the old 320 px slab. */
-      .silhouette-frame, .mode-viewer { min-height: clamp(280px, calc(100dvh - var(--sc-header-h, 108px) - 220px - var(--sc-bar-stack-h, 0px) - var(--sc-sheet-peek-h, 96px)), 520px); }
+      /* The model takes what the screen leaves under the header and above the sheet (clamped); never the old 320 px slab.
+         340 px = head band, chips row and the views row under the model: the views row ends above the sheet's peek
+         on the first screen instead of under it. */
+      .silhouette-frame, .mode-viewer { min-height: clamp(280px, calc(100dvh - var(--sc-header-h, 108px) - 340px - var(--sc-bar-stack-h, 0px) - var(--sc-sheet-peek-h, 96px)), 520px); }
       .silhouette-frame { --pin-inset: 36px; }
       .pin-label { display: none; }
       .pin:is(.sel, .active) .pin-label { display: inline; }

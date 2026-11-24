@@ -252,7 +252,7 @@ export class CodexDetailPanelComponent<T extends string = DetailTabId> {
          over both, docked on the strip; its height is what the screen has left between where the body starts
          (--holo-top) and the strip (--holo-strip-h) — both measured by the stage and set on this host. ── */
       :host([data-stage='holo']) { gap: 6px; }
-      :host([data-stage='holo']) .sh-grid { display: grid; grid-template-columns: minmax(0, 1fr) clamp(320px, 22.2vw, 360px); grid-template-rows: minmax(0, 1fr) auto;
+      :host([data-stage='holo']) .sh-grid { display: grid; grid-template-columns: minmax(0, 1fr) clamp(344px, 25vw, 360px); grid-template-rows: minmax(0, 1fr) auto;
         column-gap: 16px; row-gap: 8px; align-items: stretch; height: calc(100dvh - var(--holo-top, 170px) - var(--holo-strip-h, 82px) - 8px); min-height: 460px; }
       /* The stage slot has no box: the table it holds is the grid's first cell. */
       :host([data-stage='holo']) .sh-stage { display: contents; }
