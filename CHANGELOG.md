@@ -4,10 +4,15 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.298.8] - 2026-11-23
+## [0.298.9] - 2026-11-24
 
 ### Fixed
 - Ship page (holotable, beta view): no jump when scrolling back to the top, the panel tabs and the room chips are no longer cut off, no double frames on the area tiles, more room around the parts list; on tablet and phone the bottom strip and the view row no longer sit under the floating buttons.
+
+## [0.298.8] - 2026-11-23
+
+### Added
+- In-game events: the event card shows the official RSI picture (e.g. the IAE schedule graphic), opening full size in a new tab; the sync now reads RSI news posts directly for fresh dates and pictures.
 
 ## [0.298.7] - 2026-11-23
 
