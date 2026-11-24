@@ -9,11 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Ship page (holotable, beta view): no jump when scrolling back to the top, the panel tabs and the room chips are no longer cut off, no double frames on the area tiles, more room around the parts list; on tablet and phone the bottom strip and the view row no longer sit under the floating buttons.
 
-## [0.298.9] - 2026-11-24
-
-### Fixed
-- Ship page (holotable, beta view): no jump when scrolling back to the top, the panel tabs and the room chips are no longer cut off, no double frames on the area tiles, more room around the parts list; on tablet and phone the bottom strip and the view row no longer sit under the floating buttons.
-
 ## [0.298.8] - 2026-11-23
 
 ### Added
