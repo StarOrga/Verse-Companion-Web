@@ -58,6 +58,8 @@ import { lastDestroyedAt } from '../now/hq-live.util';
 import { BetaService } from '../../core/beta.service';
 import { HqBlueprintPickerComponent, PickedBlueprint } from './hq-blueprint-picker.component';
 import { HqCrateComponent } from './hq-crate.component';
+import { HqHereButtonComponent } from './hq-here-button.component';
+import { HqStockSearchComponent } from './hq-stock-search.component';
 import { HqPlaceSelectComponent } from './hq-place-select.component';
 import {
   type DeckCrate,
@@ -123,6 +125,7 @@ type Cell = { kind: 'add' } | { kind: 'ship'; ship: HangarShip } | { kind: 'bp';
   imports: [
     TranslatePipe, ScDatePipe, NgTemplateOutlet, RouterLink, ScActionDirective, ScTooltipDirective, HqStockPopupComponent, HqStockSharedComponent,
     HqBlueprintPickerComponent, HqCrateComponent, HqPlaceSelectComponent, ScSelectComponent, HqStockLogComponent, HqStockTableComponent,
+    HqHereButtonComponent, HqStockSearchComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -139,6 +142,8 @@ type Cell = { kind: 'add' } | { kind: 'ship'; ship: HangarShip } | { kind: 'bp';
           </a>
         }
       </nav>
+      <!-- #354 Lager search: the Standort button right of the tab bar (concept d83b72d8 round 4 a). -->
+      <sc-hq-here-button [known]="knownPlaces()" />
       <span class="head-r">
         @if (isDeckTab()) {
           <span class="mode" role="group" [attr.aria-label]="'hq.bestand.deck.modeAria' | translate">
@@ -245,6 +250,8 @@ type Cell = { kind: 'add' } | { kind: 'ship'; ship: HangarShip } | { kind: 'bp';
       @if (isDeckTab()) {
         <div class="main">
           <div class="left">
+            <!-- #354 Lager search: own search with Gegenstand, Ort, Menge (concept d83b72d8). -->
+            <sc-hq-stock-search [known]="knownPlaces()" />
             @if (bays().length) {
               <div class="bays" role="group" [attr.aria-label]="'hq.bestand.deck.baysAria' | translate">
                 @for (b of bays(); track b.location) {
@@ -521,6 +528,9 @@ type Cell = { kind: 'add' } | { kind: 'ship'; ship: HangarShip } | { kind: 'bp';
       .head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sc-space-3, 12px); }
       .ti { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--sc-border); border-radius: 10px; color: var(--sc-accent); }
       .ti svg { width: 22px; height: 22px; }
+      /* #354: fixed-width title so the tab bar never shifts with the tab name (concept d83b72d8 round 4 a). ds-ok: fixed width. */
+      .ttl { flex: 0 0 10rem; min-width: 0; }
+      .page-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       .ttl small { display: block; color: var(--sc-fg-2); font-size: 0.7rem; letter-spacing: .14em; text-transform: uppercase; }
       .page-title { margin: 0; font: 600 1.4rem / 1.2 var(--sc-font-display); }
       .tabs { display: inline-flex; flex-wrap: wrap; padding: 3px; border: 1px solid var(--sc-border); border-radius: 999px; background: var(--sc-bg-0); }
@@ -880,13 +890,18 @@ export class HqStockComponent implements OnInit {
       .lastRemovals(this.live.events())
       .filter((r) => keep(r.location, r.name, r.className, r.unit))
       .map((r) => ({ key: `o:${r.key}`, at: r.at, kind: 'out' as const, name: r.name, className: r.className, qty: r.qty, unit: r.unit, place: this.crateLabel(r.location), why: r.kind }));
+    // #354: Einlagern and upward corrections stand in the same log (concept d83b72d8).
+    const ins: LogLine[] = this.inv
+      .lastAdditions()
+      .filter((r) => keep(r.location, r.name, r.className, r.unit))
+      .map((r) => ({ key: r.key, at: r.at, kind: 'in' as const, name: r.name, className: r.className, qty: r.qty, unit: r.unit, place: this.crateLabel(r.location), why: r.kind }));
     const res: LogLine[] = [];
     for (const c of this.crates()) {
       if (!keep(c.location, c.name, c.className, c.unit)) continue;
       const all = [...c.anyReservations, ...c.stacks.flatMap((s) => s.reservations)];
       all.forEach((r, i) => res.push({ key: `r:${c.key}:${r.id ?? i}`, at: r.at, kind: 'reserve', name: c.name, className: c.className, qty: r.amount, unit: c.unit, place: this.crateLabel(c.location) }));
     }
-    return [...outs, ...res].filter((l) => !!l.at).sort((a, b) => b.at.localeCompare(a.at));
+    return [...ins, ...outs, ...res].filter((l) => !!l.at).sort((a, b) => b.at.localeCompare(a.at));
   });
   protected readonly filterSummary = computed(() => {
     const parts: string[] = [];

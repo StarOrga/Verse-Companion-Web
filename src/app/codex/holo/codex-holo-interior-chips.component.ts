@@ -34,12 +34,21 @@ import { GLYPH_PATHS, GROUP_GLYPH, INTERIOR_GROUPS } from './holo-interior';
     </div>
   `,
   styles: [`
-    :host { display: block; min-width: 0; }
+    :host { display: block; min-width: 0; container: ig / inline-size; }
   .ig { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1 1 auto; }
   .ig-row { display: flex; gap: 5px; min-width: 0; flex: 0 1 auto; overflow-x: auto; overscroll-behavior-x: contain; padding: 2px 24px 4px 0;
   mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent); }
   .ig-tag, .ig-reset { flex: none; }
   .ig-ri { display: none; }
+  /* Not room for every chip and the preset line (a 1440 px desktop): the preset folds into the reset icon (its name is the
+     tooltip) instead of pushing the last chips under the fade. */
+  @container ig (max-width: 1119px) {
+    .ig-row { flex: 1 1 auto; }
+    .ig-tag { display: none; }
+    .ig-reset { inline-size: 32px; min-inline-size: 32px; block-size: 32px; min-block-size: 32px; padding: 0; border-radius: 50%; justify-content: center; }
+    .ig-ri { display: block; width: 18px; height: 18px; }
+    .ig-rl { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  }
   /* Phone: preset tag and reset fold into one 44px icon button at the row end (the preset name is its tooltip, the word stays for screen readers). */
   @media (max-width: 640px), (orientation: landscape) and (max-height: 500px) {
     .ig-tag { display: none; }

@@ -1,4 +1,4 @@
-import type { HqInventoryRemovalRow, HqLiveEventRow, HqRemovalKind } from './hq-db.types';
+import { HQ_REMOVAL_KINDS, type HqAdditionKind, type HqInventoryRemovalRow, type HqLiveEventRow, type HqRemovalKind } from './hq-db.types';
 import { parsePreviousSnapshot } from './hq-snapshot';
 import { itemIdentity } from './hq-quality';
 
@@ -42,7 +42,7 @@ export function lastRemovals(
   current: readonly StockRef[],
   limit: number = LAST_REMOVALS,
 ): Removal[] {
-  const out: Removal[] = manual.map((m) => ({
+  const out: Removal[] = manual.filter(isRemovalRow).map((m) => ({
     key: `m:${m.id}`,
     at: m.at,
     location: m.location,
@@ -91,4 +91,29 @@ export function lastRemovals(
     }
   }
   return out.sort((a, b) => b.at.localeCompare(a.at) || a.key.localeCompare(b.key)).slice(0, Math.max(0, limit));
+}
+
+function isRemovalRow(m: HqInventoryRemovalRow): m is HqInventoryRemovalRow & { kind: HqRemovalKind } {
+  return (HQ_REMOVAL_KINDS as readonly string[]).includes(m.kind);
+}
+
+/** #354: one manual addition (Einlagern / amount raised) for the Ladeprotokoll; never counts as used up. */
+export interface Addition {
+  readonly key: string;
+  readonly at: string;
+  readonly location: string;
+  readonly name: string;
+  readonly className: string | null;
+  readonly qty: number;
+  readonly unit: 'pcs' | 'scu';
+  readonly kind: HqAdditionKind;
+}
+
+/** The manual additions of the log rows, newest first. */
+export function lastAdditions(manual: readonly HqInventoryRemovalRow[], limit: number = LAST_REMOVALS * 3): Addition[] {
+  return manual
+    .filter((m): m is HqInventoryRemovalRow & { kind: HqAdditionKind } => m.kind === 'add' || m.kind === 'raise')
+    .map((m) => ({ key: `a:${m.id}`, at: m.at, location: m.location, name: m.name, className: m.class_name, qty: Number(m.qty), unit: m.unit, kind: m.kind }))
+    .sort((a, b) => b.at.localeCompare(a.at) || a.key.localeCompare(b.key))
+    .slice(0, Math.max(0, limit));
 }

@@ -1,6 +1,6 @@
 # Verse Companion
 
-**Version: 0.297.1**
+**Version: 0.298.10**
 
 > Verse Companion – unofficial fan tool for Star Citizen. Your terminal to the verse: Verse News, codex, hangar and loadout tools.
 > Built with Angular 22 PWA · Supabase (Auth + Postgres + Storage + Edge Functions) · Vercel.
@@ -51,7 +51,7 @@ npx supabase functions serve fetch-verse-news --no-verify-jwt
 - **Production:** <https://versecompanion-alpha.vercel.app> — auto-deployed from `main`. Vercel's project default `star-citizen-companion-website.vercel.app` redirects here.
 - `vercel.json` configures SPA rewrites, security headers, and a CSP that allows Supabase + Google OAuth.
 - The build output is `dist/verse-companion/browser`.
-- **Initial connect (one-time):** open https://vercel.com/new, import `StarOrga/Star-Citizen-Companion-Web`, accept the defaults. Subsequent pushes to `main` deploy automatically.
+- **Initial connect (one-time):** open https://vercel.com/new, import `StarOrga/Verse-Companion-Web`, accept the defaults. Subsequent pushes to `main` deploy automatically.
 
 ## Architecture
 

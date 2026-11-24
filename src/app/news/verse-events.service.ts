@@ -1,7 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { toErrorKey } from '../core/describe-error';
 import { SupabaseClientProvider } from '../core/supabase.client';
-import { eventStem, eventTeaser, type EventTeaser, type VerseEvent, type VerseEventKind } from './news-events';
+import { eventImageOf, eventStem, eventTeaser, type EventTeaser, type VerseEvent, type VerseEventKind } from './news-events';
 
 /** The `sc_events` columns the teasers read, as PostgREST returns them. */
 interface ScEventTeaserRow {
@@ -14,6 +14,7 @@ interface ScEventTeaserRow {
   free_fly: boolean;
   url: string | null;
   summary: { en?: string; de?: string } | null;
+  extra?: unknown;
 }
 
 export function toVerseEvent(r: ScEventTeaserRow): VerseEvent {
@@ -28,6 +29,7 @@ export function toVerseEvent(r: ScEventTeaserRow): VerseEvent {
     freeFly: !!r.free_fly,
     url: r.url ?? '',
     summary: { en, de: r.summary?.de || en },
+    image: eventImageOf(r.extra),
   };
 }
 
@@ -76,7 +78,7 @@ export class VerseEventsService {
       const since = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);
       const { data, error } = await this.sb.client
         .from('sc_events' as never)
-        .select('id,kind,name,start_date,end_date,date_status,free_fly,url,summary')
+        .select('id,kind,name,start_date,end_date,date_status,free_fly,url,summary,extra')
         .eq('hidden', false)
         .eq('status', 'scheduled')
         .gte('end_date', since)

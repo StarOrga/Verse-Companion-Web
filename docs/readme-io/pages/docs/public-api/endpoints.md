@@ -116,7 +116,7 @@ default binding per device, and the **curated category hierarchy** on top.
 
 The bindings come from the datamined `defaultProfile.xml`; `categories` is the
 part curated by hand in the admin UI and is `null` while an action is still
-unclassified. Its five layers are the Context half of the SCC Input-Actions
+unclassified. Its five layers are the Context half of the VC Input-Actions
 hierarchy:
 
 | Field | Layer | Values |

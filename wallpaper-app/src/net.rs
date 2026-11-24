@@ -96,7 +96,7 @@ pub const API_KEY: &str = SUPA_KEY;
 /// against the catalog before installation regardless of where it landed, so it
 /// is not a trusted input.
 const BINARY_URL_PREFIX: &str =
-    "https://github.com/StarOrga/Star-Citizen-Companion-Binaries/releases/download/";
+    "https://github.com/StarOrga/Verse-Companion-Binaries/releases/download/";
 
 /// Upper bound for an update download. Starscape is ~0.3 MB; 32 MB is a wide
 /// margin that still refuses a runaway response.
@@ -954,7 +954,7 @@ mod tests {
     #[test]
     fn the_binary_pin_covers_owner_and_repo_not_just_the_host() {
         assert!(is_pinned_binary_url(
-            "https://github.com/StarOrga/Star-Citizen-Companion-Binaries/releases/download/wallpaper-app-v0.4.0/starscape-wallpaper-0.4.0-beta.exe"
+            "https://github.com/StarOrga/Verse-Companion-Binaries/releases/download/wallpaper-app-v0.4.0/starscape-wallpaper-0.4.0-beta.exe"
         ));
         // The finding this test exists for: any GitHub account can host a release
         // asset, so a host-only allowlist pins nothing.
@@ -966,16 +966,16 @@ mod tests {
         ));
         // Prefix-walking, scheme downgrade, and lookalike hosts.
         assert!(!is_pinned_binary_url(
-            "https://github.com/StarOrga/Star-Citizen-Companion-Binaries/releases/download/../../../attacker/evil/releases/download/x/a.exe"
+            "https://github.com/StarOrga/Verse-Companion-Binaries/releases/download/../../../attacker/evil/releases/download/x/a.exe"
         ));
         assert!(!is_pinned_binary_url(
-            "https://github.com/StarOrga/Star-Citizen-Companion-Binaries/releases/download/x\\..\\a.exe"
+            "https://github.com/StarOrga/Verse-Companion-Binaries/releases/download/x\\..\\a.exe"
         ));
         assert!(!is_pinned_binary_url(
-            "http://github.com/StarOrga/Star-Citizen-Companion-Binaries/releases/download/x/a.exe"
+            "http://github.com/StarOrga/Verse-Companion-Binaries/releases/download/x/a.exe"
         ));
         assert!(!is_pinned_binary_url(
-            "https://github.com.attacker.test/StarOrga/Star-Citizen-Companion-Binaries/releases/download/x/a.exe"
+            "https://github.com.attacker.test/StarOrga/Verse-Companion-Binaries/releases/download/x/a.exe"
         ));
         assert!(!is_pinned_binary_url("https://objects.githubusercontent.com/whatever"));
         assert!(!is_pinned_binary_url(""));

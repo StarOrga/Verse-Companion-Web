@@ -14,7 +14,7 @@ built in by design.
 | Ship hulls + livery icons (`ship-skins`) | Cloudflare R2 `sc-companion-assets` (WEUR, account `115d75098864fcf13d36dc1aec1d874a`), read via `cloudflare/assets-worker` at `https://sc-assets.sc-assets-worker.workers.dev` (live 2026-09-25) | 0 € egress, 10 GB. A key the bucket lacks is streamed from Supabase by the Worker |
 | News thumbnails (`news-images`, written by `fetch-verse-news`) | Same R2 bucket under `news-images/<hash>/w<N>.<ext>`, read via the same Worker at `/news-images/…` (code 2026-10-03, `feat/news-images-r2`) | Every thumbnail view used to count against the 5 GB/month Supabase egress. Legacy objects stay in Supabase and are streamed by the Worker |
 | App bundle, icons, meshopt decoder | Vercel Hobby | Static hosting |
-| Desktop installers | GitHub Releases in the public `Star-Citizen-Companion-Binaries` mirror | No bandwidth cap, trusted domain for AV scanners |
+| Desktop installers | GitHub Releases in the public `Verse-Companion-Binaries` mirror | No bandwidth cap, trusted domain for AV scanners |
 | Backups / codex build archive | *(planned)* Backblaze B2 EU with daily caps | Supabase Free has no downloadable backups |
 
 **News images on R2.** `fetch-verse-news` PUTs new variants to R2

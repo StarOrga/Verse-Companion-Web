@@ -11,7 +11,7 @@ import { getSettings, setTelemetryEnabled, patchSettings, syncAutoStartWithOs } 
 import { reportCrash, reportError, reportExtractAbort, reportJobDiagnostics } from './telemetry-reporter.js';
 import { safeSend } from '../lib/safe-send.js';
 import { collectDiagnostic, newJobDiagnostics, type JobDiagnostics, type JobOutcome } from '../lib/job-diagnostics.js';
-import { classifyExtractAbort, type ExtractAbortReason } from '../lib/telemetry.js';
+import { classifyExtractAbort, classifyUploadFailure, type ExtractAbortReason } from '../lib/telemetry.js';
 import { discoverAll, discoverManual, setRememberedInstall } from '../lib/discovery.js';
 import { PROFILES, DEFAULT_PROFILE, SELECTABLE_PROFILES, estimateForSize } from '../lib/performance.js';
 import { runOAuthFlow } from '../lib/oauth.js';
@@ -888,7 +888,9 @@ ipcMain.handle('sc:upload', async (_e, payload: UploadPayload) => {
   }
   // A timed-out upload throws nothing (we catch the AbortError internally), so
   // surface it to crash telemetry here — otherwise a hung upload is invisible.
-  if (!result.ok && result.error === 'timeout') {
+  // `duplicate` is reported as nothing: the bundle was already there (#391).
+  const failureReport = classifyUploadFailure(result);
+  if (failureReport === 'timeout') {
     void reportCrash({
       errorType: 'timeout',
       name: 'UploadTimeout',
@@ -896,7 +898,7 @@ ipcMain.handle('sc:upload', async (_e, payload: UploadPayload) => {
       stack: null,
       extra: { channel: payload.channel, patchVersion: payload.patchVersion },
     });
-  } else if (!result.ok) {
+  } else if (failureReport === 'upload-failed') {
     // Handled upload failure (HTTP 4xx/5xx, network error) — surfaced to the
     // operator but previously never telemetried (#212), so the dashboard showed
     // 0 errors while operators hit them.

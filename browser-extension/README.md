@@ -92,7 +92,7 @@ folder verbatim into a single top-level `sc-hangar-extension/` directory and
 publishes it to the public binaries-mirror repo behind a **moving tag**:
 
 ```
-https://github.com/StarOrga/Star-Citizen-Companion-Binaries
+https://github.com/StarOrga/Verse-Companion-Binaries
   └── releases/tag/browser-extension-latest
         ├── sc-hangar-extension.zip            ← the fixed URL /apps/extension links
         └── sc-hangar-extension-<version>.zip  ← same build, version history

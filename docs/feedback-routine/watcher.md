@@ -4,7 +4,7 @@
 > Core contract: [`../feedback-routine.md`](../feedback-routine.md).
 
 Since 2026-11-05 no model runs until the board holds work. A Windows Task
-Scheduler job ("SCC Feedback Watcher", every 3 min and at logon, runs hidden)
+Scheduler job ("VC Feedback Watcher", every 3 min and at logon, runs hidden)
 starts `scripts/routine-watcher.mjs tick`, which needs only Node and no
 `node_modules`. Before that, two Claude Desktop scheduled tasks opened about 33
 sessions a day to find an empty queue: 8 topics and 4 human replies in the 30

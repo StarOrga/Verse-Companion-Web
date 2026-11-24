@@ -64,7 +64,7 @@ describe('HqLogbookComponent (#896)', () => {
     expect(costs).toContain('hq.logbook.costs.medbeds.one');
   });
 
-  it('without live sync and without sessions it shows the SCC-App prompt', async () => {
+  it('without live sync and without sessions it shows the VC-App prompt', async () => {
     const el = await mount(async () => [], null);
     expect(el.querySelector('.card')).toBeNull();
     expect(el.querySelector('sc-hq-app-launch')).toBeTruthy();

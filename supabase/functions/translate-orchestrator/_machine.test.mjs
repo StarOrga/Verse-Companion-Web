@@ -289,6 +289,14 @@ describe('caps and approval', () => {
     assert.equal((await startFull(w.deps, NEW, 'de')).status, 'awaiting_approval');
   });
 
+  it('a full run on a build without English strings is refused up front, no job is made', async () => {
+    const w = world();
+    const MISSING = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+    const before = w.jobs.size;
+    await assert.rejects(startFull(w.deps, MISSING, 'de'), { key: 'translate.english_missing' });
+    assert.equal(w.jobs.size, before);
+  });
+
   it('a full run is estimated while the pipeline is switched off, a delta is not', async () => {
     const w = world({ settings: { enabled: false } });
     const full = await startFull(w.deps, NEW, 'de');

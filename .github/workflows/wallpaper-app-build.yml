@@ -138,7 +138,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/wallpaper-app-v')
         uses: softprops/action-gh-release@v3
         with:
-          repository: StarOrga/Star-Citizen-Companion-Binaries
+          repository: StarOrga/Verse-Companion-Binaries
           token: ${{ secrets.BINARIES_RELEASE_TOKEN }}
           tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
@@ -159,7 +159,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/wallpaper-app-v')
         uses: softprops/action-gh-release@v3
         with:
-          repository: StarOrga/Star-Citizen-Companion-Binaries
+          repository: StarOrga/Verse-Companion-Binaries
           token: ${{ secrets.BINARIES_RELEASE_TOKEN }}
           tag_name: wallpaper-app-latest
           name: Starscape Wallpaper (latest)
@@ -189,7 +189,7 @@ jobs:
           $exe = "starscape-wallpaper-$v.exe"
           $sha = (Get-FileHash -Algorithm SHA256 $exe).Hash.ToLower()
           $size = (Get-Item $exe).Length
-          $base = "https://github.com/StarOrga/Star-Citizen-Companion-Binaries/releases/download/${{ github.ref_name }}"
+          $base = "https://github.com/StarOrga/Verse-Companion-Binaries/releases/download/${{ github.ref_name }}"
           $asset = { param($n) "jsonb_build_object('url','$base/$n','kind','exe','sha256','$sha','size_bytes',$size)" }
           # Single-quoted tail: a backtick inside a PowerShell double-quoted string
           # is the escape character, so "`release-token`" would emit a CR.

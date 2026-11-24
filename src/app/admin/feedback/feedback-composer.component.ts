@@ -490,6 +490,10 @@ const MAX_FILE_BYTES = 5 * 1024 * 1024;
     /* One line for both quiet readouts, pinned to the field's right edge. */
     .capture-hint { margin: 0; font-size: 11px; line-height: 1.4; color: var(--sc-accent-hot); }
     @media (pointer: coarse) { .capture-hint { font-size: 12px; } }
+    /* Alt/Ctrl+click needs a mouse and a keyboard. On a touch screen the tip
+       described a move the device cannot make — three lines of admin red
+       between the field and its send row, on every phone. */
+    @media (hover: none) { .capture-hint { display: none; } }
     .meta { display: flex; align-items: center; justify-content: flex-end; gap: 8px; min-width: 0; }
 
     /* The auto-grow cell. Its ::after is an invisible replica of the text with
@@ -566,14 +570,18 @@ const MAX_FILE_BYTES = 5 * 1024 * 1024;
       cursor: pointer;
       user-select: none;
     }
+    /* The whole label is the hit area, so on a coarse pointer the LABEL takes
+       the touch height and the box keeps a box's size. Growing the box itself
+       to 48px drew an empty square the size of the "+" tile next to it. */
+    .complex { min-height: var(--sc-tap-min, 0px); }
     .complex input {
-      /* 16px box for the mouse; the full touch target on a coarse pointer. */
-      width: max(16px, var(--sc-tap-min));
-      height: max(16px, var(--sc-tap-min));
+      width: 16px;
+      height: 16px;
       margin: 0;
       accent-color: var(--sc-accent);
       cursor: pointer;
     }
+    @media (pointer: coarse) { .complex input { width: 20px; height: 20px; } }
     .complex:hover { color: var(--sc-fg-0); }
     /* The focus ring belongs on the whole control, not on the 16px box alone —
        the label is the hit area, so it is also what the keyboard lands on. */
@@ -623,6 +631,12 @@ const MAX_FILE_BYTES = 5 * 1024 * 1024;
          them and simply takes whatever width is left rather than dropping onto
          a line below them. */
       .foot .send { flex: 1 1 auto; justify-content: center; min-width: 96px; }
+      /* ...except the key-glyph button: it is a square by design, and
+         stretched across a line of its own it became a 330px bar with one
+         "⏎" in it. It keeps its size and stays in the row beside the
+         sign-off. */
+      .foot { gap: 6px; }
+      .foot .send.key { flex: 0 0 auto; min-width: max(46px, var(--sc-tap-min)); }
     }
   `],
 })

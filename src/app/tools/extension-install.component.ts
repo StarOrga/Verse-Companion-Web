@@ -17,7 +17,7 @@ const REPO_URL = 'https://github.com/StarOrga/Star-Citizen-Companion-Web/tree/ma
  * asked them to find the extension folder inside it.
  */
 const EXTENSION_ZIP_URL =
-  'https://github.com/StarOrga/Star-Citizen-Companion-Binaries/releases/download/browser-extension-latest/sc-hangar-extension.zip';
+  'https://github.com/StarOrga/Verse-Companion-Binaries/releases/download/browser-extension-latest/sc-hangar-extension.zip';
 
 /**
  * /apps/extension — install + privacy page for the hangar-import browser

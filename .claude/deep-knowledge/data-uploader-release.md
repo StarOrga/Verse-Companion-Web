@@ -11,7 +11,7 @@ A data-uploader release is not visible to users until ALL of:
    `build-windows` job in `.github/workflows/data-uploader-build.yml`. Bump
    `data-uploader/package.json` (NOT the root web version); see the `ship`
    extension rule 5 (`.claude/skills/ship/SKILL.md`).
-2. **Public mirror release** on `StarOrga/Star-Citizen-Companion-Binaries`
+2. **Public mirror release** on `StarOrga/Verse-Companion-Binaries`
    exists AND is a **full release, not a prerelease**. A prerelease leaves the
    prior `v*.*.0` as "Latest", and GitHub `/releases/latest` + the download page
    skip prereleases → users keep seeing the old version. `ship_release`'s
@@ -58,6 +58,17 @@ were unknown to the feed (`401 invalid_or_revoked_release_token`) and could neve
 update again; the uploader showed the raw HttpError.
 
 Fixes now in place:
+- One concurrency group `data-uploader-release` for every release run (tag push
+  and dispatch), no cancel: the second run of a version starts only after the
+  first has finished, so its guards see the first one's tag and release. PR and
+  main-push runs keep their per-ref group (a PR cancels its superseded run).
+  Note GitHub keeps only ONE pending run per group — a third release run queued
+  behind a pending one replaces it.
+- "Refuse to overwrite another build of this version" (right before both
+  publish steps): a dispatch whose tag appeared while it was building, or any
+  run whose mirror release already has assets, fails instead of uploading. A
+  half-uploaded mirror release is therefore never re-run over — bump
+  `data-uploader/package.json` (or finish it by hand, see below).
 - `release-guard` job: a tag whose source release already exists is not
   built again. A dispatch also refuses a version that is already on the mirror.
 - "Verify the public mirror serves THIS build": the run fails when the mirror's
@@ -105,8 +116,8 @@ maintainers), so when the public mirror step fails, do NOT rebuild via CI —
 mirror the already-built assets directly with admin `gh` auth (no PAT, no
 ~15-min rebuild):
 
-    gh release download data-uploader-v<X.Y.Z> --repo StarOrga/Star-Citizen-Companion-Web --dir <tmp>
-    gh release create   data-uploader-v<X.Y.Z> --repo StarOrga/Star-Citizen-Companion-Binaries \
+    gh release download data-uploader-v<X.Y.Z> --repo StarOrga/Verse-Companion-Web --dir <tmp>
+    gh release create   data-uploader-v<X.Y.Z> --repo StarOrga/Verse-Companion-Binaries \
         --latest  <tmp>/*.exe <tmp>/*.blockmap        # NOT --prerelease (see point 2)
 
 Then register the release the same way as a normal ship — the `desktop_releases`

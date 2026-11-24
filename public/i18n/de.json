@@ -230,7 +230,8 @@
     "translations": "KI-Übersetzung",
     "social": "Social",
     "accountMenuRequests": "Konto-Menü, {{count}} offene Freundschaftsanfragen",
-    "socialRequests": "Social, {{count}} offene Freundschaftsanfragen"
+    "socialRequests": "Social, {{count}} offene Freundschaftsanfragen",
+    "collabMenu": "Collaborator"
   },
   "impersonation": {
     "banner": {
@@ -3427,6 +3428,7 @@
       "upcomingTitle": "Demnächst im Verse",
       "aria": "Laufende und kommende Ingame-Events",
       "allPosts": "Alle Event-Beiträge",
+      "imageOpen": "Offizielles Bild zu {{name}} in voller Größe öffnen",
       "runningUntil": "Läuft · bis {{date}}",
       "endsToday": "Läuft · endet heute",
       "startsTomorrow": "Ab morgen, {{date}}",
@@ -3455,6 +3457,7 @@
       "play": "Video abspielen"
     },
     "patchBoard": {
+      "today": "heute",
       "switch": {
         "aria": "Kanal wählen",
         "live": "Live",
@@ -4589,6 +4592,7 @@
       },
       "jobErrors": {
         "unknown": "Unbekannter Fehler im Übersetzungsauftrag.",
+        "manual": "Von Hand beendet, außerhalb der Pipeline.",
         "base_build_missing": "Der Vergleichs-Build fehlt.",
         "conflict": "Der Auftrag wurde parallel geändert. Bitte neu laden.",
         "english_missing": "Die englischen Quelltexte fehlen.",
@@ -4696,6 +4700,8 @@
         "row": {
           "deck": "dein Stapel · {{count}} offen",
           "clear": "dein Stapel · alles geklärt",
+          "legacyOne": "dein Stapel · 1 Karte kommt nach dem Lernlauf",
+          "legacy": "dein Stapel · {{count}} Karten kommen nach dem Lernlauf",
           "ki": "{{count}} von KI",
           "unsure": "{{count}} unsicher",
           "kiSummary": "KI hat {{count}} entschieden",
@@ -4844,6 +4850,9 @@
         },
         "finish": {
           "title": "Alles geklärt für {{lang}}",
+          "titleWaiting": "Stapel vorerst leer für {{lang}}",
+          "legacyOne": "1 ältere Karte wartet auf den nächsten Lernlauf: er bereitet sie neu auf, danach liegt sie im Stapel oder entscheidet die KI.",
+          "legacy": "{{count}} ältere Karten warten auf den nächsten Lernlauf: er bereitet sie neu auf, danach liegen sie im Stapel oder entscheidet die KI.",
           "sum": "{{cards}} · {{texts}} vereinheitlicht",
           "points": "Punkte",
           "split": "{{base}} für {{cards}}, {{bonus}} Bonus fürs volle Tagesziel",
@@ -5164,7 +5173,7 @@
       "openSource": {
         "title": "Open Source",
         "p1": "Die gesamte Anwendung wird offen entwickelt. Jede Änderung ist öffentlich auf GitHub nachvollziehbar — es ist derselbe Code, der auf dieser Seite läuft.",
-        "repoLink": "Quellcode auf GitHub (StarOrga/Star-Citizen-Companion-Web)"
+        "repoLink": "Quellcode auf GitHub (StarOrga/Verse-Companion-Web)"
       },
       "data": {
         "title": "Deine Daten",
@@ -5616,6 +5625,7 @@
     "search": {
       "label": "Feedback durchsuchen",
       "placeholder": "Suchen … Thema, ganzer Thread oder #Nummer",
+      "placeholderShort": "Suchen oder #Nr.",
       "clear": "Suche löschen",
       "results": "{{count}} Treffer · nach Relevanz",
       "empty": "Keine Treffer für „{{query}}“.",
@@ -5871,6 +5881,7 @@
       "declined": "Nicht umgesetzt",
       "rejected": "Verworfen",
       "loop": "Nachbesserung",
+      "confirming": "Wird ausgeliefert · Bestätigung folgt",
       "pathLabel": "Stand: {{station}}",
       "step": {
         "contract": "Eingereicht · Freigabe steht aus",
@@ -6884,6 +6895,7 @@
         "more": "Alle {{n}} Änderungen",
         "less": "Weniger",
         "reorder": "Nachbestellen ({{n}})",
+        "logKind": { "in": "Eingelagert", "out": "Entnommen", "reserve": "Reserviert" },
         "logEmpty": "Noch keine Änderung.",
         "variants": "{{n}} Varianten",
         "inSpace": "Weltall",
@@ -6940,6 +6952,62 @@
           "scrap": "Zerlegen",
           "actions": "Aktionen"
         }
+      },
+      "here": {
+        "none": "Kein Standort",
+        "title": "Mein Standort",
+        "field": "Ort suchen",
+        "clear": "Kein Standort",
+        "appWins": "Die App meldet deinen Ort. Ein Ort von Hand gilt, bis die App wieder einen meldet.",
+        "tipNone": "Kein Standort: Setz ihn hier, dann reiht die Suche nach Flugminuten.",
+        "tipApp": "Live aus der App: {{place}}",
+        "tipManual": "Von dir gesetzt: {{place}}. Gilt, bis du ihn änderst."
+      },
+      "lager": {
+        "aria": "Lager durchsuchen",
+        "item": "Gegenstand oder Ort",
+        "ort": "Ort",
+        "qty": "Menge ({{unit}})",
+        "add": "Einlagern",
+        "out": "Rausnehmen",
+        "addTip": "{{qty}} {{name}} in {{place}} einlagern",
+        "outTip": "{{qty}} {{name}} aus {{place}} rausnehmen",
+        "why": {
+          "noItem": "Erst einen Gegenstand eingeben",
+          "unknown": "Unbekannter Gegenstand: Nur Namen aus deinem Lager. Neues über „Gegenstand hinzufügen“.",
+          "noPlace": "Kein Ort: Feld Ort füllen oder oben deinen Standort setzen",
+          "tooMuch": "In {{place}} liegen nur {{have}}",
+          "nothingThere": "In {{place}} liegt kein {{name}}"
+        },
+        "from": {
+          "ort": "Gemessen ab {{place}} (Ort aus der Suche)",
+          "app": "Gemessen ab {{place}} (Standort live aus der App)",
+          "manual": "Gemessen ab {{place}} (Standort von Hand)",
+          "none": "Ohne Standort: Orte nach Menge geordnet"
+        },
+        "filterAria": "Filter der Mengen-Suche",
+        "maxStops": "Höchstens Stopps",
+        "balance": "Abwägung",
+        "bal": {
+          "oneStop": "Lieber ein Stopp",
+          "balanced": "Ausgewogen",
+          "shortest": "Kürzester Weg"
+        },
+        "results": "Treffer im Lager",
+        "total": "{{qty}} an {{n}} Orten",
+        "min": "≈ {{n}} min",
+        "minSplit": "Flug {{fly}} · Anflug {{appr}}",
+        "multi": "{{n}} Stopps · hier musst du {{n}}× fliegen",
+        "more": "{{n}} weitere",
+        "short": "Nur {{total}} von {{want}} im Lager",
+        "places": "Orte von {{name}}",
+        "none": "Nichts im Lager passt dazu.",
+        "editAria": "{{name}} in {{place}} ändern",
+        "editHave": "{{qty}} in {{place}}",
+        "editAmount": "Menge",
+        "addHere": "Hier einlagern",
+        "doneAdd": "{{qty}} {{name}} in {{place}} eingelagert",
+        "doneOut": "{{qty}} {{name}} aus {{place}} rausgenommen"
       }
     },
     "nachschub": {
@@ -7832,7 +7900,7 @@
       "title": "Logbuch",
       "loading": "Logbuch wird geladen …",
       "retry": "Erneut versuchen",
-      "empty": "Noch keine Spielsitzung. Verbinde die SCC-App, dann erscheint hier jede Sitzung als Karte.",
+      "empty": "Noch keine Spielsitzung. Verbinde die VC-App, dann erscheint hier jede Sitzung als Karte.",
       "emptyLinked": "In den letzten 30 Tagen keine Spielsitzung aufgezeichnet.",
       "jumps": "Quantensprünge",
       "contracts": "Aufträge",
@@ -7864,7 +7932,7 @@
         "live": "Läuft gerade"
       },
       "showAll": "Alle {{n}} Sitzungen zeigen",
-      "note": "Sitzungen der letzten {{days}} Tage aus der SCC-App. Die aUEC-Bilanz ist Verkauf minus Einkauf.",
+      "note": "Sitzungen der letzten {{days}} Tage aus der VC-App. Die aUEC-Bilanz ist Verkauf minus Einkauf.",
       "durH": "{{h}} h {{m}} min",
       "durM": "{{m}} min"
     }
@@ -9703,6 +9771,12 @@
       "step3": "Tippe oben rechts auf „Hinzufügen“.",
       "addLabel": "Hinzufügen",
       "done": "Verstanden"
+    }
+  },
+  "collab": {
+    "eyebrow": "Collaborator",
+    "translations": {
+      "subtitle": "Hilf der KI-Übersetzung: Karteikarten in den Sprachen, die du sprichst."
     }
   }
 }

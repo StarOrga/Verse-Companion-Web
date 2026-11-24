@@ -65,11 +65,11 @@ Decided in the concept `docs/concepts/2026-10-29-ki-spieluebersetzung.html`
   CIG's own value wins only when it is a real translation of the **current** English
   (skip `! … TRANSLATION NOT FOUND` markers and values identical to English).
 - **Delivery = overlay, never CIG text.** We publish only our translations as
-  `{key: {h: <sha256 of english>, t: <text>}}`. The SCC desktop app builds the
+  `{key: {h: <sha256 of english>, t: <text>}}`. The VC desktop app builds the
   `global.ini` locally: the user's own English file, then CIG's official table, then
   our overlay where `h` matches the local English. Download only for signed-in users,
   labelled "unofficial AI translation". The app lives in the separate repo
-  `Star-Citizen-Companion-App`.
+  `Verse-Companion-App`.
 
 ## Precedence (decided 2026-11-08, per key)
 
@@ -157,7 +157,7 @@ community entries also carry `src` (source id) and `lic` (licence).
 Credit is given **always in the same form for every source**, whatever the licence asks, as long as it is
 licence-compliant: `Community-Übersetzung: <names> (<licences>) · KI-Ergänzung: SC Companion` (German text
 for `de`, English text otherwise). The **NC-SA languages (de, ru) are published under CC-BY-NC-SA 4.0**
-(`sources[].license` says so, including the AI supplement of such an overlay) and **SCC stays free for
+(`sources[].license` says so, including the AI supplement of such an overlay) and **VC stays free for
 them**. MIT sources (it, pt-BR, ja) keep the copyright and licence notice in `sources[]`.
 
 ## Data (Postgres — small rows only; the DB budget is tight)

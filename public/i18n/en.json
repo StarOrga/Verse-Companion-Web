@@ -230,7 +230,8 @@
     "translations": "AI translation",
     "social": "Social",
     "accountMenuRequests": "Account menu, {{count}} open friend requests",
-    "socialRequests": "Social, {{count}} open friend requests"
+    "socialRequests": "Social, {{count}} open friend requests",
+    "collabMenu": "Collaborator"
   },
   "impersonation": {
     "banner": {
@@ -3427,6 +3428,7 @@
       "upcomingTitle": "Coming up in the 'verse",
       "aria": "Running and upcoming in-game events",
       "allPosts": "All event posts",
+      "imageOpen": "Open the official picture of {{name}} full size",
       "runningUntil": "Running · until {{date}}",
       "endsToday": "Running · ends today",
       "startsTomorrow": "From tomorrow, {{date}}",
@@ -3455,6 +3457,7 @@
       "play": "Play video"
     },
     "patchBoard": {
+      "today": "today",
       "switch": {
         "aria": "Choose channel",
         "live": "Live",
@@ -4589,6 +4592,7 @@
       },
       "jobErrors": {
         "unknown": "Unknown error in the translation job.",
+        "manual": "Ended by hand, outside the pipeline.",
         "base_build_missing": "The comparison build is missing.",
         "conflict": "The job was changed in parallel. Please reload.",
         "english_missing": "The English source strings are missing.",
@@ -4696,6 +4700,8 @@
         "row": {
           "deck": "your deck · {{count}} open",
           "clear": "your deck · all settled",
+          "legacyOne": "your deck · 1 card after the learning pass",
+          "legacy": "your deck · {{count}} cards after the learning pass",
           "ki": "{{count}} by AI",
           "unsure": "{{count}} unsure",
           "kiSummary": "AI decided {{count}}",
@@ -4844,6 +4850,9 @@
         },
         "finish": {
           "title": "All settled for {{lang}}",
+          "titleWaiting": "Deck empty for now for {{lang}}",
+          "legacyOne": "1 older card waits for the next learning pass: it prepares the card again, then it is in your deck or the AI decides it.",
+          "legacy": "{{count}} older cards wait for the next learning pass: it prepares them again, then they are in your deck or the AI decides them.",
           "sum": "{{cards}} · {{texts}} unified",
           "points": "points",
           "split": "{{base}} for {{cards}}, {{bonus}} bonus for the full daily goal",
@@ -5164,7 +5173,7 @@
       "openSource": {
         "title": "Open source",
         "p1": "The entire application is developed in the open. Every change is publicly reviewable on GitHub — this is the same code that runs on this site.",
-        "repoLink": "Source code on GitHub (StarOrga/Star-Citizen-Companion-Web)"
+        "repoLink": "Source code on GitHub (StarOrga/Verse-Companion-Web)"
       },
       "data": {
         "title": "Your data",
@@ -5616,6 +5625,7 @@
     "search": {
       "label": "Search feedback",
       "placeholder": "Search … topic, whole thread or #number",
+      "placeholderShort": "Search or #no.",
       "clear": "Clear search",
       "results": "{{count}} results · by relevance",
       "empty": "No results for “{{query}}”.",
@@ -5871,6 +5881,7 @@
       "declined": "Not implemented",
       "rejected": "Rejected",
       "loop": "Follow-up",
+      "confirming": "Shipping · confirmation follows",
       "pathLabel": "Status: {{station}}",
       "step": {
         "contract": "Filed · release pending",
@@ -6884,6 +6895,7 @@
         "more": "All {{n}} changes",
         "less": "Less",
         "reorder": "Reorder ({{n}})",
+        "logKind": { "in": "Stored", "out": "Taken out", "reserve": "Reserved" },
         "logEmpty": "No change yet.",
         "variants": "{{n}} variants",
         "inSpace": "In space",
@@ -6940,6 +6952,62 @@
           "scrap": "Dismantle",
           "actions": "Actions"
         }
+      },
+      "here": {
+        "none": "No location",
+        "title": "My location",
+        "field": "Find a place",
+        "clear": "No location",
+        "appWins": "The app reports your place. A place set by hand holds until the app reports one again.",
+        "tipNone": "No location: set it here and the search ranks by flight minutes.",
+        "tipApp": "Live from the app: {{place}}",
+        "tipManual": "Set by you: {{place}}. Holds until you change it."
+      },
+      "lager": {
+        "aria": "Search storage",
+        "item": "Item or place",
+        "ort": "Place",
+        "qty": "Amount ({{unit}})",
+        "add": "Store",
+        "out": "Take out",
+        "addTip": "Store {{qty}} {{name}} at {{place}}",
+        "outTip": "Take {{qty}} {{name}} out of {{place}}",
+        "why": {
+          "noItem": "Enter an item first",
+          "unknown": "Unknown item: only names from your storage. Add new ones via “Add item”.",
+          "noPlace": "No place: fill the Place field or set your location at the top",
+          "tooMuch": "Only {{have}} at {{place}}",
+          "nothingThere": "No {{name}} at {{place}}"
+        },
+        "from": {
+          "ort": "Measured from {{place}} (place from the search)",
+          "app": "Measured from {{place}} (location live from the app)",
+          "manual": "Measured from {{place}} (location set by hand)",
+          "none": "No location: places ordered by amount"
+        },
+        "filterAria": "Amount search filter",
+        "maxStops": "Max stops",
+        "balance": "Balance",
+        "bal": {
+          "oneStop": "Prefer one stop",
+          "balanced": "Balanced",
+          "shortest": "Shortest route"
+        },
+        "results": "Storage results",
+        "total": "{{qty}} at {{n}} places",
+        "min": "≈ {{n}} min",
+        "minSplit": "Flight {{fly}} · approach {{appr}}",
+        "multi": "{{n}} stops · you fly {{n}}×",
+        "more": "{{n}} more",
+        "short": "Only {{total}} of {{want}} in storage",
+        "places": "Places of {{name}}",
+        "none": "Nothing in storage matches.",
+        "editAria": "Change {{name}} at {{place}}",
+        "editHave": "{{qty}} at {{place}}",
+        "editAmount": "Amount",
+        "addHere": "Store here",
+        "doneAdd": "Stored {{qty}} {{name}} at {{place}}",
+        "doneOut": "Took {{qty}} {{name}} out of {{place}}"
       }
     },
     "nachschub": {
@@ -7832,7 +7900,7 @@
       "title": "Logbook",
       "loading": "Loading the logbook …",
       "retry": "Try again",
-      "empty": "No game session yet. Connect the SCC App and every session shows up here as a card.",
+      "empty": "No game session yet. Connect the VC App and every session shows up here as a card.",
       "emptyLinked": "No game session recorded in the last 30 days.",
       "jumps": "Quantum jumps",
       "contracts": "Contracts",
@@ -7864,7 +7932,7 @@
         "live": "Running now"
       },
       "showAll": "Show all {{n}} sessions",
-      "note": "Sessions of the last {{days}} days from the SCC App. The aUEC balance is sells minus buys.",
+      "note": "Sessions of the last {{days}} days from the VC App. The aUEC balance is sells minus buys.",
       "durH": "{{h}} h {{m}} min",
       "durM": "{{m}} min"
     }
@@ -9703,6 +9771,12 @@
       "step3": "Tap “Add” at the top right.",
       "addLabel": "Add",
       "done": "Got it"
+    }
+  },
+  "collab": {
+    "eyebrow": "Collaborator",
+    "translations": {
+      "subtitle": "Help the AI translation: flash cards in the languages you speak."
     }
   }
 }

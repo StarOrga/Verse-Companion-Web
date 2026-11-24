@@ -455,6 +455,14 @@ export const routes: Routes = [
           import('./admin/telemetry-stats.component').then((m) => m.TelemetryStatsComponent),
       },
       {
+        // The collaborator space: only the AI translation cards (admin feedback #387).
+        path: 'collab/translations',
+        data: { layout: 'content' },
+        canActivate: [roleGuard('admin', 'collaborator')],
+        loadComponent: () =>
+          import('./collab/collab-translations.component').then((m) => m.CollabTranslationsComponent),
+      },
+      {
         path: 'admin/translations',
         data: { layout: 'content' },
         canActivate: [roleGuard('admin')],

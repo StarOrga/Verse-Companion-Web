@@ -3408,6 +3408,7 @@
       "play": "動画を再生"
     },
     "patchBoard": {
+      "today": "今日",
       "switch": {
         "aria": "チャンネルを選択",
         "live": "Live",
@@ -5106,7 +5107,7 @@
       "openSource": {
         "title": "オープンソース",
         "p1": "アプリケーション全体がオープンに開発されています。すべての変更はGitHubで公開され、誰でも確認できます。このサイトで動いているのと同じコードです。",
-        "repoLink": "GitHub上のソースコード(StarOrga/Star-Citizen-Companion-Web)"
+        "repoLink": "GitHub上のソースコード(StarOrga/Verse-Companion-Web)"
       },
       "data": {
         "title": "あなたのデータ",

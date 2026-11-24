@@ -3408,6 +3408,7 @@
       "play": "播放视频"
     },
     "patchBoard": {
+      "today": "今天",
       "switch": {
         "aria": "选择渠道",
         "live": "Live",
@@ -5106,7 +5107,7 @@
       "openSource": {
         "title": "开源",
         "p1": "整个应用都是公开开发的。每一次改动都可以在 GitHub 上公开查看——这与运行在本站上的是同一份代码。",
-        "repoLink": "GitHub 上的源代码（StarOrga/Star-Citizen-Companion-Web）"
+        "repoLink": "GitHub 上的源代码（StarOrga/Verse-Companion-Web）"
       },
       "data": {
         "title": "你的数据",
@@ -7774,7 +7775,7 @@
       "title": "日志",
       "loading": "正在加载日志…",
       "retry": "重试",
-      "empty": "暂无游戏会话。连接 SCC 应用后，每次会话都会以卡片形式显示在这里。",
+      "empty": "暂无游戏会话。连接 VC 应用后，每次会话都会以卡片形式显示在这里。",
       "emptyLinked": "最近 30 天内没有记录到游戏会话。",
       "jumps": "量子跃迁",
       "contracts": "合约",
@@ -7806,7 +7807,7 @@
         "live": "正在进行"
       },
       "showAll": "显示全部 {{n}} 个会话",
-      "note": "来自 SCC 应用的最近 {{days}} 天的会话。aUEC 结余为卖出减去买入。",
+      "note": "来自 VC 应用的最近 {{days}} 天的会话。aUEC 结余为卖出减去买入。",
       "durH": "{{h}} 小时 {{m}} 分钟",
       "durM": "{{m}} 分钟"
     }

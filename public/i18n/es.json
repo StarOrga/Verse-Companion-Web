@@ -3408,6 +3408,7 @@
       "play": "Reproducir vídeo"
     },
     "patchBoard": {
+      "today": "hoy",
       "switch": {
         "aria": "Elegir canal",
         "live": "Live",
@@ -5106,7 +5107,7 @@
       "openSource": {
         "title": "Código abierto",
         "p1": "Toda la aplicación se desarrolla de forma abierta. Cada cambio puede revisarse públicamente en GitHub: es el mismo código que se ejecuta en este sitio.",
-        "repoLink": "Código fuente en GitHub (StarOrga/Star-Citizen-Companion-Web)"
+        "repoLink": "Código fuente en GitHub (StarOrga/Verse-Companion-Web)"
       },
       "data": {
         "title": "Tus datos",
@@ -7774,7 +7775,7 @@
       "title": "Diario de a bordo",
       "loading": "Cargando el diario de a bordo…",
       "retry": "Reintentar",
-      "empty": "Aún no hay sesiones de juego. Conecta la app de SCC y cada sesión aparecerá aquí como una tarjeta.",
+      "empty": "Aún no hay sesiones de juego. Conecta la app de VC y cada sesión aparecerá aquí como una tarjeta.",
       "emptyLinked": "No se ha registrado ninguna sesión de juego en los últimos 30 días.",
       "jumps": "Saltos cuánticos",
       "contracts": "Contratos",
@@ -7806,7 +7807,7 @@
         "live": "En curso"
       },
       "showAll": "Mostrar las {{n}} sesiones",
-      "note": "Sesiones de los últimos {{days}} días desde la app de SCC. El saldo de aUEC es ventas menos compras.",
+      "note": "Sesiones de los últimos {{days}} días desde la app de VC. El saldo de aUEC es ventas menos compras.",
       "durH": "{{h}} h {{m}} min",
       "durM": "{{m}} min"
     }

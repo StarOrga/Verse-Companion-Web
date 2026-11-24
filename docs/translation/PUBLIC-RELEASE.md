@@ -4,7 +4,7 @@ Decided in the concept `docs/concepts/20261108-1130-spieluebersetzung-community-
 (round-1 `d-license-note`, round-2 `d2-license-note`, `d-nopack-note`). Contract:
 [ARCHITECTURE.md](ARCHITECTURE.md), operations: [OPERATIONS.md](OPERATIONS.md).
 
-**Rule.** As long as the SCC app is only shown to friends, nothing is sent. Before the app is promoted beyond
+**Rule.** As long as the VC app is only shown to friends, nothing is sent. Before the app is promoted beyond
 people we know, every maintainer whose pack we use is informed, each in the form their licence calls for.
 Everything below is **drafts only**: no code path sends a message, approval is reserved to **protected
 admins** (`public.protected_admins`), sending is manual (copy the text, then mark it as sent) and **never

@@ -17,6 +17,7 @@
 import { runVerdict, WORKER_LIMIT_KEY } from './_attempts.ts';
 import { TranslateError } from './_errors.ts';
 import { sweepPrefix } from './_io.ts';
+import { openTable } from './_scan.ts';
 import { addStats, groupsOf, jobPrefix, LostRace, MAX_ATTEMPTS, monthOf, OPEN_STATUSES, round4, TERMINAL_STATUSES } from './_job.ts';
 import type { Deps, Job, Status } from './_job.ts';
 import { estimateSlice } from './_job_estimate.ts';
@@ -404,6 +405,10 @@ export async function cancel(deps: Deps, jobId: string): Promise<Job> {
 export async function startFull(deps: Deps, build_id: string, lang: string): Promise<Job> {
   const language = await deps.db.getLanguage(lang);
   if (!language) throw new TranslateError('translate.lang_unknown');
+  // One read of the English index: a build whose strings never reached R2 (a finalize whose locale
+  // publish failed) would only make a job that fails at once. The admin gets the reason right away.
+  const en = await openTable(deps.store, build_id, 'en');
+  if (!en.index || !en.index.count) throw new TranslateError('translate.english_missing');
   const have = deps.db.findJob ? await deps.db.findJob(build_id, lang, 'full') : null;
   if (!have) return await deps.db.insertJob({ build_id, lang, mode: 'full', base_build_id: null });
   if (!TERMINAL_STATUSES.includes(have.status)) return have;

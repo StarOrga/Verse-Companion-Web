@@ -319,11 +319,42 @@ an `<img>` renders without firing `error`.
 
 ## Star Citizen events timeline: `sc-events-sync`
 
-SCC-Web owns the event timeline (`public.sc_events`). `sc-events-sync` (pg_cron, every 6 h at :17) matches
+VC-Web owns the event timeline (`public.sc_events`). `sc-events-sync` (pg_cron, every 6 h at :17) matches
 Star Citizen Wiki comm-links against the known event families and upserts through the service-role-only
 `sc_events_upsert_scraped()` (never touches locked rows, never downgrades confirmed, never deletes). The desktop
 app reads `rpc/sc_events_feed` (authenticated only) and `sc_events_health()`. Migration `20261016120000` is
 older than `20261016125100`: on an environment that already applied the later one, `db push` needs `--include-all`.
+
+### RSI's own pages: fresh dates and the official picture (feedback #400)
+
+**The wiki mirror lags.** On 2026-11-23 its newest comm-link was `21431` (Nov 2) while RSI had published the
+whole IAE 2956 run (`21386`–`21462`): `iae-2956` stayed `estimated` 11-20..12-03 although RSI said Nov 13–27, and
+no picture of it could be found. Ids are not a freshness signal either — `21389` (Countdown) is older than the
+mirror's newest id and still missing from it. So `sc-events-sync` also reads RSI directly (`rsi-pages.ts`, pure,
+node tests):
+
+1. **Hub list** — `POST https://robertsspaceindustries.com/api/hub/getCommlinkItems`
+   `{channel:'',series:'',type:'',text:'',sort:'publish_new',page}` → `{success, data: "<html>"}`, 20 posts a
+   page as `<a class="content-block2" href="/comm-link/<ch>/<id>-<slug>">` with title, `channel_item_full`
+   thumbnail and a relative age ("2 weeks ago" → approximate `publishedAt`). 4 pages per run.
+2. **Article page** — server-renders only meta tags plus `data-platform-client-props`, whose
+   `content.htmlUrl` points at the body (`/alexandria/html/…`). og:image = the editorial hero.
+3. **Article body** — plain HTML: the text (dates for the matcher) and every picture as signed
+   `/i/<sha1>/<token>/<file>` paths, each in several crops (`resize(3000,…)`, a portrait cut, a 4 px blur) plus
+   the untouched original; `articleImages` keeps one url per file, the original first.
+
+Event-titled hub posts the mirror lacks (up to 8) are read and matched like mirror posts. Then every running or
+upcoming row (−7 … +120 days) gets `sc_events.extra.image = { url, kind, from }`: the edition's posts (family +
+in-game year in the title; own post first, then titles with schedule/free fly, countdown/save the date, about)
+are read until one carries a picture whose **file name** says schedule/calendar/line-up
+(`iae2956-schedule-16x9-72dpi.jpg` sits in "Countdown To IAE 2956", not in the schedule post itself) —
+`kind: 'schedule'`; none → the own post's og:image, `kind: 'hero'`. `kind: 'admin'` is never replaced, a locked
+row only gets a picture when it has none, a row is re-checked at most every 20 h (`extra.image_checked_at`).
+Budget: 10 article reads for pictures, one 70 s wall clock for all RSI requests; an RSI failure lands in the
+run's `error`, never degrades it. No migration: `extra` already exists and is readable to signed-in users.
+
+The teaser (`sc-events-teaser`) shows the picture on the event's card as its own anchor to the full-size file
+(`news:event_open` with `target: 'image'`); a `schedule` spans the whole row and is shown uncropped.
 
 ## In-game events in Verse News and the hub (feedback #389)
 

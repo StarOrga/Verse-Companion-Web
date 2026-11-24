@@ -469,7 +469,9 @@ export class AdminTranslationsComponent implements OnInit {
    * with its cost; the money question is asked when it is approved.
    */
   async startFull(l: TranslationLanguage): Promise<void> {
-    const build = this.builds()[0];
+    // The current LIVE build: the one whose overlay is served as `latest` (a PTU run would not be).
+    const builds = this.builds();
+    const build = builds.find((b) => b.channel === 'LIVE') ?? builds[0];
     if (!build) {
       this.flash.set({ kind: 'error', key: 'admin.translations.jobs.noBuild' });
       return;

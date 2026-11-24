@@ -1,4 +1,6 @@
+import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { RoleService } from '../../../auth/role.service';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { TranslateService, provideTranslateService } from '@ngx-translate/core';
@@ -44,7 +46,7 @@ function backend(cards: TranslationCard[] = [conventionCard(), termCard()], extr
   };
 }
 
-async function mount(answer: Answer, url = '/admin/translations?tab=cards') {
+async function mount(answer: Answer, url = '/admin/translations?tab=cards', role: 'admin' | 'collaborator' = 'admin') {
   const fake = fakeSupabase({ answer });
   const track = vi.fn();
   const prompt = vi.fn().mockResolvedValue('Mein Text');
@@ -56,6 +58,7 @@ async function mount(answer: Answer, url = '/admin/translations?tab=cards') {
       provideRouter([{ path: 'admin/translations', component: TranslationCardsComponent }, { path: '**', children: [] }]),
       { provide: AnalyticsService, useValue: { track } },
       { provide: ScConfirmService, useValue: { prompt, confirm } },
+      { provide: RoleService, useValue: { isAdmin: signal(role === 'admin'), isCollaborator: signal(true) } },
     ],
   });
   // Only the quote frame is a real string: the KI text and the moment's hero live inside it.
@@ -211,6 +214,23 @@ describe('TranslationCardsComponent (Karteikarten v2)', () => {
     expect(track).toHaveBeenCalledWith('admin:translation_deck_finish', { lang: 'de', cards: 1, points: 20 });
   });
 
+  it('an empty deck with legacy cards waiting never claims „Alles geklärt“ (#396)', async () => {
+    const base = backend([]);
+    const { el } = await mount((c) => {
+      if (c.target === 'translation_card_board') {
+        const b = board();
+        return { data: { ...b, langs: b.langs.map((l) => (l.lang === 'de' ? { ...l, deck_open: 0, deck_waiting: 54 } : l)) } };
+      }
+      if (c.target === 'translation_deck') return { data: deckOf([], { open_total: 0, waiting_total: 54, deck_affected: 0 }) };
+      return base(c);
+    });
+    expect(q(el, '[data-test=finish]')).not.toBeNull();
+    expect(q(el, '.finish-h')?.textContent?.trim()).toBe('admin.translations.cards.finish.titleWaiting');
+    expect(q(el, '[data-test=finish-waiting]')?.textContent).toContain('admin.translations.cards.finish.legacy');
+    expect(q(el, '[data-test=lang-de]')?.textContent).toContain('admin.translations.cards.row.legacy');
+    expect(q(el, '[data-test=lang-de]')?.classList.contains('done')).toBe(false);
+  });
+
   it('a KI language opens its veto list as cards in the same frame; „Passt“ and „Sieht falsch aus“ score', async () => {
     const { harness, el, cmp, rpc, track } = await mount(backend(), '/admin/translations?tab=cards&lang=it');
     expect(cmp.vetoMode()).toBe(true);
@@ -228,6 +248,16 @@ describe('TranslationCardsComponent (Karteikarten v2)', () => {
     cmp.endMoment();
     harness.detectChanges();
     expect(q(el, '[data-test=veto-empty]')).not.toBeNull();
+  });
+
+  it('„Rest übernehmen“ (a whole language at once) is an admin call: a collaborator judges single decisions only', async () => {
+    const admin = await mount(backend(), '/admin/translations?tab=cards&lang=it');
+    expect(q(admin.el, '[data-test=act-accept-all]')).not.toBeNull();
+    TestBed.resetTestingModule();
+    const collab = await mount(backend(), '/admin/translations?tab=cards&lang=it', 'collaborator');
+    expect(collab.cmp.vetoMode()).toBe(true);
+    expect(q(collab.el, '[data-test=veto-ok]')).not.toBeNull();
+    expect(q(collab.el, '[data-test=act-accept-all]')).toBeNull();
   });
 
   it('language rows are real anchors: a click opens that language, the KI row is the last row and has no extra button', async () => {

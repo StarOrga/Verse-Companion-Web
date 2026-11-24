@@ -18,6 +18,7 @@ import { ActivatedRoute } from '@angular/router';
 import { NgTemplateOutlet } from '@angular/common';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { map } from 'rxjs';
+import { RoleService } from '../../auth/role.service';
 import { AnalyticsService } from '../../core/analytics.service';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ScConfirmService } from '../../shared/dialog/sc-confirm.service';
@@ -201,7 +202,7 @@ export interface CardMoment {
                   </g>
                 </svg>
               </div>
-              <h2 class="finish-h">{{ 'admin.translations.cards.finish.title' | translate: { lang: langName(lang()) } }}</h2>
+              <h2 class="finish-h">{{ (waiting() > 0 ? 'admin.translations.cards.finish.titleWaiting' : 'admin.translations.cards.finish.title') | translate: { lang: langName(lang()) } }}</h2>
               @if (s.cards > 0) {
                 <p class="finish-s">{{ 'admin.translations.cards.finish.sum' | translate: { cards: nTxt('cardsN', s.cards), texts: nTxt('textsN', s.texts) } }} · <b>+{{ fmt(s.points) }} {{ 'admin.translations.cards.finish.points' | translate }}</b></p>
                 @if (s.bonus > 0) {
@@ -218,6 +219,9 @@ export interface CardMoment {
                 </ul>
               } @else {
                 <p class="finish-s">{{ 'admin.translations.cards.finish.none' | translate }}</p>
+              }
+              @if (waiting() > 0) {
+                <p class="finish-s" data-test="finish-waiting">{{ cn('admin.translations.cards.finish.legacy', waiting()) | translate: { count: waiting() } }}</p>
               }
               <p class="finish-w">{{ 'admin.translations.cards.finish.when' | translate }}
                 @if (rest() > 0) { {{ cn('admin.translations.cards.finish.rest', rest()) | translate: { count: rest() } }} }
@@ -263,10 +267,12 @@ export interface CardMoment {
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z" /><path d="m13.5 6.5 4 4" /></svg>
                 {{ 'admin.translations.cards.own.short' | translate }} <kbd class="kbd desk" aria-hidden="true">{{ keys.own }}</kbd>
               </button>
-              <button type="button" scAction tier="secondary" data-test="act-accept-all" [disabled]="busy()" (click)="acceptAll()">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 5 5 9-10" /></svg>
-                {{ 'admin.translations.cards.veto.acceptAll' | translate }}
-              </button>
+              @if (roles.isAdmin()) {
+                <button type="button" scAction tier="secondary" data-test="act-accept-all" [disabled]="busy()" (click)="acceptAll()">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 5 5 9-10" /></svg>
+                  {{ 'admin.translations.cards.veto.acceptAll' | translate }}
+                </button>
+              }
             </div>
             <p class="swipe touch">
               <span>{{ 'admin.translations.cards.swipe.left' | translate: { label: ('admin.translations.cards.veto.wrong' | translate) } }}</span>
@@ -503,6 +509,8 @@ export class TranslationCardsComponent {
   private readonly zone = inject(NgZone);
   private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
   private readonly injector = inject(Injector);
+  /** Collaborators review cards too (/collab/translations); taking over a whole language at once stays an admin call. */
+  protected readonly roles = inject(RoleService);
 
   protected readonly keys = CARD_KEYS;
   protected readonly optionLabel = optionLabel;
@@ -559,6 +567,8 @@ export class TranslationCardsComponent {
   });
   readonly summary = computed(() => finishSummary(this.session()));
   /** Open cards beyond this deck, re-checked by the next learn pass. */
+  /** Legacy open cards outside the deck until the next learn pass upgrades them (#396): the board counts them apart. */
+  readonly waiting = computed(() => (this.vetoMode() ? 0 : (this.deck()?.waiting_total ?? 0)));
   readonly rest = computed(() => Math.max(0, (this.deck()?.open_total ?? 0) - (this.deck()?.cards.length ?? 0)));
 
   private seq = 0;

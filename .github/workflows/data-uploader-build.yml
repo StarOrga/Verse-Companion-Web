@@ -24,8 +24,15 @@ on:
 permissions:
   contents: write
 
+# Release runs (a tag push and a manual dispatch) share ONE group and never
+# cancel each other: a dispatch creates the tag it built, and before this a tag
+# run on its own ref built the same version a second time with a new release
+# token (0.84.3, 2026-11-21). Serialised, the later run starts only once the
+# earlier one is done, so release-guard / "Resolve release tag" see its release.
+# Pull requests and main pushes keep their per-ref group; a PR cancels its
+# superseded run.
 concurrency:
-  group: data-uploader-${{ github.ref }}
+  group: ${{ (startsWith(github.ref, 'refs/tags/data-uploader-v') || github.event_name == 'workflow_dispatch') && 'data-uploader-release' || format('data-uploader-{0}', github.ref) }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
@@ -168,7 +175,7 @@ jobs:
             if (git tag -l $tag) { Write-Error "$tag already exists - bump data-uploader/package.json first"; exit 1 }
             # The public mirror is what installs download: a release there means
             # this version is out, even when the source tag is missing.
-            gh release view $tag --repo StarOrga/Star-Citizen-Companion-Binaries --json tagName 2>$null | Out-Null
+            gh release view $tag --repo StarOrga/Verse-Companion-Binaries --json tagName 2>$null | Out-Null
             if ($LASTEXITCODE -eq 0) { Write-Error "$tag is already on the public mirror - bump data-uploader/package.json first"; exit 1 }
             $global:LASTEXITCODE = 0
           }
@@ -237,6 +244,30 @@ jobs:
             data-uploader/release-builds/*.blockmap
             data-uploader/release-builds/latest*.yml
           retention-days: 7
+      - name: Refuse to overwrite another build of this version
+        # Checked again right before publishing, ~15 minutes after "Resolve
+        # release tag": a build that uploads over files of the same version
+        # bakes a different release token into them, and installs that fetched
+        # the first files can never update again. A mirror release that already
+        # has assets came from another run (or an earlier attempt of this one)
+        # - bump data-uploader/package.json instead of overwriting it.
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "${{ steps.rel.outputs.tag }}"
+          if ($env:GITHUB_REF -notlike 'refs/tags/data-uploader-v*') {
+            # A dispatch creates the tag only when it publishes; one that exists
+            # now was pushed while this run was building.
+            git ls-remote --exit-code --tags origin "refs/tags/$tag" | Out-Null
+            if ($LASTEXITCODE -eq 0) { Write-Error "$tag was created while this run was building - not publishing a second build of it"; exit 1 }
+            $global:LASTEXITCODE = 0
+          }
+          $assets = gh release view $tag --repo StarOrga/Verse-Companion-Binaries --json assets --jq '.assets | length' 2>$null
+          if ($LASTEXITCODE -eq 0 -and [int]$assets -gt 0) { Write-Error "$tag on the public mirror already has $assets asset(s) from another build - bump data-uploader/package.json, do not overwrite"; exit 1 }
+          $global:LASTEXITCODE = 0
+          Write-Host "no other build of $tag published - publishing this one"
+
       - name: Publish to PRIVATE source-repo release (for maintainers + token artefact handoff)
         uses: softprops/action-gh-release@v3
         with:
@@ -252,7 +283,7 @@ jobs:
             Automated build from tag ${{ steps.rel.outputs.tag }}.
 
             **Public download (end-users):** see the matching release in
-            [StarOrga/Star-Citizen-Companion-Binaries](https://github.com/StarOrga/Star-Citizen-Companion-Binaries/releases/tag/${{ steps.rel.outputs.tag }})
+            [StarOrga/Verse-Companion-Binaries](https://github.com/StarOrga/Verse-Companion-Binaries/releases/tag/${{ steps.rel.outputs.tag }})
             — that's the URL `electron-updater` and the `desktop_releases`
             row should point at.
 
@@ -261,14 +292,14 @@ jobs:
       - name: Publish to PUBLIC binaries-mirror release (end-user download)
         # End-users with the installed Tool can't authenticate to GitHub, so
         # the auto-update download URL must be publicly accessible. We
-        # publish a mirror release in the public `Star-Citizen-Companion-Binaries`
+        # publish a mirror release in the public `Verse-Companion-Binaries`
         # repo via a fine-grained PAT (scope: Contents R/W on that repo
         # only) stored as `BINARIES_RELEASE_TOKEN`. See
         # https://github.com/StarOrga/Star-Citizen-Companion-Web/issues/7
         # for the full rationale.
         uses: softprops/action-gh-release@v3
         with:
-          repository: StarOrga/Star-Citizen-Companion-Binaries
+          repository: StarOrga/Verse-Companion-Binaries
           token: ${{ secrets.BINARIES_RELEASE_TOKEN }}
           tag_name: ${{ steps.rel.outputs.tag }}
           name: ${{ steps.rel.outputs.tag }}
@@ -301,7 +332,7 @@ jobs:
           $remote = ''
           for ($i = 0; $i -lt 5 -and -not $remote; $i++) {
             try {
-              $yml = (Invoke-WebRequest -UseBasicParsing "https://github.com/StarOrga/Star-Citizen-Companion-Binaries/releases/download/$tag/latest.yml").Content
+              $yml = (Invoke-WebRequest -UseBasicParsing "https://github.com/StarOrga/Verse-Companion-Binaries/releases/download/$tag/latest.yml").Content
               if ($yml -is [byte[]]) { $yml = [Text.Encoding]::UTF8.GetString($yml) }
               $remote = ([regex]::Match($yml, '(?m)^sha512:\s*(\S+)')).Groups[1].Value
             } catch { Start-Sleep -Seconds 10 }
@@ -344,8 +375,8 @@ jobs:
           $setupSize = $setupFile.Length
           $portableSize = $portableFile.Length
 
-          $setupUrl = "https://github.com/StarOrga/Star-Citizen-Companion-Binaries/releases/download/$tag/$($setupFile.Name)"
-          $portableUrl = "https://github.com/StarOrga/Star-Citizen-Companion-Binaries/releases/download/$tag/$($portableFile.Name)"
+          $setupUrl = "https://github.com/StarOrga/Verse-Companion-Binaries/releases/download/$tag/$($setupFile.Name)"
+          $portableUrl = "https://github.com/StarOrga/Verse-Companion-Binaries/releases/download/$tag/$($portableFile.Name)"
 
           # The full release token is a masked secret and is NEVER printed here.
           # Fetch it from the workflow's private artefact and paste it for <UUID>:

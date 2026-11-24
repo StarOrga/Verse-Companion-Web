@@ -76,6 +76,23 @@ PWA caveat are baked into its output, so the correct reply is now the cheap one 
 a ✅ nobody verified cannot be produced by accident. Pass `--route` **without** the
 leading slash — Git Bash rewrites a leading-slash argument into a Windows path.
 
+Three amendments from 2026-11-23 (#391/#393 — 19 silent minutes between the
+merge and the reply, the board showing both topics as "Du bist dran"):
+
+- **Post a "merged" note first.** Right after the `shipped` UPDATE, before any
+  waiting: `🔀 Gemerged in <PR> — <Deploy|Release> läuft, die Bestätigung folgt
+  hier.` The board treats `review_reply_pending` as the routine's turn, so the
+  sign-off is offered only after the ✅/⏳ reply landed.
+- **Not a web change → no web wait.** When the merge touches nothing under
+  `src/`/`public/` (or the Angular/Vercel config), `verify:ship-live` prints a
+  "not a website change" reply and exits 0 at once (`--web` forces the full
+  check). Post it right after the item's own deploy/release check.
+- **Don't serialise the waits.** Start each web verify in the background right
+  after its merge and post each reply when its own verify exits. The version
+  probe accepts a newer `current` than the merge's own — in a wave the later
+  merge goes live first, and the exact-version match made #391 time out at 888 s
+  on a green deployment.
+
 So step 5b runs as five rules, in this order:
 
 1. **Wait for the production deployment that carries the merge SHA.** After the
@@ -91,8 +108,8 @@ So step 5b runs as five rules, in this order:
 
    ```bash
    SHA=$(git rev-parse origin/main)   # the squash-merge commit
-   gh api "repos/StarOrga/Star-Citizen-Companion-Web/deployments?sha=$SHA&environment=Production" --jq '.[].id'
-   gh api "repos/StarOrga/Star-Citizen-Companion-Web/deployments/<id>/statuses" --jq '.[0].state'
+   gh api "repos/StarOrga/Verse-Companion-Web/deployments?sha=$SHA&environment=Production" --jq '.[].id'
+   gh api "repos/StarOrga/Verse-Companion-Web/deployments/<id>/statuses" --jq '.[0].state'
    # state: success | failure | in_progress
    ```
 

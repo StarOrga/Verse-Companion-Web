@@ -133,9 +133,21 @@ describe('finalize wiring (index.ts)', () => {
 
   it('starts the lists publish as a call of its own, before the locale publish', { skip }, () => {
     const lists = finalize.indexOf('callListsPublish(supabaseUrl, serviceKey, buildId)');
-    const locale = finalize.indexOf('publishBuildLocales(');
+    const locale = finalize.indexOf('callLocaleStep(');
     assert.ok(lists > 0, 'finalize calls callListsPublish');
     assert.ok(locale > lists, 'the lists call is started first');
+  });
+
+  it('no longer publishes the locale strings on the finalize worker (4.10.3 lost them all there)', { skip }, () => {
+    assert.ok(!finalize.includes('publishBuildLocales('), 'the strings go through the locale chain');
+    assert.ok(finalize.includes('callLocaleStep(supabaseUrl, serviceKey, { build_id: buildId, langs: null, done: [] })'));
+  });
+
+  it('sends a locale chain step once and lets only the service key detach one', { skip }, () => {
+    assert.ok(src.includes("{ ...body, op: 'locale_publish', detach: true }, { retryThrown: false })"));
+    const op = src.slice(src.indexOf("if (op === 'locale_publish') {"), src.indexOf("if (op === 'lists_publish') {"));
+    assert.match(op, /body\.detach === true && lang === null && !!authHeader && safeEqual\(authHeader, `Bearer \$\{serviceKey\}`\)/);
+    assert.match(op, /started: true \}, 202\)/);
   });
 
   it('no longer publishes the lists on the finalize worker', { skip }, () => {

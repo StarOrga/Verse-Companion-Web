@@ -61,7 +61,8 @@
 //         atomically: -> { replaces, cloned, locale_copy }. An incomplete build
 //         is refused with 409 codex_build_incomplete and the live one stays; a
 //         failed string copy answers 503 locale_copy_failed (retry finalize).)
-//        (then, after the response: publishes the build's locale strings to R2
+//        (then, after the response: publishes the build's locale strings to R2,
+//         one language per request (_locale-chain.ts, detach: true),
 //         and deletes the rows once the public Worker serves them — see below)
 //   POST { op: "locale_publish",   build_id, lang?, delete_source? }   -> { ok, results }
 //        (service role or the gates below; one language per call keeps it short)
@@ -117,6 +118,8 @@ import { GEN_RE as SILHOUETTE_GEN_RE, SILHOUETTE_SELECT, SILHOUETTE_TABLES, SILH
 import { type SilhouettePublishDeps, type StepResult, parseCursor, publishSilhouetteStep } from './_silhouette-publish.ts';
 import { PART_SELECT } from './_rank-parts.ts';
 import { WORKER_ID, callOwnOp } from './_self-call.ts';
+import { orderLangs, parseLocaleChain } from './_locale-chain.ts';
+import type { LocaleChainBody, LocaleStepResult } from './_locale-chain.ts';
 import { enqueueTranslationJobs } from './_translation-enqueue.ts';
 import { gcLocalePrefixes } from './_locale-gc.ts';
 import {
@@ -452,6 +455,55 @@ async function callListsPublish(supabaseUrl: string, serviceKey: string, buildId
   await callOwnOp(supabaseUrl, serviceKey, { op: 'lists_publish', build_id: buildId, detach: true }, { retryThrown: false });
 }
 
+/**
+ * The next step of the locale publish chain (_locale-chain.ts) as a request of its
+ * own. Not sent again after a throw: it may have arrived, and two publishes of one
+ * language at once can leave the index naming a generation the other one collected.
+ * A broken chain leaves the remaining languages in the staging rows; the clients
+ * keep reading them and `locale_publish` redoes it.
+ */
+async function callLocaleStep(supabaseUrl: string, serviceKey: string, body: LocaleChainBody): Promise<void> {
+  const ok = await callOwnOp(supabaseUrl, serviceKey, { ...body, op: 'locale_publish', detach: true }, { retryThrown: false });
+  if (!ok) {
+    console.error(`ingest-catalog: locale publish chain ${body.build_id} broken before ${JSON.stringify(body.langs)}; run locale_publish for the build`);
+  }
+}
+
+/** One step of the locale publish chain: publish one language, hand the rest on, open the jobs after the last. */
+async function localeChainStep(
+  admin: Admin, r2: R2, supabaseUrl: string, serviceKey: string, step: LocaleChainBody,
+): Promise<void> {
+  const buildId = step.build_id;
+  try {
+    let list = step.langs;
+    if (!list) {
+      const { data, error } = await admin.rpc('codex_locale_langs', { p_build_id: buildId });
+      if (error) throw error;
+      list = orderLangs(((data ?? []) as { lang: string }[]).map((r) => r.lang).filter((l) => LANG_RE.test(l)));
+    }
+    if (list.length === 0) {
+      if (step.done.length) await translationAfterPublish(admin, supabaseUrl, serviceKey, buildId, step.done);
+      else console.error(`ingest-catalog: locale publish ${buildId}: no staged strings to publish`);
+      return;
+    }
+    const [lang, ...rest] = list;
+    let result: LocaleStepResult;
+    try {
+      const [r] = await publishBuildLocales(admin, r2, buildId, [lang], true);
+      result = { lang, verified: r?.verified === true };
+      console.log(`ingest-catalog: locale publish ${buildId} ${lang} (worker ${WORKER_ID}): ${JSON.stringify(r)}`);
+    } catch (e) {
+      result = { lang, verified: false };
+      console.error(`ingest-catalog: locale publish ${buildId} ${lang} (worker ${WORKER_ID}) failed: ${(e as Error).message}`);
+    }
+    const done = [...step.done, result];
+    if (rest.length) await callLocaleStep(supabaseUrl, serviceKey, { build_id: buildId, langs: rest, done });
+    else await translationAfterPublish(admin, supabaseUrl, serviceKey, buildId, done);
+  } catch (e) {
+    console.error(`ingest-catalog: locale publish chain ${buildId} (worker ${WORKER_ID}) failed: ${(e as Error).message}`);
+  }
+}
+
 /** One lists publish that only logs: its caller has already answered. */
 async function publishListsLogged(admin: Admin, r2: R2, buildId: string): Promise<void> {
   try {
@@ -597,7 +649,7 @@ async function translationAfterPublish(
   supabaseUrl: string,
   serviceKey: string,
   buildId: string,
-  results: PublishResult[],
+  results: readonly LocaleStepResult[],
 ): Promise<void> {
   const r = await enqueueTranslationJobs(
     {
@@ -1195,18 +1247,12 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
       // A failure only leaves the tables as the source.
       console.log(`ingest-catalog: finalize ${buildId} answered on worker ${WORKER_ID}`);
       afterResponse(callListsPublish(supabaseUrl, serviceKey, buildId));
-      // After the response: the uploader's finalize must not wait ~30 s for
-      // 11 languages. A failure only leaves the rows in place (clients keep
-      // reading them); locale_publish or the backfill script can redo it.
-      afterResponse((async () => {
-        try {
-          const results = await publishBuildLocales(admin, r2, buildId, null, true);
-          console.log(`ingest-catalog: locale publish ${buildId}: ${JSON.stringify(results)}`);
-          await translationAfterPublish(admin, supabaseUrl, serviceKey, buildId, results);
-        } catch (e) {
-          console.error(`ingest-catalog: locale publish ${buildId} failed: ${(e as Error).message}`);
-        }
-      })());
+      // After the response, and not on this worker: the uploader's finalize must
+      // not wait for 11 languages, and this worker's CPU is spent (it died here
+      // for 4.10.3 LIVE and no language reached R2). A chain of requests, one
+      // language each (_locale-chain.ts). A failure only leaves the rows in place
+      // (clients keep reading them); locale_publish or the backfill script can redo it.
+      afterResponse(callLocaleStep(supabaseUrl, serviceKey, { build_id: buildId, langs: null, done: [] }));
       return json({ ok: true, current: true, ...replaced, locale_publish: 'started' });
     }
 
@@ -1218,6 +1264,14 @@ Deno.serve(withPosthog('ingest-catalog', async (req: Request): Promise<Response>
       }
       const r2 = r2FromEnv((k) => Deno.env.get(k));
       if (!r2) return json({ error: 'r2_not_configured' }, 503);
+      // detach (the function's own chain after finalize, service key only): answer
+      // now, publish one language on this worker's own budget, hand the rest on.
+      if (body.detach === true && lang === null && !!authHeader && safeEqual(authHeader, `Bearer ${serviceKey}`)) {
+        const step = parseLocaleChain(buildId, body.langs, body.done);
+        if (!step) return json({ error: 'invalid_body', message: 'langs / done malformed' }, 400);
+        afterResponse(localeChainStep(admin, r2, supabaseUrl, serviceKey, step));
+        return json({ ok: true, started: true }, 202);
+      }
       const blocked = await r2WriteBlocked(r2);
       if (blocked) return json({ error: blocked.code, message: blocked.message }, blocked.status);
       const results = await publishBuildLocales(admin, r2, buildId, lang ? [lang] : null, body.delete_source === true, true);

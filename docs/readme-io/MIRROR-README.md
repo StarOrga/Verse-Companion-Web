@@ -18,10 +18,10 @@ project is mirrored here for ReadMe to consume.
 
 | | |
 |---|---|
-| **Source of truth** | [`docs/readme-io/pages/`](https://github.com/StarOrga/Star-Citizen-Companion-Web/tree/main/docs/readme-io/pages) in `StarOrga/Star-Citizen-Companion-Web` |
+| **Source of truth** | [`docs/readme-io/pages/`](https://github.com/StarOrga/Verse-Companion-Web/tree/main/docs/readme-io/pages) in `StarOrga/Verse-Companion-Web` |
 | **Published at** | <https://star-citizen-companion.readme.io> |
 | **Mirrored by** | `.github/workflows/readme-docs-sync.yml` on every push to `main` |
-| **Setup guide** | [`docs/readme-io/GIT-SYNC-SETUP.md`](https://github.com/StarOrga/Star-Citizen-Companion-Web/blob/main/docs/readme-io/GIT-SYNC-SETUP.md) |
+| **Setup guide** | [`docs/readme-io/GIT-SYNC-SETUP.md`](https://github.com/StarOrga/Verse-Companion-Web/blob/main/docs/readme-io/GIT-SYNC-SETUP.md) |
 
 ## To change a page
 

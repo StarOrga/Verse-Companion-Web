@@ -45,7 +45,7 @@ docs stay authored and reviewed here, and CI copies `docs/readme-io/pages/`
 into the mirror's root on every push to `main`. ReadMe watches the mirror.
 
 ```
-Star-Citizen-Companion-Web            sc-companion-readme-docs        ReadMe
+Verse-Companion-Web            sc-companion-readme-docs        ReadMe
   docs/readme-io/pages/     ──CI──▶     (repo root)          ──sync──▶  site
     docs/…                                docs/…
 ```
@@ -59,7 +59,7 @@ It must be **completely empty**: no README, no `.gitignore`, no licence.
 ```bash
 gh repo create StarOrga/sc-companion-readme-docs \
   --public \
-  --description "ReadMe Git-Sync mirror of Star-Citizen-Companion-Web/docs/readme-io/pages. Do not edit."
+  --description "ReadMe Git-Sync mirror of Verse-Companion-Web/docs/readme-io/pages. Do not edit."
 ```
 
 Do **not** pass `--add-readme`, and do not click "Initialize this repository
@@ -105,7 +105,7 @@ Then store it on the **main** repository:
 
 ```bash
 gh secret set README_DOCS_MIRROR_TOKEN \
-  --repo StarOrga/Star-Citizen-Companion-Web
+  --repo StarOrga/Verse-Companion-Web
 # paste the token when prompted
 ```
 
@@ -115,7 +115,7 @@ on every PR — it just skips the mirror step and says so in the log.
 ## Step 4 — trigger the first sync
 
 ```bash
-gh workflow run readme-docs-sync.yml --repo StarOrga/Star-Citizen-Companion-Web
+gh workflow run readme-docs-sync.yml --repo StarOrga/Verse-Companion-Web
 ```
 
 or simply merge any change under `docs/readme-io/`.
@@ -123,7 +123,7 @@ or simply merge any change under `docs/readme-io/`.
 Watch it:
 
 ```bash
-gh run watch --repo StarOrga/Star-Citizen-Companion-Web
+gh run watch --repo StarOrga/Verse-Companion-Web
 ```
 
 Then check, in order:

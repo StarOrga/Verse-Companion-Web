@@ -1,8 +1,8 @@
-# SCC-App event progress (contract, desktop -> SCC-Web)
+# VC-App event progress (contract, desktop -> VC-Web)
 
-Contract version: 1 (2026-11-08, proposal for the SCC-App session; checklist A1-A4 of the HQ events brief). Companion
-of `docs/contracts/hq-live.md` (same opt-in `hq.liveSync.enabled`, same user session token, RLS self-only). This SCC-Web
-file is the master; the SCC-App repo mirrors it byte-identically with `npm run contracts:sync`.
+Contract version: 1 (2026-11-08, proposal for the VC-App session; checklist A1-A4 of the HQ events brief). Companion
+of `docs/contracts/hq-live.md` (same opt-in `hq.liveSync.enabled`, same user session token, RLS self-only). This VC-Web
+file is the master; the VC-App repo mirrors it byte-identically with `npm run contracts:sync`.
 
 Goal: the web updates the user's event state automatically - progress per track, the place the user is in (offers
 "in the event area, switch to the Nachschub?"), Arena Commander mode, and a received reward ("claim ticks itself").

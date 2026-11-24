@@ -4,6 +4,77 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.298.10] - 2026-11-24
+
+### Fixed
+- Ship page (holotable, beta view): no jump when scrolling back to the top, the panel tabs and the room chips are no longer cut off, no double frames on the area tiles, more room around the parts list; on tablet and phone the bottom strip and the view row no longer sit under the floating buttons.
+
+## [0.298.8] - 2026-11-23
+
+### Added
+- In-game events: the event card shows the official RSI picture (e.g. the IAE schedule graphic), opening full size in a new tab; the sync now reads RSI news posts directly for fresh dates and pictures.
+
+## [0.298.7] - 2026-11-23
+
+### Fixed
+- Admin feedback board: a shipped topic whose confirmation is still being posted reads "Wird ausgeliefert · Bestätigung folgt" instead of waiting for the admin's sign-off.
+
+## [0.298.6] - 2026-11-23
+
+### Fixed
+- Feedback panel on phones: one 12px side gutter for the whole sheet, topic titles on two lines, "Neues Thema" takes over the sheet, area chips in one scrollable row, the Alt+click admin tip hidden on touch screens, the send key stays beside "Abgenommen", and drawn search/filter icons replace broken font glyphs.
+
+## [0.298.5] - 2026-11-23
+
+### Fixed
+- Data Uploader release workflow: tag-push and manual release runs now queue behind each other and refuse to overwrite another build of the same version, so one version is never published twice with two release tokens.
+
+## [0.298.4] - 2026-11-23
+
+### Fixed
+- Data Uploader 0.85.1: a bundle the server already holds (`duplicate`) is no longer reported to error telemetry as a failed upload; real upload failures still are.
+
+## [0.298.3] - 2026-11-23
+
+### Changed
+- Holotable deck plan: the line under the plan that named the picked room is gone; the room now sits in the top line beside the bow mark and the deck ("▲ Bug · Deck 01 · Maschinenraum").
+
+## [0.298.2] - 2026-11-22
+
+### Changed
+- Release mirror references point at the renamed `StarOrga/Verse-Companion-Binaries` repo.
+- Visible "SCC" / "Star Citizen Companion" text renamed to "VC" / "Verse Companion" (UI strings in all locales, Starscape label, docs).
+
+## [0.298.1] - 2026-11-22
+
+### Fixed
+- Translation cards: a language row no longer says "54 offen" while its deck shows everything done. The board counts the same cards as the deck, and cards that wait for the next learn pass are shown as waiting.
+
+## [0.298.0] - 2026-11-22
+
+### Added
+- Collaborators can review the AI translation flash cards on their own page (/collab/translations): pick the languages they speak, answer cards, judge single KI decisions and see the weekly board. Taking over a whole language at once stays with admins.
+
+## [0.297.4] - 2026-11-22
+
+### Fixed
+- The Admin station on /verse opens the admin hub instead of user management.
+
+## [0.297.3] - 2026-11-22
+
+### Fixed
+- Patch board: a patch note from today reads "heute" / "today" instead of "seit 0 Tagen" / "for 0 days".
+- Verse: News and Patches show the door planet at the same, smaller size again (the round-4 concept size).
+
+### Removed
+- The patch-lesestand concept page (decided "discard" at its close-out; it stays in git history).
+
+## [0.297.2] - 2026-11-22
+
+### Fixed
+- Game strings of a new build reach the server one language at a time. For 4.10.3 the step had died after the upload, so no language arrived and every AI translation of that build failed with "English source texts missing".
+- AI translation: a full run on a build without English texts is refused at once instead of creating a job that fails. Jobs ended by hand show "Ended by hand" instead of "Unknown error".
+
 ## [0.297.1] - 2026-11-22
 
 ### Fixed

@@ -1,10 +1,10 @@
-# HQ live contract (desktop <-> SCC-Web)
+# HQ live contract (desktop <-> VC-Web)
 
 Contract version: 3 (2026-11-08). This file exists in BOTH repos at
-`docs/contracts/hq-live.md`. The SCC-Web file is the master: edit it there, then mirror it into the
-SCC-App repo with `npm run contracts:sync` (byte-identical; `npm run contracts:check` reports drift).
+`docs/contracts/hq-live.md`. The VC-Web file is the master: edit it there, then mirror it into the
+VC-App repo with `npm run contracts:sync` (byte-identical; `npm run contracts:check` reports drift).
 
-Writer: SCC-App `modules/desktop/src/hq-live-sync-service.js` with the user's SCC
+Writer: VC-App `modules/desktop/src/hq-live-sync-service.js` with the user's VC
 session token (PostgREST, RLS self-only). Reader: the web HQ (Jetzt, Bestand, Statistik).
 
 ## Opt-in
@@ -47,7 +47,7 @@ id across restarts and re-reads.
 `refinery.complete`, `armistice.entered/exited`, `monitored.down/restored/entered/exited`,
 `shop.purchase`, `shop.purchase_failed`, `insurance.claim_requested/complete`,
 `jurisdiction.changed`, `fuel.low`, `blueprint.received`, `mobiglas.app`,
-`inventory.opened`, `inventory.snapshot`. Data shapes: SCC-App `docs/features/gamelog.md`.
+`inventory.opened`, `inventory.snapshot`. Data shapes: VC-App `docs/features/gamelog.md`.
 
 **Privacy filter:** keys `member`, `members`, `victim`, `player`, `playerName`,
 `characterId`, `geid`, `handle` are removed, so party events carry only `{ key }`.
@@ -174,4 +174,4 @@ web migration.)
 
 - `docs/contracts/scc-app-event-progress.md` (event progress, location / Arena Commander mode, received rewards) extends
   this contract: same opt-in, same session token, same RLS-self-only rule, no new live table. It follows the same copy
-  rule: the SCC-Web file is the master and the SCC-App copy is mirrored from it with `npm run contracts:sync`.
+  rule: the VC-Web file is the master and the VC-App copy is mirrored from it with `npm run contracts:sync`.
