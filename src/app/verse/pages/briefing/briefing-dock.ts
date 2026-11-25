@@ -304,6 +304,11 @@ function snapStepper(marked: () => readonly HTMLElement[]): { onWheel: (e: Wheel
   return { onWheel, stop };
 }
 
+/** The shell footer's own box (the end of the document), or null without one. */
+export function footerEnd(): HTMLElement | null {
+  return document.querySelector<HTMLElement>('sc-footer footer');
+}
+
 /** Smooth native scroll to `top` (the "Mehr im Verse" cue); instant under reduced motion. */
 export function scrollToSmooth(top: number): void {
   const reduce = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -338,10 +343,14 @@ export function wireDock(
     return true;
   };
   // Stage and hub are the two snap areas; the browser finishes every gesture on one of them.
+  // The footer under the hub snaps with its end edge: without it the end of the document was
+  // no snap position, so a scroll down to the footer was pulled straight back to the hub's
+  // start once the hub plus footer outgrew the viewport (admin feedback #401). The inner
+  // <footer>: the <sc-footer> host is `display: contents`, a box-less element is no snap area.
   const releaseSnap = wireSnap(() => [
     host.querySelector<HTMLElement>('section'),
     host.querySelector<HTMLElement>('sc-briefing-hub'),
-  ], { zone });
+  ], { zone, end: footerEnd });
   let offScroll = (): void => undefined;
 
   const parts = () =>
