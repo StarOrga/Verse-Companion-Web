@@ -1,7 +1,7 @@
 import { NgZone } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { wireHqPageScroll } from '../../../hq/hq-page-scroll';
-import { dockEase, dockProgress, dockState, glideTarget, labelMove, planetMove, snapStepTarget, wireSnap } from './briefing-dock';
+import { dockEase, dockProgress, dockState, footerEnd, glideTarget, labelMove, planetMove, snapStepTarget, wireSnap } from './briefing-dock';
 
 describe('snapStepTarget (a wheel step that mandatory snapping would bounce)', () => {
   // Codex: stage at 16, the tall overview from 900 (2400 px), the footer end at 3300; viewport 900.
@@ -139,5 +139,27 @@ describe('briefing-dock', () => {
     expect(document.documentElement.style.scrollSnapType).toBe('');
     expect(footer.style.scrollSnapAlign).toBe('');
     footer.remove();
+  });
+
+  it('snaps the footer box, not its box-less host, as the end of the Verse hub (#401)', () => {
+    const host = document.createElement('sc-footer');
+    host.style.display = 'contents';
+    const footer = document.createElement('footer');
+    host.append(footer);
+    document.body.append(host);
+    const stage = document.createElement('section');
+    const hub = document.createElement('div');
+    const release = wireSnap(() => [stage, hub], { end: footerEnd });
+    try {
+      expect(footerEnd()).toBe(footer);
+      if (matchMedia('(min-width: 901px)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        expect(footer.style.scrollSnapAlign).toContain('end');
+        expect(host.style.scrollSnapAlign).toBe('');
+      }
+      release();
+      expect(footer.style.scrollSnapAlign).toBe('');
+    } finally {
+      host.remove();
+    }
   });
 });
