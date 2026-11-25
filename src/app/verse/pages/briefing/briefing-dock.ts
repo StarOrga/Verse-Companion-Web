@@ -338,10 +338,13 @@ export function wireDock(
     return true;
   };
   // Stage and hub are the two snap areas; the browser finishes every gesture on one of them.
+  // The footer under the hub snaps with its end edge: without it the end of the document was
+  // no snap position, so a scroll down to the footer was pulled straight back to the hub's
+  // start once the hub plus footer outgrew the viewport (admin feedback #401).
   const releaseSnap = wireSnap(() => [
     host.querySelector<HTMLElement>('section'),
     host.querySelector<HTMLElement>('sc-briefing-hub'),
-  ], { zone });
+  ], { zone, end: () => document.querySelector<HTMLElement>('sc-footer') });
   let offScroll = (): void => undefined;
 
   const parts = () =>
