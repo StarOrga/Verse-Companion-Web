@@ -1770,7 +1770,8 @@ class CodexExtractor:
             "source": self.source,
         }
         # Colour still of the item's 3D model (#402); absent when none exists.
-        render = self._renders.resolve(base["className"]) if self._renders else None
+        renders = getattr(self, "_renders", None)  # a bare instance (specs) has none
+        render = renders.resolve(base["className"]) if renders else None
         if render:
             base["renderImage"] = render
         # Turret / gimbal mounts land in weapons/, components/ or items/
