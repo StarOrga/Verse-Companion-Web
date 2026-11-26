@@ -10,7 +10,7 @@ import { SHIP_PREFETCH_SCHEDULER, ShipPrefetchService, modelPrefetchAllowed, pre
 class PackagesStub {
   readonly calls: { ship: string; bg: BackgroundFetch }[] = [];
   scenes = 0;
-  /** Resolve the pending prefetch with this value. */
+  /** Resolve the latest prefetch with this value. */
   private pending: ((v: boolean) => void)[] = [];
   prefetchShip(ship: string, bg: BackgroundFetch): Promise<boolean> {
     this.calls.push({ ship, bg });
@@ -24,7 +24,7 @@ class PackagesStub {
     return Promise.resolve();
   }
   finish(v: boolean): void {
-    this.pending.shift()?.(v);
+    this.pending.pop()?.(v);
   }
 }
 
