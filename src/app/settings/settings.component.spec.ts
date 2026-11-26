@@ -18,6 +18,7 @@ import { APP_LANGUAGES } from '../core/locale/locale.types';
 import { SupabaseClientProvider } from '../core/supabase.client';
 import { BetaService } from '../core/beta.service';
 import { RoutineTintPrefsService } from '../admin/feedback/routine-tint-prefs.service';
+import { ItemArtPrefsService } from '../codex/item-art-prefs.service';
 import { SettingsComponent } from './settings.component';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
 import { ScConfirmService } from '../shared/dialog/sc-confirm.service';
@@ -130,6 +131,7 @@ describe('SettingsComponent layout', () => {
             setPcLight: (on: boolean) => pcLightCalls.push(on),
           },
         },
+        { provide: ItemArtPrefsService, useValue: { renders: signal(true), set: () => undefined } },
         {
           provide: SupabaseClientProvider,
           useValue: {
