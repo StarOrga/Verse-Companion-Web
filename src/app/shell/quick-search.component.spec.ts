@@ -13,6 +13,8 @@ import { SearchOpenService } from './search-open.service';
 import { fakeSupabase } from '../testing/fake-supabase';
 import { UpcomingShipsService } from '../codex/upcoming-ships.service';
 import type { PolySearchHit } from '../codex/codex-poly-search';
+import { ItemPathService } from '../hq/data/item-path.service';
+import { fakeItemPath } from '../shared/item-path/item-path.testing';
 
 describe('QuickSearchComponent', () => {
   let searchAll: Mock;
@@ -178,6 +180,8 @@ describe('QuickSearchComponent', () => {
       hits: [hit('ship', 'aegs_gladius', 'Gladius'), hit('item', 'gladius_pilot_helmet', 'Gladius Pilot Helmet')],
       totals: { ship: 1, item: 1 },
     });
+    // Ship rows carry the HQ path; its own spec covers it.
+    TestBed.overrideProvider(ItemPathService, { useValue: fakeItemPath() });
     TestBed.inject(UpcomingShipsService).feed.set({
       ships: [], counts: null, fetchedAt: '2026-11-26T00:00:00Z',
       gameShipArt: { gladius: { name: 'Gladius', rsiUrl: null, thumbnails: ['https://media.example/gladius.jpg'] } },
