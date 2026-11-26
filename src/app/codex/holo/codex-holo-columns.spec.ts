@@ -170,10 +170,21 @@ describe('codex-holo-columns · buildHoloColumns', () => {
     expect(cols[1].gaps.length).toBe(1);
   });
 
-  it('ore is a gap only on Bergbau', () => {
-    const metrics = [...FIGHTER, m('ore', null, null, null, { gapKey: 'gap.ore' })];
-    expect(buildHoloColumns({ mission: 'combat', metrics, ...FMT })[2].gaps.map((g) => g.reasonKey)).toEqual(['gap.cargo']);
-    expect(buildHoloColumns({ mission: 'mining', metrics, ...FMT })[2].gaps.map((g) => g.reasonKey)).toContain('gap.ore');
+  it('an old extract without tool values or ore shows what is known, never a gap (r3-d-luecke)', () => {
+    const metrics = [...FIGHTER, m('ore', null, null, null, { gapKey: 'gap.ore' }), m('beamPower', null, null, null, { gapKey: 'gap.beam' })];
+    const cols = buildHoloColumns({ mission: 'mining', metrics, ...FMT });
+    expect(cols[2].gaps.map((g) => g.reasonKey)).toEqual(['gap.cargo']);
+    expect(cols[0].gaps).toEqual([]);
+  });
+
+  it('Bergbau leads Offensive with the laser and its beam power, Bergung with the head and its reach', () => {
+    const laser = m('miningTool', null, null, null, { text: '1 × Arbor MH1', gapKey: null });
+    const list = byId([...FIGHTER, laser, m('beamPower', 2340)]);
+    expect(selectColumnMetrics('mining', 'offensive', list).slice(0, 2)).toEqual(['miningTool', 'beamPower']);
+    const head = m('salvageTool', null, null, null, { text: '2 × Abrade', gapKey: null });
+    const salv = byId([...FIGHTER, head, m('salvageRange', 150), m('cargo', 16), m('salvageScu', 16)]);
+    expect(selectColumnMetrics('salvage', 'offensive', salv).slice(0, 2)).toEqual(['salvageTool', 'salvageRange']);
+    expect(selectColumnMetrics('salvage', 'movement', salv).slice(0, 2)).toEqual(['cargo', 'salvageScu']);
   });
 });
 

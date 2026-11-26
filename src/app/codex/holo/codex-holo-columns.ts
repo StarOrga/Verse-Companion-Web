@@ -14,7 +14,7 @@ import { PERSPECTIVES, type Perspective } from '../codex-build-compare';
 import type { RankClassId } from '../codex-rank';
 
 /** A row's metric: every KPI-sheet key plus the four the columns add. */
-export type HoloMetricId = KpiKey | 'coolingLoad' | 'miningTool' | 'salvageTool' | 'ore';
+export type HoloMetricId = KpiKey | 'coolingLoad' | 'miningTool' | 'salvageTool' | 'beamPower' | 'salvageRange' | 'salvageScu' | 'ore';
 
 /** The topic a row belongs to inside "Alle Werte" (one heading each). */
 export type HoloTopic =
@@ -36,6 +36,9 @@ const METRIC_META: Readonly<Record<HoloMetricId, MetricMeta>> = {
   missiles: { area: 'offensive', topic: 'missiles' },
   miningTool: { area: 'offensive', topic: 'tools' },
   salvageTool: { area: 'offensive', topic: 'tools' },
+  beamPower: { area: 'offensive', topic: 'tools' },
+  salvageRange: { area: 'offensive', topic: 'tools' },
+  salvageScu: { area: 'movement', topic: 'cargo' },
   shieldHp: { area: 'defensive', topic: 'shield' },
   shieldRegen: { area: 'defensive', topic: 'shield' },
   hullHp: { area: 'defensive', topic: 'hull' },
@@ -75,7 +78,7 @@ export function holoMetricTopic(id: HoloMetricId): HoloTopic {
  */
 export function holoLowerIsBetter(id: HoloMetricId): boolean {
   if (id === 'coolingLoad') return true;
-  if (id === 'miningTool' || id === 'salvageTool' || id === 'ore') return false;
+  if (id === 'miningTool' || id === 'salvageTool' || id === 'ore' || id === 'beamPower' || id === 'salvageRange' || id === 'salvageScu') return false;
   return kpiLowerIsBetter(id);
 }
 
@@ -142,15 +145,15 @@ export const EINSATZ_COLUMNS: Readonly<Record<MissionId, Readonly<Record<Perspec
     signature: { lead: 'ir', then: ['emLoad'], focus: true },
   },
   mining: {
-    offensive: { lead: 'miningTool', focus: true },
+    offensive: { lead: 'miningTool', then: ['beamPower'], focus: true },
     defensive: { lead: 'shieldHp' },
     movement: { lead: 'quantumRange', then: ['ore'] },
     signature: { lead: 'coolingLoad', focus: true },
   },
   salvage: {
-    offensive: { lead: 'salvageTool', focus: true },
+    offensive: { lead: 'salvageTool', then: ['salvageRange'], focus: true },
     defensive: { lead: 'hullHp' },
-    movement: { lead: 'cargo', focus: true },
+    movement: { lead: 'cargo', then: ['salvageScu'], focus: true },
     signature: { lead: 'coolingLoad', quiet: true },
   },
 };
@@ -317,19 +320,21 @@ export interface HoloColumnsInput {
   detailGaps?: Partial<Record<Perspective, readonly HoloColumnGap[]>>;
   /** The metric's number as the page prints it ("1.180", "11 Gm"). */
   fmt: (m: HoloMetric, value: number) => string;
+  /** The delta's magnitude without its unit ("700"); defaults to `fmt`. */
+  fmtDelta?: (m: HoloMetric, value: number) => string;
   /** The translated words around a value ("statt {{was}}", "Gespeichert: {{v}}"). */
   wasText: (factory: string) => string;
   savedText: (value: string) => string;
 }
 
 /** The row of one metric with its comparison against Werk. */
-export function metricRow(m: HoloMetric, input: Pick<HoloColumnsInput, 'fmt' | 'wasText' | 'savedText'>): HoloColumnRow {
+export function metricRow(m: HoloMetric, input: Pick<HoloColumnsInput, 'fmt' | 'fmtDelta' | 'wasText' | 'savedText'>): HoloColumnRow {
   if (m.text != null && m.current == null) {
     const was = m.factoryText != null && m.factoryText !== m.text ? input.wasText(m.factoryText || '—') : null;
     return { key: m.id, labelKey: m.labelKey, value: m.text, was, cmp: null, deltaText: null, savedText: null };
   }
   const cmp = compareToWerk(m.current, m.factory, m.saved, holoLowerIsBetter(m.id));
-  const deltaText = cmp?.delta != null ? (cmp.delta > 0 ? '+' : '−') + input.fmt(m, Math.abs(cmp.delta)) : null;
+  const deltaText = cmp?.delta != null ? (cmp.delta > 0 ? '+' : '−') + (input.fmtDelta ?? input.fmt)(m, Math.abs(cmp.delta)) : null;
   const savedText = cmp?.savedAt != null && m.saved != null ? input.savedText(input.fmt(m, m.saved)) : null;
   return {
     key: m.id,
@@ -341,10 +346,10 @@ export function metricRow(m: HoloMetric, input: Pick<HoloColumnsInput, 'fmt' | '
   };
 }
 
-/** The metrics whose absence counts as a gap for this Einsatz (ore only matters when mining). */
-function gapRelevant(id: HoloMetricId, mission: MissionId): boolean {
-  if (id === 'miningTool' || id === 'salvageTool') return false;
-  if (id === 'ore') return mission === 'mining';
+/** The metrics whose absence counts as a gap in the game data. */
+function gapRelevant(id: HoloMetricId): boolean {
+  // Tool values and ore come from schema-7 extracts; an older extract simply lacks them — never a gap (r3-d-luecke).
+  if (id === 'miningTool' || id === 'salvageTool' || id === 'beamPower' || id === 'salvageRange' || id === 'salvageScu' || id === 'ore') return false;
   return true;
 }
 
@@ -365,7 +370,7 @@ export function buildHoloColumns(input: HoloColumnsInput): HoloColumnView[] {
     }
     const gaps: HoloColumnGap[] = [
       ...input.metrics
-        .filter((m) => holoMetricArea(m.id) === id && !hasValue(m) && m.gapKey && gapRelevant(m.id, input.mission))
+        .filter((m) => holoMetricArea(m.id) === id && !hasValue(m) && m.gapKey && gapRelevant(m.id))
         .map((m) => ({ labelKey: m.labelKey, reasonKey: m.gapKey! })),
       ...(input.detailGaps?.[id] ?? []),
     ];
