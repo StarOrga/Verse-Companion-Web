@@ -91,7 +91,10 @@ class ExtractResult:
     # off the magazine entity behind `ammoContainerRecord`). Countermeasure
     # launchers and the ~50 ship guns whose round is not `<class>_AMMO` are
     # resolvable for the first time; the web no longer has to guess by name.
-    schema_version: int = 6
+    # 7 = mining laser / salvage head figures (`weaponParams.mining.*` /
+    # `salvage.*`), `providesMission` on ships / lasers / heads / modules, and the
+    # hull's `salvageScu` / `salvageStatus` (salvage buffer).
+    schema_version: int = 7
     quality_score: float = 0.0
     entity_counts: Dict[str, int] = field(default_factory=dict)
     warnings: List[str] = field(default_factory=list)

@@ -1884,6 +1884,15 @@ class CodexExtractor:
             # (the Nomad's open bed). Both are cargoScu: null, and printing
             # "no cargo hold" on a Nomad would be a false statement.
             "cargoStatus": self._cargo_status(loadout),
+            # Mining / salvage: which Einsatz the stock fit enables (a laser or
+            # a salvage head in the loadout) and the salvage buffer (the
+            # `SalvageInternalStorage` item, SCU). `salvageStatus` mirrors
+            # `cargoStatus`: "measured" or "none" - a hull without a buffer
+            # reads as "none", never as 0 SCU.
+            "providesMission": self._mining_salvage_scan(loadout)[0],
+            "salvageScu": self._mining_salvage_scan(loadout)[1],
+            "salvageStatus": ("measured" if self._mining_salvage_scan(loadout)[1] is not None
+                              else "none"),
             # Hydrogen / quantum fuel capacity in SCU: Σ the stock fuel tanks'
             # `ResourceContainer.capacity` (VERIFIED LIVE 4.10.2: Starlancer
             # MAX 32.1 / 8.6, matching the wiki). None per kind without a tank.
@@ -2669,6 +2678,12 @@ class CodexExtractor:
         lifts, the Aurora GS rack, the Cyclone module, the F7C cargo mod. So a
         cargo entry whose ship loadout lists no sub-items is expanded one hop
         into its own stock fit (recursively, depth-capped, never twice)."""
+        return self._gated_entries(loadout, self._CARGO_EVIDENCE)
+
+    def _gated_entries(self, loadout: List[Dict[str, Any]],
+                       evidence: Tuple[str, ...]) -> List[Tuple[str, str]]:
+        """``(port, class)`` of every loadout entry whose port or class name
+        contains one of ``evidence`` (see `_cargo_entries` for the walk)."""
         out: List[Tuple[str, str]] = []
 
         def walk(entries: Any, depth: int, seen: frozenset) -> None:
@@ -2681,7 +2696,7 @@ class CodexExtractor:
                 if not isinstance(cls, str) or not cls:
                     continue
                 port = str(e.get("itemPortName") or "")
-                evident = any(w in f"{port} {cls}".lower() for w in self._CARGO_EVIDENCE)
+                evident = any(w in f"{port} {cls}".lower() for w in evidence)
                 if evident:
                     out.append((port, cls))
                 children = e.get("entries")
@@ -2692,6 +2707,70 @@ class CodexExtractor:
 
         walk(loadout, 0, frozenset())
         return out
+
+    # -- mining / salvage capability + salvage buffer ---------------------------
+    # VERIFIED LIVE 4.10 (probe 2026-11-26, the PC's LIVE Data.p4k):
+    #   * a mining laser is `AttachDef.Type == "WeaponMining"` and carries
+    #     `SEntityComponentMiningLaserParams`; a salvage head is
+    #     `Type == "SalvageHead"` with a `SWeaponActionFireSalvageRepairParams`
+    #     fire action. Both sit in the ship's stock loadout (under a gimbal
+    #     mount / tool arm), named `Mining_Laser_*` / `Salvage_Head_*`.
+    #   * `Controller_Salvage_TractorBeamOnly` (Cutlass, Hull, Nomad, Caterpillar,
+    #     Polaris, Taurus, Reliant ...) is a TRACTOR controller: no head, so it
+    #     does NOT make a hull a salvage ship. The capability is therefore the
+    #     head / laser, never the controller.
+    #   * the salvage buffer is `SalvageInternalStorage_<Ship>` (Type
+    #     `SalvageInternalStorage`), a `ResourceContainer` with an SCU capacity.
+    #   * no LIVE 4.10 hull module (Galaxy, Retaliator, Aurora Mk2, Apollo)
+    #     installs a laser or head, but the walk expands an installed item's
+    #     own default loadout, so a module that ever does is picked up as is.
+    _MISSION_EVIDENCE = ("mining", "salvage", "module")
+    _MISSION_BY_TYPE = {"WeaponMining": "mining", "SalvageHead": "salvage"}
+
+    def _own_missions(self, comps: List[Dict[str, Any]]) -> List[str]:
+        """Missions an item enables by itself (a laser or a salvage head)."""
+        attach = _attach_def(comps) or {}
+        mission = self._MISSION_BY_TYPE.get(attach.get("Type"))
+        if mission == "salvage":
+            fa = _find_struct(_find_component(comps, "SCItemWeaponComponentParams") or {},
+                              _SALVAGE_ACTION_TYPE)
+            if isinstance(fa, dict) and fa.get("salvageRepairMode") == "Repair":
+                return []
+        return [mission] if mission else []
+
+    def _mining_salvage_scan(self, loadout: List[Dict[str, Any]]) -> Tuple[List[str], Optional[float]]:
+        """``(missions, salvage buffer SCU or None)`` over a stock loadout,
+        memoised per loadout like `_cargo_measure`."""
+        memo = getattr(self, "_ms_memo", None)
+        if memo is None:
+            memo = self._ms_memo = {}
+        hit = memo.get(id(loadout))
+        if hit is not None and hit[0] is loadout:
+            return hit[1]
+        missions: set = set()
+        total = 0.0
+        found = False
+        for _port, cls in self._gated_entries(loadout, self._MISSION_EVIDENCE):
+            comps = self._entity_class_comps(cls)
+            missions.update(self._own_missions(comps))
+            attach = _attach_def(comps) or {}
+            if attach.get("Type") == "SalvageInternalStorage":
+                scu = self._hold_scu(comps)
+                if scu is not None:
+                    total += scu
+                    found = True
+        result = (sorted(missions), round(total, 2) if found else None)
+        memo[id(loadout)] = (loadout, result)
+        return result
+
+    def _item_missions(self, comps: List[Dict[str, Any]], atype: Any) -> List[str]:
+        """``providesMission`` of one item: its own laser / head, and for a hull
+        module whatever its own stock loadout installs."""
+        missions = set(self._own_missions(comps))
+        if atype == "Module":
+            found, _scu = self._mining_salvage_scan(_default_loadout_of(comps))
+            missions.update(found)
+        return sorted(missions)
 
     def _hold_scu(self, comps: List[Dict[str, Any]]) -> Optional[float]:
         """SCU of one cargo item: a resource container's own SCU capacity
@@ -2940,6 +3019,12 @@ class CodexExtractor:
         wcp = _find_component(comps, "SCItemWeaponComponentParams") or {}
         weapon_params = self._weapon_params(wcp, resolved)
         weapon_params.update(self._weapon_ammo_link(comps, wcp))
+        # Mining laser / salvage head figures (flat `mining.*` / `salvage.*`).
+        weapon_params.update(_mining_laser_params(comps, wcp))
+        weapon_params.update(_salvage_head_params(wcp))
+        missions = self._item_missions(comps, atype)
+        if missions:
+            base["providesMission"] = missions
         base.update({
             "entityKind": "weapon",
             "weaponClass": "FPS" if atype in _FPS_WEAPON_TYPES else "Ship",
@@ -3097,6 +3182,21 @@ class CodexExtractor:
             stats = self._component_stats(comps, "Item")
             if stats:
                 base["stats"] = stats
+        # Mining / salvage: a hull module (or a loose item) that installs a
+        # laser or a head enables that Einsatz; the salvage buffer item states
+        # its SCU; a salvage controller states the grinder / fracture figures.
+        missions = self._item_missions(comps, atype)
+        if missions:
+            base["providesMission"] = missions
+        if atype == "SalvageInternalStorage":
+            scu = self._hold_scu(comps)
+            if scu is not None:
+                base["salvageScu"] = round(scu, 2)
+        ctrl = _find_component(comps, "SCItemSalvageControllerParams")
+        if ctrl is not None:
+            flat = _salvage_controller_params(ctrl)
+            if flat:
+                base.setdefault("stats", {})["SCItemSalvageControllerParams"] = flat
         return base
 
     # Component params structs are not the same vocabulary as AttachDef.Type;
@@ -4107,6 +4207,155 @@ def _tractor_beam_params(wcp: Dict[str, Any]) -> Dict[str, float]:
             v = _to_float(movement.get(src))
             if v is not None:
                 out[_TRACTOR_PARAMS_PREFIX + dst] = v
+    return out
+
+
+# -- mining lasers + salvage heads -----------------------------------------------
+# VERIFIED LIVE 4.10 (probe 2026-11-26: GRIN Arbor S1/S2, Hofstede, Helix,
+# Salvage_Head_standard / _Salvation). `SEntityComponentMiningLaserParams`
+# keeps its modifiers in `miningLaserModifiers.<name>.value` (percent, signed;
+# the field is null when the laser leaves that axis alone) plus
+# `filterParams.filterModifier.value`; the beam itself is the first
+# `SWeaponActionFireBeamParams` on `SCItemWeaponComponentParams.fireActions`
+# (mannequinTag "laser"): `damagePerSecond.DamageEnergy` is the laser power at
+# full throttle, `fullDamageRange` the optimal range and `zeroDamageRange` the
+# maximum one. The module slots are ordinary `itemPorts` and need no key. A
+# salvage head's numbers sit on its `SWeaponActionFireSalvageRepairParams`.
+# Everything is emitted only when the record carries the field.
+_MINING_MODIFIER_KEYS = (
+    ("laserInstability", "laserInstability"),
+    ("optimalChargeWindowSizeModifier", "optimalChargeWindowSize"),
+    ("optimalChargeWindowRateModifier", "optimalChargeWindowRate"),
+    ("catastrophicChargeWindowRateModifier", "catastrophicChargeWindowRate"),
+    ("resistanceModifier", "resistance"),
+    ("shatterdamageModifier", "shatterDamage"),
+    ("clusterFactorModifier", "clusterFactor"),
+)
+_BEAM_ACTION_TYPE = "SWeaponActionFireBeamParams"
+_SALVAGE_ACTION_TYPE = "SWeaponActionFireSalvageRepairParams"
+_SALVAGE_SCALAR_KEYS = (
+    "materialEfficiency", "maxVehicleDamageRatio", "maxHealthRepairRate",
+    "maxDamageMapRepairRate", "healthToAmmoRatio", "repairedMaterialRatio",
+    "rampUpTime", "rampDownTime", "hitRadius",
+)
+_SALVAGE_RANGE_KEYS = ("maxBeamDistance", "maxSensorDistance", "aimPointSensorRadius")
+_SALVAGE_CONTROLLER_KEYS = (
+    "fractureTimePerRadiusMetre", "minFracturableRadius", "maxFracturableRadius",
+    "minDisintegratableRadius", "maxDisintegratableRadius",
+    "disintegrationTimePerRadiusMetre", "disintegrationSCUPerCubicMetre",
+    "numFieldSupportersRequired", "fieldAlignmentMaxSpeedMultiplier",
+    "fieldAlignmentMaxYieldMultiplier", "fieldAlignmentBaselineFactor",
+    "fieldAlignmentFalloffDistanceForward", "fieldAlignmentFalloffDistanceRadial",
+)
+
+
+def _find_struct(node: Any, type_name: str, _depth: int = 0) -> Optional[Dict[str, Any]]:
+    """First struct of ``_Type_ == type_name`` under ``node`` (DFS)."""
+    if _depth > 10:
+        return None
+    if isinstance(node, dict):
+        if node.get("_Type_") == type_name:
+            return node
+        for k, v in node.items():
+            if isinstance(k, str) and k.startswith("_") and k.endswith("_"):
+                continue
+            found = _find_struct(v, type_name, _depth + 1)
+            if found is not None:
+                return found
+    elif isinstance(node, list):
+        for item in node:
+            found = _find_struct(item, type_name, _depth + 1)
+            if found is not None:
+                return found
+    return None
+
+
+def _mining_laser_params(comps: List[Dict[str, Any]], wcp: Dict[str, Any]) -> Dict[str, float]:
+    """Flat `mining.<key>` figures of a mining laser, {} for every other item."""
+    ml = _find_component(comps, "SEntityComponentMiningLaserParams")
+    if ml is None:
+        return {}
+    out: Dict[str, float] = {}
+    mods = ml.get("miningLaserModifiers")
+    if isinstance(mods, dict):
+        for src, dst in _MINING_MODIFIER_KEYS:
+            node = mods.get(src)
+            v = _to_float(node.get("value")) if isinstance(node, dict) else None
+            if v is not None:
+                out["mining." + dst] = v
+    fp = ml.get("filterParams")
+    fm = fp.get("filterModifier") if isinstance(fp, dict) else None
+    v = _to_float(fm.get("value")) if isinstance(fm, dict) else None
+    if v is not None:
+        out["mining.filter"] = v
+    for src in ("throttleMinimum", "throttleLerpSpeed"):
+        v = _to_float(ml.get(src))
+        if v is not None:
+            out["mining." + src] = v
+    beams: List[Dict[str, Any]] = []
+
+    def collect(node: Any, depth: int = 0) -> None:
+        if depth > 10:
+            return
+        if isinstance(node, dict):
+            if node.get("_Type_") == _BEAM_ACTION_TYPE:
+                beams.append(node)
+            for k, val in node.items():
+                if not (isinstance(k, str) and k.startswith("_") and k.endswith("_")):
+                    collect(val, depth + 1)
+        elif isinstance(node, list):
+            for item in node:
+                collect(item, depth + 1)
+
+    collect(wcp.get("fireActions"))
+    beam = next((b for b in beams
+                 if (b.get("mannequinTag") or {}).get("tag") == "laser"), beams[0] if beams else None)
+    if beam is not None:
+        dps = beam.get("damagePerSecond")
+        energy = _to_float(dps.get("DamageEnergy")) if isinstance(dps, dict) else None
+        if energy is not None:
+            out["mining.beamPower"] = energy
+        for src, dst in (("fullDamageRange", "optimalRangeM"), ("zeroDamageRange", "maxRangeM")):
+            v = _to_float(beam.get(src))
+            if v is not None:
+                out["mining." + dst] = v
+    return out
+
+
+def _salvage_head_params(wcp: Dict[str, Any]) -> Dict[str, Any]:
+    """Flat `salvage.<key>` figures of a salvage head, {} for every other weapon."""
+    fa = _find_struct(wcp.get("fireActions"), _SALVAGE_ACTION_TYPE)
+    if fa is None:
+        return {}
+    out: Dict[str, Any] = {}
+    mode = fa.get("salvageRepairMode")
+    if isinstance(mode, str) and mode:
+        out["salvage.mode"] = mode
+    for key in _SALVAGE_SCALAR_KEYS:
+        v = _to_float(fa.get(key))
+        if v is not None:
+            out["salvage." + key] = v
+    rng = fa.get("rangeParams")
+    if isinstance(rng, dict):
+        for key in _SALVAGE_RANGE_KEYS:
+            v = _to_float(rng.get(key))
+            if v is not None:
+                out["salvage." + key] = v
+    return out
+
+
+def _salvage_controller_params(ctrl: Dict[str, Any]) -> Dict[str, float]:
+    """Grinder / fracture figures of a `SCItemSalvageControllerParams` (the
+    hull-side controller: how fast and how large a wreck it works), keyed by
+    leaf name. {} for a tractor-only controller that carries none."""
+    st = ctrl.get("structuralParams")
+    if not isinstance(st, dict):
+        return {}
+    out: Dict[str, float] = {}
+    for key in _SALVAGE_CONTROLLER_KEYS:
+        v = _to_float(st.get(key))
+        if v is not None:
+            out[key] = v
     return out
 
 
