@@ -1,6 +1,7 @@
 import { Injectable, InjectionToken, Injector, NgZone, inject } from '@angular/core';
 import { SupabaseClientProvider } from '../core/supabase.client';
 import { logWarn } from '../core/log';
+import { prefetchAllowed } from './ship-prefetch.service';
 import { readRpcInWorker } from './codex-swap-worker-link';
 import { CodexKind, CodexService, CompatibleItem } from './codex.service';
 import { ammoClassNamesFor } from './codex-equipped-stats';
@@ -161,7 +162,8 @@ export class CodexSwapCandidatesService {
    * every slot of a ship).
    */
   preload(queries: readonly SwapSourceQuery[]): void {
-    if (this.rpcMissing) return;
+    // Speculative downloads stay off when the reader saves data or is on 2G (#404).
+    if (this.rpcMissing || !prefetchAllowed()) return;
     for (const q of queries) {
       const key = swapQueryKey(q);
       if (this.queued.has(key)) continue;
