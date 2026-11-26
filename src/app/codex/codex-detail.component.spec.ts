@@ -1302,7 +1302,7 @@ describe('CodexDetailComponent — Holotable (Nomad fixture)', () => {
       // No equipment mass in this fixture: the value is hidden and named behind the gap counter.
       el.querySelectorAll<HTMLButtonElement>('.ptile[data-p="movement"] .gaps').forEach((b) => b.click());
       fixture.detectChanges();
-      expect(el.querySelector('.ptile[data-p="movement"] .gap-list')?.textContent).toContain('codex.kpi.short.mass');
+      expect(el.querySelector('.ptile[data-p="movement"] .gap-list')?.textContent).toContain('codex.hull.equippedMass');
       return;
     }
     const values = new Set(massRows.map((r) => r.querySelector('.v')?.textContent?.trim()));

@@ -165,17 +165,18 @@ export interface HoloPerspectiveView {
     .ptile.quiet .vlist, .ptile.quiet .pt-head { opacity: 0.6; }
 
     .vlist { list-style: none; margin: 0; padding: 0; display: grid; }
-    .vr { display: grid; grid-template-columns: minmax(0, 1fr) auto 48px 52px; align-items: center; column-gap: 4px; padding: 4px 0; position: relative;
+    /* The label keeps its words whole (never broken mid-word); a long value wraps at its own spaces instead. */
+    .vr { display: grid; grid-template-columns: minmax(min-content, 1fr) minmax(0, max-content) 32px 52px; align-items: center; column-gap: 4px; padding: 4px 0; position: relative;
       font-size: max(13px, var(--f)); border-bottom: 1px solid color-mix(in srgb, var(--sc-accent) 8%, transparent); }
-    .vr .k { min-width: 0; color: var(--sc-fg-1); overflow-wrap: anywhere; }
+    .vr .k { color: var(--sc-fg-1); overflow-wrap: normal; word-break: normal; hyphens: manual; }
     .vr .was { display: block; font-size: max(13px, var(--f)); color: var(--sc-fg-2); }
-    .vr .v { font-family: var(--m); font-size: 15px; color: var(--sc-fg-0); white-space: nowrap; font-variant-numeric: tabular-nums; padding-inline-end: 4px; }
+    .vr .v { font-family: var(--m); font-size: 15px; color: var(--sc-fg-0); text-align: end; font-variant-numeric: tabular-nums; padding-inline-end: 4px; }
     .vr.first { padding: 4px 0 8px; }
     .vr.first .k { color: var(--sc-fg-0); }
     .vr.first .v { font-size: 18px; }
     .vr.port .k { padding-inline-start: 12px; color: var(--sc-fg-2); }
     .vr.port .v { font-size: max(13px, var(--f)); color: var(--sc-fg-1); }
-    .pk { background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; text-align: start; overflow-wrap: anywhere; }
+    .pk { background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; text-align: start; }
     .pk:hover, .pk[aria-expanded="true"] { color: var(--sc-accent); }
     .pk:focus-visible, .gaps:focus-visible, .tick:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: var(--holo-r-xs); }
 

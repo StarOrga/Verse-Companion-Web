@@ -244,6 +244,18 @@ describe('CodexHoloStageComponent', () => {
   });
 });
 
+describe('CodexHoloStageComponent — column values (QA D2–D4)', () => {
+  it('prints the equipment mass in tonnes under its own name and EM as plain "EM"', async () => {
+    const fixture = await setup({ allKpiCells: [cell('mass', 1039397), cell('emLoad', 11200)] });
+    const el = fixture.nativeElement as HTMLElement;
+    const mass = el.querySelector('sc-codex-holo-perspectives.below-persp .ptile[data-p="movement"] .vr[data-key="mass"]')!;
+    expect(mass.querySelector('.v')!.textContent!.trim()).toBe('1,039 t');
+    expect(mass.querySelector('.k')!.textContent).toContain('codex.hull.equippedMass');
+    const em = el.querySelector('sc-codex-holo-perspectives.below-persp .ptile[data-p="signature"] .vr[data-key="emLoad"]')!;
+    expect(em.querySelector('.k')!.textContent).toContain('codex.kpi.short.em');
+  });
+});
+
 // ── Wave 5 (holodeck audit): overlaps, default silhouette, share, resets ──
 describe('CodexHoloStageComponent — wave 5 fixes', () => {
   const manyPorts = Array.from({ length: 12 }, (_, i) => `hardpoint_gun_${i}`);

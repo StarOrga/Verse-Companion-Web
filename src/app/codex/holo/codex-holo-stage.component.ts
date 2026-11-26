@@ -313,6 +313,16 @@ function toolParam(occupants: readonly SummaryOccupant[], attach: string, key: s
   if (vals.length === 0) return null;
   return sum ? vals.reduce((a, b) => a + b, 0) : Math.max(...vals);
 }
+/** Column labels that differ from the strip's short label: the mock's plain "EM", and which mass. */
+const COLUMN_LABEL: Partial<Record<string, string>> = { emLoad: 'codex.kpi.short.em', mass: 'codex.hull.equippedMass' };
+
+/** kg as tonnes, the hero chip's rule: hundredths only on a light hull ("2.339 t", not "2,339,240.06 kg"). */
+function tonnes(kg: number, unit: boolean): string {
+  const t = kg / 1000;
+  const n = formatNumber(Math.abs(t) >= 100 ? Math.round(t) : t);
+  return unit ? `${n} t` : n;
+}
+
 const RATE_FACTS = ['codex.hull.pitch', 'codex.hull.yaw', 'codex.hull.roll'] as const;
 const TANK_FACTS = ['codex.detail.quantumFuel', 'codex.detail.fuelCapacity'] as const;
 
@@ -3134,7 +3144,7 @@ export class CodexHoloStageComponent implements DetailSlotSource {
     const out: HoloMetric[] = this.allKpiCells().map((c) => {
       // The cell carries current and current − Werk; Werk is what is left.
       const factory = c.value == null ? null : c.delta ? c.value - c.delta.raw : c.value;
-      const base: HoloMetric = { id: c.key, labelKey: `codex.kpi.short.${c.key}`, current: c.value, factory, saved: saved?.[c.key] ?? null, gapKey: c.gapKey };
+      const base: HoloMetric = { id: c.key, labelKey: COLUMN_LABEL[c.key] ?? `codex.kpi.short.${c.key}`, current: c.value, factory, saved: saved?.[c.key] ?? null, gapKey: c.gapKey };
       if (c.value == null && SIGNATURE_KEYS.has(c.key) && sig.current) {
         const k = c.key as 'ir' | 'emLoad' | 'crossSection' | 'emIdle';
         const cur = sig.current[k];
@@ -3178,6 +3188,7 @@ export class CodexHoloStageComponent implements DetailSlotSource {
   private fmtMetric(m: HoloMetric, v: number, unit: boolean): string {
     if (m.id === 'coolingLoad') return unit ? `${formatNumber(Math.round(v))} %` : formatNumber(Math.round(v));
     if (m.id === 'ore' || m.id === 'salvageScu') return unit ? `${formatNumber(v)} SCU` : formatNumber(v);
+    if (m.id === 'mass') return tonnes(v, unit);
     const format: StatFormat = METRIC_FORMAT[m.id] ?? this.allKpiCells().find((c) => c.key === m.id)?.format ?? 'dec';
     const stat = { labelKey: m.labelKey, value: v, format };
     return unit ? formatEquippedStat(stat) : formatEquippedStatNumber(stat);
@@ -3206,8 +3217,9 @@ export class CodexHoloStageComponent implements DetailSlotSource {
     for (const sec of this.allSections()) {
       if (sec.section !== 'weapons' && sec.section !== 'remoteTurrets' && sec.section !== 'mannedTurrets') continue;
       for (const slot of sec.slots) {
-        const held = (slot.children ?? []).filter((c) => !!c.className && c.kind === 'weapon' && !tools.has(c.className));
-        if (held.length > 0) {
+        // A mount (gimbal, turret) is no gun: what it carries is. A mount without a carried gun has no figure of its own.
+        const held = (slot.children ?? []).filter((c) => !!c.className && c.kind !== 'item' && !tools.has(c.className));
+        if ((slot.children ?? []).some((c) => !!c.className)) {
           for (const c of held) {
             for (let i = 0; i < Math.max(1, c.count); i++) {
               guns.push({ className: c.className!, name: this.nameOf(c.className!), port: `${slot.port} · ${c.port}`, value: gunValue(off, c.className!) });
@@ -3231,11 +3243,11 @@ export class CodexHoloStageComponent implements DetailSlotSource {
         key: 'gun:' + g.className,
         labelKey: null,
         label: `${g.count} × ${g.name}`,
-        value: g.total != null ? dpsFmt(g.total, true) : '—',
+        value: g.total != null ? dpsFmt(g.total, true) : '',
         cmp,
         deltaText: cmp?.delta != null ? (cmp.delta > 0 ? '+' : '−') + dpsFmt(Math.abs(cmp.delta), false) : null,
         savedText: null,
-        ports: g.count > 1 ? g.ports.map((p) => ({ label: p.port, value: p.value != null ? dpsFmt(p.value, true) : '—' })) : undefined,
+        ports: g.count > 1 ? g.ports.map((p) => ({ label: p.port, value: p.value != null ? dpsFmt(p.value, true) : '' })) : undefined,
       };
     });
     const missileRows: HoloColumnRow[] = (off?.missileRows ?? []).map((r) => ({
@@ -3281,10 +3293,11 @@ export class CodexHoloStageComponent implements DetailSlotSource {
       pick(keys).filter((r) => r.value != null).map((r) => ({ key: r.labelKey, labelKey: r.labelKey, value: r.value!, cmp: null, deltaText: null, savedText: null }));
     const factGaps = (keys: readonly string[]): HoloColumnGap[] =>
       pick(keys).filter((r) => r.value == null && !!r.gapKey).map((r) => ({ labelKey: r.labelKey, reasonKey: r.gapKey! }));
+    const hullMass = (this.detail().payload as ShipPayload | null)?.hull?.mass ?? null;
     const movement: HoloColumnGroup[] = [
       { topic: 'rates', rows: factRows(RATE_FACTS) },
       { topic: 'quantum', rows: factRows(TANK_FACTS) },
-      { topic: 'mass', rows: factRows(['codex.hull.hullMass']) },
+      { topic: 'mass', rows: hullMass != null && hullMass > 0 ? [{ key: 'hullMass', labelKey: 'codex.hull.hullMass', value: tonnes(hullMass, true), cmp: null, deltaText: null, savedText: null }] : [] },
     ];
     const coolant = this.signatureSides().current?.coolant ?? null;
     const signature: HoloColumnGroup[] = [
