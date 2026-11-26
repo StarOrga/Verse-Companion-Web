@@ -3215,7 +3215,7 @@ export class CodexHoloStageComponent implements DetailSlotSource {
 
   private fmtMetric(m: HoloMetric, v: number, unit: boolean): string {
     if (m.id === 'coolingLoad') return unit ? `${formatNumber(Math.round(v))} %` : formatNumber(Math.round(v));
-    if (m.id === 'ore' || m.id === 'salvageScu') return unit ? `${formatNumber(v)} SCU` : formatNumber(v);
+    if (m.id === 'cargo' || m.id === 'ore' || m.id === 'salvageScu') return unit ? `${formatNumber(v)} SCU` : formatNumber(v);
     if (m.id === 'mass') return tonnes(v, unit);
     const format: StatFormat = METRIC_FORMAT[m.id] ?? this.allKpiCells().find((c) => c.key === m.id)?.format ?? 'dec';
     const stat = { labelKey: m.labelKey, value: v, format };

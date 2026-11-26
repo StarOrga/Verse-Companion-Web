@@ -65,7 +65,7 @@ export interface HoloPerspectiveView {
           @if (col.focus) { <span class="sc-sr-only">{{ 'codex.holo.col.focusSr' | translate }}</span> }
           @if (col.quiet) { <span class="sc-sr-only">{{ 'codex.holo.col.quietSr' | translate }}</span> }
         </div>
-        <ol class="vlist">
+        <ol class="vlist" [class.calm]="calm(col)">
           @for (row of col.rows; track row.key; let first = $first) {
             <ng-container *ngTemplateOutlet="rowTpl; context: { $implicit: row, first: first, col: col.id }" />
           }
@@ -176,6 +176,9 @@ export interface HoloPerspectiveView {
     .vr.first .v { font-size: 18px; }
     .vr.port .k { padding-inline-start: 12px; color: var(--sc-fg-2); }
     .vr.port .v { font-size: max(13px, var(--f)); color: var(--sc-fg-1); }
+    /* A column with no comparison anywhere (factory loadout) gives the bar and delta lanes back to the labels, so they stay on one line at 1280. */
+    .vlist.calm .vr { grid-template-columns: minmax(min-content, 1fr) minmax(0, max-content); }
+    .vlist.calm .vr .dv, .vlist.calm .vr .dd { display: none; }
     .pk { background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; text-align: start; }
     .pk:hover, .pk[aria-expanded="true"] { color: var(--sc-accent); }
     .pk:focus-visible, .gaps:focus-visible, .tick:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: var(--holo-r-xs); }
@@ -272,6 +275,12 @@ export class CodexHoloPerspectivesComponent {
     const opening = !this.allOpen();
     this.openCols.set(opening ? new Set(this.columns().map((c) => c.id)) : new Set());
     if (opening) this.analytics.track('codex:perspective_detail_open', { perspective: 'all', mission: this.missionId() });
+  }
+
+  /** No row of this column (shown or in "Alle Werte") differs from Werk or carries a saved tick. */
+  calm(col: HoloColumnView): boolean {
+    const quiet = (r: HoloColumnRow) => !r.cmp;
+    return col.rows.every(quiet) && (!this.isOpen(col.id) || col.groups.every((g) => g.rows.every(quiet)));
   }
 
   isOpen(id: Perspective): boolean {
