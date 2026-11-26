@@ -9,6 +9,9 @@ import { resolveIcons } from './search-cta';
 import { CodexService } from '../codex.service';
 import { CodexCategoryIconComponent } from '../codex-category-icon.component';
 import { ShipBlueprintIconComponent } from '../ship-blueprint/ship-blueprint-icon.component';
+import { FallbackImageComponent } from '../fallback-image.component';
+import { UpcomingShipsService, thumbnailCandidates } from '../upcoming-ships.service';
+import { hitThumbCandidates, type SearchHitArtSource } from './search-hit-thumbs';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import { PolySearchHit, isUpcomingHit, polyHitIconKind } from '../codex-poly-search';
 import { CodexSearchEngine } from './codex-search-engine';
@@ -29,7 +32,7 @@ import { SearchOption, SearchVariantLink, VARIANT_LINKS_SHOWN, hitManufacturer, 
 @Component({
   selector: 'sc-codex-search-results',
   standalone: true,
-  imports: [CompareIconComponent, ItemPathComponent, NgTemplateOutlet, RouterLink, TranslatePipe, CodexCategoryIconComponent, ShipBlueprintIconComponent, ScTooltipDirective],
+  imports: [CompareIconComponent, ItemPathComponent, NgTemplateOutlet, RouterLink, TranslatePipe, CodexCategoryIconComponent, ShipBlueprintIconComponent, FallbackImageComponent, ScTooltipDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @let e = engine();
@@ -212,14 +215,27 @@ import { SearchOption, SearchVariantLink, VARIANT_LINKS_SHOWN, hitManufacturer, 
       }
     </ng-template>
 
+    <ng-template #hitGlyph let-hit>
+      @if (hit.kind === 'ship') {
+        <sc-ship-blueprint-icon [shipId]="hit.classNameSlug">
+          <sc-codex-icon [kind]="iconKind(hit)" />
+        </sc-ship-blueprint-icon>
+      } @else {
+        <sc-codex-icon [kind]="iconKind(hit)" />
+      }
+    </ng-template>
+
     <ng-template #hitBody let-o let-here="here">
-          <span class="icon" aria-hidden="true">
-            @if (o.hit.kind === 'ship') {
-              <sc-ship-blueprint-icon [shipId]="o.hit.classNameSlug">
-                <sc-codex-icon [kind]="iconKind(o.hit)" />
-              </sc-ship-blueprint-icon>
+          <!-- The real, coloured picture of the hull when RSI has one (#402); the blueprint / category icon
+               otherwise, and again when every candidate fails to load. -->
+          @let art = thumbs(o.hit);
+          <span class="icon" [class.art]="art.length > 0" aria-hidden="true">
+            @if (art.length) {
+              <sc-fallback-image [candidates]="art" [alt]="title(o.hit)" [width]="thumbW" [height]="thumbH">
+                <ng-container *ngTemplateOutlet="hitGlyph; context: { $implicit: o.hit }" />
+              </sc-fallback-image>
             } @else {
-              <sc-codex-icon [kind]="iconKind(o.hit)" />
+              <ng-container *ngTemplateOutlet="hitGlyph; context: { $implicit: o.hit }" />
             }
           </span>
           <span class="body">
@@ -292,6 +308,13 @@ import { SearchOption, SearchVariantLink, VARIANT_LINKS_SHOWN, hitManufacturer, 
     .hit:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
     .icon { flex: 0 0 auto; display: inline-flex; width: 30px; height: 30px; align-items: center; justify-content: center; color: var(--tone, var(--sc-accent)); }
     .icon:has(sc-ship-blueprint-art) { width: 44px; }
+    /* ds-new: a colour thumbnail of the hull in a result row (#402) - StarUI's list row has no media slot.
+       Same 44px lane as the blueprint icon, a fixed box (no shift when the file arrives), radius on the scale;
+       sizing reaches the <img> inside sc-fallback-image through its custom properties. */
+    .icon.art {
+      width: 44px; height: 30px; border-radius: 4px; overflow: hidden;
+      --sc-img-w: 100%; --sc-img-h: 100%; --sc-img-fit: cover; --sc-img-shadow: none;
+    }
     .body { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
     /* Two lines before an ellipsis: "Aegis Gladius Thruster Main" and its
        siblings differ at the END of the name, which one line cut off. */
@@ -417,6 +440,7 @@ import { SearchOption, SearchVariantLink, VARIANT_LINKS_SHOWN, hitManufacturer, 
     }
     .roomy .icon { width: 34px; height: 34px; }
     .roomy .icon:has(sc-ship-blueprint-art) { width: 52px; }
+    .roomy .icon.art { width: 52px; height: 34px; }
 
     @media (pointer: coarse) {
       .hit, .more, .chip, .act, .head-action, .dym, .retry, .partial-retry { min-height: 48px; }
@@ -432,6 +456,23 @@ import { SearchOption, SearchVariantLink, VARIANT_LINKS_SHOWN, hitManufacturer, 
 })
 export class CodexSearchResultsComponent {
   readonly codex = inject(CodexService);
+  private readonly rsi = inject(UpcomingShipsService);
+
+  /** Intrinsic size of a row thumbnail (the dense overlay box; `.roomy` scales it in CSS). */
+  protected readonly thumbW = 44;
+  protected readonly thumbH = 30;
+
+  /**
+   * Reads the RSI feed the search itself loads (`CodexService.searchAll` asks it for announced ships), so
+   * rows never trigger a fetch of their own; the signal read re-renders them once the feed is there.
+   */
+  private readonly art: SearchHitArtSource = {
+    shipArt: (name) => this.rsi.artFor(name),
+    upcomingArt: (id) => {
+      const ship = this.rsi.shipById(id);
+      return ship ? thumbnailCandidates(ship) : [];
+    },
+  };
 
   readonly engine = input.required<CodexSearchEngine>();
   /** id of the listbox — the input's aria-controls. */
@@ -559,6 +600,11 @@ export class CodexSearchResultsComponent {
 
   mfr(hit: PolySearchHit): string | null {
     return hitManufacturer(hit, this.engine().lang());
+  }
+
+  /** Colour thumbnail candidates of a hit row; empty = the row keeps its icon. */
+  thumbs(hit: PolySearchHit): readonly string[] {
+    return hitThumbCandidates(hit, this.art);
   }
 
   iconKind(hit: PolySearchHit) {
