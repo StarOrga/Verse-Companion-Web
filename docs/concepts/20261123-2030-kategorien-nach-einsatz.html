@@ -2,7 +2,7 @@
      rewrites it on every tab switch. body overflow is set by that function,
      the inline style below is only the first-paint value. -->
 <!DOCTYPE html>
-<html lang="de" data-theme="dark" data-page-version="2026-11-23T19:22:14" data-template="design">
+<html lang="de" data-theme="dark" data-page-version="2026-11-23T19:22:14" data-template="free">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1280,15 +1280,23 @@ body.anno-hidden .upin-layer .upin:not([data-upin-fresh]), body.anno-hidden .des
    It takes every other engine-owned bit of chrome along too — the bottom
    status messages and tips (.jr-toast, .submitted-toast, .hk-nudge, the
    .upin-hint / .dpin-hint pin hints) and the corner indicators
-   (.screen-indicator, .recovered-notes-strip) — so the design itself is all
-   that is left. Kept on purpose: the eye, the device switch beside it
-   (.viewport-toggle) and the draft-offline strip (a data-loss warning). */
+   (.screen-indicator, .recovered-notes-strip), the review pill beside the
+   eye (.review-switch), the LIVE chip (.fidelity-chip), the past-round bar
+   (.frozen-bar) and its veil (#content-dimmer, still armed underneath) — so
+   the design itself is all that is left. An OPEN notes dock goes too: the eye
+   closes it and opens it again on the way back (calmDock(), § Panel Chrome —
+   feedback dock), so Space can still open it on purpose while all is hidden.
+   Kept on purpose: the eye, the device switch beside it (.viewport-toggle),
+   the draft-offline strip (a data-loss warning), and what the user opens
+   deliberately while all is hidden (☰ panel, ? sheet, Alt key badges). */
 body.anno-hidden #design-quick, body.anno-hidden .design-switcher,
 body.anno-hidden .panel-fab, body.anno-hidden .feedback-fab,
 body.anno-hidden .jr-toast, body.anno-hidden .submitted-toast,
 body.anno-hidden .hk-nudge, body.anno-hidden .upin-hint,
 body.anno-hidden .dpin-hint, body.anno-hidden .screen-indicator,
-body.anno-hidden .recovered-notes-strip {
+body.anno-hidden .recovered-notes-strip, body.anno-hidden .review-switch,
+body.anno-hidden .fidelity-chip, body.anno-hidden .frozen-bar,
+body.anno-hidden #content-dimmer {
   opacity: 0 !important; visibility: hidden; pointer-events: none;
   transition: opacity 0.18s ease, visibility 0s linear 0.18s;
 }
@@ -1298,7 +1306,9 @@ body.anno-hidden .recovered-notes-strip {
   body.anno-hidden .jr-toast, body.anno-hidden .submitted-toast,
   body.anno-hidden .hk-nudge, body.anno-hidden .upin-hint,
   body.anno-hidden .dpin-hint, body.anno-hidden .screen-indicator,
-  body.anno-hidden .recovered-notes-strip { transition: none; }
+  body.anno-hidden .recovered-notes-strip, body.anno-hidden .review-switch,
+  body.anno-hidden .fidelity-chip, body.anno-hidden .frozen-bar,
+  body.anno-hidden #content-dimmer { transition: none; }
 }
 /* Eye = island control: filled, glow, no ring. The counter is the number of
    OPEN (unanswered) notes of the page; it hides at 0, the eye itself stays. */
@@ -5983,7 +5993,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
 }
 </style>
 </head>
-<body style="overflow: hidden">
+<body>
   <div class="concept-layout design fullscreen">
     <div class="concept-content">
       <header class="page-header" data-page-header>
@@ -9007,7 +9017,7 @@ Spalte   OFFENSIVE  1.180 Dauer-DPS · besser als 78 % · Burst-DPS 1.640 · Alp
 </section>
 </section>
 
-<section data-iteration="3" data-iteration-template="design" data-design-set="alternatives" data-fidelity="live" data-fidelity-note="Spaltenreihe, Leiste, Kopfband, Einsatz-Auswahl und Tokens aus dem Live-Code · Schriften angenähert · Zahlen Beispielwerte" data-fidelity-approx data-baked id="iter-3" data-active>
+<section data-iteration="3" data-iteration-template="design" data-design-set="alternatives" data-fidelity="live" data-fidelity-note="Spaltenreihe, Leiste, Kopfband, Einsatz-Auswahl und Tokens aus dem Live-Code · Schriften angenähert · Zahlen Beispielwerte" data-fidelity-approx data-baked id="iter-3" hidden>
   <script type="application/json" data-frozen-feedback>{"general":{"attachments":[],"text":""},"designs":{},"screens":{},"views":{},"favorite":"d1","fidelity":"live"}</script>
 <style>
 /* Round 3 mock CSS: page frame, baseline switch, disabled Einsatz rows and the three row comparisons. Live rules come from assets/03/holo-row.css. */
@@ -9320,7 +9330,7 @@ Spalte   OFFENSIVE  1.180 Dauer-DPS · besser als 78 % · Burst-DPS 1.640 · Alp
             <span class="anno-bubble-question">Unveränderte Zeilen zeigen nur den Mittelstrich: ruhig genug, oder soll auch er ganz weg?</span>
           </button>
           <div class="anno-bubble-body">
-            <textarea class="anno-answer" data-comment="anno-r3-d1-s1-a1" data-annotation="r3-d1-s1-a1" data-attachable placeholder="Deine Antwort…"></textarea>
+            <textarea class="anno-answer" data-comment="anno-r3-d1-s1-a1" data-annotation="r3-d1-s1-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea>
             <div class="attach-slot" data-attach-slot="anno-r3-d1-s1-a1"></div>
           </div>
         </div>
@@ -9332,7 +9342,7 @@ Spalte   OFFENSIVE  1.180 Dauer-DPS · besser als 78 % · Burst-DPS 1.640 · Alp
             <span class="anno-bubble-question">„Vergleich: Werk | Gespeichert“ über der Spaltenreihe: richtiger Platz, oder lieber im Kopfband neben „Standard-Loadout“?</span>
           </button>
           <div class="anno-bubble-body">
-            <textarea class="anno-answer" data-comment="anno-r3-d1-s1-a2" data-annotation="r3-d1-s1-a2" data-attachable placeholder="Deine Antwort…">Ja, wobei immer gepsichert immer vorranigg ausgewählt. Bzw. ne, implizit soll das sein, nänlich in den balken markiert ggü. werk imemr ! </textarea>
+            <textarea class="anno-answer" data-comment="anno-r3-d1-s1-a2" data-annotation="r3-d1-s1-a2" data-attachable placeholder="Deine Antwort…" readonly>Ja, wobei immer gepsichert immer vorranigg ausgewählt. Bzw. ne, implizit soll das sein, nänlich in den balken markiert ggü. werk imemr ! </textarea>
             <div class="attach-slot" data-attach-slot="anno-r3-d1-s1-a2"></div>
           </div>
         </div>
@@ -9344,7 +9354,7 @@ Spalte   OFFENSIVE  1.180 Dauer-DPS · besser als 78 % · Burst-DPS 1.640 · Alp
             <span class="anno-bubble-question">Nicht passende Einsätze grau mit Grund in der Zeile: klar genug, oder Grund erst beim Darüberfahren?</span>
           </button>
           <div class="anno-bubble-body">
-            <textarea class="anno-answer" data-comment="anno-r3-d1-s1-a3" data-annotation="r3-d1-s1-a3" data-attachable placeholder="Deine Antwort…">klar genug, aber die aktiven zu wenig offensichtlich ! </textarea>
+            <textarea class="anno-answer" data-comment="anno-r3-d1-s1-a3" data-annotation="r3-d1-s1-a3" data-attachable placeholder="Deine Antwort…" readonly>klar genug, aber die aktiven zu wenig offensichtlich ! </textarea>
             <div class="attach-slot" data-attach-slot="anno-r3-d1-s1-a3"></div>
           </div>
         </div>
@@ -9392,7 +9402,7 @@ Spalte   OFFENSIVE  1.180 Dauer-DPS · besser als 78 % · Burst-DPS 1.640 · Alp
             <span class="anno-bubble-question">Balken nach rechts = besser, nach links = schlechter: liest du die Richtung ohne Legende?</span>
           </button>
           <div class="anno-bubble-body">
-            <textarea class="anno-answer" data-comment="anno-r3-d1-s2-a1" data-annotation="r3-d1-s2-a1" data-attachable placeholder="Deine Antwort…"></textarea>
+            <textarea class="anno-answer" data-comment="anno-r3-d1-s2-a1" data-annotation="r3-d1-s2-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea>
             <div class="attach-slot" data-attach-slot="anno-r3-d1-s2-a1"></div>
           </div>
         </div>
@@ -9404,7 +9414,7 @@ Spalte   OFFENSIVE  1.180 Dauer-DPS · besser als 78 % · Burst-DPS 1.640 · Alp
             <span class="anno-bubble-question">Änderung als Zahl („+700“) oder als Prozent („+11 %“)?</span>
           </button>
           <div class="anno-bubble-body">
-            <textarea class="anno-answer" data-comment="anno-r3-d1-s2-a2" data-annotation="r3-d1-s2-a2" data-attachable placeholder="Deine Antwort…"></textarea>
+            <textarea class="anno-answer" data-comment="anno-r3-d1-s2-a2" data-annotation="r3-d1-s2-a2" data-attachable placeholder="Deine Antwort…" readonly></textarea>
             <div class="attach-slot" data-attach-slot="anno-r3-d1-s2-a2"></div>
           </div>
         </div>
@@ -9416,7 +9426,7 @@ Spalte   OFFENSIVE  1.180 Dauer-DPS · besser als 78 % · Burst-DPS 1.640 · Alp
             <span class="anno-bubble-question">IR wächst um 700 m, der Balken zeigt nach links (schlechter): passt das zusammen mit dem Plus?</span>
           </button>
           <div class="anno-bubble-body">
-            <textarea class="anno-answer" data-comment="anno-r3-d1-s2-a3" data-annotation="r3-d1-s2-a3" data-attachable placeholder="Deine Antwort…"></textarea>
+            <textarea class="anno-answer" data-comment="anno-r3-d1-s2-a3" data-annotation="r3-d1-s2-a3" data-attachable placeholder="Deine Antwort…" readonly></textarea>
             <div class="attach-slot" data-attach-slot="anno-r3-d1-s2-a3"></div>
           </div>
         </div>
@@ -9464,7 +9474,7 @@ Spalte   OFFENSIVE  1.180 Dauer-DPS · besser als 78 % · Burst-DPS 1.640 · Alp
             <span class="anno-bubble-question">Basis „Gespeichert“ = dein Exemplar „Frachtlauf“: reicht das Wort, oder soll der Name dort stehen?</span>
           </button>
           <div class="anno-bubble-body">
-            <textarea class="anno-answer" data-comment="anno-r3-d1-s3-a1" data-annotation="r3-d1-s3-a1" data-attachable placeholder="Deine Antwort…"></textarea>
+            <textarea class="anno-answer" data-comment="anno-r3-d1-s3-a1" data-annotation="r3-d1-s3-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea>
             <div class="attach-slot" data-attach-slot="anno-r3-d1-s3-a1"></div>
           </div>
         </div>
@@ -9512,7 +9522,7 @@ Spalte   OFFENSIVE  1.180 Dauer-DPS · besser als 78 % · Burst-DPS 1.640 · Alp
             <span class="anno-bubble-question">Getauschte Waffe als eine Zeile mit „statt …“ darunter: verständlich?</span>
           </button>
           <div class="anno-bubble-body">
-            <textarea class="anno-answer" data-comment="anno-r3-d1-s4-a1" data-annotation="r3-d1-s4-a1" data-attachable placeholder="Deine Antwort…"></textarea>
+            <textarea class="anno-answer" data-comment="anno-r3-d1-s4-a1" data-annotation="r3-d1-s4-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea>
             <div class="attach-slot" data-attach-slot="anno-r3-d1-s4-a1"></div>
           </div>
         </div>
@@ -9743,7 +9753,7 @@ Spalte   OFFENSIVE  1.180 Dauer-DPS · besser als 78 % · Burst-DPS 1.640 · Alp
             <span class="anno-bubble-question">Ohne Änderung steht nur der Wert, kein Hinweis auf den Vergleich: fehlt dir dort etwas?</span>
           </button>
           <div class="anno-bubble-body">
-            <textarea class="anno-answer" data-comment="anno-r3-d2-s1-a1" data-annotation="r3-d2-s1-a1" data-attachable placeholder="Deine Antwort…"></textarea>
+            <textarea class="anno-answer" data-comment="anno-r3-d2-s1-a1" data-annotation="r3-d2-s1-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea>
             <div class="attach-slot" data-attach-slot="anno-r3-d2-s1-a1"></div>
           </div>
         </div>
@@ -9791,7 +9801,7 @@ Spalte   OFFENSIVE  1.180 Dauer-DPS · besser als 78 % · Burst-DPS 1.640 · Alp
             <span class="anno-bubble-question">Alter Wert durchgestrichen neben dem neuen: hilfreich, oder zu viel Text in einer Zeile?</span>
           </button>
           <div class="anno-bubble-body">
-            <textarea class="anno-answer" data-comment="anno-r3-d2-s2-a1" data-annotation="r3-d2-s2-a1" data-attachable placeholder="Deine Antwort…"></textarea>
+            <textarea class="anno-answer" data-comment="anno-r3-d2-s2-a1" data-annotation="r3-d2-s2-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea>
             <div class="attach-slot" data-attach-slot="anno-r3-d2-s2-a1"></div>
           </div>
         </div>
@@ -9803,7 +9813,7 @@ Spalte   OFFENSIVE  1.180 Dauer-DPS · besser als 78 % · Burst-DPS 1.640 · Alp
             <span class="anno-bubble-question">Chip als Zahl („+130“) oder als Prozent („+11 %“)?</span>
           </button>
           <div class="anno-bubble-body">
-            <textarea class="anno-answer" data-comment="anno-r3-d2-s2-a2" data-annotation="r3-d2-s2-a2" data-attachable placeholder="Deine Antwort…"></textarea>
+            <textarea class="anno-answer" data-comment="anno-r3-d2-s2-a2" data-annotation="r3-d2-s2-a2" data-attachable placeholder="Deine Antwort…" readonly></textarea>
             <div class="attach-slot" data-attach-slot="anno-r3-d2-s2-a2"></div>
           </div>
         </div>
@@ -9851,7 +9861,7 @@ Spalte   OFFENSIVE  1.180 Dauer-DPS · besser als 78 % · Burst-DPS 1.640 · Alp
             <span class="anno-bubble-question">Gegen „Gespeichert“ zeigt der Chip nur, was seit dem Speichern geändert ist: so erwartet?</span>
           </button>
           <div class="anno-bubble-body">
-            <textarea class="anno-answer" data-comment="anno-r3-d2-s3-a1" data-annotation="r3-d2-s3-a1" data-attachable placeholder="Deine Antwort…"></textarea>
+            <textarea class="anno-answer" data-comment="anno-r3-d2-s3-a1" data-annotation="r3-d2-s3-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea>
             <div class="attach-slot" data-attach-slot="anno-r3-d2-s3-a1"></div>
           </div>
         </div>
@@ -9899,7 +9909,7 @@ Spalte   OFFENSIVE  1.180 Dauer-DPS · besser als 78 % · Burst-DPS 1.640 · Alp
             <span class="anno-bubble-question">In der langen Liste: findest du die geänderten Zeilen an den Chips schnell genug?</span>
           </button>
           <div class="anno-bubble-body">
-            <textarea class="anno-answer" data-comment="anno-r3-d2-s4-a1" data-annotation="r3-d2-s4-a1" data-attachable placeholder="Deine Antwort…"></textarea>
+            <textarea class="anno-answer" data-comment="anno-r3-d2-s4-a1" data-annotation="r3-d2-s4-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea>
             <div class="attach-slot" data-attach-slot="anno-r3-d2-s4-a1"></div>
           </div>
         </div>
@@ -10130,7 +10140,7 @@ Spalte   OFFENSIVE  1.180 Dauer-DPS · besser als 78 % · Burst-DPS 1.640 · Alp
             <span class="anno-bubble-question">Die Marke steht in der Spanne der leichten Jäger: stört das, wo der Rang hier egal sein soll?</span>
           </button>
           <div class="anno-bubble-body">
-            <textarea class="anno-answer" data-comment="anno-r3-d3-s1-a1" data-annotation="r3-d3-s1-a1" data-attachable placeholder="Deine Antwort…"></textarea>
+            <textarea class="anno-answer" data-comment="anno-r3-d3-s1-a1" data-annotation="r3-d3-s1-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea>
             <div class="attach-slot" data-attach-slot="anno-r3-d3-s1-a1"></div>
           </div>
         </div>
@@ -10178,7 +10188,7 @@ Spalte   OFFENSIVE  1.180 Dauer-DPS · besser als 78 % · Burst-DPS 1.640 · Alp
             <span class="anno-bubble-question">Hohle Marke = Basis, volle = jetzt: liest du die Lücke sofort als Änderung?</span>
           </button>
           <div class="anno-bubble-body">
-            <textarea class="anno-answer" data-comment="anno-r3-d3-s2-a1" data-annotation="r3-d3-s2-a1" data-attachable placeholder="Deine Antwort…"></textarea>
+            <textarea class="anno-answer" data-comment="anno-r3-d3-s2-a1" data-annotation="r3-d3-s2-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea>
             <div class="attach-slot" data-attach-slot="anno-r3-d3-s2-a1"></div>
           </div>
         </div>
@@ -10190,7 +10200,7 @@ Spalte   OFFENSIVE  1.180 Dauer-DPS · besser als 78 % · Burst-DPS 1.640 · Alp
             <span class="anno-bubble-question">Ohne Zahl zur Änderung: reicht die Lücke, oder fehlt „+700“?</span>
           </button>
           <div class="anno-bubble-body">
-            <textarea class="anno-answer" data-comment="anno-r3-d3-s2-a2" data-annotation="r3-d3-s2-a2" data-attachable placeholder="Deine Antwort…"></textarea>
+            <textarea class="anno-answer" data-comment="anno-r3-d3-s2-a2" data-annotation="r3-d3-s2-a2" data-attachable placeholder="Deine Antwort…" readonly></textarea>
             <div class="attach-slot" data-attach-slot="anno-r3-d3-s2-a2"></div>
           </div>
         </div>
@@ -10238,7 +10248,7 @@ Spalte   OFFENSIVE  1.180 Dauer-DPS · besser als 78 % · Burst-DPS 1.640 · Alp
             <span class="anno-bubble-question">Bei kleinen Änderungen (EM +1.200 m) liegen die Marken fast aufeinander: reicht das?</span>
           </button>
           <div class="anno-bubble-body">
-            <textarea class="anno-answer" data-comment="anno-r3-d3-s3-a1" data-annotation="r3-d3-s3-a1" data-attachable placeholder="Deine Antwort…"></textarea>
+            <textarea class="anno-answer" data-comment="anno-r3-d3-s3-a1" data-annotation="r3-d3-s3-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea>
             <div class="attach-slot" data-attach-slot="anno-r3-d3-s3-a1"></div>
           </div>
         </div>
@@ -10312,27 +10322,27 @@ Spalte   OFFENSIVE  1.180 Dauer-DPS · besser als 78 % · Burst-DPS 1.640 · Alp
       <p data-stakes>Was nach dem Öffnen als Änderung markiert ist.</p>
       <div data-options>
         <label data-opt="saved" data-recommended>
-          <input type="radio" name="dm-r3-d-basis" value="saved" checked>
+          <input type="radio" name="dm-r3-d-basis" value="saved" checked disabled>
           <span data-opt-label>Gespeichert, sonst Werk</span>
           <span data-opt-consequence>Mit Exemplar im Hangar gilt dessen Stand; ein Gladius ohne Exemplar vergleicht mit dem Werk.</span>
         </label>
         <label data-opt="werk">
-          <input type="radio" name="dm-r3-d-basis" value="werk">
+          <input type="radio" name="dm-r3-d-basis" value="werk" disabled>
           <span data-opt-label>Immer Werk</span>
           <span data-opt-consequence>Jede Seite zeigt, wie weit das Schiff vom Werk abweicht, auch längst gespeicherte Tausche.</span>
         </label>
         <label data-opt="last">
-          <input type="radio" name="dm-r3-d-basis" value="last">
+          <input type="radio" name="dm-r3-d-basis" value="last" disabled>
           <span data-opt-label>Zuletzt gewählte Basis</span>
           <span data-opt-consequence>Wer einmal Werk wählt, vergleicht auch beim nächsten Schiff mit dem Werk.</span>
         </label>
       </div>
-      <textarea data-comment="r3-d-basis-note" placeholder="Notiz (optional)"></textarea>
-      <input type="hidden" name="dm-r3-d-basis-none" value="">
-      <input type="hidden" name="dm-r3-d-basis-hes" value="{&quot;ms&quot;:10508,&quot;revisits&quot;:0,&quot;median&quot;:16703}">
-      <input type="hidden" name="dm-r3-d-basis-touched" value="1">
-      <input type="hidden" name="dm-r3-d-basis-issue" value="">
-      <input type="hidden" name="dm-r3-d-basis-epic" value="">
+      <textarea data-comment="r3-d-basis-note" placeholder="Notiz (optional)" readonly></textarea>
+      <input type="hidden" name="dm-r3-d-basis-none" value="" disabled>
+      <input type="hidden" name="dm-r3-d-basis-hes" value="{&quot;ms&quot;:10508,&quot;revisits&quot;:0,&quot;median&quot;:16703}" disabled>
+      <input type="hidden" name="dm-r3-d-basis-touched" value="1" disabled>
+      <input type="hidden" name="dm-r3-d-basis-issue" value="" disabled>
+      <input type="hidden" name="dm-r3-d-basis-epic" value="" disabled>
       <div data-alevel="3" data-title="Basis beim Öffnen">
         <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Gegen das Werk erscheinen auch gespeicherte Tausche als Änderung."}'>Gegen das Werk erscheinen auch gespeicherte Tausche als Änderung.</div></div>
         <div data-slot="long">
@@ -10350,27 +10360,27 @@ Basis Gespeichert  C2 „Frachtlauf“ → Schild HP +3.700 · Schild-Regen −7
       <h3 data-question>Was zeigen die Zeilen, wenn das Loadout der Basis gleicht?</h3>
       <div data-options>
         <label data-opt="values" data-recommended>
-          <input type="radio" name="dm-r3-d-gleich" value="values" checked>
+          <input type="radio" name="dm-r3-d-gleich" value="values" checked disabled>
           <span data-opt-label>Nur die Werte, kein Vergleich</span>
           <span data-opt-consequence>Ein Gladius ab Werk sieht aus wie in Runde 2 ohne Rang; der erste Tausch bringt die Änderungen.</span>
         </label>
         <label data-opt="hint">
-          <input type="radio" name="dm-r3-d-gleich" value="hint">
+          <input type="radio" name="dm-r3-d-gleich" value="hint" disabled>
           <span data-opt-label>Leiser Hinweis „= Werk“ je Spalte</span>
           <span data-opt-consequence>Jede Spalte bestätigt, dass nichts abweicht; vier kurze Hinweise mehr im ersten Blick.</span>
         </label>
         <label data-opt="hide">
-          <input type="radio" name="dm-r3-d-gleich" value="hide">
+          <input type="radio" name="dm-r3-d-gleich" value="hide" disabled>
           <span data-opt-label>Vergleichsschalter erst ab dem ersten Tausch</span>
           <span data-opt-consequence>„Vergleich: Werk | Gespeichert“ fehlt ab Werk und erscheint, sobald ein Teil getauscht ist.</span>
         </label>
       </div>
-      <textarea data-comment="r3-d-gleich-note" placeholder="Notiz (optional)"></textarea>
-      <input type="hidden" name="dm-r3-d-gleich-none" value="">
-      <input type="hidden" name="dm-r3-d-gleich-hes" value="{&quot;ms&quot;:7543,&quot;revisits&quot;:0,&quot;median&quot;:16703}">
-      <input type="hidden" name="dm-r3-d-gleich-touched" value="1">
-      <input type="hidden" name="dm-r3-d-gleich-issue" value="">
-      <input type="hidden" name="dm-r3-d-gleich-epic" value="">
+      <textarea data-comment="r3-d-gleich-note" placeholder="Notiz (optional)" readonly></textarea>
+      <input type="hidden" name="dm-r3-d-gleich-none" value="" disabled>
+      <input type="hidden" name="dm-r3-d-gleich-hes" value="{&quot;ms&quot;:7543,&quot;revisits&quot;:0,&quot;median&quot;:16703}" disabled>
+      <input type="hidden" name="dm-r3-d-gleich-touched" value="1" disabled>
+      <input type="hidden" name="dm-r3-d-gleich-issue" value="" disabled>
+      <input type="hidden" name="dm-r3-d-gleich-epic" value="" disabled>
       <div data-alevel="3" data-title="Vergleich ohne Änderung">
         <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Ab Werk hat keine Zeile etwas zu vergleichen."}'>Ab Werk hat keine Zeile etwas zu vergleichen.</div></div>
         <div data-slot="long">
@@ -10388,22 +10398,22 @@ Getauscht   Gladius · OFFENSIVE  Dauer-DPS 1.310 (+130) · Burst-DPS 1.890 (+25
       <h3 data-question>Wie verhält sich der Patch-Vergleich zum Vergleich mit Werk oder Gespeichert?</h3>
       <div data-options>
         <label data-opt="third" data-recommended>
-          <input type="radio" name="dm-r3-d-patch" value="third">
+          <input type="radio" name="dm-r3-d-patch" value="third" disabled>
           <span data-opt-label>Patch wird dritte Basis</span>
           <span data-opt-consequence>„Vergleich: Werk | Gespeichert | 4.3.1“; jede Zeile zeigt immer nur einen Vergleich.</span>
         </label>
         <label data-opt="ghost">
-          <input type="radio" name="dm-r3-d-patch" value="ghost">
+          <input type="radio" name="dm-r3-d-patch" value="ghost" disabled>
           <span data-opt-label>Patch bleibt eigener Geisterwert</span>
           <span data-opt-consequence>Eine Zeile kann zwei Vergleiche tragen: zur Basis und zum alten Patch.</span>
         </label>
       </div>
-      <textarea data-comment="r3-d-patch-note" placeholder="Notiz (optional)">ne, patch ist nur üpber einordnujngzus sehen das reicht!</textarea>
-      <input type="hidden" name="dm-r3-d-patch-none" value="1">
-      <input type="hidden" name="dm-r3-d-patch-hes" value="{&quot;ms&quot;:25994,&quot;revisits&quot;:0,&quot;median&quot;:16703}">
-      <input type="hidden" name="dm-r3-d-patch-touched" value="1">
-      <input type="hidden" name="dm-r3-d-patch-issue" value="">
-      <input type="hidden" name="dm-r3-d-patch-epic" value="">
+      <textarea data-comment="r3-d-patch-note" placeholder="Notiz (optional)" readonly>ne, patch ist nur üpber einordnujngzus sehen das reicht!</textarea>
+      <input type="hidden" name="dm-r3-d-patch-none" value="1" disabled>
+      <input type="hidden" name="dm-r3-d-patch-hes" value="{&quot;ms&quot;:25994,&quot;revisits&quot;:0,&quot;median&quot;:16703}" disabled>
+      <input type="hidden" name="dm-r3-d-patch-touched" value="1" disabled>
+      <input type="hidden" name="dm-r3-d-patch-issue" value="" disabled>
+      <input type="hidden" name="dm-r3-d-patch-epic" value="" disabled>
       <div data-alevel="3" data-title="Patch-Vergleich">
         <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Patch-Geist und Basis wären zwei Vergleiche in einer Zeile."}'>Patch-Geist und Basis wären zwei Vergleiche in einer Zeile.</div></div>
         <div data-slot="long">
@@ -10429,22 +10439,22 @@ Ein Vergleich     Vergleich: Werk | Gespeichert | 4.3.1  →  Dauer-DPS 1.310  +
       <h3 data-question>Ist ein Einsatz wählbar, wenn die Ausstattung da ist, ihre Werte aber fehlen?</h3>
       <div data-options>
         <label data-opt="known" data-recommended>
-          <input type="radio" name="dm-r3-d-luecke" value="known">
+          <input type="radio" name="dm-r3-d-luecke" value="known" disabled>
           <span data-opt-label>Wählbar, Bekanntes plus Lückenhinweis</span>
           <span data-opt-consequence>Prospector · Bergbau: Arbor MH1 · S1, 32 SCU Erz, dazu „Laserleistung fehlt in den Spieldaten“.</span>
         </label>
         <label data-opt="locked">
-          <input type="radio" name="dm-r3-d-luecke" value="locked">
+          <input type="radio" name="dm-r3-d-luecke" value="locked" disabled>
           <span data-opt-label>Gesperrt, bis die Werte da sind</span>
           <span data-opt-consequence>Bergbau bleibt grau mit „Werte fehlen noch“, auch bei echten Bergbauschiffen.</span>
         </label>
       </div>
-      <textarea data-comment="r3-d-luecke-note" placeholder="Notiz (optional)">das sollte es niccht geben,da nn pass den uploader an, bis er alles davon hat! Ggf. haben aber einige schiffe nicht alles, weil sie einfach z. B. kein mining schiff sind oder m odular ggf. mining oder nicht</textarea>
-      <input type="hidden" name="dm-r3-d-luecke-none" value="1">
-      <input type="hidden" name="dm-r3-d-luecke-hes" value="{&quot;ms&quot;:54720,&quot;revisits&quot;:1,&quot;median&quot;:16703}">
-      <input type="hidden" name="dm-r3-d-luecke-touched" value="1">
-      <input type="hidden" name="dm-r3-d-luecke-issue" value="">
-      <input type="hidden" name="dm-r3-d-luecke-epic" value="">
+      <textarea data-comment="r3-d-luecke-note" placeholder="Notiz (optional)" readonly>das sollte es niccht geben,da nn pass den uploader an, bis er alles davon hat! Ggf. haben aber einige schiffe nicht alles, weil sie einfach z. B. kein mining schiff sind oder m odular ggf. mining oder nicht</textarea>
+      <input type="hidden" name="dm-r3-d-luecke-none" value="1" disabled>
+      <input type="hidden" name="dm-r3-d-luecke-hes" value="{&quot;ms&quot;:54720,&quot;revisits&quot;:1,&quot;median&quot;:16703}" disabled>
+      <input type="hidden" name="dm-r3-d-luecke-touched" value="1" disabled>
+      <input type="hidden" name="dm-r3-d-luecke-issue" value="" disabled>
+      <input type="hidden" name="dm-r3-d-luecke-epic" value="" disabled>
       <div data-alevel="3" data-title="Rolle ohne Daten">
         <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Bergbau und Bergung haben Ausstattung, aber keine Kernwerte."}'>Bergbau und Bergung haben Ausstattung, aber keine Kernwerte.</div></div>
         <div data-slot="long">
@@ -10463,27 +10473,27 @@ Gladius · Bergbau     nicht wählbar: Keine Bergbau-Hardpoints</pre></div>
       <p data-context>Aus Runde 2 übernommen; dort noch nicht angesehen.</p>
       <div data-options>
         <label data-opt="neutral" data-recommended>
-          <input type="radio" name="dm-r3-d-alles" value="neutral" checked>
+          <input type="radio" name="dm-r3-d-alles" value="neutral" checked disabled>
           <span data-opt-label>Fester neutraler Leitwert je Spalte</span>
           <span data-opt-consequence>Dauer-DPS, Schild HP, SCM, IR bei jedem Schiff; Vergleiche zwischen Schiffen bleiben direkt.</span>
         </label>
         <label data-opt="strong">
-          <input type="radio" name="dm-r3-d-alles" value="strong">
+          <input type="radio" name="dm-r3-d-alles" value="strong" disabled>
           <span data-opt-label>Stärkster Wert des Schiffs je Spalte</span>
           <span data-opt-consequence>Beim Gladius führt Bewegung mit Wendigkeit, bei der Hercules mit Fracht; je Schiff anders.</span>
         </label>
         <label data-opt="role">
-          <input type="radio" name="dm-r3-d-alles" value="role">
+          <input type="radio" name="dm-r3-d-alles" value="role" disabled>
           <span data-opt-label>Leitwerte der Schiffsrolle</span>
           <span data-opt-consequence>Ein Frachter zeigt schon bei „Alles“ Fracht; „Alles“ und Rolle werden fast gleich.</span>
         </label>
       </div>
-      <textarea data-comment="r3-d-alles-note" placeholder="Notiz (optional)"></textarea>
-      <input type="hidden" name="dm-r3-d-alles-none" value="">
-      <input type="hidden" name="dm-r3-d-alles-hes" value="{&quot;ms&quot;:10350,&quot;revisits&quot;:1,&quot;median&quot;:16703}">
-      <input type="hidden" name="dm-r3-d-alles-touched" value="1">
-      <input type="hidden" name="dm-r3-d-alles-issue" value="">
-      <input type="hidden" name="dm-r3-d-alles-epic" value="">
+      <textarea data-comment="r3-d-alles-note" placeholder="Notiz (optional)" readonly></textarea>
+      <input type="hidden" name="dm-r3-d-alles-none" value="" disabled>
+      <input type="hidden" name="dm-r3-d-alles-hes" value="{&quot;ms&quot;:10350,&quot;revisits&quot;:1,&quot;median&quot;:16703}" disabled>
+      <input type="hidden" name="dm-r3-d-alles-touched" value="1" disabled>
+      <input type="hidden" name="dm-r3-d-alles-issue" value="" disabled>
+      <input type="hidden" name="dm-r3-d-alles-epic" value="" disabled>
       <div data-alevel="3" data-title="Leitwerte bei „Alles“">
         <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Bei „Alles“ fehlt eine Regel, welcher Wert je Spalte führt."}'>Bei „Alles“ fehlt eine Regel, welcher Wert je Spalte führt.</div></div>
         <div data-slot="long">
@@ -10502,28 +10512,28 @@ Danach  „Alles“ · Gladius → Offensive 1.180 Dauer-DPS · Verteidigung 4.3
       <p data-context>Aus Runde 2 übernommen; Korrekturen einzelner Zellen ins Feld „Was stimmt nicht?“.</p>
       <div data-options>
         <label data-opt="ok" data-recommended>
-          <input type="radio" name="dm-r3-d-leitwert" value="ok" checked>
+          <input type="radio" name="dm-r3-d-leitwert" value="ok" checked disabled>
           <span data-opt-label>Stimmt</span>
           <span data-opt-consequence>Diese Tabelle wird die Vorgabe für Leitwerte, Fokus und leise Spalten.</span>
         </label>
         <label data-opt="partial">
-          <input type="radio" name="dm-r3-d-leitwert" value="partial">
+          <input type="radio" name="dm-r3-d-leitwert" value="partial" disabled>
           <span data-opt-label>Teilweise</span>
           <span data-opt-consequence>Ich korrigiere einzelne Zellen im Feld darunter.</span>
         </label>
         <label data-opt="wrong">
-          <input type="radio" name="dm-r3-d-leitwert" value="wrong">
+          <input type="radio" name="dm-r3-d-leitwert" value="wrong" disabled>
           <span data-opt-label>Stimmt nicht</span>
           <span data-opt-consequence>Die Zuordnung muss neu gedacht werden.</span>
         </label>
       </div>
-      <input type="text" name="dm-r3-d-leitwert-fix" value="" placeholder="Was stimmt nicht?">
-      <textarea data-comment="r3-d-leitwert-note" placeholder="Notiz (optional)"></textarea>
-      <input type="hidden" name="dm-r3-d-leitwert-none" value="">
-      <input type="hidden" name="dm-r3-d-leitwert-hes" value="{&quot;ms&quot;:16703,&quot;revisits&quot;:0,&quot;median&quot;:16703}">
-      <input type="hidden" name="dm-r3-d-leitwert-touched" value="1">
-      <input type="hidden" name="dm-r3-d-leitwert-issue" value="">
-      <input type="hidden" name="dm-r3-d-leitwert-epic" value="">
+      <input type="text" name="dm-r3-d-leitwert-fix" value="" placeholder="Was stimmt nicht?" readonly disabled>
+      <textarea data-comment="r3-d-leitwert-note" placeholder="Notiz (optional)" readonly></textarea>
+      <input type="hidden" name="dm-r3-d-leitwert-none" value="" disabled>
+      <input type="hidden" name="dm-r3-d-leitwert-hes" value="{&quot;ms&quot;:16703,&quot;revisits&quot;:0,&quot;median&quot;:16703}" disabled>
+      <input type="hidden" name="dm-r3-d-leitwert-touched" value="1" disabled>
+      <input type="hidden" name="dm-r3-d-leitwert-issue" value="" disabled>
+      <input type="hidden" name="dm-r3-d-leitwert-epic" value="" disabled>
       <div data-alevel="3" data-title="Leitwert je Einsatz">
         <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Je Einsatz ein Leitwert pro Spalte, dazu welche Spalten führen."}'>Je Einsatz ein Leitwert pro Spalte, dazu welche Spalten führen.</div></div>
         <div data-slot="long">
@@ -10549,27 +10559,27 @@ Transport · C2   → Verteidigung 62.000 Rumpf HP ★ · Bewegung 696 SCU Frach
       <p data-context>Aus Runde 2 übernommen; dort noch nicht angesehen.</p>
       <div data-options>
         <label data-opt="offensive" data-recommended>
-          <input type="radio" name="dm-r3-d-werkzeug" value="offensive" checked>
+          <input type="radio" name="dm-r3-d-werkzeug" value="offensive" checked disabled>
           <span data-opt-label>In der Offensive statt „keine Waffen“</span>
           <span data-opt-consequence>Prospector: Offensive zeigt Arbor MH1 · S1; Schiffe mit Waffen und Laser zeigen beides untereinander.</span>
         </label>
         <label data-opt="signature">
-          <input type="radio" name="dm-r3-d-werkzeug" value="signature">
+          <input type="radio" name="dm-r3-d-werkzeug" value="signature" disabled>
           <span data-opt-label>In Signatur &amp; Kühlung neben der Kühllast</span>
           <span data-opt-consequence>Laser und Hitze stehen zusammen; Offensive bleibt bei „keine Waffen“.</span>
         </label>
         <label data-opt="detail">
-          <input type="radio" name="dm-r3-d-werkzeug" value="detail">
+          <input type="radio" name="dm-r3-d-werkzeug" value="detail" disabled>
           <span data-opt-label>Nur in „Alle Werte“</span>
           <span data-opt-consequence>Der erste Blick zeigt kein Werkzeug; wer es sucht, klappt auf.</span>
         </label>
       </div>
-      <textarea data-comment="r3-d-werkzeug-note" placeholder="Notiz (optional)"></textarea>
-      <input type="hidden" name="dm-r3-d-werkzeug-none" value="">
-      <input type="hidden" name="dm-r3-d-werkzeug-hes" value="{&quot;ms&quot;:106808,&quot;revisits&quot;:7,&quot;median&quot;:16703}">
-      <input type="hidden" name="dm-r3-d-werkzeug-touched" value="1">
-      <input type="hidden" name="dm-r3-d-werkzeug-issue" value="">
-      <input type="hidden" name="dm-r3-d-werkzeug-epic" value="">
+      <textarea data-comment="r3-d-werkzeug-note" placeholder="Notiz (optional)" readonly></textarea>
+      <input type="hidden" name="dm-r3-d-werkzeug-none" value="" disabled>
+      <input type="hidden" name="dm-r3-d-werkzeug-hes" value="{&quot;ms&quot;:106808,&quot;revisits&quot;:7,&quot;median&quot;:16703}" disabled>
+      <input type="hidden" name="dm-r3-d-werkzeug-touched" value="1" disabled>
+      <input type="hidden" name="dm-r3-d-werkzeug-issue" value="" disabled>
+      <input type="hidden" name="dm-r3-d-werkzeug-epic" value="" disabled>
       <div data-alevel="3" data-title="Platz des Werkzeugs">
         <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Die Offensive der Prospector bleibt leer, ihr Laser steht nirgends."}'>Die Offensive der Prospector bleibt leer, ihr Laser steht nirgends.</div></div>
         <div data-slot="long">
@@ -10581,6 +10591,117 @@ Danach  Prospector · OFFENSIVE Arbor MH1 · S1 Bergbaulaser · Leistung fehlt i
     </section>
   </section>
 </section>
+</section>
+
+<section id="iter-4" data-iteration="4" data-iteration-template="free" data-final-report data-active>
+  <p class="fr-sentence">Die vier Spalten zeigen jetzt je Einsatz die passenden Werte und vergleichen jede Zeile mit dem Werkszustand, statt Ränge zu zeigen.</p>
+
+  <div class="fr-main">
+    <div class="fr-results">
+      <p class="fr-label">Was kam raus</p>
+      <ul class="fr-wins">
+        <li><span class="fr-win-icon" aria-hidden="true">🎯</span><span>Jeder Einsatz bringt <b>seine Werte nach oben</b>, etwa Fracht beim C2.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">↔️</span><span>Ein Balken zeigt <b>besser oder schlechter als ab Werk</b>, Gespeichertes als Marke.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">🚫</span><span>Einsätze ohne Ausstattung sind <b>gesperrt, mit Grund</b>.</span></li>
+      </ul>
+      <a class="fr-try" href="http://127.0.0.1:4200/codex/ship/CRUS_Starlifter_C2?view=holo" target="_blank" rel="noopener noreferrer">▶ Selbst ausprobieren</a>
+      <p class="fr-try-auth">🔑 Mit deinem Konto; vorher im Worktree <code>npm start</code> starten</p>
+    </div>
+    <div class="fr-ba" data-label-before="Vorher" data-label-after="Nachher">
+      <figure class="fr-shot"><img src="20261123-2030-kategorien-nach-einsatz/assets/04/before.png" alt=""><figcaption>Ränge und alte Analyse-Panels</figcaption></figure>
+      <figure class="fr-shot"><img src="20261123-2030-kategorien-nach-einsatz/assets/04/after.png" alt=""><figcaption>C2 auf Transport, „Alle Werte“ offen</figcaption></figure>
+    </div>
+  </div>
+
+  <div class="fr-holds">
+    <p class="fr-label">Was es aushält<small>Balken = wie weit die Anforderung erfüllt ist</small></p>
+    <div class="fr-meters">
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="3192 Codex-Tests und 27 Uploader-Tests grün, keine Konsolenfehler; Anforderung: alles grün (geschätzt).">
+        <span class="fr-meter-name">🧱 Stabilität</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">0 Fehler</b>
+      </div>
+      <div class="fr-meter" data-grade="part" style="--fr-fill: 80%" data-tip="Alte Spieldaten zeigen, was bekannt ist, ohne Lückenmeldung; Bergbau- und Bergungswerte erscheinen erst nach neuem Upload (geschätzt).">
+        <span class="fr-meter-name">🔗 Kompatibilität</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">4 / 5</b>
+      </div>
+      <div class="fr-meter" data-grade="part" style="--fr-fill: 85%" data-tip="Gesperrte Einsätze mit Grund für Screenreader, Marke mit Tooltip; Kontrast nicht gemessen (geschätzt).">
+        <span class="fr-meter-name">♿ Barrierefreiheit</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">ungemessen</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="fr-depth" tabindex="0" data-tip="4 / 7 · ✓ Code-Check · ✓ Trockentest · ✓ Zusammenspiel · ✓ Lokal durchgespielt · ○ Prod-Build geprüft · ○ Live vertestet · ◌ Von dir abgenommen">
+    <span class="fr-depth-done">✓ Zuletzt bestanden: <b>Lokal durchgespielt</b></span>
+    <span class="fr-depth-next">○ Noch nicht gemacht: <b>Prod-Build geprüft</b></span>
+  </div>
+
+  <div class="fr-close">
+  <div class="fr-funde-box" data-open-questions>
+    <p class="fr-close-head"><span>🧭 Du entscheidest</span><small>2 Funde unterwegs</small></p>
+    <ul class="fr-funde">
+      <li data-oq-id="oq-qrange"
+          data-issue-title="[BUG] Show a real quantum range on the Holotisch columns"
+          data-issue-type="bug"
+          data-issue-body="Approved in the category-panels concept (r2-d-leitwert: Reisen leads Bewegung with Q-Reichweite), not built: the extract's SCItemQuantumDriveParams.jumpRange is float max, so the web drops it and the row stays empty. Derive the range from ship fuel.quantum and the drive's quantumFuelRequirement once the unit is verified against in-game values."
+          data-issue-module="codex"
+          data-oq-origin="shortfall"
+          data-route-default="issue"
+          data-route-reason="braucht-Formel">
+        <span class="oq-label">Q-Reichweite fehlt</span>
+        <dl class="fr-fkv">
+          <dt>Was</dt><dd>Die Spieldaten nennen nur „unbegrenzt“; die echte Reichweite muss aus Treibstoff und Verbrauch gerechnet werden.</dd>
+          <dt>Wo</dt><dd>Einsatz Reisen und Transport, Spalte Bewegung</dd>
+          <dt>Warum vorbelegt</dt><dd>📌 Issue — die Einheit des Verbrauchs ist unbestätigt.</dd>
+        </dl>
+      </li>
+      <li data-oq-id="oq-posthog"
+          data-issue-title="[CHORE] Add the Einsatz choice and Alle Werte tile to the Codex dashboard"
+          data-issue-type="chore"
+          data-issue-body="Approved in the category-panels concept (r2-d-messen): the events codex:einsatz_select and codex:perspective_detail_open are in the catalogue and fire; the PostHog dashboard tile 'Einsatz-Wahl und Alle Werte' on the Codex dashboard is not created yet."
+          data-issue-module="analytics"
+          data-oq-origin="shortfall"
+          data-route-default="now"
+          data-route-reason="klein">
+        <span class="oq-label">Dashboard-Kachel fehlt</span>
+        <dl class="fr-fkv">
+          <dt>Was</dt><dd>Beide Ereignisse werden gesendet, die Kachel im Codex-Dashboard gibt es noch nicht.</dd>
+          <dt>Wo</dt><dd>PostHog, Codex-Dashboard</dd>
+          <dt>Warum vorbelegt</dt><dd>⚡ Jetzt — eine Kachel, schnell angelegt.</dd>
+        </dl>
+      </li>
+    </ul>
+    <p class="fr-funde-hint">↻ Ein Tipp auf die Pille wechselt: ⚡ Jetzt → 📌 Issue → Weglassen.</p>
+  </div>
+  </div>
+
+  <div class="fr-folds">
+  <details class="fr-fold">
+    <summary>🛠 Für Entwickler</summary>
+    <ul class="fr-dev">
+      <li>Commits <code>b35960be9</code>…<code>710ce753d</code> · Bereiche: codex/holo, data-uploader</li>
+      <li><code>codex-holo-columns.ts</code>, <code>codex-holo-perspectives.component.ts</code>, <code>sc_extract/dataforge_extract.py</code></li>
+      <li>Tests: 3192 Codex grün, 27 Uploader neu grün; Typecheck, Lint 0 Fehler</li>
+      <li>Parität (QA im Browser): 1, 3–8, 10–18, 21 met · 2, 5 nach Fix met · 9, 20 teilweise · 19 met (alte Daten)</li>
+      <li>Lesart: kein Werk/Gespeichert-Schalter, Gespeichertes als Marke; Modul-Einsätze gebaut, 4.10 hat kein Bergbaumodul</li>
+    </ul>
+  </details>
+  </div>
+
+  <section data-tests hidden aria-label="Du testest">
+    <ul>
+      <li data-todo-id="t-saved" data-crit="mid" data-guide="">Gespeichert-Marke an echter Konfig ansehen</li>
+      <li data-todo-id="t-alles" data-crit="low" data-guide="">Einsatz „Alles“ an zwei Schiffen ansehen</li>
+    </ul>
+  </section>
+  <section data-handoffs hidden aria-label="Du machst danach">
+    <ul>
+      <li data-todo-id="h-upload" data-crit="high" data-guide="">Uploader neu bauen, LIVE extrahieren, hochladen</li>
+    </ul>
+  </section>
 </section>
 </main>
     </div>
@@ -10795,7 +10916,8 @@ Danach  Prospector · OFFENSIVE Arbor MH1 · S1 Bergbaulaser · Leistung fehlt i
       <nav class="iteration-tabs" role="tablist" aria-label="Runden">
 <button class="iteration-tab" role="tab" data-iteration="1" aria-selected="false" aria-controls="iter-1">Runde 1</button>
 <button class="iteration-tab" role="tab" data-fidelity="live" data-iteration="2" aria-selected="false" aria-controls="iter-2">Runde 2</button>
-<button class="iteration-tab" role="tab" data-fidelity="live" data-iteration="3" aria-selected="true" aria-controls="iter-3">Runde 3</button>
+<button class="iteration-tab" role="tab" data-fidelity="live" data-iteration="3" aria-selected="false" aria-controls="iter-3">Runde 3</button>
+<button class="iteration-tab" role="tab" data-final-report data-iteration="4" aria-selected="true" aria-controls="iter-4">Abschlussbericht</button>
 </nav>
       <!-- #section-nav also lives on the design skeleton: a free/decision round
            on a design concept (the final report is always free) renders its TOC
@@ -11724,6 +11846,7 @@ else wireReviewSwitch();
   function openDock() {
     if (!dock || !dockToggle) return;
     window.closePanel?.();   // mutually exclusive overlays, see openPanel above
+    delete dock.dataset.calmStashed;   // opened on purpose: the eye no longer owns it
     dock.dataset.open = 'true';
     dockToggle.setAttribute('aria-expanded', 'true');
     dockToggle.setAttribute('aria-label', LABEL_CLOSE);
@@ -11749,6 +11872,23 @@ else wireReviewSwitch();
   }
   window.openDock = openDock;
   window.closeDock = closeDock;
+  // The eye's calm view (body.anno-hidden, design eye and document pin eye)
+  // hid the 💬 FAB but left an OPEN dock standing on its own. Hiding now
+  // closes the dock and marks it (data-calm-stashed); showing again reopens
+  // exactly a dock the eye closed. Closing instead of a CSS hide keeps Space
+  // working while all is hidden: a dock opened on purpose then is visible
+  // and clears the mark, so the way back never toggles it a second time.
+  function calmDock(hide) {
+    if (!dock || !dockToggle) return;
+    if (hide) {
+      if (dock.dataset.open !== 'true') return;
+      closeDock(true);   // no focus to the 💬 FAB: it is hidden with the rest
+      dock.dataset.calmStashed = 'true';
+    } else if (dock.dataset.calmStashed === 'true') {
+      openDock();
+    }
+  }
+  window.calmDock = calmDock;
   // Dock keys while the dock is open (capture phase, so no page handler
   // swallows them first):
   //   * Ctrl/Cmd + Enter in a dock field → focus the next VISIBLE field of the
@@ -14270,7 +14410,10 @@ else wireReviewSwitch();
     document.body.classList.toggle('anno-hidden');
     // Hiding the layer must not leave a bubble open underneath it —
     // reopening later should start from a clean collapsed state.
-    if (document.body.classList.contains('anno-hidden')) closeAllBubbles();
+    const nowHidden = document.body.classList.contains('anno-hidden');
+    if (nowHidden) closeAllBubbles();
+    // An open notes dock goes with the rest and comes back with it.
+    window.calmDock?.(nowHidden);
     updateAnnoUI();
     if (typeof saveState === 'function') saveState();
   });
@@ -17717,7 +17860,10 @@ function collectFreeDecisions() {
       + '<svg class="anno-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path d="M3 3l18 18"/></svg>';
     b.addEventListener('click', () => {
       body.classList.toggle('anno-hidden');
-      if (body.classList.contains('anno-hidden')) closeEditors(null);
+      const nowHidden = body.classList.contains('anno-hidden');
+      if (nowHidden) closeEditors(null);
+      // An open notes dock goes with the rest and comes back with it.
+      window.calmDock?.(nowHidden);
       syncEye();
       if (typeof saveState === 'function') saveState();
     });

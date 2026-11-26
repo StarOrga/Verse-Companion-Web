@@ -1,0 +1,110 @@
+<section id="iter-4" data-iteration="4" data-iteration-template="free" data-final-report data-active>
+  <p class="fr-sentence">Die vier Spalten zeigen jetzt je Einsatz die passenden Werte und vergleichen jede Zeile mit dem Werkszustand, statt Ränge zu zeigen.</p>
+
+  <div class="fr-main">
+    <div class="fr-results">
+      <p class="fr-label">{{final.results}}</p>
+      <ul class="fr-wins">
+        <li><span class="fr-win-icon" aria-hidden="true">🎯</span><span>Jeder Einsatz bringt <b>seine Werte nach oben</b>, etwa Fracht beim C2.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">↔️</span><span>Ein Balken zeigt <b>besser oder schlechter als ab Werk</b>, Gespeichertes als Marke.</span></li>
+        <li><span class="fr-win-icon" aria-hidden="true">🚫</span><span>Einsätze ohne Ausstattung sind <b>gesperrt, mit Grund</b>.</span></li>
+      </ul>
+      <a class="fr-try" href="http://127.0.0.1:4200/codex/ship/CRUS_Starlifter_C2?view=holo" target="_blank" rel="noopener noreferrer">▶ {{final.try_it}}</a>
+      <p class="fr-try-auth">🔑 Mit deinem Konto; vorher im Worktree <code>npm start</code> starten</p>
+    </div>
+    <div class="fr-ba" data-label-before="{{final.before}}" data-label-after="{{final.after}}">
+      <figure class="fr-shot"><img src="20261123-2030-kategorien-nach-einsatz/assets/04/before.png" alt=""><figcaption>Ränge und alte Analyse-Panels</figcaption></figure>
+      <figure class="fr-shot"><img src="20261123-2030-kategorien-nach-einsatz/assets/04/after.png" alt=""><figcaption>C2 auf Transport, „Alle Werte“ offen</figcaption></figure>
+    </div>
+  </div>
+
+  <div class="fr-holds">
+    <p class="fr-label">{{final.holds}}<small>{{final.holds_hint}}</small></p>
+    <div class="fr-meters">
+      <div class="fr-meter" data-grade="full" style="--fr-fill: 100%" data-tip="3192 Codex-Tests und 27 Uploader-Tests grün, keine Konsolenfehler; Anforderung: alles grün (geschätzt).">
+        <span class="fr-meter-name">🧱 Stabilität</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">0 Fehler</b>
+      </div>
+      <div class="fr-meter" data-grade="part" style="--fr-fill: 80%" data-tip="Alte Spieldaten zeigen, was bekannt ist, ohne Lückenmeldung; Bergbau- und Bergungswerte erscheinen erst nach neuem Upload (geschätzt).">
+        <span class="fr-meter-name">🔗 Kompatibilität</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">4 / 5</b>
+      </div>
+      <div class="fr-meter" data-grade="part" style="--fr-fill: 85%" data-tip="Gesperrte Einsätze mit Grund für Screenreader, Marke mit Tooltip; Kontrast nicht gemessen (geschätzt).">
+        <span class="fr-meter-name">♿ Barrierefreiheit</span>
+        <div class="fr-meter-bar" aria-hidden="true"></div>
+        <b class="fr-meter-value">ungemessen</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="fr-depth" tabindex="0" data-tip="4 / 7 · ✓ {{final.level_code}} · ✓ {{final.level_dry}} · ✓ {{final.level_interplay}} · ✓ {{final.level_local}} · ○ {{final.level_prod}} · ○ {{final.level_live}} · ◌ {{final.level_accept}}">
+    <span class="fr-depth-done">✓ {{final.depth_done}}: <b>{{final.level_local}}</b></span>
+    <span class="fr-depth-next">○ {{final.depth_next}}: <b>{{final.level_prod}}</b></span>
+  </div>
+
+  <div class="fr-close">
+  <div class="fr-funde-box" data-open-questions>
+    <p class="fr-close-head"><span>🧭 {{final.group_decide}}</span><small>2 {{final.funde_fold}}</small></p>
+    <ul class="fr-funde">
+      <li data-oq-id="oq-qrange"
+          data-issue-title="[BUG] Show a real quantum range on the Holotisch columns"
+          data-issue-type="bug"
+          data-issue-body="Approved in the category-panels concept (r2-d-leitwert: Reisen leads Bewegung with Q-Reichweite), not built: the extract's SCItemQuantumDriveParams.jumpRange is float max, so the web drops it and the row stays empty. Derive the range from ship fuel.quantum and the drive's quantumFuelRequirement once the unit is verified against in-game values."
+          data-issue-module="codex"
+          data-oq-origin="shortfall"
+          data-route-default="issue"
+          data-route-reason="braucht-Formel">
+        <span class="oq-label">Q-Reichweite fehlt</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Die Spieldaten nennen nur „unbegrenzt“; die echte Reichweite muss aus Treibstoff und Verbrauch gerechnet werden.</dd>
+          <dt>{{final.fund_where}}</dt><dd>Einsatz Reisen und Transport, Spalte Bewegung</dd>
+          <dt>{{final.fund_why}}</dt><dd>📌 Issue — die Einheit des Verbrauchs ist unbestätigt.</dd>
+        </dl>
+      </li>
+      <li data-oq-id="oq-posthog"
+          data-issue-title="[CHORE] Add the Einsatz choice and Alle Werte tile to the Codex dashboard"
+          data-issue-type="chore"
+          data-issue-body="Approved in the category-panels concept (r2-d-messen): the events codex:einsatz_select and codex:perspective_detail_open are in the catalogue and fire; the PostHog dashboard tile 'Einsatz-Wahl und Alle Werte' on the Codex dashboard is not created yet."
+          data-issue-module="analytics"
+          data-oq-origin="shortfall"
+          data-route-default="now"
+          data-route-reason="klein">
+        <span class="oq-label">Dashboard-Kachel fehlt</span>
+        <dl class="fr-fkv">
+          <dt>{{final.fund_what}}</dt><dd>Beide Ereignisse werden gesendet, die Kachel im Codex-Dashboard gibt es noch nicht.</dd>
+          <dt>{{final.fund_where}}</dt><dd>PostHog, Codex-Dashboard</dd>
+          <dt>{{final.fund_why}}</dt><dd>⚡ Jetzt — eine Kachel, schnell angelegt.</dd>
+        </dl>
+      </li>
+    </ul>
+    <p class="fr-funde-hint">{{final.funde_hint}}</p>
+  </div>
+  </div>
+
+  <div class="fr-folds">
+  <details class="fr-fold">
+    <summary>🛠 {{final.dev_fold}}</summary>
+    <ul class="fr-dev">
+      <li>Commits <code>b35960be9</code>…<code>710ce753d</code> · Bereiche: codex/holo, data-uploader</li>
+      <li><code>codex-holo-columns.ts</code>, <code>codex-holo-perspectives.component.ts</code>, <code>sc_extract/dataforge_extract.py</code></li>
+      <li>Tests: 3192 Codex grün, 27 Uploader neu grün; Typecheck, Lint 0 Fehler</li>
+      <li>Parität (QA im Browser): 1, 3–8, 10–18, 21 met · 2, 5 nach Fix met · 9, 20 teilweise · 19 met (alte Daten)</li>
+      <li>Lesart: kein Werk/Gespeichert-Schalter, Gespeichertes als Marke; Modul-Einsätze gebaut, 4.10 hat kein Bergbaumodul</li>
+    </ul>
+  </details>
+  </div>
+
+  <section data-tests hidden aria-label="{{final.group_tests}}">
+    <ul>
+      <li data-todo-id="t-saved" data-crit="mid" data-guide="">Gespeichert-Marke an echter Konfig ansehen</li>
+      <li data-todo-id="t-alles" data-crit="low" data-guide="">Einsatz „Alles“ an zwei Schiffen ansehen</li>
+    </ul>
+  </section>
+  <section data-handoffs hidden aria-label="{{final.group_handoffs}}">
+    <ul>
+      <li data-todo-id="h-upload" data-crit="high" data-guide="">Uploader neu bauen, LIVE extrahieren, hochladen</li>
+    </ul>
+  </section>
+</section>
