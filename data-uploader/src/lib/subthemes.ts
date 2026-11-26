@@ -134,11 +134,13 @@ export const SUBTHEMES: readonly Subtheme[] = [
   // codex_components (kind Radar) with flat range / sensitivity keys.
   // components 5 / weapons 5 / items 6: names behind a `,P`-marked loc key
   // resolve instead of showing the raw `@key`.
-  { key: 'components', revision: 5, phases: ['codex_components'], sources: CATALOG_SHARED },
+  // components 6 / weapons 6 / items 7: #402 — `renderImage`, the colour still
+  // of the item's 3D model (model_render.py), plus its WebP in previews/.
+  { key: 'components', revision: 6, phases: ['codex_components'], sources: CATALOG_SHARED },
   // weapons 4: #343 — weaponParams gains regen.* / heat.* (sustained DPS).
-  { key: 'weapons', revision: 5, phases: ['codex_weapons', 'codex_ammunition'], sources: CATALOG_SHARED },
+  { key: 'weapons', revision: 6, phases: ['codex_weapons', 'codex_ammunition'], sources: CATALOG_SHARED },
   // items 5: missiles carry stats.SCItemMissileParams (feedback e7b6a2a1).
-  { key: 'items', revision: 6, phases: ['codex_items'], sources: CATALOG_SHARED },
+  { key: 'items', revision: 7, phases: ['codex_items'], sources: CATALOG_SHARED },
   {
     key: 'codex_extra',
     // 2: #643 — codex_item_ports.helper_name / position / rotation resolve on
