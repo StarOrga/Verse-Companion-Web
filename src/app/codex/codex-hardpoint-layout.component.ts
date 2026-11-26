@@ -450,16 +450,35 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                             <span class="slot-item">{{ itemName(row.slot.name) }}</span>
                             <span class="slot-meta">
                               @if (row.slot.roleKey) {
-                                <span class="tag role">{{ row.slot.roleKey | translate }}</span>
+                                @if (calm() && row.slot.roleKey === 'codex.module.badge.active') {
+                                  <!-- ds-new: Status-Punkt — quiet green dot + word instead of a tag (Holotisch cards) -->
+                                  <span class="hx-state"><i aria-hidden="true"></i>{{ row.slot.roleKey | translate }}</span>
+                                } @else {
+                                  <span class="tag role">{{ row.slot.roleKey | translate }}</span>
+                                }
                               }
-                              @if (metaLine(row); as m) { <span class="meta-txt">{{ m }}</span> }
+                              @if (metaLine(row); as m) { <span class="meta-txt" [class.hx-maker]="calm()">{{ m }}</span> }
                               @for (ch of row.slot.damageChannels; track ch) {
                                 <span class="tag dmg">{{ ('codex.damage.' + ch) | translate }}</span>
                               }
                               @if (seeker(row.slot.className, row.slot.stats); as sk) {
                                 <span class="tag seeker" [scTooltip]="sk.tipKey | translate">{{ sk.labelKey | translate }}</span>
                               }
-                              @if (row.slot.grade) { <span class="tag">{{ row.slot.grade }}</span> }
+                              @if (row.slot.grade; as g) {
+                                @if (calm()) {
+                                  <!-- ds-new: Güte-Skala — "Güte C" + 4 steps A–D, the grade lit -->
+                                  <span class="hx-grade" [attr.aria-label]="'codex.holo.part.grade' | translate: { grade: g }">
+                                    <b>{{ 'codex.holo.part.grade' | translate: { grade: g } }}</b>
+                                    @if (gradeStep(g); as step) {
+                                      <span class="hx-gbar" aria-hidden="true">
+                                        @for (i of gradeSteps; track i) { <i [class.on]="i === step"></i> }
+                                      </span>
+                                    }
+                                  </span>
+                                } @else {
+                                  <span class="tag">{{ g }}</span>
+                                }
+                              }
                               @if (row.slot.statChip) { <span class="tag accent">{{ row.slot.statChip }}</span> }
                               @if (row.slot.draftState; as ds) {
                                 <span class="tag draft" [class.pending]="ds === 'pending'" [class.unresolved]="ds === 'unresolved'">
@@ -493,6 +512,13 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                         }
                       </span>
                       <span class="slot-port">{{ portLabel(row) }}</span>
+                      @if (calm() && rowShare(row); as sh) {
+                        <!-- ds-new: Anteilsbalken — the row's share of the category total -->
+                        <span class="hx-share" data-testid="part-share">
+                          <span>{{ 'codex.holo.part.share' | translate: { pct: sh.pct, total: partShareOf() ?? '' } }}</span>
+                          <span class="hx-share-b" aria-hidden="true"><i [style.width.%]="sh.pct"></i></span>
+                        </span>
+                      }
                       @if (secondaryStats(row); as rest) {
                         @if (rest.length) {
                           <!-- Per-item values. An AMOUNT on a collapsed run
@@ -736,7 +762,7 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                                 <span class="slot-ident">
                                   <span class="kid-empty">—</span>
                                   <span class="slot-meta">
-                                    @if (kid.typeLabel) { <span class="meta-txt">{{ kid.typeLabel }}</span> }
+                                    @if (kid.typeLabel && !calm()) { <span class="meta-txt">{{ kid.typeLabel }}</span> }
                                     <span class="tag pick">{{ 'codex.swap.pickHere' | translate }}</span>
                                   </span>
                                 </span>
@@ -750,7 +776,7 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                                 <span class="slot-ident">
                                   <span class="kid-empty">—</span>
                                   <span class="slot-meta">
-                                    @if (kid.typeLabel) { <span class="meta-txt">{{ kid.typeLabel }}</span> }
+                                    @if (kid.typeLabel && !calm()) { <span class="meta-txt">{{ kid.typeLabel }}</span> }
                                   </span>
                                 </span>
                               </span>
@@ -1119,6 +1145,19 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
     :host(.calm) .slot:hover .slot-swap, :host(.calm) .slot:hover .slot-swap-action, :host(.calm) .slot:hover .slot-revert,
     :host(.calm) .slot:focus-within .slot-swap, :host(.calm) .slot:focus-within .slot-swap-action { opacity: 1; border-color: var(--sc-border); }
     :host(.calm) .slot:has(.tag.draft) { border-inline-start: 2px solid var(--sc-warn); }
+    /* ds-new: Holotisch-Bauteilkarte — status dot, grade scale and share bar (concept holotisch-kategorien r3) */
+    :host(.calm) .hx-state { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--sc-fg-1); }
+    :host(.calm) .hx-state i { inline-size: 8px; block-size: 8px; border-radius: 50%; background: var(--sc-success); box-shadow: 0 0 4px color-mix(in srgb, var(--sc-success) 60%, transparent); }
+    :host(.calm) .hx-maker { color: var(--sc-fg-1); font-size: 13px; }
+    :host(.calm) .hx-grade { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+    :host(.calm) .hx-grade b { font-weight: 600; color: var(--sc-fg-0); }
+    :host(.calm) .hx-gbar { display: inline-flex; gap: 2px; }
+    :host(.calm) .hx-gbar i { inline-size: 10px; block-size: 6px; border-radius: 2px; background: color-mix(in srgb, var(--sc-fg-2) 26%, transparent); }
+    :host(.calm) .hx-gbar i.on { background: var(--sc-fg-1); }
+    :host(.calm) .hx-share { display: grid; grid-template-columns: auto minmax(32px, 1fr); gap: 8px; align-items: center; margin-top: 6px; font-size: 13px; color: var(--sc-fg-1); }
+    :host(.calm) .hx-share > span:first-child { white-space: nowrap; }
+    :host(.calm) .hx-share-b { position: relative; block-size: 4px; border-radius: 2px; background: color-mix(in srgb, var(--sc-fg-2) 22%, transparent); }
+    :host(.calm) .hx-share-b i { position: absolute; inset: 0 auto 0 0; border-radius: 2px; background: var(--p, var(--sc-accent)); }
     :host(.calm) .sec-rows.no-detail .slot-stats { display: none; }
     :host(.calm) .slot-stats { border-top: 0; padding-top: 2px; gap: 2px 18px; }
     :host(.calm) .slot-stats dd { font-family: var(--font-monospace, monospace); color: var(--sc-fg-0); }
@@ -1132,6 +1171,31 @@ export class CodexHardpointLayoutComponent {
    * stats hide behind a per-group "Detail ▾" (concept round 5: per box, not
    * a global density switch); everything else keeps working as in classic. */
   readonly calm = input(false);
+  /** Calm only: className → its share (0..1) of the column's category total (`HoloPart.share`). */
+  readonly partShares = input<ReadonlyMap<string, number>>(new Map());
+  /** Calm only: the total the shares refer to, as text ("506/s"). */
+  readonly partShareOf = input<string | null>(null);
+  protected readonly gradeSteps = [1, 2, 3, 4] as const;
+
+  /** A–D → 1–4; a grade outside the four steps shows its letter without a scale. */
+  gradeStep(grade: string | null | undefined): number {
+    const i = 'ABCD'.indexOf((grade ?? '').trim().toUpperCase());
+    return (grade ?? '').trim().length === 1 && i >= 0 ? i + 1 : 0;
+  }
+
+  /** The row's share of its category total: its own item plus what the mount carries. */
+  rowShare(row: GroupedSlot<LayoutSlot>): { pct: number } | null {
+    const shares = this.partShares();
+    if (shares.size === 0) return null;
+    const names = [row.slot.className, ...(row.slot.children ?? []).map((k) => k.className)].filter((n): n is string => !!n);
+    const seen = new Set<string>();
+    let sum = 0;
+    for (const n of names) {
+      const v = shares.get(n);
+      if (v !== undefined && !seen.has(n)) { seen.add(n); sum += v; }
+    }
+    return seen.size > 0 ? { pct: Math.round(sum * 100) } : null;
+  }
   /** Merged groups ("Antrieb & Systeme") nest their sections; false = every section stands as its own block (the Holotable's area columns). */
   readonly nestGroups = input(true);
   private readonly detailOpenSections = signal<ReadonlySet<ShipModuleSection>>(new Set());
@@ -1600,7 +1664,8 @@ export class CodexHardpointLayoutComponent {
   }
 
   metaLine(row: GroupedSlot<LayoutSlot>): string {
-    return [row.slot.manufacturerCode, row.slot.typeLabel].filter(Boolean).join(' · ');
+    // The Holotable's cards show the maker as plain text and drop the engine's English type label.
+    return [row.slot.manufacturerCode, this.calm() ? null : row.slot.typeLabel].filter(Boolean).join(' · ');
   }
 
   /**
@@ -1625,7 +1690,7 @@ export class CodexHardpointLayoutComponent {
 
   /** The carried item's meta line, read the same way a top-level row's is. */
   kidMetaLine(kid: LayoutChild): string {
-    return [kid.manufacturerCode, kid.typeLabel].filter(Boolean).join(' · ');
+    return [kid.manufacturerCode, this.calm() ? null : kid.typeLabel].filter(Boolean).join(' · ');
   }
 
   /**

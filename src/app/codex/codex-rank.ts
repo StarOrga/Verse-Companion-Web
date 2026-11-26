@@ -556,7 +556,7 @@ export function groupScale(
   return Math.round(Math.max(0, Math.min(1, t)) * 1000) / 10;
 }
 
-function median(values: readonly number[]): number | null {
+export function median(values: readonly number[]): number | null {
   if (values.length === 0) return null;
   const s = [...values].sort((a, b) => a - b);
   const mid = s.length >> 1;
