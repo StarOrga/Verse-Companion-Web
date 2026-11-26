@@ -41,6 +41,16 @@ export const HEARTBEAT_FRESH_MS = 45 * 60 * 1000;
 export const HEARTBEAT_GRACE_MS = 15 * 60 * 1000;
 
 /**
+ * The tighter slack of the opt-in "PC on" light (feedback #405). Every watcher
+ * tick stamps `next_run_at = now + 3 min`, so the light stays green from one
+ * stamp to the next and only a short buffer after that: two minutes cover a
+ * tick that starts late or waits on a slow gate call, plus the panel's own
+ * 60-second re-read. A PC that went off turns the light red about five
+ * minutes after its last tick instead of the default palette's eighteen.
+ */
+export const HEARTBEAT_PC_GRACE_MS = 2 * 60 * 1000;
+
+/**
  * A `running` state older than this is a run that died without releasing its
  * lock. The gate takes such a lock over; the panel stops calling it running.
  * Mirrors the gate script's `RUN_LOCK_MAX_MIN`.
@@ -83,7 +93,11 @@ const parse = (iso: string | null | undefined): number | null => {
  * bare `last_seen_at` string for callers (and tests) written before the row
  * grew its extra columns.
  */
-export function heartbeatState(row: HeartbeatRow | string | null | undefined, now: number): HeartbeatState {
+export function heartbeatState(
+  row: HeartbeatRow | string | null | undefined,
+  now: number,
+  graceMs: number = HEARTBEAT_GRACE_MS,
+): HeartbeatState {
   const r: HeartbeatRow | null = typeof row === 'string' ? { last_seen_at: row } : (row ?? null);
   const seen = parse(r?.last_seen_at);
   if (seen === null) return 'unknown';
@@ -98,7 +112,7 @@ export function heartbeatState(row: HeartbeatRow | string | null | undefined, no
 
   const due = parse(r?.next_run_at);
   // A stamp from the future means clock skew, not death — treat it as fresh.
-  const fresh = due !== null ? now < due + HEARTBEAT_GRACE_MS : now - seen < HEARTBEAT_FRESH_MS;
+  const fresh = due !== null ? now < due + graceMs : now - seen < HEARTBEAT_FRESH_MS;
   if (!fresh) return 'offline';
   return r?.state === 'paused' ? 'paused' : 'online';
 }
@@ -172,6 +186,11 @@ export class RoutineHeartbeatService {
 
   readonly state = computed<HeartbeatState>(() =>
     this.errored() ? 'unknown' : heartbeatState(this.row(), this.now()),
+  );
+
+  /** The same verdict with the "PC on" light's tighter grace (feedback #405). */
+  readonly pcState = computed<HeartbeatState>(() =>
+    this.errored() ? 'unknown' : heartbeatState(this.row(), this.now(), HEARTBEAT_PC_GRACE_MS),
   );
 
   /**
