@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.298.12] - 2026-11-26
+
+### Fixed
+- Ship loadout: closing the swap picker or another large popup no longer jumps the page back to the top; it stays where you were.
+
 ## [0.298.11] - 2026-11-25
 
 ### Fixed
