@@ -1518,6 +1518,81 @@
       "part": {
         "grade": "Güte {{grade}}",
         "share": "{{pct}} % von {{total}}"
+      },
+      "panel": {
+        "close": "Übersicht schließen",
+        "aria": "Übersicht: {{area}}",
+        "cellAria": "{{area}}: Übersicht öffnen",
+        "noData": "keine Daten",
+        "limiter": {
+          "heat": "Hitze",
+          "magazine": "Magazin",
+          "energyPool": "Energie"
+        },
+        "limiterAcc": {
+          "heat": "die Hitze",
+          "magazine": "das Magazin",
+          "energyPool": "die Energie"
+        },
+        "damage": {
+          "physical": "Kugeln & Kollision",
+          "energy": "Energiewaffen",
+          "distortion": "Lähmung"
+        },
+        "emSource": {
+          "generator": "Generator",
+          "shields": "Schilde",
+          "weapons": "Waffen",
+          "coolers": "Kühler",
+          "rest": "Rest"
+        },
+        "offensive": {
+          "title": "Wie lange kann ich voll feuern – und was stoppt mich?",
+          "phaseUntil": "bis {{sec}} s",
+          "phaseOpen": "danach auf Dauer",
+          "classMedian": "Klassenmitte (Dauerfeuer)",
+          "takeaway": "Volles Feuer {{sec}} s, dann bremst {{limiter}}; danach {{sustained}}/s auf Dauer (Klasse {{median}}/s)",
+          "takeawayNoClass": "Volles Feuer {{sec}} s, dann bremst {{limiter}}; danach {{sustained}}/s auf Dauer",
+          "takeawayPartial": "Volles Feuer {{sec}} s, dann bremst {{limiter}}",
+          "takeawayOpen": "Kein Bauteil bremst – durchgehend {{sustained}}/s",
+          "incomplete": "Unvollständig: nicht für jede Waffe liegt ein Feuerzyklus vor.",
+          "noTimeline": "Keine Waffen eingebaut – kein Feuerverlauf.",
+          "alpha": "Alpha",
+          "burst": "Salve",
+          "sustained": "Dauer",
+          "missiles": "Raketen",
+          "gunner": "{{pct}} % des Schadens kommen von Waffen, die einen Schützen brauchen."
+        },
+        "defensive": {
+          "title": "Schadensweg",
+          "shieldDown": "Schild weg in (bei Feuer der Klassenmitte)",
+          "regenDelay": "Schild-Pause nach Treffer / nach Ausfall",
+          "regenFull": "Schild wieder voll nach",
+          "armor": "Rüstung (HP)"
+        },
+        "movement": {
+          "title": "Tempo und Wendigkeit",
+          "scm": "SCM",
+          "boost": "Boost",
+          "max": "Höchstgeschwindigkeit",
+          "pitch": "Nicken",
+          "yaw": "Gieren",
+          "roll": "Rollen",
+          "quantumSpeed": "Quantum-Tempo",
+          "quantumRange": "Quantum-Reichweite",
+          "acceleration": "Beschleunigung"
+        },
+        "signature": {
+          "title": "Wie weit sieht man dich?",
+          "ir": "Infrarot",
+          "em": "Elektromagnetisch",
+          "crossSection": "Querschnitt",
+          "lowerBetter": "Kürzere Distanz ist besser.",
+          "emSources": "Woher kommt das EM-Signal",
+          "cooling": "Kühlauslastung",
+          "decoys": "Täuschkörper, um dich zu überstrahlen: IR {{ir}}, EM {{em}}, Querschnitt {{cs}}",
+          "decoysNone": "Keine Angabe zu Täuschkörpern."
+        }
       }
     },
     "empty": {

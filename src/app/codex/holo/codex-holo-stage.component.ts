@@ -791,22 +791,6 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
       @if (saveErrorElsewhere(); as err) {
         <p class="save-err" role="alert">{{ err }}</p>
       }
-
-      <!-- Perspektiven at the very end (concept r1-dock-open "both"): at the
-           page's end they stand on their own, docked onto the sticky strip;
-           the strip's arrow opens the same four areas anywhere as its dock. -->
-      <sc-codex-holo-perspectives
-        class="below-persp mobile-data"
-        layout="row"
-        [docked]="true"
-        [scFeedbackSpot]="'codex.holo.stage.perspectives'"
-        [tiles]="perspectiveViews()"
-        [missionLabelKey]="missionLabelKey()"
-        [cohortSize]="rankResult()?.cohortSize ?? null"
-        [pulse]="pulseTile()"
-        [offensivePanel]="offensivePanel()"
-        [defensivePanel]="defensivePanel()"
-        [shipFactGroups]="shipFactGroups()" />
     </div></ng-template>
     <ng-template #stripTpl><div class="holo-scope" [class]="scopeClass()" [attr.data-mission]="activeMissionId()" [style.--holo-e]="missionHue()">
       <!-- slot: strip — sticky bottom (mobile: sticky KPI row via its own CSS) -->
@@ -819,6 +803,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
         [crossSection]="crossSection()"
         [cells]="allKpiCells()"
         [capabilities]="shipCapabilities()"
+        [models]="categoryModels()"
         (sheetChange)="onSheetChange($event)">
         <sc-codex-holo-perspectives
           hsDock
@@ -1055,12 +1040,8 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .area-h { display: flex; align-items: center; gap: 6px; margin: 4px 0 12px; font-family: var(--d); font-weight: 400; text-transform: uppercase; font-size: max(9.5px, var(--f)); letter-spacing: 0.14em; color: var(--p, var(--sc-accent)); }
   .area-empty { margin: 4px 0; font-size: max(11.5px, var(--f)); color: var(--sc-fg-2); }
   .holo-below .holo-details { grid-column: 1 / 5; grid-row: 4; min-width: 0; }
-  /* At the page's end the perspectives sit right on the strip. */
-  .below-persp { margin-top: 14px; margin-bottom: 0; }
-  /* The stage is a flex column with gap: 6px; the panel cancels it toward the strip so the two meet without a seam (feedback #4). */
-  @media (min-width: 901px) { .below-persp { margin-bottom: -6px; } }
   /* The strip ends before the launcher lane (it measures --holo-fab-clear): what stands on its columns ends there too, or the four columns drift apart. */
-  @media (min-width: 641px) { .holo-below, .below-persp { margin-inline-end: var(--holo-fab-clear, 0px); } }
+  @media (min-width: 641px) { .holo-below { margin-inline-end: var(--holo-fab-clear, 0px); } }
   .holo-scope.first:is(.ph-wait, .ph-hero) .holo-below { opacity: 0; }
   .first.ph-reveal .holo-below { animation: rise 600ms var(--e-out) 440ms backwards; }
   .holo-below { transition: opacity var(--holo-t-fast) var(--e-io); }
