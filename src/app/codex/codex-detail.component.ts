@@ -4525,8 +4525,9 @@ export class CodexDetailComponent implements OnInit {
   private readonly kpiShipInput = computed<KpiShipInput | null>(() => {
     const d = this.detail();
     if (!d || d.kind !== 'ship') return null;
-    const p = d.payload as ShipPayload;
-    return { flight: p.flight, stats: p.stats ?? null };
+    // The same ship fields the ranking reads (hull HP + mass, armour, cargo grid): without them the
+    // Holotisch columns showed Rumpf HP and Fracht as missing although the extract carries them.
+    return rankTargetShipInput(d.payload as ShipPayload);
   });
 
   /** Public since Wave 2.5: the patch-Δ trigger's `activeKpiSheet` input is
