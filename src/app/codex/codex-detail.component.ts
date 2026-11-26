@@ -4481,8 +4481,10 @@ export class CodexDetailComponent implements OnInit {
   private readonly kpiShipInput = computed<KpiShipInput | null>(() => {
     const d = this.detail();
     if (!d || d.kind !== 'ship') return null;
-    const p = d.payload as ShipPayload;
-    return { flight: p.flight, stats: p.stats ?? null };
+    // Hull HP, armour, cargo and the ship stats too — the same shaping the
+    // cohort sheets use (`rankTargetShipInput`), so this ship's own sheet is
+    // comparable with the cohort's.
+    return rankTargetShipInput(d.payload as ShipPayload);
   });
 
   /** Public since Wave 2.5: the patch-Δ trigger's `activeKpiSheet` input is
@@ -4631,9 +4633,8 @@ export class CodexDetailComponent implements OnInit {
 
   /**
    * The target's sheet for the ranking: built from the SAME ship input as the
-   * cohort sheets (hull, armor, cargo included). The strip's `kpiShipInput`
-   * lacks those, which left `cargo` null for every hull, so Transport was
-   * always reported "disabled" and the stage's Einsatz effect never switched.
+   * cohort sheets (hull, armor, cargo included) — `kpiShipInput` now carries
+   * them too, so the strip's sheet and this one agree.
    */
   private readonly rankKpiSheet = computed(() => {
     const payload = this.kind() === 'ship' ? (this.detail()?.payload as ShipPayload | undefined) : undefined;
