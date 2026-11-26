@@ -162,5 +162,302 @@
         "note": ""
       }
     ]
+  },
+  {
+    "_artifactStoredAt": "2026-11-26T19:32:40.175Z",
+    "_storedAtMs": 1795721560175,
+    "_tab": "t-mwxw8ahs-ynzdamtn",
+    "action": "implement",
+    "allFields": {
+      "anno-r3-d1-s1-a1": "",
+      "anno-r3-d1-s1-a2": "Ja, wobei immer gepsichert immer vorranigg ausgewählt. Bzw. ne, implizit soll das sein, nänlich in den balken markiert ggü. werk imemr ! ",
+      "anno-r3-d1-s1-a3": "klar genug, aber die aktiven zu wenig offensichtlich ! ",
+      "anno-r3-d1-s2-a1": "",
+      "anno-r3-d1-s2-a2": "",
+      "anno-r3-d1-s2-a3": "",
+      "anno-r3-d1-s3-a1": "",
+      "anno-r3-d1-s4-a1": "",
+      "anno-r3-d2-s1-a1": "",
+      "anno-r3-d2-s2-a1": "",
+      "anno-r3-d2-s2-a2": "",
+      "anno-r3-d2-s3-a1": "",
+      "anno-r3-d2-s4-a1": "",
+      "anno-r3-d3-s1-a1": "",
+      "anno-r3-d3-s2-a1": "",
+      "anno-r3-d3-s2-a2": "",
+      "anno-r3-d3-s3-a1": "",
+      "dm-r3-d-alles": "neutral",
+      "dm-r3-d-alles-epic": "",
+      "dm-r3-d-alles-hes": "{\"ms\":10350,\"revisits\":1,\"median\":16703}",
+      "dm-r3-d-alles-issue": "",
+      "dm-r3-d-alles-none": "",
+      "dm-r3-d-alles-touched": "1",
+      "dm-r3-d-basis": "saved",
+      "dm-r3-d-basis-epic": "",
+      "dm-r3-d-basis-hes": "{\"ms\":10508,\"revisits\":0,\"median\":16703}",
+      "dm-r3-d-basis-issue": "",
+      "dm-r3-d-basis-none": "",
+      "dm-r3-d-basis-touched": "1",
+      "dm-r3-d-gleich": "values",
+      "dm-r3-d-gleich-epic": "",
+      "dm-r3-d-gleich-hes": "{\"ms\":7543,\"revisits\":0,\"median\":16703}",
+      "dm-r3-d-gleich-issue": "",
+      "dm-r3-d-gleich-none": "",
+      "dm-r3-d-gleich-touched": "1",
+      "dm-r3-d-leitwert": "ok",
+      "dm-r3-d-leitwert-epic": "",
+      "dm-r3-d-leitwert-fix": "",
+      "dm-r3-d-leitwert-hes": "{\"ms\":16703,\"revisits\":0,\"median\":16703}",
+      "dm-r3-d-leitwert-issue": "",
+      "dm-r3-d-leitwert-none": "",
+      "dm-r3-d-leitwert-touched": "1",
+      "dm-r3-d-luecke-epic": "",
+      "dm-r3-d-luecke-hes": "{\"ms\":54720,\"revisits\":1,\"median\":16703}",
+      "dm-r3-d-luecke-issue": "",
+      "dm-r3-d-luecke-none": "1",
+      "dm-r3-d-luecke-touched": "1",
+      "dm-r3-d-patch-epic": "",
+      "dm-r3-d-patch-hes": "{\"ms\":25994,\"revisits\":0,\"median\":16703}",
+      "dm-r3-d-patch-issue": "",
+      "dm-r3-d-patch-none": "1",
+      "dm-r3-d-patch-touched": "1",
+      "dm-r3-d-werkzeug": "offensive",
+      "dm-r3-d-werkzeug-epic": "",
+      "dm-r3-d-werkzeug-hes": "{\"ms\":106808,\"revisits\":7,\"median\":16703}",
+      "dm-r3-d-werkzeug-issue": "",
+      "dm-r3-d-werkzeug-none": "",
+      "dm-r3-d-werkzeug-touched": "1",
+      "r3-analyse-closing-note": "",
+      "r3-briefing-note": "",
+      "r3-d-alles-note": "",
+      "r3-d-basis-note": "",
+      "r3-d-gleich-note": "",
+      "r3-d-leitwert-note": "",
+      "r3-d-luecke-note": "das sollte es niccht geben,da nn pass den uploader an, bis er alles davon hat! Ggf. haben aber einige schiffe nicht alles, weil sie einfach z. B. kein mining schiff sind oder m odular ggf. mining oder nicht",
+      "r3-d-patch-note": "ne, patch ist nur üpber einordnujngzus sehen das reicht!",
+      "r3-d-werkzeug-note": "",
+      "r3-t-basis-note": "",
+      "r3-t-einsatz-note": ""
+    },
+    "annotations": [
+      {
+        "answer": "Ja, wobei immer gepsichert immer vorranigg ausgewählt. Bzw. ne, implizit soll das sein, nänlich in den balken markiert ggü. werk imemr !",
+        "design": "d1",
+        "id": "r3-d1-s1-a2",
+        "question": "„Vergleich: Werk | Gespeichert“ über der Spaltenreihe: richtiger Platz, oder lieber im Kopfband neben „Standard-Loadout“?",
+        "screen": "r3-d1-s1"
+      },
+      {
+        "answer": "klar genug, aber die aktiven zu wenig offensichtlich !",
+        "design": "d1",
+        "id": "r3-d1-s1-a3",
+        "question": "Nicht passende Einsätze grau mit Grund in der Zeile: klar genug, oder Grund erst beim Darüberfahren?",
+        "screen": "r3-d1-s1"
+      }
+    ],
+    "attachments": {},
+    "comments": {
+      "designs": {},
+      "general": {
+        "attachments": [],
+        "text": ""
+      },
+      "items": [
+        {
+          "attachments": [],
+          "id": "anno-r3-d1-s1-a2",
+          "text": "Ja, wobei immer gepsichert immer vorranigg ausgewählt. Bzw. ne, implizit soll das sein, nänlich in den balken markiert ggü. werk imemr !"
+        },
+        {
+          "attachments": [],
+          "id": "anno-r3-d1-s1-a3",
+          "text": "klar genug, aber die aktiven zu wenig offensichtlich !"
+        },
+        {
+          "attachments": [],
+          "id": "r3-d-patch-note",
+          "text": "ne, patch ist nur üpber einordnujngzus sehen das reicht!"
+        },
+        {
+          "attachments": [],
+          "id": "r3-d-luecke-note",
+          "text": "das sollte es niccht geben,da nn pass den uploader an, bis er alles davon hat! Ggf. haben aber einige schiffe nicht alles, weil sie einfach z. B. kein mining schiff sind oder m odular ggf. mining oder nicht"
+        }
+      ],
+      "screens": {},
+      "views": {}
+    },
+    "decisions": [
+      {
+        "appliesTo": "jede Schiffsseite (Holotisch)",
+        "deviates": false,
+        "epic": "",
+        "finding": "f-r3-d-basis",
+        "hesitation": {
+          "flagged": false,
+          "ms": 10508,
+          "noteWords": 0,
+          "own": false,
+          "revisits": 0
+        },
+        "id": "r3-d-basis",
+        "issue": false,
+        "label": "Basis beim Öffnen",
+        "mode": "single",
+        "none": false,
+        "note": "",
+        "rec": "saved",
+        "untouched": false,
+        "value": "saved",
+        "view": "r3-analyse"
+      },
+      {
+        "appliesTo": "jede Spalte, solange das Loadout der Basis gleicht",
+        "deviates": false,
+        "epic": "",
+        "finding": "f-r3-d-gleich",
+        "hesitation": {
+          "flagged": false,
+          "ms": 7543,
+          "noteWords": 0,
+          "own": false,
+          "revisits": 0
+        },
+        "id": "r3-d-gleich",
+        "issue": false,
+        "label": "Vergleich ohne Änderung",
+        "mode": "single",
+        "none": false,
+        "note": "",
+        "rec": "values",
+        "untouched": false,
+        "value": "values",
+        "view": "r3-analyse"
+      },
+      {
+        "appliesTo": "Patch-Auswahl im Holotisch",
+        "deviates": true,
+        "epic": "",
+        "finding": "f-r3-d-patch",
+        "hesitation": {
+          "flagged": false,
+          "ms": 25994,
+          "noteWords": 9,
+          "own": true,
+          "revisits": 0
+        },
+        "id": "r3-d-patch",
+        "issue": false,
+        "label": "Patch-Vergleich",
+        "mode": "single",
+        "none": true,
+        "note": "ne, patch ist nur üpber einordnujngzus sehen das reicht!",
+        "rec": "third",
+        "untouched": false,
+        "value": "",
+        "view": "r3-analyse"
+      },
+      {
+        "appliesTo": "Bergbau und Bergung bei Schiffen mit passender Ausstattung",
+        "deviates": true,
+        "epic": "",
+        "finding": "f-r3-d-luecke",
+        "hesitation": {
+          "flagged": false,
+          "ms": 54720,
+          "noteWords": 38,
+          "own": true,
+          "revisits": 1
+        },
+        "id": "r3-d-luecke",
+        "issue": false,
+        "label": "Rolle ohne Daten",
+        "mode": "single",
+        "none": true,
+        "note": "das sollte es niccht geben,da nn pass den uploader an, bis er alles davon hat! Ggf. haben aber einige schiffe nicht alles, weil sie einfach z. B. kein mining schiff sind oder m odular ggf. mining oder nicht",
+        "rec": "known",
+        "untouched": false,
+        "value": "",
+        "view": "r3-analyse"
+      },
+      {
+        "appliesTo": "Einsatz „Alles“ und Schiffe ohne klare Rolle",
+        "deviates": false,
+        "epic": "",
+        "finding": "f-r3-d-alles",
+        "hesitation": {
+          "flagged": false,
+          "ms": 10350,
+          "noteWords": 0,
+          "own": false,
+          "revisits": 1
+        },
+        "id": "r3-d-alles",
+        "issue": false,
+        "label": "Leitwerte bei „Alles“",
+        "mode": "single",
+        "none": false,
+        "note": "",
+        "rec": "neutral",
+        "untouched": false,
+        "value": "neutral",
+        "view": "r3-analyse"
+      },
+      {
+        "appliesTo": "alle sieben Einsätze, alle vier Spalten",
+        "deviates": false,
+        "epic": "",
+        "finding": "f-r3-d-leitwert",
+        "fix": "",
+        "hesitation": {
+          "flagged": false,
+          "ms": 16703,
+          "noteWords": 0,
+          "own": false,
+          "revisits": 0
+        },
+        "id": "r3-d-leitwert",
+        "issue": false,
+        "label": "Leitwert je Einsatz",
+        "mode": "verify",
+        "none": false,
+        "note": "",
+        "rec": "ok",
+        "untouched": false,
+        "value": "ok",
+        "view": "r3-analyse"
+      },
+      {
+        "appliesTo": "Bergbau und Bergung",
+        "deviates": false,
+        "epic": "",
+        "finding": "f-r3-d-werkzeug",
+        "hesitation": {
+          "flagged": true,
+          "ms": 106808,
+          "noteWords": 0,
+          "own": false,
+          "revisits": 7
+        },
+        "id": "r3-d-werkzeug",
+        "issue": false,
+        "label": "Platz des Werkzeugs",
+        "mode": "single",
+        "none": false,
+        "note": "",
+        "rec": "offensive",
+        "untouched": false,
+        "value": "offensive",
+        "view": "r3-analyse"
+      }
+    ],
+    "favorite": "d1",
+    "fidelity": "live",
+    "iteration": "3",
+    "mappings": [],
+    "submission_id": "sub-mwxy93dg-kw9o8eje",
+    "submitted": true,
+    "template": "design",
+    "userPins": []
   }
 ]

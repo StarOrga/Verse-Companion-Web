@@ -9007,7 +9007,8 @@ Spalte   OFFENSIVE  1.180 Dauer-DPS · besser als 78 % · Burst-DPS 1.640 · Alp
 </section>
 </section>
 
-<section data-iteration="3" data-iteration-template="design" data-design-set="alternatives" data-fidelity="live" data-fidelity-note="Spaltenreihe, Leiste, Kopfband, Einsatz-Auswahl und Tokens aus dem Live-Code · Schriften angenähert · Zahlen Beispielwerte" data-fidelity-approx id="iter-3" data-active>
+<section data-iteration="3" data-iteration-template="design" data-design-set="alternatives" data-fidelity="live" data-fidelity-note="Spaltenreihe, Leiste, Kopfband, Einsatz-Auswahl und Tokens aus dem Live-Code · Schriften angenähert · Zahlen Beispielwerte" data-fidelity-approx data-baked id="iter-3" data-active>
+  <script type="application/json" data-frozen-feedback>{"general":{"attachments":[],"text":""},"designs":{},"screens":{},"views":{},"favorite":"d1","fidelity":"live"}</script>
 <style>
 /* Round 3 mock CSS: page frame, baseline switch, disabled Einsatz rows and the three row comparisons. Live rules come from assets/03/holo-row.css. */
   [data-design] .mk-page { display: grid; gap: 16px; max-width: 1280px; margin: 0 auto; padding: 0 12px 16px; box-sizing: border-box; border-radius: 8px;
@@ -9331,7 +9332,7 @@ Spalte   OFFENSIVE  1.180 Dauer-DPS · besser als 78 % · Burst-DPS 1.640 · Alp
             <span class="anno-bubble-question">„Vergleich: Werk | Gespeichert“ über der Spaltenreihe: richtiger Platz, oder lieber im Kopfband neben „Standard-Loadout“?</span>
           </button>
           <div class="anno-bubble-body">
-            <textarea class="anno-answer" data-comment="anno-r3-d1-s1-a2" data-annotation="r3-d1-s1-a2" data-attachable placeholder="Deine Antwort…"></textarea>
+            <textarea class="anno-answer" data-comment="anno-r3-d1-s1-a2" data-annotation="r3-d1-s1-a2" data-attachable placeholder="Deine Antwort…">Ja, wobei immer gepsichert immer vorranigg ausgewählt. Bzw. ne, implizit soll das sein, nänlich in den balken markiert ggü. werk imemr ! </textarea>
             <div class="attach-slot" data-attach-slot="anno-r3-d1-s1-a2"></div>
           </div>
         </div>
@@ -9343,7 +9344,7 @@ Spalte   OFFENSIVE  1.180 Dauer-DPS · besser als 78 % · Burst-DPS 1.640 · Alp
             <span class="anno-bubble-question">Nicht passende Einsätze grau mit Grund in der Zeile: klar genug, oder Grund erst beim Darüberfahren?</span>
           </button>
           <div class="anno-bubble-body">
-            <textarea class="anno-answer" data-comment="anno-r3-d1-s1-a3" data-annotation="r3-d1-s1-a3" data-attachable placeholder="Deine Antwort…"></textarea>
+            <textarea class="anno-answer" data-comment="anno-r3-d1-s1-a3" data-annotation="r3-d1-s1-a3" data-attachable placeholder="Deine Antwort…">klar genug, aber die aktiven zu wenig offensichtlich ! </textarea>
             <div class="attach-slot" data-attach-slot="anno-r3-d1-s1-a3"></div>
           </div>
         </div>
@@ -10328,8 +10329,8 @@ Spalte   OFFENSIVE  1.180 Dauer-DPS · besser als 78 % · Burst-DPS 1.640 · Alp
       </div>
       <textarea data-comment="r3-d-basis-note" placeholder="Notiz (optional)"></textarea>
       <input type="hidden" name="dm-r3-d-basis-none" value="">
-      <input type="hidden" name="dm-r3-d-basis-hes" value="">
-      <input type="hidden" name="dm-r3-d-basis-touched" value="">
+      <input type="hidden" name="dm-r3-d-basis-hes" value="{&quot;ms&quot;:10508,&quot;revisits&quot;:0,&quot;median&quot;:16703}">
+      <input type="hidden" name="dm-r3-d-basis-touched" value="1">
       <input type="hidden" name="dm-r3-d-basis-issue" value="">
       <input type="hidden" name="dm-r3-d-basis-epic" value="">
       <div data-alevel="3" data-title="Basis beim Öffnen">
@@ -10366,8 +10367,8 @@ Basis Gespeichert  C2 „Frachtlauf“ → Schild HP +3.700 · Schild-Regen −7
       </div>
       <textarea data-comment="r3-d-gleich-note" placeholder="Notiz (optional)"></textarea>
       <input type="hidden" name="dm-r3-d-gleich-none" value="">
-      <input type="hidden" name="dm-r3-d-gleich-hes" value="">
-      <input type="hidden" name="dm-r3-d-gleich-touched" value="">
+      <input type="hidden" name="dm-r3-d-gleich-hes" value="{&quot;ms&quot;:7543,&quot;revisits&quot;:0,&quot;median&quot;:16703}">
+      <input type="hidden" name="dm-r3-d-gleich-touched" value="1">
       <input type="hidden" name="dm-r3-d-gleich-issue" value="">
       <input type="hidden" name="dm-r3-d-gleich-epic" value="">
       <div data-alevel="3" data-title="Vergleich ohne Änderung">
@@ -10387,7 +10388,7 @@ Getauscht   Gladius · OFFENSIVE  Dauer-DPS 1.310 (+130) · Burst-DPS 1.890 (+25
       <h3 data-question>Wie verhält sich der Patch-Vergleich zum Vergleich mit Werk oder Gespeichert?</h3>
       <div data-options>
         <label data-opt="third" data-recommended>
-          <input type="radio" name="dm-r3-d-patch" value="third" checked>
+          <input type="radio" name="dm-r3-d-patch" value="third">
           <span data-opt-label>Patch wird dritte Basis</span>
           <span data-opt-consequence>„Vergleich: Werk | Gespeichert | 4.3.1“; jede Zeile zeigt immer nur einen Vergleich.</span>
         </label>
@@ -10397,10 +10398,10 @@ Getauscht   Gladius · OFFENSIVE  Dauer-DPS 1.310 (+130) · Burst-DPS 1.890 (+25
           <span data-opt-consequence>Eine Zeile kann zwei Vergleiche tragen: zur Basis und zum alten Patch.</span>
         </label>
       </div>
-      <textarea data-comment="r3-d-patch-note" placeholder="Notiz (optional)"></textarea>
-      <input type="hidden" name="dm-r3-d-patch-none" value="">
-      <input type="hidden" name="dm-r3-d-patch-hes" value="">
-      <input type="hidden" name="dm-r3-d-patch-touched" value="">
+      <textarea data-comment="r3-d-patch-note" placeholder="Notiz (optional)">ne, patch ist nur üpber einordnujngzus sehen das reicht!</textarea>
+      <input type="hidden" name="dm-r3-d-patch-none" value="1">
+      <input type="hidden" name="dm-r3-d-patch-hes" value="{&quot;ms&quot;:25994,&quot;revisits&quot;:0,&quot;median&quot;:16703}">
+      <input type="hidden" name="dm-r3-d-patch-touched" value="1">
       <input type="hidden" name="dm-r3-d-patch-issue" value="">
       <input type="hidden" name="dm-r3-d-patch-epic" value="">
       <div data-alevel="3" data-title="Patch-Vergleich">
@@ -10428,7 +10429,7 @@ Ein Vergleich     Vergleich: Werk | Gespeichert | 4.3.1  →  Dauer-DPS 1.310  +
       <h3 data-question>Ist ein Einsatz wählbar, wenn die Ausstattung da ist, ihre Werte aber fehlen?</h3>
       <div data-options>
         <label data-opt="known" data-recommended>
-          <input type="radio" name="dm-r3-d-luecke" value="known" checked>
+          <input type="radio" name="dm-r3-d-luecke" value="known">
           <span data-opt-label>Wählbar, Bekanntes plus Lückenhinweis</span>
           <span data-opt-consequence>Prospector · Bergbau: Arbor MH1 · S1, 32 SCU Erz, dazu „Laserleistung fehlt in den Spieldaten“.</span>
         </label>
@@ -10438,10 +10439,10 @@ Ein Vergleich     Vergleich: Werk | Gespeichert | 4.3.1  →  Dauer-DPS 1.310  +
           <span data-opt-consequence>Bergbau bleibt grau mit „Werte fehlen noch“, auch bei echten Bergbauschiffen.</span>
         </label>
       </div>
-      <textarea data-comment="r3-d-luecke-note" placeholder="Notiz (optional)"></textarea>
-      <input type="hidden" name="dm-r3-d-luecke-none" value="">
-      <input type="hidden" name="dm-r3-d-luecke-hes" value="">
-      <input type="hidden" name="dm-r3-d-luecke-touched" value="">
+      <textarea data-comment="r3-d-luecke-note" placeholder="Notiz (optional)">das sollte es niccht geben,da nn pass den uploader an, bis er alles davon hat! Ggf. haben aber einige schiffe nicht alles, weil sie einfach z. B. kein mining schiff sind oder m odular ggf. mining oder nicht</textarea>
+      <input type="hidden" name="dm-r3-d-luecke-none" value="1">
+      <input type="hidden" name="dm-r3-d-luecke-hes" value="{&quot;ms&quot;:54720,&quot;revisits&quot;:1,&quot;median&quot;:16703}">
+      <input type="hidden" name="dm-r3-d-luecke-touched" value="1">
       <input type="hidden" name="dm-r3-d-luecke-issue" value="">
       <input type="hidden" name="dm-r3-d-luecke-epic" value="">
       <div data-alevel="3" data-title="Rolle ohne Daten">
@@ -10479,8 +10480,8 @@ Gladius · Bergbau     nicht wählbar: Keine Bergbau-Hardpoints</pre></div>
       </div>
       <textarea data-comment="r3-d-alles-note" placeholder="Notiz (optional)"></textarea>
       <input type="hidden" name="dm-r3-d-alles-none" value="">
-      <input type="hidden" name="dm-r3-d-alles-hes" value="">
-      <input type="hidden" name="dm-r3-d-alles-touched" value="">
+      <input type="hidden" name="dm-r3-d-alles-hes" value="{&quot;ms&quot;:10350,&quot;revisits&quot;:1,&quot;median&quot;:16703}">
+      <input type="hidden" name="dm-r3-d-alles-touched" value="1">
       <input type="hidden" name="dm-r3-d-alles-issue" value="">
       <input type="hidden" name="dm-r3-d-alles-epic" value="">
       <div data-alevel="3" data-title="Leitwerte bei „Alles“">
@@ -10519,8 +10520,8 @@ Danach  „Alles“ · Gladius → Offensive 1.180 Dauer-DPS · Verteidigung 4.3
       <input type="text" name="dm-r3-d-leitwert-fix" value="" placeholder="Was stimmt nicht?">
       <textarea data-comment="r3-d-leitwert-note" placeholder="Notiz (optional)"></textarea>
       <input type="hidden" name="dm-r3-d-leitwert-none" value="">
-      <input type="hidden" name="dm-r3-d-leitwert-hes" value="">
-      <input type="hidden" name="dm-r3-d-leitwert-touched" value="">
+      <input type="hidden" name="dm-r3-d-leitwert-hes" value="{&quot;ms&quot;:16703,&quot;revisits&quot;:0,&quot;median&quot;:16703}">
+      <input type="hidden" name="dm-r3-d-leitwert-touched" value="1">
       <input type="hidden" name="dm-r3-d-leitwert-issue" value="">
       <input type="hidden" name="dm-r3-d-leitwert-epic" value="">
       <div data-alevel="3" data-title="Leitwert je Einsatz">
@@ -10565,8 +10566,8 @@ Transport · C2   → Verteidigung 62.000 Rumpf HP ★ · Bewegung 696 SCU Frach
       </div>
       <textarea data-comment="r3-d-werkzeug-note" placeholder="Notiz (optional)"></textarea>
       <input type="hidden" name="dm-r3-d-werkzeug-none" value="">
-      <input type="hidden" name="dm-r3-d-werkzeug-hes" value="">
-      <input type="hidden" name="dm-r3-d-werkzeug-touched" value="">
+      <input type="hidden" name="dm-r3-d-werkzeug-hes" value="{&quot;ms&quot;:106808,&quot;revisits&quot;:7,&quot;median&quot;:16703}">
+      <input type="hidden" name="dm-r3-d-werkzeug-touched" value="1">
       <input type="hidden" name="dm-r3-d-werkzeug-issue" value="">
       <input type="hidden" name="dm-r3-d-werkzeug-epic" value="">
       <div data-alevel="3" data-title="Platz des Werkzeugs">
