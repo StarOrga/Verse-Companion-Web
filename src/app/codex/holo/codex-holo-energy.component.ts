@@ -15,6 +15,7 @@ import {
   Component,
   computed,
   effect,
+  inject,
   input,
   linkedSignal,
   output,
@@ -22,6 +23,7 @@ import {
 } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 
+import { LocaleService } from '../../core/locale/locale.service';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { AreaSymbolComponent } from '../../shared/area-symbol/area-symbol.component';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
@@ -150,7 +152,7 @@ const round1 = (v: number): number => Math.round(v * 10) / 10;
                               scTooltipTier="label" (click)="toggle(c)">
                         <sc-area-symbol [area]="c.symbol" />
                       </button>
-                      <span class="cl">{{ c.labelKey | translate: c.labelParams }}</span>
+                      <span class="cl" [attr.lang]="lang()">{{ c.labelKey | translate: c.labelParams }}</span>
                       <span class="step" role="group" [attr.aria-label]="c.labelKey | translate: c.labelParams">
                         <button type="button" class="stp" [disabled]="c.used <= 0"
                                 [attr.aria-label]="'codex.holo.energy.less' | translate: { group: (c.labelKey | translate: c.labelParams) }"
@@ -229,7 +231,7 @@ const round1 = (v: number): number => Math.round(v * 10) / 10;
       .gen-s { margin-top: auto; font-size: 13px; color: var(--sc-fg-2); }
       .gen-s .is-ok { color: var(--sc-success); }
       .gen-s .is-warn { color: var(--sc-warning); }
-      .en-cols { display: flex; justify-content: center; align-items: flex-end; gap: 20px; min-width: 0; overflow-x: auto; padding-top: 28px; }
+      .en-cols { display: flex; justify-content: safe center; align-items: flex-end; gap: 20px; min-width: 0; overflow-x: auto; padding-top: 28px; }
       .grp { display: flex; flex-direction: column; align-items: stretch; flex: none; }
       .grp[data-p='offensive'] { --p: var(--sc-area-offensive); }
       .grp[data-p='defensive'] { --p: var(--sc-area-defensive); }
@@ -250,7 +252,7 @@ const round1 = (v: number): number => Math.round(v * 10) / 10;
       @media (hover: hover) { .gbtn:hover { border-color: var(--p); background: color-mix(in srgb, var(--p) 10%, transparent); } }
       .gbtn.is-off { color: var(--sc-fg-2); border-style: dashed; }
       .gbtn:focus-visible, .stp:focus-visible, .reset:focus-visible { outline: 1px solid transparent; box-shadow: var(--sc-focus-ring); }
-      .cl { min-block-size: 2.5em; font-size: 13px; line-height: 1.25; color: var(--sc-fg-1); text-align: center; hyphens: auto; overflow-wrap: anywhere; }
+      .cl { max-inline-size: 100%; min-block-size: 2.5em; font-size: 13px; line-height: 1.25; color: var(--sc-fg-1); text-align: center; hyphens: auto; overflow-wrap: break-word; }
       .step { display: inline-flex; gap: 4px; }
       .stp { display: grid; place-items: center; inline-size: 28px; block-size: 28px; padding: 0; border: 1px solid var(--sc-border); border-radius: 4px; background: none; color: var(--sc-fg-1); cursor: pointer; }
       .stp svg { inline-size: 14px; block-size: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
@@ -288,6 +290,8 @@ const round1 = (v: number): number => Math.round(v * 10) / 10;
   ],
 })
 export class CodexHoloEnergyComponent {
+  /** Language of the column labels, so `hyphens: auto` splits German words at syllables. */
+  protected readonly lang = inject(LocaleService).language;
   readonly occupants = input.required<readonly SummaryOccupant[]>();
   readonly shipStats = input<Record<string, Record<string, unknown>> | null>(null);
   readonly schemaVersion = input<number | null>(null);

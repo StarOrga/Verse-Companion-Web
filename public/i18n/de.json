@@ -1500,7 +1500,7 @@
         "emFrom": "EM entdeckt ab",
         "irFrom": "IR entdeckt ab",
         "reset": "Zurücksetzen",
-        "coolingNote": "{{used}} von {{total}} Kühlleistung · Reserve {{reserve}} %"
+        "coolingNote": "{{used}} von {{total}} Kühlleistung · Reserve {{reserve}}\u00a0%"
       },
       "head": {
         "rankAria": "Rang {{n}} von 100 in der Klasse",
