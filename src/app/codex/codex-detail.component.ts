@@ -289,6 +289,7 @@ import { HoloSilhouette } from './holo-silhouette';
 import { CodexHoloStageComponent, HoloSharedBanner } from './holo/codex-holo-stage.component';
 import { AssetPackageViewerComponent } from './asset-package/asset-package-viewer.component';
 import { AssetPackageService } from './asset-package/asset-package.service';
+import { ShipPrefetchService } from './ship-prefetch.service';
 import type { AssetPackageKind, AssetPackageRow } from './asset-package/asset-package.model';
 import { ALL_KPI_KEYS } from './codex-build-compare';
 import type { BuildRef, PortOccupantMap } from './codex-build-compare';
@@ -1784,6 +1785,8 @@ export class CodexDetailComponent implements OnInit {
     return this.route.snapshot.fragment === SHIP_SOURCE_FRAGMENT;
   }
   private readonly router = inject(Router);
+  /** Idle prefetch of the classic ship page's 3D model (#404). */
+  private readonly shipPrefetch = inject(ShipPrefetchService);
   private readonly analytics = inject(AnalyticsService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly t = inject(TranslateService);
@@ -3169,6 +3172,19 @@ export class CodexDetailComponent implements OnInit {
   private readonly lang = signal<Lang>(toLang(this.t.getCurrentLang() || this.t.getFallbackLang()));
 
   constructor() {
+    // #404: on the classic ship page the model loads only on "3D". Once the page
+    // settled and the stage reported a model, fetch it in idle time, so the press
+    // opens straight into it (the Holotable preloads in its own stage).
+    effect(() => {
+      const ship = this.kind() === 'ship' && !this.holoView() && this.has3dView() && !this.loading() && !this.error()
+        ? this.shipClassName()
+        : '';
+      untracked(() => {
+        if (ship) void this.shipPrefetch.start(ship);
+        else this.shipPrefetch.stop();
+      });
+    });
+    this.destroyRef.onDestroy(() => this.shipPrefetch.stop());
     // The item page starts on its first tab for every item; the Nachschub lookup is only needed when opened from the HQ.
     effect(() => {
       if (this.detail()) untracked(() => this.itemTab.set('einordnung'));
@@ -4009,11 +4025,13 @@ export class CodexDetailComponent implements OnInit {
    */
   /** Press / focus on a slot card: the picker builds that slot's list before the click opens it. */
   prepareSwapPicker(ev: LayoutTarget): void {
+    this.shipPrefetch.yieldToForeground();
     const t = this.swapTargetFor(ev);
     if (t) this.swapPicker()?.prepare(t);
   }
 
   openSwapPicker(ev: LayoutTarget): void {
+    this.shipPrefetch.yieldToForeground();
     const t = this.swapTargetFor(ev);
     if (t) this.swapTarget.set(t);
   }
@@ -5295,6 +5313,7 @@ export class CodexDetailComponent implements OnInit {
    * struct and marks what the game files do not carry.
    */
   openInspect(ev: LayoutTarget): void {
+    this.shipPrefetch.yieldToForeground();
     const source = ev.child
       ? {
           className: ev.child.className,
