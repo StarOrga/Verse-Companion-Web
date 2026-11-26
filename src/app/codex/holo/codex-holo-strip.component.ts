@@ -403,6 +403,10 @@ let uidSeq = 0;
         .holo-strip { margin-inline-end: var(--fab-clear, 0px); }
         .hs-row { padding-inline-end: 0; }
       }
+      /* Tablet: the "continue on the phone" button owns the bottom-left corner the same way (it lay over "Offensive"). */
+      @media (min-width: 641px) and (max-width: 1000px) {
+        .holo-strip { margin-inline-start: var(--fab-clear-start, 0px); }
+      }
       .hs-panel { position: absolute; inset-inline: -1px; inset-block-end: 100%; z-index: 4;
         display: flex; flex-direction: column; gap: 0;
         max-block-size: calc(100dvh - var(--holo-strip-h, 64px) - 72px); overflow-y: auto; overscroll-behavior: contain;
@@ -706,6 +710,10 @@ export class CodexHoloStripComponent {
     if (dock && dock.width > 0) free = Math.min(free, dock.left - gutter / 2);
     const clear = Math.max(0, Math.round(box.right - free));
     el.style.setProperty('--fab-clear', `${clear}px`);
+    // The handoff button's twin corner on the left (tablet only, see the styles): the bar starts after it.
+    const handoff = document.querySelector('sc-handoff-button .wrap')?.getBoundingClientRect();
+    const startClear = handoff && handoff.width > 0 ? Math.max(0, Math.round(handoff.right + gutter / 2 - box.left)) : 0;
+    el.style.setProperty('--fab-clear-start', `${startClear}px`);
     // The stage's shared columns end with the same lane, so the parts and the
     // perspectives above stay on the bar's columns (concept r1 d2).
     (el.closest('.holo-stage, [data-holo-root]') as HTMLElement | null)?.style.setProperty('--holo-fab-clear', `${clear}px`);

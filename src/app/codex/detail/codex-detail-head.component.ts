@@ -118,7 +118,8 @@ export function naturalTop(host: HTMLElement): number | null {
         box-shadow: 0 16px 28px -22px color-mix(in srgb, var(--sc-accent) 70%, transparent);
         -webkit-backdrop-filter: blur(10px) saturate(1.15);
         backdrop-filter: blur(10px) saturate(1.15);
-        transition: padding 220ms ease, min-height 220ms ease;
+        /* No height transition: the flow below keeps the full height only through the slim margin, so a band that
+           grew back over 220 ms at the page top pulled the whole page up and pushed it down again (scroll jump). */
       }
       /* The cyan hairline the band rests on, with its own light. */
       :host::after {
@@ -137,7 +138,6 @@ export function naturalTop(host: HTMLElement): number | null {
         margin: 0; min-width: 0; font-weight: 500; font-size: clamp(20px, 1.25vw, 24px); line-height: 1.15; letter-spacing: 0.16em;
         text-transform: uppercase; color: var(--sc-fg-0); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         animation: name-in 520ms cubic-bezier(0.16, 0.84, 0.24, 1) backwards;
-        transition: font-size 220ms ease, letter-spacing 220ms ease;
       }
       .ht-name:focus-visible { outline: 1px solid transparent; border-radius: 4px; box-shadow: var(--sc-focus-ring); }
       .ht-kicker { min-width: 0; font-size: max(11px, var(--sc-fs-floor)); letter-spacing: 0.04em; color: var(--sc-fg-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -178,7 +178,8 @@ export function naturalTop(host: HTMLElement): number | null {
         margin-bottom: max(0px, calc(var(--hb-full, 0px) - var(--hb-slim-h)));
       }
       :host(.slim) .ht-title { flex-direction: row-reverse; justify-content: flex-end; align-items: baseline; gap: 10px; }
-      :host(.slim) .ht-name { font-size: max(15px, var(--sc-fs-floor)); letter-spacing: 0.14em; animation: none; }
+      /* The animation stays as it is: switching it to none and back replayed the name's scan on every return to the top. */
+      :host(.slim) .ht-name { font-size: max(15px, var(--sc-fs-floor)); letter-spacing: 0.14em; }
       :host(.slim) .ht-kicker { flex: none; font-size: max(10.5px, var(--sc-fs-floor)); }
       :host(.slim) .ht-extra { display: none; }
       :host(.slim) .ht-centre { justify-self: start; }
@@ -207,7 +208,6 @@ export function naturalTop(host: HTMLElement): number | null {
         :host(.slim) .ht-centre { justify-self: end; }
       }
       @media (prefers-reduced-motion: reduce) {
-        :host, .ht-name { transition: none; }
         .ht-name, :host(.scan) .ht-name, :host(.scan) .ht-title::after { animation: none; }
       }
     `,

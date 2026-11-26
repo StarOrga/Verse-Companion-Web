@@ -3381,6 +3381,7 @@
       "upcomingTitle": "Demnächst im Verse",
       "aria": "Laufende und kommende Ingame-Events",
       "allPosts": "Alle Event-Beiträge",
+      "imageOpen": "Offizielles Bild zu {{name}} in voller Größe öffnen",
       "runningUntil": "Läuft · bis {{date}}",
       "endsToday": "Läuft · endet heute",
       "startsTomorrow": "Ab morgen, {{date}}",
@@ -5577,6 +5578,7 @@
     "search": {
       "label": "Feedback durchsuchen",
       "placeholder": "Suchen … Thema, ganzer Thread oder #Nummer",
+      "placeholderShort": "Suchen oder #Nr.",
       "clear": "Suche löschen",
       "results": "{{count}} Treffer · nach Relevanz",
       "empty": "Keine Treffer für „{{query}}“.",
@@ -5832,6 +5834,7 @@
       "declined": "Nicht umgesetzt",
       "rejected": "Verworfen",
       "loop": "Nachbesserung",
+      "confirming": "Wird ausgeliefert · Bestätigung folgt",
       "pathLabel": "Stand: {{station}}",
       "step": {
         "contract": "Eingereicht · Freigabe steht aus",

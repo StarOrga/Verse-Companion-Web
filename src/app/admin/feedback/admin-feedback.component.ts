@@ -234,7 +234,8 @@ type AvatarTone = 'adm' | 'col' | 'usr';
       [class.embedded]="embedded()"
       [class.sc-dense]="embedded()"
       [class.large]="isLarge()"
-      [class.overlay-open]="overlayOpen()">
+      [class.overlay-open]="overlayOpen()"
+      [class.composing]="composerOpen()">
       @if (!embedded()) {
         <header class="head">
           <div>
@@ -292,7 +293,12 @@ type AvatarTone = 'adm' | 'col' | 'usr';
              phone) hides them again via the container query on the topbar. -->
         <div class="topbar">
           <div class="search-box" [class.active]="searchQuery().length > 0">
-            <span class="search-icon" aria-hidden="true">&#9099;</span>
+            <!-- A drawn magnifier, not a font glyph: the old ⎋ character came out
+                 as a tiny broken circle on Android and read as "no entry". -->
+            <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2" />
+              <path d="M16 16l4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
             <input
               #searchInput
               type="search"
@@ -300,7 +306,7 @@ type AvatarTone = 'adm' | 'col' | 'usr';
               [value]="searchQuery()"
               (input)="setSearch($any($event.target).value)"
               (keydown.escape)="clearSearch(); searchInput.blur(); $event.stopPropagation()"
-              [attr.placeholder]="'adminFeedback.search.placeholder' | translate"
+              [attr.placeholder]="(phone() ? 'adminFeedback.search.placeholderShort' : 'adminFeedback.search.placeholder') | translate"
               [attr.aria-label]="'adminFeedback.search.label' | translate" />
             @if (searchQuery().length > 0) {
               <button
@@ -329,7 +335,19 @@ type AvatarTone = 'adm' | 'col' | 'usr';
             [attr.aria-expanded]="filtersOpen()"
             [scTooltip]="filterCount() > 0 ? ('adminFeedback.filters.activeHint' | translate: { count: filterCount() }) : null"
             [attr.aria-label]="'adminFeedback.filters.open' | translate">
-            <span aria-hidden="true">⚲</span>
+            <!-- A funnel, drawn like the progress glyph next to it: the ⚲ font
+                 glyph rendered as a pin a few pixels tall on a phone, where the
+                 word beside it is hidden. -->
+            <span class="tb-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path
+                  d="M4 5h16l-6.2 7.4V18l-3.6 1.8v-7.4z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linejoin="round" />
+              </svg>
+            </span>
             <span class="tb-label">{{ 'adminFeedback.filters.open' | translate }}</span>
             @if (filterCount() > 0) { <span class="tb-count">{{ filterCount() }}</span> }
           </button>
@@ -1098,7 +1116,7 @@ type AvatarTone = 'adm' | 'col' | 'usr';
     .tb-title { font-weight: 600; font-size: 0.9rem; }
     .search-box { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 10px; background: var(--sc-bg-1); border: 1px solid var(--sc-border); border-radius: 8px; }
     .search-box:focus-within, .search-box.active { border-color: var(--sc-accent); }
-    .search-icon { color: var(--sc-fg-2); flex: 0 0 auto; }
+    .search-icon { display: block; width: 18px; height: 18px; color: var(--sc-fg-2); flex: 0 0 auto; }
     .search-box input { flex: 1 1 auto; min-width: 0; background: transparent; border: 0; color: var(--sc-fg-0); font: inherit; font-size: max(0.86rem, var(--sc-fs-input)); outline: none; }
     .search-clear { flex: 0 0 auto; min-width: max(32px, var(--sc-tap-min)); min-height: max(32px, var(--sc-tap-min)); background: transparent; border: 0; color: var(--sc-fg-2); font-size: 1.1rem; cursor: pointer; }
     .tb-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; min-width: 44px; padding: 0 12px; background: var(--sc-bg-1); border: 1px solid var(--sc-border); border-radius: 8px; color: var(--sc-fg-1); font: inherit; font-size: max(0.82rem, var(--sc-fs-floor)); cursor: pointer; }
@@ -1388,8 +1406,40 @@ type AvatarTone = 'adm' | 'col' | 'usr';
     .cs-close { min-width: 40px; min-height: 40px; background: transparent; border: 0; color: var(--sc-fg-2); font-size: 1rem; cursor: pointer; }
 
     @media (max-width: 720px) {
-      .page.embedded { padding: var(--sc-pad-3); }
+      /* PHONE SHEET (Jerry, 2026-11-23: "das Feedback-Panel in mobile sieht
+         nicht toll aus"). One side gutter for the whole sheet — the panel's
+         own head, the stream, an opened topic and its reply bar all start at
+         --sc-pad-1 (12px on a phone). The 6px leaf padding this used to take
+         put the card borders against the glass, and every layer below had its
+         own idea of the edge (14 / 8 / 6px). */
+      .page.embedded { padding: var(--sc-pad-1); }
+      .page.embedded .sh-head,
+      .page.embedded .sh-body { padding-inline: var(--sc-pad-1); }
+      .page.embedded .sh-composer { padding-inline: var(--sc-pad-1); }
+      /* Eight px off each side of the sign-off pill is what keeps "＋ · 📷 ·
+         🎤 · ✓ Abgenommen · ⏎" on ONE line down to a 360px phone instead of
+         dropping the send key onto a line of its own. */
+      .sh-composer .sign-off { padding-inline: 8px; }
       .ch-time { flex-basis: 100%; margin-left: 0; }
+      /* Two lines of title instead of one: at ~250px a single ellipsised line
+         left "PostHog: ingest-catalog HTTP 503 in…" — the part that tells
+         two topics apart was always the part cut off. */
+      .topic-title {
+        white-space: normal;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        overflow-wrap: anywhere;
+      }
+      /* Writing a new topic owns the sheet. Pinned under the stream it left
+         one squeezed card above a composer that had to scroll inside itself;
+         the sheet's own ✕ brings the stream back. The stream is collapsed,
+         not removed, so its scroll position survives the round trip. */
+      .page.embedded.composing > .topbar,
+      .page.embedded.composing > .threads-stale { display: none; }
+      .page.embedded.composing > .scroll { flex: 0 0 0; visibility: hidden; margin-top: calc(-1 * var(--sc-gap-2)); }
+      .page.embedded.composing > .compose-sheet { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding-top: 0; border-top: 0; }
     }
   `],
 })
@@ -2394,7 +2444,7 @@ export class AdminFeedbackComponent implements OnInit {
       .from('admin_feedback')
       // `author.role` colours the avatar; admins may read every profile
       // (policy profiles_admin_read_all), so no projection is needed.
-      .select('id, seq, author_id, origin, body, status, ship_ref, processing_note, created_at, updated_at, shipped_at, processed_at, reviewed_at, source, triaged, decision_note, area, summary, complex, author:profiles(display_name, username, role)')
+      .select('id, seq, author_id, origin, body, status, ship_ref, processing_note, created_at, updated_at, shipped_at, processed_at, reviewed_at, review_reply_pending, source, triaged, decision_note, area, summary, complex, author:profiles(display_name, username, role)')
       .order('created_at', { ascending: true });
     if (error) {
       this.errorMsg.set(toErrorKey('admin-feedback', 'load board', error));

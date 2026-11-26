@@ -227,14 +227,15 @@ export interface HoloPerspectiveView {
     /* Inside the strip's dock: the dock is the frame. */
     :host(.row.in-dock) { border: 0; border-radius: 0; background: none; overflow: visible; }
     /* The switch has a slim line of its own above the tiles, right-aligned: the four columns stay where the strip's four groups are. */
-    .all-line { grid-column: 1 / -1; display: flex; justify-content: flex-end; padding: 0 12px; }
+    .all-line { grid-column: 1 / -1; display: flex; justify-content: flex-end; padding: 4px 16px 0; }
     .all-expand { background: none; border: none; padding: 0; cursor: pointer; font-family: var(--d); text-transform: uppercase;
       font-size: max(8.5px, var(--f)); letter-spacing: 0.14em; color: var(--sc-fg-2); min-height: var(--sc-tap-min, 24px); transition: color var(--holo-t-fast) ease; }
     .all-expand:hover, .all-expand[aria-expanded="true"] { color: var(--sc-accent); }
     .all-expand:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); border-radius: var(--holo-r-xs); }
-    :host(.row) .ptile { border: 0; border-inline-start: 1px solid var(--sc-border); border-radius: 0; padding: 12px 12px 10px; gap: 8px;
+    /* The row is the frame: tiles only draw the rule between each other, never a second edge on the frame's (as the strip's groups). */
+    :host(.row) .ptile { border: 0; border-radius: 0; padding: 12px 16px 12px; gap: 8px;
       background: none; box-shadow: inset 0 2px 0 var(--p); }
-    :host(.row) .ptile:last-child { border-inline-end: 1px solid var(--sc-border); }
+    :host(.row) .ptile + .ptile { border-inline-start: 1px solid var(--sc-border); }
     :host(.row) .ptile::before { display: none; }
     :host(.row) .pt-head .prof { display: none; }
     :host(.row) .pt-main { grid-template-columns: minmax(0, 1fr) 64px; gap: 8px; }
@@ -243,7 +244,7 @@ export interface HoloPerspectiveView {
     :host(.row) .subs { grid-template-columns: repeat(auto-fit, minmax(84px, 1fr)); }
     @media (max-width: 1000px) {
       :host(.row) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      :host(.row) .ptile:nth-of-type(odd) { border-inline-end: 0; }
+      :host(.row) .ptile:nth-of-type(odd) { border-inline-start: 0; }
     }
     /* Phone (concept r1-dock-phone "swipe"): the four areas side by side,
        one large at a time, swiped sideways with a snap. */

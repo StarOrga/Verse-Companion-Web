@@ -63,7 +63,7 @@ export interface StripMission {
       .einsatz { display: inline-flex; align-items: center; gap: 8px; box-sizing: border-box; block-size: var(--hb-pill-h, 34px); padding: 0 14px;
         border: 1px solid var(--hb-pill-bd, color-mix(in srgb, var(--sc-accent) 30%, transparent)); border-radius: var(--hb-pill-r, 999px);
         background: var(--hb-pill-bg, color-mix(in srgb, var(--sc-bg-0) 52%, transparent)); color: var(--sc-fg-0); font: inherit; cursor: pointer; white-space: nowrap;
-        transition: border-color 160ms ease, background 160ms ease, block-size 220ms ease; max-inline-size: 100%; min-inline-size: 0; }
+        transition: border-color 160ms ease, background 160ms ease; max-inline-size: 100%; min-inline-size: 0; }
       .einsatz:hover, .einsatz[aria-expanded='true'] { border-color: var(--sc-accent); background: color-mix(in srgb, var(--holo-e, var(--sc-accent)) 12%, transparent); }
       .einsatz:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .lab { display: var(--hb-pill-meta, inline); padding-inline-end: 8px; border-inline-end: 1px solid color-mix(in srgb, var(--sc-accent) 22%, transparent);

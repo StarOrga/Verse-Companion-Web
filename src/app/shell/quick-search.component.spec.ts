@@ -11,6 +11,10 @@ import { CodexSearchHub, isTypeToSearchKey } from '../codex/search/codex-search-
 import { QuickSearchComponent } from './quick-search.component';
 import { SearchOpenService } from './search-open.service';
 import { fakeSupabase } from '../testing/fake-supabase';
+import { UpcomingShipsService } from '../codex/upcoming-ships.service';
+import type { PolySearchHit } from '../codex/codex-poly-search';
+import { ItemPathService } from '../hq/data/item-path.service';
+import { fakeItemPath } from '../shared/item-path/item-path.testing';
 
 describe('QuickSearchComponent', () => {
   let searchAll: Mock;
@@ -164,6 +168,41 @@ describe('QuickSearchComponent', () => {
     const text = document.querySelector('.cdk-overlay-container')?.textContent ?? '';
     expect(text).toContain('codex.search.bar.failed');
     expect(text).not.toContain('codex.search.bar.empty');
+    fixture.componentInstance.close();
+  }));
+
+  it('a ship row shows the colour RSI render of its hull, an item row keeps its category icon (#402)', fakeAsync(() => {
+    const hit = (kind: 'ship' | 'item', slug: string, name: string): PolySearchHit => ({
+      kind, classNameSlug: slug, nameLocalized: name, manufacturerCode: null, manufacturerName: null,
+      size: null, grade: null, scope: 'equipment',
+    });
+    searchAll.mockResolvedValue({
+      hits: [hit('ship', 'aegs_gladius', 'Gladius'), hit('item', 'gladius_pilot_helmet', 'Gladius Pilot Helmet')],
+      totals: { ship: 1, item: 1 },
+    });
+    // Ship rows carry the HQ path; its own spec covers it.
+    TestBed.overrideProvider(ItemPathService, { useValue: fakeItemPath() });
+    TestBed.inject(UpcomingShipsService).feed.set({
+      ships: [], counts: null, fetchedAt: '2026-11-26T00:00:00Z',
+      gameShipArt: { gladius: { name: 'Gladius', rsiUrl: null, thumbnails: ['https://media.example/gladius.jpg'] } },
+    });
+    const fixture = create();
+    fixture.componentInstance.open();
+    fixture.componentInstance.engine.setInput('gladius');
+    tick(1000);
+    fixture.detectChanges();
+
+    const rows = Array.from(document.querySelectorAll<HTMLElement>('.cdk-overlay-container .hit'));
+    const ship = rows.find((r) => r.querySelector('.name')?.textContent?.trim() === 'Gladius')!;
+    const item = rows.find((r) => r.textContent?.includes('Helmet'))!;
+    const img = ship.querySelector<HTMLImageElement>('.icon.art img')!;
+    expect(img.getAttribute('src')).toBe('https://media.example/gladius.jpg');
+    expect(img.getAttribute('loading')).toBe('lazy');
+    expect(img.getAttribute('width')).toBe('44');
+    expect(img.getAttribute('height')).toBe('30');
+    expect(img.getAttribute('alt')).toBe('Gladius');
+    expect(item.querySelector('.icon.art')).toBeNull();
+    expect(item.querySelector('.icon sc-codex-icon')).not.toBeNull();
     fixture.componentInstance.close();
   }));
 

@@ -833,7 +833,8 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   --holo-gold: var(--accent-gold, #c8a84b); --holo-gold-rgb: var(--accent-gold-rgb, 200, 168, 75);
   --a4: color-mix(in srgb, var(--sc-accent) 4%, transparent); --a5: color-mix(in srgb, var(--sc-accent) 5%, transparent); --a7: color-mix(in srgb, var(--sc-accent) 7%, transparent); --a10: color-mix(in srgb, var(--sc-accent) 10%, transparent); --a12: color-mix(in srgb, var(--sc-accent) 12%, transparent); --a14: color-mix(in srgb, var(--sc-accent) 14%, transparent); --a22: color-mix(in srgb, var(--sc-accent) 22%, transparent); --a28: color-mix(in srgb, var(--sc-accent) 28%, transparent); --a40: color-mix(in srgb, var(--sc-accent) 40%, transparent); --a50: color-mix(in srgb, var(--sc-accent) 50%, transparent); --a55: color-mix(in srgb, var(--sc-accent) 55%, transparent); --a80: color-mix(in srgb, var(--sc-accent) 80%, transparent);
   --e-out: var(--holo-e-out); --e-io: var(--holo-e-io);
-  --panel-w: clamp(320px, 22.2vw, 360px);
+  /* 344 px floor: below it the panel's three tabs no longer fit and turned into a cut-off scroll row (1440 px). */
+  --panel-w: clamp(344px, 25vw, 360px);
   /* The fixed right card and the Akte card share one height (concept holotisch-feinschliff C14/C20). */
   --holo-card-h: min(100%, 540px);
   /* The strip's columns, shared by everything below the first screen: the four areas evenly, edge on edge with the strip's four groups. */
@@ -974,7 +975,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
 
   /* ── The bottom row (r4 d1, C6): views = one choice as thumbnails, filters = multi-select chips ── */
   .holo-views { grid-column: 1 / -1; grid-row: 2; position: relative; z-index: 2; display: flex; align-items: flex-end; gap: 12px; min-width: 0;
-  padding: 6px 10px 7px; margin-bottom: calc(-1 * 8px); border: 1px solid color-mix(in srgb, var(--sc-accent) 42%, transparent); border-bottom: 0;
+  padding: 6px 10px 7px; margin-bottom: calc(-1 * 8px); border: 1px solid color-mix(in srgb, var(--holo-e, var(--sc-accent)) 28%, transparent); border-bottom: 0;
   border-radius: 12px 12px 0 0; background: color-mix(in srgb, var(--sc-bg-0) 88%, var(--sc-accent) 4%); }
   .vw { display: flex; align-items: flex-end; gap: 6px; min-width: 0; flex: none; }
   .vw-grp { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
@@ -1029,15 +1030,15 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   @media (min-width: 1001px) { .holo-scope ::ng-deep .pin-key { display: none; } }
 
   /* ── Below: side column | four area columns (the strip's columns) ── */
-  .holo-below { display: grid; grid-template-columns: var(--holo-cols); column-gap: 0; row-gap: 8px; align-items: start; margin-top: 10px; }
+  .holo-below { display: grid; grid-template-columns: var(--holo-cols); column-gap: 0; row-gap: 12px; align-items: start; margin-top: 24px; }
   .below-head { grid-column: 1 / 5; grid-row: 1; margin-bottom: 0; }
   .below-head .n { font-family: var(--m); letter-spacing: 0; text-transform: none; color: var(--sc-fg-2); }
-  .below-area { grid-row: 2; min-width: 0; padding: 4px 10px 8px; border-inline-start: 1px solid var(--l1); box-shadow: inset 0 2px 0 var(--p); }
+  .below-area { grid-row: 2; min-width: 0; padding: 8px 16px 16px; border-inline-start: 1px solid var(--l1); box-shadow: inset 0 2px 0 var(--p); }
   .below-area[data-p="offensive"] { --p: var(--holo-p-offensive); }
   .below-area[data-p="defensive"] { --p: var(--holo-p-defensive); }
   .below-area[data-p="movement"] { --p: var(--holo-p-movement); }
   .below-area[data-p="signature"] { --p: var(--holo-p-signature); border-inline-end: 1px solid var(--l1); }
-  .area-h { display: flex; align-items: center; gap: 6px; margin: 6px 0 4px; font-family: var(--d); font-weight: 400; text-transform: uppercase; font-size: max(9.5px, var(--f)); letter-spacing: 0.14em; color: var(--p, var(--sc-accent)); }
+  .area-h { display: flex; align-items: center; gap: 6px; margin: 4px 0 12px; font-family: var(--d); font-weight: 400; text-transform: uppercase; font-size: max(9.5px, var(--f)); letter-spacing: 0.14em; color: var(--p, var(--sc-accent)); }
   .area-empty { margin: 4px 0; font-size: max(11.5px, var(--f)); color: var(--sc-fg-2); }
   .holo-below .holo-details { grid-column: 1 / 5; grid-row: 3; min-width: 0; }
   /* At the page's end the perspectives sit right on the strip. */
@@ -1108,7 +1109,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .holo-body { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; height: auto; min-height: 0; }
   .holo-panel { height: auto; align-self: stretch; }
   /* The row stands under the table on its own: rounded all round, views and filters wrap onto two lines. */
-  .holo-views { flex-wrap: wrap; margin-bottom: 0; border-bottom: 1px solid color-mix(in srgb, var(--sc-accent) 42%, transparent); border-radius: 12px; }
+  .holo-views { flex-wrap: wrap; margin-bottom: 0; border-bottom: 1px solid color-mix(in srgb, var(--holo-e, var(--sc-accent)) 28%, transparent); border-radius: 12px; }
   .vw { max-width: 100%; overflow-x: auto; }
   .vw-sep { display: none; }
   .vf { flex-basis: 100%; align-items: flex-start; }
