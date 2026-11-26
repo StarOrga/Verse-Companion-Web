@@ -7,6 +7,7 @@ import {
   ElementRef,
   HostListener,
   computed,
+  inject,
   input,
   output,
   signal,
@@ -17,6 +18,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { MissionId, missionById } from '../codex-mission';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import { MISSION_ICON, missionColor } from './codex-holo-mission';
+import { AnalyticsService } from '../../core/analytics.service';
 
 /** One choice of the Einsatz picker. */
 export interface StripMission {
@@ -44,12 +46,20 @@ export interface StripMission {
     @if (open()) {
       <div class="mission-pop" role="radiogroup" tabindex="-1"[attr.aria-label]="'codex.mission.label' | translate" (keydown.escape)="close($event)">
         @for (m of missions(); track m.id) {
+          <!-- Not equipped for it = not selectable (concept r2-d-ohnedaten): the reason stays visible in the
+               row (r3 a3 "klar genug"), as tooltip and for screen readers (codex-mission-bar pattern). -->
           <button type="button" class="mp" role="radio" [class.on]="m.id === active()" [attr.aria-checked]="m.id === active()"
                   [attr.aria-disabled]="!!m.disabledKey" [class.dis]="!!m.disabledKey"
+                  [attr.aria-describedby]="m.disabledKey ? ('einsatz-why-' + m.id) : null"
                   [scTooltip]="m.disabledKey ? (m.disabledKey | translate) : null" scTooltipTier="label"
                   (click)="pick(m)">
             <span class="mp-l" [style.--h]="hueOf(m.id)"><svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="iconOf(m.id)" /></svg>{{ m.labelKey | translate }}</span>
-            @if (!m.disabledKey) { <small>{{ m.sub }}</small> }
+            @if (m.disabledKey) {
+              <small class="why" aria-hidden="true">{{ m.disabledKey | translate }}</small>
+              <span class="sc-sr-only" [id]="'einsatz-why-' + m.id">{{ m.disabledKey | translate }}</span>
+            } @else {
+              <small>{{ m.sub }}</small>
+            }
           </button>
         }
       </div>
@@ -77,14 +87,20 @@ export interface StripMission {
       .mp-l svg, .val svg { inline-size: 1.15em; block-size: 1.15em; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
       .mission-pop { position: absolute; inset-block-start: calc(100% + 6px); inset-inline-start: 50%; translate: -50% 0; z-index: 30; display: grid; gap: 2px; padding: 6px; min-inline-size: 260px;
         background: var(--sc-bg-0); border: 1px solid color-mix(in srgb, var(--sc-accent) 45%, var(--sc-bg-0)); border-radius: 10px; box-shadow: 0 10px 30px rgb(0 0 0 / 0.5); }
-      .mp { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 6px 10px; min-block-size: var(--sc-tap-min, 32px); background: none; border: 0; border-radius: 6px;
-        color: var(--sc-fg-1); font: inherit; cursor: pointer; text-align: start; }
-      .mp-l { display: inline-flex; align-items: center; gap: 8px; font-family: var(--sc-font-display); font-size: max(10.5px, var(--sc-fs-floor)); letter-spacing: 0.12em; text-transform: uppercase; }
+      .mp { position: relative; display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 6px 10px; min-block-size: var(--sc-tap-min, 32px); background: none; border: 0; border-radius: 6px;
+        color: var(--sc-fg-0); font: inherit; cursor: pointer; text-align: start; }
+      /* Selectable Einsätze read clearly brighter and heavier than the ones the ship is not made for (r3 a3). */
+      .mp-l { display: inline-flex; align-items: center; gap: 8px; font-family: var(--sc-font-display); font-size: max(13px, var(--sc-fs-floor)); font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; }
       .mp-l svg { color: var(--h, currentColor); }
-      .mp small { font-family: var(--font-monospace, 'Share Tech Mono', monospace); font-size: max(10px, var(--sc-fs-floor)); color: var(--sc-fg-2); white-space: nowrap; }
-      .mp:hover:not(.dis) { color: var(--sc-fg-0); background: color-mix(in srgb, var(--sc-accent) 8%, transparent); }
-      .mp.on { color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 12%, transparent); }
-      .mp.dis { opacity: 0.4; cursor: not-allowed; }
+      .mp small { font-family: var(--font-monospace, 'Share Tech Mono', monospace); font-size: max(13px, var(--sc-fs-floor)); color: var(--sc-fg-1); white-space: nowrap; }
+      .mp:hover:not(.dis) { background: color-mix(in srgb, var(--sc-accent) 10%, transparent); }
+      /* The active one is unmistakable: its own hue as a bar on the edge, a filled row and its label in the hue. */
+      .mp.on { color: var(--holo-e, var(--sc-accent)); background: color-mix(in srgb, var(--holo-e, var(--sc-accent)) 18%, transparent);
+        box-shadow: inset 3px 0 0 var(--holo-e, var(--sc-accent)); }
+      .mp.dis { color: var(--sc-fg-2); cursor: not-allowed; }
+      .mp.dis .mp-l { font-weight: 400; opacity: 0.55; }
+      .mp.dis .mp-l svg { color: currentColor; }
+      .mp .why { font-family: var(--sc-font-body, inherit); color: var(--sc-fg-2); }
       .mp:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
       @media (max-width: 640px) {
         /* The word "Einsatz" stays for screen readers; the value gets the pill's width ("Frachter" not "Fracht…"). */
@@ -104,6 +120,7 @@ export class CodexHoloEinsatzComponent {
   readonly cohortLabel = input<string | null>(null);
   readonly missionChange = output<MissionId>();
 
+  private readonly analytics = inject(AnalyticsService);
   readonly open = signal(false);
   private readonly btn = viewChild<ElementRef<HTMLElement>>('btn');
 
@@ -131,6 +148,7 @@ export class CodexHoloEinsatzComponent {
   pick(m: StripMission): void {
     if (m.disabledKey) return;
     this.open.set(false);
+    if (m.id !== this.active()) this.analytics.track('codex:einsatz_select', { mission: m.id, source: 'user' });
     this.missionChange.emit(m.id);
     this.btn()?.nativeElement.focus({ preventScroll: true });
   }

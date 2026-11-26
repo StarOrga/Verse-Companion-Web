@@ -202,6 +202,29 @@ export function detectShipCapabilities(
   };
 }
 
+function providesOf(payload: unknown): readonly string[] | null {
+  const v = (payload as { providesMission?: unknown } | null | undefined)?.providesMission;
+  return Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : null;
+}
+
+/**
+ * Mining / salvage availability from the extract's own `providesMission`
+ * (schema 7: on the ship and on every fitted laser, head or hull module), so a
+ * modular hull follows the module it carries. Old extracts lack the key: the
+ * regex-based `detected` result stands.
+ */
+export function resolveShipCapabilities(
+  detected: ShipCapabilities,
+  shipPayload: unknown,
+  fittedPayloads: readonly unknown[],
+): ShipCapabilities {
+  const ship = providesOf(shipPayload);
+  if (ship === null) return detected;
+  const all = new Set<string>(ship);
+  for (const p of fittedPayloads) for (const m of providesOf(p) ?? []) all.add(m);
+  return { ...detected, hasMining: all.has('mining'), hasSalvage: all.has('salvage') };
+}
+
 /** i18n key naming why a mission chip is disabled for this hull, or null when it isn't. */
 export function missionDisabledReasonKey(mission: MissionId, caps: ShipCapabilities): string | null {
   if (mission === 'mining' && !caps.hasMining) return 'codex.mission.disabled.noMining';
