@@ -62,5 +62,105 @@
         "untouched": true
       }
     ]
+  },
+  {
+    "iteration": 2,
+    "action": "iterate",
+    "general": "",
+    "favorite": "d2",
+    "fidelity": "live",
+    "userPins": [
+      {
+        "screen": "r2-d2-s1",
+        "target": "li.d2-row \"Burst-DPS1.640\"",
+        "text": "rangbalken hmm visualis8ierung finde ich gut, aber es geht eher darum wie verhält sie sich zur entweder werkskonfiguration oder letzten gespeicherten"
+      }
+    ],
+    "decisions": [
+      {
+        "id": "r2-d-default",
+        "value": "role",
+        "untouched": false,
+        "none": false,
+        "note": ""
+      },
+      {
+        "id": "r2-d-alles",
+        "value": "neutral",
+        "untouched": true,
+        "none": false,
+        "note": ""
+      },
+      {
+        "id": "r2-d-ohnedaten",
+        "value": "",
+        "untouched": false,
+        "none": true,
+        "note": "manche schiffe sind ja auch nicht für bestimmte einsätze, dann gewrn die einsätze nicht auswählbar machen"
+      },
+      {
+        "id": "r2-d-leitwert",
+        "value": "ok",
+        "untouched": true,
+        "none": false,
+        "note": ""
+      },
+      {
+        "id": "r2-d-fracht",
+        "value": "lead",
+        "untouched": false,
+        "none": false,
+        "note": ""
+      },
+      {
+        "id": "r2-d-werkzeug",
+        "value": "offensive",
+        "untouched": true,
+        "none": false,
+        "note": ""
+      },
+      {
+        "id": "r2-d-rang",
+        "value": "",
+        "untouched": false,
+        "none": true,
+        "note": "ggü. werk bzw. gespeicehrte versioN! Damit man die untsfheide sieht, rang ist dort egal, das sieht man unter einordnung !"
+      },
+      {
+        "id": "r2-d-detail",
+        "value": "flat",
+        "untouched": false,
+        "none": false,
+        "note": ""
+      },
+      {
+        "id": "r2-d-gruppe",
+        "value": "group",
+        "untouched": false,
+        "none": false,
+        "note": ""
+      },
+      {
+        "id": "r2-d-luecken",
+        "value": "count",
+        "untouched": false,
+        "none": false,
+        "note": ""
+      },
+      {
+        "id": "r2-d-doppel",
+        "value": "need",
+        "untouched": false,
+        "none": false,
+        "note": ""
+      },
+      {
+        "id": "r2-d-messen",
+        "value": "ok",
+        "untouched": false,
+        "none": false,
+        "note": ""
+      }
+    ]
   }
 ]

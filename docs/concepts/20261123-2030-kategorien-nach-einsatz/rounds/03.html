@@ -1,0 +1,1043 @@
+<section data-iteration="3" data-iteration-template="design" data-design-set="alternatives" data-fidelity="live" data-fidelity-note="Spaltenreihe, Leiste, Kopfband, Einsatz-Auswahl und Tokens aus dem Live-Code · Schriften angenähert · Zahlen Beispielwerte" data-fidelity-approx>
+<style>
+/* Round 3 mock CSS: page frame, baseline switch, disabled Einsatz rows and the three row comparisons. Live rules come from assets/03/holo-row.css. */
+  [data-design] .mk-page { display: grid; gap: 16px; max-width: 1280px; margin: 0 auto; padding: 0 12px 16px; box-sizing: border-box; border-radius: 8px;
+    background: radial-gradient(ellipse at 50% 0%, #0f2c3d 0%, #081b26 72%); color: var(--sc-fg-0); font: 13px/1.45 var(--sc-font-body); }
+  [data-design] .mk-stage { display: grid; gap: 8px; }
+  [data-design] .mk-pick { position: relative; }
+  [data-design] .mk-pick > summary { list-style: none; }
+  [data-design] .mk-pick > summary::-webkit-details-marker { display: none; }
+  [data-design] .mk-own { cursor: default; font-size: 13px; color: var(--sc-fg-1); }
+  [data-design] .lv-ht-left[data-fidelity-approx-part] { display: flex; align-items: center; gap: 8px; min-width: 0; }
+
+  /* Einsatz picker: Einsätze the ship is not made for (codex.mission.disabled.*) */
+  [data-design] .lv-mp.mk-mp-off { cursor: not-allowed; color: var(--sc-fg-2); align-items: center; }
+  [data-design] .lv-mp.mk-mp-off .lv-mp-l { opacity: 0.5; }
+  [data-design] .lv-mp.mk-mp-off:hover { background: none; color: var(--sc-fg-2); }
+  [data-design] .mk-why { font-size: 13px; color: var(--sc-fg-2); white-space: nowrap; }
+
+  /* Baseline switch "Vergleich: Werk | Gespeichert", same in every design */
+  [data-design] .lv-all-line.mk-line { justify-content: space-between; align-items: center; padding: 8px 12px 0; }
+  [data-design] .mk-base { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: var(--sc-fg-2); }
+  [data-design] .mk-base-k { margin-right: 4px; }
+  [data-design] .mk-seg { display: inline-flex; align-items: center; height: 24px; padding: 0 12px; border: 1px solid var(--border-subtle); border-radius: 999px; color: var(--sc-fg-1); cursor: pointer; }
+  [data-design] .mk-seg.mk-on { border-color: color-mix(in srgb, var(--sc-accent) 55%, transparent); background: color-mix(in srgb, var(--sc-accent) 12%, transparent); color: var(--sc-fg-0); }
+  [data-design] .mk-seg.mk-off { opacity: 0.45; cursor: not-allowed; }
+
+  /* Column list (round 2 d2), rank bars removed */
+  [data-design] .lv-persp .mk-col { align-content: start; }
+  [data-design] .lv-persp .mk-col .lv-pt-head { font-size: 13px; align-items: center; }
+  [data-design] .lv-persp .mk-col .lv-tile-expand { font-size: 13px; }
+  [data-design] .lv-persp .mk-col .lv-tile-expand.mk-open { color: var(--sc-accent); }
+  [data-design] .mk-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+  [data-design] .mk-row { display: grid; align-items: center; gap: 8px; padding: 4px 0; font-size: 13px;
+    border-bottom: 1px solid color-mix(in srgb, var(--sc-accent) 8%, transparent); }
+  [data-design] .mk-k { min-width: 0; color: var(--sc-fg-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  [data-design] .mk-was { display: block; font-size: 13px; color: var(--sc-fg-2); overflow: hidden; text-overflow: ellipsis; }
+  [data-design] .mk-v { font-family: var(--font-monospace); font-size: 15px; color: var(--sc-fg-0); white-space: nowrap; }
+  [data-design] .mk-first { padding: 4px 0 8px; }
+  [data-design] .mk-first .mk-k { color: var(--sc-fg-0); }
+  [data-design] .mk-first .mk-v { font-size: 20px; }
+  [data-design] .mk-grp { padding: 12px 0 4px; font: 13px var(--sc-font-display); letter-spacing: 0.1em; text-transform: uppercase; color: var(--sc-fg-2); }
+  [data-design] .mk-gaps { justify-self: stretch; padding-top: 4px; border-top: 1px dashed var(--border-default); color: var(--sc-fg-2); font-size: 13px; cursor: pointer; }
+
+  /* d1 · Balken ab Basislinie: diverging bar around a centre mark */
+  [data-design="d1"] .mk-row { grid-template-columns: minmax(0, 1fr) auto 48px 52px; column-gap: 4px; }
+  [data-design="d1"] .mk-first .mk-v { font-size: 18px; }
+  [data-design="d1"] .d1-dv { position: relative; display: block; height: 6px; border-radius: 2px; }
+  [data-design="d1"] .d1-dv::before { content: ''; position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: color-mix(in srgb, var(--sc-fg-2) 55%, transparent); }
+  [data-design="d1"] .d1-dv.d1-ch { background: color-mix(in srgb, var(--sc-fg-2) 16%, transparent); }
+  [data-design="d1"] .d1-dv i { position: absolute; top: 0; bottom: 0; border-radius: 2px; }
+  [data-design="d1"] .d1-dv i.d1-up { left: 50%; background: var(--sc-success); }
+  [data-design="d1"] .d1-dv i.d1-down { right: 50%; background: var(--sc-warning); }
+  [data-design="d1"] .d1-dd { font-family: var(--font-monospace); font-size: 13px; text-align: right; white-space: nowrap; }
+  [data-design="d1"] .d1-good { color: var(--sc-success); }
+  [data-design="d1"] .d1-bad { color: var(--sc-warning); }
+
+  /* d2 · Wert mit Basiswert: baseline struck through + delta chip */
+  [data-design="d2"] .mk-row { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; column-gap: 8px; }
+  [data-design="d2"] .mk-k { flex: 0 0 auto; overflow: visible; }
+  [data-design="d2"] .d2-vv { margin-left: auto; }
+  [data-design="d2"] .d2-vv { display: inline-flex; align-items: baseline; gap: 8px; white-space: nowrap; }
+  [data-design="d2"] .d2-was { font-family: var(--font-monospace); font-size: 13px; color: var(--sc-fg-2); text-decoration-color: color-mix(in srgb, var(--sc-fg-2) 70%, transparent); }
+  [data-design="d2"] .d2-chip { font-family: var(--font-monospace); font-size: 13px; line-height: 20px; padding: 0 4px; border-radius: 4px; }
+  [data-design="d2"] .d2-chip.d2-good { color: var(--sc-success); background: color-mix(in srgb, var(--sc-success) 14%, transparent); }
+  [data-design="d2"] .d2-chip.d2-bad { color: var(--sc-warning); background: color-mix(in srgb, var(--sc-warning) 14%, transparent); }
+
+  /* d3 · Zwei Marken auf einer Spur: hollow = baseline, filled = current */
+  [data-design="d3"] .mk-row { grid-template-columns: minmax(0, 1fr) auto 80px; }
+  [data-design="d3"] .d3-tr { position: relative; display: block; height: 12px; }
+  [data-design="d3"] .d3-tr::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: color-mix(in srgb, var(--sc-fg-2) 35%, transparent); }
+  [data-design="d3"] .d3-tr b { position: absolute; top: 50%; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; box-sizing: border-box; }
+  [data-design="d3"] .d3-cur { background: var(--sc-fg-1); }
+  [data-design="d3"] .d3-cur.d3-good { background: var(--sc-success); }
+  [data-design="d3"] .d3-cur.d3-bad { background: var(--sc-warning); }
+  [data-design="d3"] .d3-base { border: 2px solid var(--sc-fg-1); background: var(--sc-bg-0); }
+  [data-design="d3"] .d3-gap { position: absolute; top: 50%; height: 2px; margin-top: -1px; }
+  [data-design="d3"] .d3-gap.d3-good { background: color-mix(in srgb, var(--sc-success) 70%, transparent); }
+  [data-design="d3"] .d3-gap.d3-bad { background: color-mix(in srgb, var(--sc-warning) 70%, transparent); }
+
+  /* Analysis */
+  .mk-atbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .mk-atbl th, .mk-atbl td { text-align: left; padding: 3px 6px; border-bottom: 1px solid rgba(127, 127, 127, 0.25); }
+  .mk-fest { font-size: 13px; opacity: 0.8; }
+</style>
+<header class="iteration-intro">
+  <h2>Runde 3 · Vergleich zur Basis</h2>
+  <p>Die Spalten bleiben wie in Runde 2; jede Zeile zeigt jetzt statt eines Rangs, wie weit sie vom Werk oder vom gespeicherten Stand abweicht.</p>
+</header>
+<section data-design="d1" data-nav-label="Balken ab Basislinie" data-design-active="true"
+    data-design-motto="Zeilenbalken ab Mittelstrich" data-design-traits="Zeilenbalken wächst vom Mittelstrich nach rechts (besser) oder links (schlechter)|Änderung als kleine Zahl neben dem Balken|Unveränderte Zeile zeigt nur den Mittelstrich" data-design-icon="chart" data-design-color="#e0a458"
+    data-design-improved="Balken vergleicht mit der Basis statt Rang" data-ov-demo=".lv-ptile[data-p='signature'] .mk-list">
+  <style data-live-css="assets/03/holo-row.css" data-scope="d1"></style>
+  <section id="r3-d1-s1" data-nav-label="Gladius · ab Werk" data-screen data-screen-active="true">
+    <div class="mk-page" style="--holo-e:var(--sc-mission-combat)">
+      <div class="lv-head">
+        <div class="lv-ht-left" data-fidelity-approx-part="Schriften"><div class="lv-ht-title"><span class="lv-ht-kicker">Aegis Dynamics</span><span class="lv-ht-name">Gladius</span></div><span class="fidelity-approx-badge">Schriften angenähert</span></div>
+        <div class="lv-ht-centre"><details class="mk-pick" open><summary class="lv-einsatz"><span class="lv-val"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M18 12a6 6 0 1 1-12 0 6 6 0 0 1 12 0z"/></svg><span>Kampf</span></span><span class="lv-caret">▾</span></summary><div class="lv-mission-pop"><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-all)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 9-9 9-9-9z M12 8.5l3.5 3.5-3.5 3.5-3.5-3.5z"/></svg>Alles</span></span><span class="lv-mp lv-on" data-screen-link="r3-d1-s1"><span class="lv-mp-l" style="--h:var(--sc-mission-combat)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M18 12a6 6 0 1 1-12 0 6 6 0 0 1 12 0z"/></svg>Kampf</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-transport)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v8l-8 4-8-4zM4 8l8 4 8-4M12 12v8"/></svg>Transport</span><span class="mk-why">Kein Frachtgitter</span></span><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-travel)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h15M12 6l6 6-6 6"/></svg>Reisen</span></span><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-stealth)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM4 4l16 16"/></svg>Schleichen</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-mining)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12l4 6-10 11L2 10zM2 10h20"/></svg>Bergbau</span><span class="mk-why">Keine Bergbau-Hardpoints</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-salvage)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v8a6 6 0 0 0 12 0V4M3 4h6M15 4h6"/></svg>Bergung</span><span class="mk-why">Keine Bergungs-Hardpoints</span></span></div></details></div>
+        <div class="lv-ht-right"><span class="lv-einsatz mk-own"><span>Standard-Loadout</span><span class="lv-caret">▾</span></span></div>
+      </div>
+      <div class="mk-stage">
+      <div class="lv-sh"><span class="lv-details-toggle">Details ▾</span><span class="lv-rule"></span><span class="lv-switch"><span class="lv-track"></span>UI-Töne</span></div>
+      <div class="lv-persp lv-row lv-docked">
+        <div class="lv-all-line mk-line"><span class="mk-base" role="group" aria-label="Vergleich"><span class="mk-base-k">Vergleich</span><span class="mk-seg mk-on" aria-pressed="true">Werk</span><span class="mk-seg mk-off" aria-disabled="true">Gespeichert</span></span><span class="lv-all-expand" data-screen-link="r3-d1-s4">Alle Werte aller vier ▾</span></div>
+        <article class="lv-ptile mk-col" data-p="offensive">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l10 10-10 10L2 12z M12 7v3 M12 14v3 M7 12h3 M14 12h3"/></svg>Offensive</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">Dauer-DPS</span><span class="mk-v">1.180</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Burst-DPS</span><span class="mk-v">1.640</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Alpha</span><span class="mk-v">412</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Raketen</span><span class="mk-v">6 × S2</span><span></span><span></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d1-s4">Alle Werte ▾</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="defensive">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L20 5V11C20 16 16.4 20 12 22C7.6 20 4 16 4 11V5Z"/></svg>Verteidigung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">Schild HP</span><span class="mk-v">4.320</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Schild-Regen</span><span class="mk-v">216/s</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Rumpf HP</span><span class="mk-v">3.950</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Panzerung</span><span class="mk-v">1.850</span><span class="d1-dv"></span><span></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d1-s4">Alle Werte ▾</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="movement">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6l6 6-6 6 M13 6l6 6-6 6"/></svg>Bewegung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">SCM</span><span class="mk-v">236 m/s</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Wendigkeit</span><span class="mk-v">14,2</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Boost</span><span class="mk-v">1.140 m/s</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Maximal</span><span class="mk-v">1.240 m/s</span><span class="d1-dv"></span><span></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d1-s4">Alle Werte ▾</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="signature">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12h.01 M8.5 8.5a5 5 0 0 0 0 7 M15.5 8.5a5 5 0 0 1 0 7 M5.6 5.6a9 9 0 0 0 0 12.8 M18.4 5.6a9 9 0 0 1 0 12.8"/></svg>Signatur &amp; Kühlung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">IR</span><span class="mk-v">6.400 m</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">EM</span><span class="mk-v">11.200 m</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Querschnitt</span><span class="mk-v">9.800 m</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Kühllast</span><span class="mk-v">61 %</span><span class="d1-dv"></span><span></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d1-s4">Alle Werte ▾</span>
+        </article>
+      </div>
+      <div class="lv-strip"><div class="lv-holo-strip"><div class="lv-hs-row"><div class="lv-seg" data-p="offensive"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l10 10-10 10L2 12z M12 7v3 M12 14v3 M7 12h3 M14 12h3"/></svg><span>Offensive</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Alpha</span><span class="lv-v">412</span></span><span class="lv-tv"><span class="lv-k">Burst-DPS</span><span class="lv-v">1.640</span></span><span class="lv-tv"><span class="lv-k">Dauer-DPS</span><span class="lv-v">1.180</span></span></div></div><div class="lv-seg" data-p="defensive"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L20 5V11C20 16 16.4 20 12 22C7.6 20 4 16 4 11V5Z"/></svg><span>Verteidigung</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Schild HP</span><span class="lv-v">4.320</span></span><span class="lv-tv"><span class="lv-k">Schild-Regen</span><span class="lv-v">216/s</span></span></div></div><div class="lv-seg" data-p="movement"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6l6 6-6 6 M13 6l6 6-6 6"/></svg><span>Bewegung</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Boost</span><span class="lv-v">1.140</span></span><span class="lv-tv"><span class="lv-k">SCM</span><span class="lv-v">236</span></span><span class="lv-tv"><span class="lv-k">Maximal</span><span class="lv-v">1.240</span></span></div></div><div class="lv-seg" data-p="signature"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12h.01 M8.5 8.5a5 5 0 0 0 0 7 M15.5 8.5a5 5 0 0 1 0 7 M5.6 5.6a9 9 0 0 0 0 12.8 M18.4 5.6a9 9 0 0 1 0 12.8"/></svg><span>Signatur &amp; Kühlung</span></span><div class="lv-tile-vals"><span class="lv-fact"><span class="lv-tip-trigger">IR</span><span class="lv-v">6,4<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">EM</span><span class="lv-v">11,2<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">CS</span><span class="lv-v">9,8<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">Kühllast</span><span class="lv-v">11 / 18</span></span></div></div></div><span class="lv-hs-toggle"><span class="lv-bar"></span></span></div></div>
+      </div>
+    </div>
+    <div class="anno-layer" data-anno-layer><div class="anno" data-anno="r3-d1-s1-a1" data-anno-side="right" data-anno-target=".lv-ptile[data-p='movement'] .mk-first .d1-dv" style="--anno-x:50%;--anno-y:40%">
+        <button class="anno-pin" type="button" data-anno-pin="r3-d1-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r3-d1-s1-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-r3-d1-s1-a1" data-anno-bubble="r3-d1-s1-a1" data-open="false">
+          <p class="anno-bubble-improved"><strong>{{design.change_improved}}</strong> Balken misst den Abstand zur Basis, nicht mehr den Rang</p>
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r3-d1-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r3-d1-s1-a1">
+            <span class="anno-bubble-question">Unveränderte Zeilen zeigen nur den Mittelstrich: ruhig genug, oder soll auch er ganz weg?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-r3-d1-s1-a1" data-annotation="r3-d1-s1-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-r3-d1-s1-a1"></div>
+          </div>
+        </div>
+      </div>
+<div class="anno" data-anno="r3-d1-s1-a2" data-anno-side="bottom" data-anno-target=".mk-base" style="--anno-x:50%;--anno-y:40%">
+        <button class="anno-pin" type="button" data-anno-pin="r3-d1-s1-a2" aria-expanded="false" aria-controls="anno-bubble-r3-d1-s1-a2" aria-label="{{anno.pin_label}}">2</button>
+        <div class="anno-bubble" id="anno-bubble-r3-d1-s1-a2" data-anno-bubble="r3-d1-s1-a2" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r3-d1-s1-a2" aria-expanded="false" aria-controls="anno-bubble-r3-d1-s1-a2">
+            <span class="anno-bubble-question">„Vergleich: Werk | Gespeichert“ über der Spaltenreihe: richtiger Platz, oder lieber im Kopfband neben „Standard-Loadout“?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-r3-d1-s1-a2" data-annotation="r3-d1-s1-a2" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-r3-d1-s1-a2"></div>
+          </div>
+        </div>
+      </div>
+<div class="anno" data-anno="r3-d1-s1-a3" data-anno-side="right" data-anno-target=".mk-pick .mk-mp-off" style="--anno-x:50%;--anno-y:40%">
+        <button class="anno-pin" type="button" data-anno-pin="r3-d1-s1-a3" aria-expanded="false" aria-controls="anno-bubble-r3-d1-s1-a3" aria-label="{{anno.pin_label}}">3</button>
+        <div class="anno-bubble" id="anno-bubble-r3-d1-s1-a3" data-anno-bubble="r3-d1-s1-a3" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r3-d1-s1-a3" aria-expanded="false" aria-controls="anno-bubble-r3-d1-s1-a3">
+            <span class="anno-bubble-question">Nicht passende Einsätze grau mit Grund in der Zeile: klar genug, oder Grund erst beim Darüberfahren?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-r3-d1-s1-a3" data-annotation="r3-d1-s1-a3" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-r3-d1-s1-a3"></div>
+          </div>
+        </div>
+      </div></div>
+  </section>
+  <section id="r3-d1-s2" data-nav-label="Gladius · geändert" data-screen hidden>
+    <div class="mk-page" style="--holo-e:var(--sc-mission-combat)">
+      <div class="lv-head">
+        <div class="lv-ht-left" data-fidelity-approx-part="Schriften"><div class="lv-ht-title"><span class="lv-ht-kicker">Aegis Dynamics</span><span class="lv-ht-name">Gladius</span></div><span class="fidelity-approx-badge">Schriften angenähert</span></div>
+        <div class="lv-ht-centre"><details class="mk-pick"><summary class="lv-einsatz"><span class="lv-val"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M18 12a6 6 0 1 1-12 0 6 6 0 0 1 12 0z"/></svg><span>Kampf</span></span><span class="lv-caret">▾</span></summary><div class="lv-mission-pop"><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-all)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 9-9 9-9-9z M12 8.5l3.5 3.5-3.5 3.5-3.5-3.5z"/></svg>Alles</span></span><span class="lv-mp lv-on" data-screen-link="r3-d1-s2"><span class="lv-mp-l" style="--h:var(--sc-mission-combat)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M18 12a6 6 0 1 1-12 0 6 6 0 0 1 12 0z"/></svg>Kampf</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-transport)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v8l-8 4-8-4zM4 8l8 4 8-4M12 12v8"/></svg>Transport</span><span class="mk-why">Kein Frachtgitter</span></span><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-travel)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h15M12 6l6 6-6 6"/></svg>Reisen</span></span><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-stealth)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM4 4l16 16"/></svg>Schleichen</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-mining)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12l4 6-10 11L2 10zM2 10h20"/></svg>Bergbau</span><span class="mk-why">Keine Bergbau-Hardpoints</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-salvage)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v8a6 6 0 0 0 12 0V4M3 4h6M15 4h6"/></svg>Bergung</span><span class="mk-why">Keine Bergungs-Hardpoints</span></span></div></details></div>
+        <div class="lv-ht-right"><span class="lv-einsatz mk-own"><span>Standard-Loadout</span><span class="lv-caret">▾</span></span></div>
+      </div>
+      <div class="mk-stage">
+      <div class="lv-sh"><span class="lv-details-toggle">Details ▾</span><span class="lv-rule"></span><span class="lv-switch"><span class="lv-track"></span>UI-Töne</span></div>
+      <div class="lv-persp lv-row lv-docked">
+        <div class="lv-all-line mk-line"><span class="mk-base" role="group" aria-label="Vergleich"><span class="mk-base-k">Vergleich</span><span class="mk-seg mk-on" aria-pressed="true">Werk</span><span class="mk-seg mk-off" aria-disabled="true">Gespeichert</span></span><span class="lv-all-expand" data-screen-link="r3-d1-s4">Alle Werte aller vier ▾</span></div>
+        <article class="lv-ptile mk-col" data-p="offensive">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l10 10-10 10L2 12z M12 7v3 M12 14v3 M7 12h3 M14 12h3"/></svg>Offensive</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first mk-ch"><span class="mk-k">Dauer-DPS</span><span class="mk-v">1.310</span><span class="d1-dv d1-ch"><i class="d1-up" style="width:20%"></i></span><span class="d1-dd d1-good">+130</span></li><li class="mk-row mk-ch"><span class="mk-k">Burst-DPS</span><span class="mk-v">1.890</span><span class="d1-dv d1-ch"><i class="d1-up" style="width:25%"></i></span><span class="d1-dd d1-good">+250</span></li><li class="mk-row mk-ch"><span class="mk-k">Alpha</span><span class="mk-v">598</span><span class="d1-dv d1-ch"><i class="d1-up" style="width:50%"></i></span><span class="d1-dd d1-good">+186</span></li><li class="mk-row"><span class="mk-k">Raketen</span><span class="mk-v">6 × S2</span><span></span><span></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d1-s4">Alle Werte ▾</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="defensive">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L20 5V11C20 16 16.4 20 12 22C7.6 20 4 16 4 11V5Z"/></svg>Verteidigung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">Schild HP</span><span class="mk-v">4.320</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Schild-Regen</span><span class="mk-v">216/s</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Rumpf HP</span><span class="mk-v">3.950</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Panzerung</span><span class="mk-v">1.850</span><span class="d1-dv"></span><span></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d1-s4">Alle Werte ▾</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="movement">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6l6 6-6 6 M13 6l6 6-6 6"/></svg>Bewegung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">SCM</span><span class="mk-v">236 m/s</span><span class="d1-dv"></span><span></span></li><li class="mk-row mk-ch"><span class="mk-k">Wendigkeit</span><span class="mk-v">13,9</span><span class="d1-dv d1-ch"><i class="d1-down" style="width:6%"></i></span><span class="d1-dd d1-bad">−0,3</span></li><li class="mk-row"><span class="mk-k">Boost</span><span class="mk-v">1.140 m/s</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Maximal</span><span class="mk-v">1.240 m/s</span><span class="d1-dv"></span><span></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d1-s4">Alle Werte ▾</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="signature">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12h.01 M8.5 8.5a5 5 0 0 0 0 7 M15.5 8.5a5 5 0 0 1 0 7 M5.6 5.6a9 9 0 0 0 0 12.8 M18.4 5.6a9 9 0 0 1 0 12.8"/></svg>Signatur &amp; Kühlung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first mk-ch"><span class="mk-k">IR</span><span class="mk-v">7.100 m</span><span class="d1-dv d1-ch"><i class="d1-down" style="width:20%"></i></span><span class="d1-dd d1-bad">+700</span></li><li class="mk-row mk-ch"><span class="mk-k">EM</span><span class="mk-v">11.900 m</span><span class="d1-dv d1-ch"><i class="d1-down" style="width:12.5%"></i></span><span class="d1-dd d1-bad">+700</span></li><li class="mk-row"><span class="mk-k">Querschnitt</span><span class="mk-v">9.800 m</span><span class="d1-dv"></span><span></span></li><li class="mk-row mk-ch"><span class="mk-k">Kühllast</span><span class="mk-v">70 %</span><span class="d1-dv d1-ch"><i class="d1-down" style="width:25%"></i></span><span class="d1-dd d1-bad">+9</span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d1-s4">Alle Werte ▾</span>
+        </article>
+      </div>
+      <div class="lv-strip"><div class="lv-holo-strip"><div class="lv-hs-row"><div class="lv-seg" data-p="offensive"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l10 10-10 10L2 12z M12 7v3 M12 14v3 M7 12h3 M14 12h3"/></svg><span>Offensive</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Alpha</span><span class="lv-v">598</span></span><span class="lv-tv"><span class="lv-k">Burst-DPS</span><span class="lv-v">1.890</span></span><span class="lv-tv"><span class="lv-k">Dauer-DPS</span><span class="lv-v">1.310</span></span></div></div><div class="lv-seg" data-p="defensive"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L20 5V11C20 16 16.4 20 12 22C7.6 20 4 16 4 11V5Z"/></svg><span>Verteidigung</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Schild HP</span><span class="lv-v">4.320</span></span><span class="lv-tv"><span class="lv-k">Schild-Regen</span><span class="lv-v">216/s</span></span></div></div><div class="lv-seg" data-p="movement"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6l6 6-6 6 M13 6l6 6-6 6"/></svg><span>Bewegung</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Boost</span><span class="lv-v">1.140</span></span><span class="lv-tv"><span class="lv-k">SCM</span><span class="lv-v">236</span></span><span class="lv-tv"><span class="lv-k">Maximal</span><span class="lv-v">1.240</span></span></div></div><div class="lv-seg" data-p="signature"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12h.01 M8.5 8.5a5 5 0 0 0 0 7 M15.5 8.5a5 5 0 0 1 0 7 M5.6 5.6a9 9 0 0 0 0 12.8 M18.4 5.6a9 9 0 0 1 0 12.8"/></svg><span>Signatur &amp; Kühlung</span></span><div class="lv-tile-vals"><span class="lv-fact"><span class="lv-tip-trigger">IR</span><span class="lv-v">7,1<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">EM</span><span class="lv-v">11,9<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">CS</span><span class="lv-v">9,8<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">Kühllast</span><span class="lv-v">13 / 18</span></span></div></div></div><span class="lv-hs-toggle"><span class="lv-bar"></span></span></div></div>
+      </div>
+    </div>
+    <div class="anno-layer" data-anno-layer><div class="anno" data-anno="r3-d1-s2-a1" data-anno-side="right" data-anno-target=".lv-ptile[data-p='offensive'] .mk-row:nth-child(3) .d1-dv" style="--anno-x:50%;--anno-y:40%">
+        <button class="anno-pin" type="button" data-anno-pin="r3-d1-s2-a1" aria-expanded="false" aria-controls="anno-bubble-r3-d1-s2-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-r3-d1-s2-a1" data-anno-bubble="r3-d1-s2-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r3-d1-s2-a1" aria-expanded="false" aria-controls="anno-bubble-r3-d1-s2-a1">
+            <span class="anno-bubble-question">Balken nach rechts = besser, nach links = schlechter: liest du die Richtung ohne Legende?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-r3-d1-s2-a1" data-annotation="r3-d1-s2-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-r3-d1-s2-a1"></div>
+          </div>
+        </div>
+      </div>
+<div class="anno" data-anno="r3-d1-s2-a2" data-anno-side="bottom" data-anno-target=".lv-ptile[data-p='signature'] .mk-first .d1-dd" style="--anno-x:50%;--anno-y:40%">
+        <button class="anno-pin" type="button" data-anno-pin="r3-d1-s2-a2" aria-expanded="false" aria-controls="anno-bubble-r3-d1-s2-a2" aria-label="{{anno.pin_label}}">2</button>
+        <div class="anno-bubble" id="anno-bubble-r3-d1-s2-a2" data-anno-bubble="r3-d1-s2-a2" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r3-d1-s2-a2" aria-expanded="false" aria-controls="anno-bubble-r3-d1-s2-a2">
+            <span class="anno-bubble-question">Änderung als Zahl („+700“) oder als Prozent („+11 %“)?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-r3-d1-s2-a2" data-annotation="r3-d1-s2-a2" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-r3-d1-s2-a2"></div>
+          </div>
+        </div>
+      </div>
+<div class="anno" data-anno="r3-d1-s2-a3" data-anno-side="bottom" data-anno-target=".lv-ptile[data-p='signature'] .mk-first .d1-dv" style="--anno-x:50%;--anno-y:40%">
+        <button class="anno-pin" type="button" data-anno-pin="r3-d1-s2-a3" aria-expanded="false" aria-controls="anno-bubble-r3-d1-s2-a3" aria-label="{{anno.pin_label}}">3</button>
+        <div class="anno-bubble" id="anno-bubble-r3-d1-s2-a3" data-anno-bubble="r3-d1-s2-a3" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r3-d1-s2-a3" aria-expanded="false" aria-controls="anno-bubble-r3-d1-s2-a3">
+            <span class="anno-bubble-question">IR wächst um 700 m, der Balken zeigt nach links (schlechter): passt das zusammen mit dem Plus?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-r3-d1-s2-a3" data-annotation="r3-d1-s2-a3" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-r3-d1-s2-a3"></div>
+          </div>
+        </div>
+      </div></div>
+  </section>
+  <section id="r3-d1-s3" data-nav-label="C2 Hercules · gegen gespeichert" data-screen hidden>
+    <div class="mk-page" style="--holo-e:var(--sc-mission-transport)">
+      <div class="lv-head">
+        <div class="lv-ht-left" data-fidelity-approx-part="Schriften"><div class="lv-ht-title"><span class="lv-ht-kicker">Crusader Industries</span><span class="lv-ht-name">C2 Hercules Starlifter</span></div><span class="fidelity-approx-badge">Schriften angenähert</span></div>
+        <div class="lv-ht-centre"><details class="mk-pick"><summary class="lv-einsatz"><span class="lv-val"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v8l-8 4-8-4zM4 8l8 4 8-4M12 12v8"/></svg><span>Transport</span></span><span class="lv-caret">▾</span></summary><div class="lv-mission-pop"><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-all)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 9-9 9-9-9z M12 8.5l3.5 3.5-3.5 3.5-3.5-3.5z"/></svg>Alles</span></span><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-combat)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M18 12a6 6 0 1 1-12 0 6 6 0 0 1 12 0z"/></svg>Kampf</span></span><span class="lv-mp lv-on" data-screen-link="r3-d1-s3"><span class="lv-mp-l" style="--h:var(--sc-mission-transport)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v8l-8 4-8-4zM4 8l8 4 8-4M12 12v8"/></svg>Transport</span></span><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-travel)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h15M12 6l6 6-6 6"/></svg>Reisen</span></span><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-stealth)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM4 4l16 16"/></svg>Schleichen</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-mining)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12l4 6-10 11L2 10zM2 10h20"/></svg>Bergbau</span><span class="mk-why">Keine Bergbau-Hardpoints</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-salvage)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v8a6 6 0 0 0 12 0V4M3 4h6M15 4h6"/></svg>Bergung</span><span class="mk-why">Keine Bergungs-Hardpoints</span></span></div></details></div>
+        <div class="lv-ht-right"><span class="lv-einsatz mk-own"><span>1× im Hangar · Frachtlauf</span><span class="lv-caret">▾</span></span></div>
+      </div>
+      <div class="mk-stage">
+      <div class="lv-sh"><span class="lv-details-toggle">Details ▾</span><span class="lv-rule"></span><span class="lv-switch"><span class="lv-track"></span>UI-Töne</span></div>
+      <div class="lv-persp lv-row lv-docked">
+        <div class="lv-all-line mk-line"><span class="mk-base" role="group" aria-label="Vergleich"><span class="mk-base-k">Vergleich</span><span class="mk-seg">Werk</span><span class="mk-seg mk-on" aria-pressed="true">Gespeichert</span></span><span class="lv-all-expand" data-screen-link="r3-d1-s4">Alle Werte aller vier ▾</span></div>
+        <article class="lv-ptile mk-col" data-p="offensive">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l10 10-10 10L2 12z M12 7v3 M12 14v3 M7 12h3 M14 12h3"/></svg>Offensive</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">Dauer-DPS</span><span class="mk-v">2.860</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Burst-DPS</span><span class="mk-v">3.900</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Alpha</span><span class="mk-v">640</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Raketen</span><span class="mk-v">8 × S3</span><span></span><span></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d1-s4">Alle Werte ▾</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="defensive">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L20 5V11C20 16 16.4 20 12 22C7.6 20 4 16 4 11V5Z"/></svg>Verteidigung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">Rumpf HP</span><span class="mk-v">62.000</span><span class="d1-dv"></span><span></span></li><li class="mk-row mk-ch"><span class="mk-k">Schild HP</span><span class="mk-v">35.200</span><span class="d1-dv d1-ch"><i class="d1-up" style="width:20%"></i></span><span class="d1-dd d1-good">+3.700</span></li><li class="mk-row"><span class="mk-k">Panzerung</span><span class="mk-v">9.800</span><span class="d1-dv"></span><span></span></li><li class="mk-row mk-ch"><span class="mk-k">Schild-Regen</span><span class="mk-v">470/s</span><span class="d1-dv d1-ch"><i class="d1-down" style="width:22.5%"></i></span><span class="d1-dd d1-bad">−70</span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d1-s4">Alle Werte ▾</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="movement">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6l6 6-6 6 M13 6l6 6-6 6"/></svg>Bewegung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">Fracht</span><span class="mk-v">696 SCU</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Q-Reichweite</span><span class="mk-v">11,4 Gm</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">SCM</span><span class="mk-v">125 m/s</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Q-Tempo</span><span class="mk-v">212 Mm/s</span><span class="d1-dv"></span><span></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d1-s4">Alle Werte ▾</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="signature">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12h.01 M8.5 8.5a5 5 0 0 0 0 7 M15.5 8.5a5 5 0 0 1 0 7 M5.6 5.6a9 9 0 0 0 0 12.8 M18.4 5.6a9 9 0 0 1 0 12.8"/></svg>Signatur &amp; Kühlung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">Querschnitt</span><span class="mk-v">47.000 m</span><span class="d1-dv"></span><span></span></li><li class="mk-row mk-ch"><span class="mk-k">IR</span><span class="mk-v">22.400 m</span><span class="d1-dv d1-ch"><i class="d1-down" style="width:10%"></i></span><span class="d1-dd d1-bad">+1.100</span></li><li class="mk-row mk-ch"><span class="mk-k">EM</span><span class="mk-v">40.100 m</span><span class="d1-dv d1-ch"><i class="d1-down" style="width:7.5%"></i></span><span class="d1-dd d1-bad">+1.200</span></li><li class="mk-row"><span class="mk-k">Kühllast</span><span class="mk-v">56 %</span><span class="d1-dv"></span><span></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d1-s4">Alle Werte ▾</span>
+        </article>
+      </div>
+      <div class="lv-strip"><div class="lv-holo-strip"><div class="lv-hs-row"><div class="lv-seg" data-p="offensive"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l10 10-10 10L2 12z M12 7v3 M12 14v3 M7 12h3 M14 12h3"/></svg><span>Offensive</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Alpha</span><span class="lv-v">640</span></span><span class="lv-tv"><span class="lv-k">Burst-DPS</span><span class="lv-v">3.900</span></span><span class="lv-tv"><span class="lv-k">Dauer-DPS</span><span class="lv-v">2.860</span></span></div></div><div class="lv-seg" data-p="defensive"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L20 5V11C20 16 16.4 20 12 22C7.6 20 4 16 4 11V5Z"/></svg><span>Verteidigung</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Schild HP</span><span class="lv-v">35.200</span></span><span class="lv-tv"><span class="lv-k">Schild-Regen</span><span class="lv-v">470/s</span></span></div></div><div class="lv-seg" data-p="movement"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6l6 6-6 6 M13 6l6 6-6 6"/></svg><span>Bewegung</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Boost</span><span class="lv-v">640</span></span><span class="lv-tv"><span class="lv-k">SCM</span><span class="lv-v">125</span></span><span class="lv-tv"><span class="lv-k">Maximal</span><span class="lv-v">1.050</span></span></div></div><div class="lv-seg" data-p="signature"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12h.01 M8.5 8.5a5 5 0 0 0 0 7 M15.5 8.5a5 5 0 0 1 0 7 M5.6 5.6a9 9 0 0 0 0 12.8 M18.4 5.6a9 9 0 0 1 0 12.8"/></svg><span>Signatur &amp; Kühlung</span></span><div class="lv-tile-vals"><span class="lv-fact"><span class="lv-tip-trigger">IR</span><span class="lv-v">22,4<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">EM</span><span class="lv-v">40,1<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">CS</span><span class="lv-v">47,0<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">Kühllast</span><span class="lv-v">10 / 18</span></span></div></div></div><span class="lv-hs-toggle"><span class="lv-bar"></span></span></div></div>
+      </div>
+    </div>
+    <div class="anno-layer" data-anno-layer><div class="anno" data-anno="r3-d1-s3-a1" data-anno-side="bottom" data-anno-target=".mk-base .mk-on" style="--anno-x:50%;--anno-y:40%">
+        <button class="anno-pin" type="button" data-anno-pin="r3-d1-s3-a1" aria-expanded="false" aria-controls="anno-bubble-r3-d1-s3-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-r3-d1-s3-a1" data-anno-bubble="r3-d1-s3-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r3-d1-s3-a1" aria-expanded="false" aria-controls="anno-bubble-r3-d1-s3-a1">
+            <span class="anno-bubble-question">Basis „Gespeichert“ = dein Exemplar „Frachtlauf“: reicht das Wort, oder soll der Name dort stehen?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-r3-d1-s3-a1" data-annotation="r3-d1-s3-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-r3-d1-s3-a1"></div>
+          </div>
+        </div>
+      </div></div>
+  </section>
+  <section id="r3-d1-s4" data-nav-label="Alle Werte offen" data-screen hidden>
+    <div class="mk-page" style="--holo-e:var(--sc-mission-combat)">
+      <div class="lv-head">
+        <div class="lv-ht-left" data-fidelity-approx-part="Schriften"><div class="lv-ht-title"><span class="lv-ht-kicker">Aegis Dynamics</span><span class="lv-ht-name">Gladius</span></div><span class="fidelity-approx-badge">Schriften angenähert</span></div>
+        <div class="lv-ht-centre"><details class="mk-pick"><summary class="lv-einsatz"><span class="lv-val"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M18 12a6 6 0 1 1-12 0 6 6 0 0 1 12 0z"/></svg><span>Kampf</span></span><span class="lv-caret">▾</span></summary><div class="lv-mission-pop"><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-all)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 9-9 9-9-9z M12 8.5l3.5 3.5-3.5 3.5-3.5-3.5z"/></svg>Alles</span></span><span class="lv-mp lv-on" data-screen-link="r3-d1-s4"><span class="lv-mp-l" style="--h:var(--sc-mission-combat)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M18 12a6 6 0 1 1-12 0 6 6 0 0 1 12 0z"/></svg>Kampf</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-transport)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v8l-8 4-8-4zM4 8l8 4 8-4M12 12v8"/></svg>Transport</span><span class="mk-why">Kein Frachtgitter</span></span><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-travel)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h15M12 6l6 6-6 6"/></svg>Reisen</span></span><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-stealth)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM4 4l16 16"/></svg>Schleichen</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-mining)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12l4 6-10 11L2 10zM2 10h20"/></svg>Bergbau</span><span class="mk-why">Keine Bergbau-Hardpoints</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-salvage)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v8a6 6 0 0 0 12 0V4M3 4h6M15 4h6"/></svg>Bergung</span><span class="mk-why">Keine Bergungs-Hardpoints</span></span></div></details></div>
+        <div class="lv-ht-right"><span class="lv-einsatz mk-own"><span>Standard-Loadout</span><span class="lv-caret">▾</span></span></div>
+      </div>
+      <div class="mk-stage">
+      <div class="lv-sh"><span class="lv-details-toggle">Details ▾</span><span class="lv-rule"></span><span class="lv-switch"><span class="lv-track"></span>UI-Töne</span></div>
+      <div class="lv-persp lv-row lv-docked">
+        <div class="lv-all-line mk-line"><span class="mk-base" role="group" aria-label="Vergleich"><span class="mk-base-k">Vergleich</span><span class="mk-seg mk-on" aria-pressed="true">Werk</span><span class="mk-seg mk-off" aria-disabled="true">Gespeichert</span></span><span class="lv-all-expand" aria-expanded="true" data-screen-link="r3-d1-s2">Alle Werte zuklappen ▴</span></div>
+        <article class="lv-ptile mk-col" data-p="offensive">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l10 10-10 10L2 12z M12 7v3 M12 14v3 M7 12h3 M14 12h3"/></svg>Offensive</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first mk-ch"><span class="mk-k">Dauer-DPS</span><span class="mk-v">1.310</span><span class="d1-dv d1-ch"><i class="d1-up" style="width:20%"></i></span><span class="d1-dd d1-good">+130</span></li><li class="mk-row mk-ch"><span class="mk-k">Burst-DPS</span><span class="mk-v">1.890</span><span class="d1-dv d1-ch"><i class="d1-up" style="width:25%"></i></span><span class="d1-dd d1-good">+250</span></li><li class="mk-row mk-ch"><span class="mk-k">Alpha</span><span class="mk-v">598</span><span class="d1-dv d1-ch"><i class="d1-up" style="width:50%"></i></span><span class="d1-dd d1-good">+186</span></li><li class="mk-row"><span class="mk-k">Raketen</span><span class="mk-v">6 × S2</span><span></span><span></span></li><li class="mk-grp">Waffen</li><li class="mk-row mk-ch"><span class="mk-k">2 × Omnisky IX<small class="mk-was">statt 2 × CF-337 Panther</small></span><span class="mk-v">770</span><span class="d1-dv d1-ch"><i class="d1-up" style="width:20%"></i></span><span class="d1-dd d1-good">+130</span></li><li class="mk-row"><span class="mk-k">1 × Attrition-3</span><span class="mk-v">540</span><span class="d1-dv"></span><span></span></li><li class="mk-grp">Raketen</li><li class="mk-row"><span class="mk-k">6 × Ignite II</span><span class="mk-v">S2 · IR</span><span></span><span></span></li><li class="mk-row"><span class="mk-k">Salve</span><span class="mk-v">15.600</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Aufschalten</span><span class="mk-v">2,5 s</span><span></span><span></span></li><li class="mk-grp">Schaden &amp; Reichweite</li><li class="mk-row"><span class="mk-k">Energie-Anteil</span><span class="mk-v">100 %</span><span></span><span></span></li><li class="mk-row mk-ch"><span class="mk-k">Wirkreichweite</span><span class="mk-v">2.250 m</span><span class="d1-dv d1-ch"><i class="d1-up" style="width:15%"></i></span><span class="d1-dd d1-good">+300</span></li><li class="mk-row mk-ch"><span class="mk-k">Geschosstempo</span><span class="mk-v">1.250 m/s</span><span class="d1-dv d1-ch"><i class="d1-down" style="width:11%"></i></span><span class="d1-dd d1-bad">−150</span></li></ol><span class="mk-gaps">2 Werte fehlen ▾</span>
+          <span class="lv-tile-expand mk-open" aria-expanded="true" data-screen-link="r3-d1-s2">Alle Werte ▴</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="defensive">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L20 5V11C20 16 16.4 20 12 22C7.6 20 4 16 4 11V5Z"/></svg>Verteidigung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">Schild HP</span><span class="mk-v">4.320</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Schild-Regen</span><span class="mk-v">216/s</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Rumpf HP</span><span class="mk-v">3.950</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Panzerung</span><span class="mk-v">1.850</span><span class="d1-dv"></span><span></span></li><li class="mk-grp">Schild</li><li class="mk-row"><span class="mk-k">Regen-Pause</span><span class="mk-v">5,6 s</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Schildflächen</span><span class="mk-v">1</span><span></span><span></span></li><li class="mk-grp">Rumpf</li><li class="mk-row"><span class="mk-k">Teile</span><span class="mk-v">7</span><span></span><span></span></li><li class="mk-row"><span class="mk-k">Masse Panzerung</span><span class="mk-v">3.100 kg</span><span></span><span></span></li></ol><span class="mk-gaps">4 Werte fehlen ▾</span>
+          <span class="lv-tile-expand mk-open" aria-expanded="true" data-screen-link="r3-d1-s2">Alle Werte ▴</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="movement">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6l6 6-6 6 M13 6l6 6-6 6"/></svg>Bewegung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">SCM</span><span class="mk-v">236 m/s</span><span class="d1-dv"></span><span></span></li><li class="mk-row mk-ch"><span class="mk-k">Wendigkeit</span><span class="mk-v">13,9</span><span class="d1-dv d1-ch"><i class="d1-down" style="width:6%"></i></span><span class="d1-dd d1-bad">−0,3</span></li><li class="mk-row"><span class="mk-k">Boost</span><span class="mk-v">1.140 m/s</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Maximal</span><span class="mk-v">1.240 m/s</span><span class="d1-dv"></span><span></span></li><li class="mk-grp">Drehraten</li><li class="mk-row"><span class="mk-k">Nicken</span><span class="mk-v">72 °/s</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Gieren</span><span class="mk-v">60 °/s</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Rollen</span><span class="mk-v">160 °/s</span><span class="d1-dv"></span><span></span></li><li class="mk-grp">Quantum</li><li class="mk-row"><span class="mk-k">Q-Reichweite</span><span class="mk-v">1,9 Gm</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Q-Tempo</span><span class="mk-v">166 Mm/s</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">Spool</span><span class="mk-v">4,5 s</span><span class="d1-dv"></span><span></span></li><li class="mk-grp">Masse</li><li class="mk-row mk-ch"><span class="mk-k">Leermasse</span><span class="mk-v">50.020 kg</span><span class="d1-dv d1-ch"><i class="d1-down" style="width:5%"></i></span><span class="d1-dd d1-bad">+320</span></li></ol>
+          <span class="lv-tile-expand mk-open" aria-expanded="true" data-screen-link="r3-d1-s2">Alle Werte ▴</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="signature">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12h.01 M8.5 8.5a5 5 0 0 0 0 7 M15.5 8.5a5 5 0 0 1 0 7 M5.6 5.6a9 9 0 0 0 0 12.8 M18.4 5.6a9 9 0 0 1 0 12.8"/></svg>Signatur &amp; Kühlung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first mk-ch"><span class="mk-k">IR</span><span class="mk-v">7.100 m</span><span class="d1-dv d1-ch"><i class="d1-down" style="width:20%"></i></span><span class="d1-dd d1-bad">+700</span></li><li class="mk-row mk-ch"><span class="mk-k">EM</span><span class="mk-v">11.900 m</span><span class="d1-dv d1-ch"><i class="d1-down" style="width:12.5%"></i></span><span class="d1-dd d1-bad">+700</span></li><li class="mk-row"><span class="mk-k">Querschnitt</span><span class="mk-v">9.800 m</span><span class="d1-dv"></span><span></span></li><li class="mk-row mk-ch"><span class="mk-k">Kühllast</span><span class="mk-v">70 %</span><span class="d1-dv d1-ch"><i class="d1-down" style="width:25%"></i></span><span class="d1-dd d1-bad">+9</span></li><li class="mk-grp">Signatur</li><li class="mk-row"><span class="mk-k">EM (Ruhe)</span><span class="mk-v">4.800 m</span><span class="d1-dv"></span><span></span></li><li class="mk-row"><span class="mk-k">EM (Quantum)</span><span class="mk-v">15.300 m</span><span class="d1-dv"></span><span></span></li><li class="mk-grp">Kühlung</li><li class="mk-row mk-ch"><span class="mk-k">Kühllast</span><span class="mk-v">13 / 18</span><span class="d1-dv d1-ch"><i class="d1-down" style="width:20%"></i></span><span class="d1-dd d1-bad">+2</span></li><li class="mk-row"><span class="mk-k">Kühler</span><span class="mk-v">2 × S1</span><span></span><span></span></li></ol><span class="mk-gaps">1 Wert fehlt ▾</span>
+          <span class="lv-tile-expand mk-open" aria-expanded="true" data-screen-link="r3-d1-s2">Alle Werte ▴</span>
+        </article>
+      </div>
+      <div class="lv-strip"><div class="lv-holo-strip"><div class="lv-hs-row"><div class="lv-seg" data-p="offensive"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l10 10-10 10L2 12z M12 7v3 M12 14v3 M7 12h3 M14 12h3"/></svg><span>Offensive</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Alpha</span><span class="lv-v">598</span></span><span class="lv-tv"><span class="lv-k">Burst-DPS</span><span class="lv-v">1.890</span></span><span class="lv-tv"><span class="lv-k">Dauer-DPS</span><span class="lv-v">1.310</span></span></div></div><div class="lv-seg" data-p="defensive"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L20 5V11C20 16 16.4 20 12 22C7.6 20 4 16 4 11V5Z"/></svg><span>Verteidigung</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Schild HP</span><span class="lv-v">4.320</span></span><span class="lv-tv"><span class="lv-k">Schild-Regen</span><span class="lv-v">216/s</span></span></div></div><div class="lv-seg" data-p="movement"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6l6 6-6 6 M13 6l6 6-6 6"/></svg><span>Bewegung</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Boost</span><span class="lv-v">1.140</span></span><span class="lv-tv"><span class="lv-k">SCM</span><span class="lv-v">236</span></span><span class="lv-tv"><span class="lv-k">Maximal</span><span class="lv-v">1.240</span></span></div></div><div class="lv-seg" data-p="signature"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12h.01 M8.5 8.5a5 5 0 0 0 0 7 M15.5 8.5a5 5 0 0 1 0 7 M5.6 5.6a9 9 0 0 0 0 12.8 M18.4 5.6a9 9 0 0 1 0 12.8"/></svg><span>Signatur &amp; Kühlung</span></span><div class="lv-tile-vals"><span class="lv-fact"><span class="lv-tip-trigger">IR</span><span class="lv-v">7,1<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">EM</span><span class="lv-v">11,9<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">CS</span><span class="lv-v">9,8<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">Kühllast</span><span class="lv-v">13 / 18</span></span></div></div></div><span class="lv-hs-toggle"><span class="lv-bar"></span></span></div></div>
+      </div>
+    </div>
+    <div class="anno-layer" data-anno-layer><div class="anno" data-anno="r3-d1-s4-a1" data-anno-side="right" data-anno-target=".lv-ptile[data-p='offensive'] .mk-was" style="--anno-x:50%;--anno-y:40%">
+        <button class="anno-pin" type="button" data-anno-pin="r3-d1-s4-a1" aria-expanded="false" aria-controls="anno-bubble-r3-d1-s4-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-r3-d1-s4-a1" data-anno-bubble="r3-d1-s4-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r3-d1-s4-a1" aria-expanded="false" aria-controls="anno-bubble-r3-d1-s4-a1">
+            <span class="anno-bubble-question">Getauschte Waffe als eine Zeile mit „statt …“ darunter: verständlich?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-r3-d1-s4-a1" data-annotation="r3-d1-s4-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-r3-d1-s4-a1"></div>
+          </div>
+        </div>
+      </div></div>
+  </section>
+</section>
+<section data-design="d2" data-nav-label="Wert mit Basiswert" hidden
+    data-design-motto="Alter Wert neben neuem" data-design-traits="Kein Balken: geänderte Zeile zeigt den alten Wert durchgestrichen|Änderung als farbiger Chip, grün besser, gelb schlechter|Unveränderte Zeile zeigt nur den Wert" data-design-icon="list" data-design-color="#c58fe0"
+    data-design-improved="Alter Wert und Änderung statt Rangbalken" data-ov-demo=".lv-ptile[data-p='signature'] .mk-list">
+  <style data-live-css="assets/03/holo-row.css" data-scope="d2"></style>
+  <section id="r3-d2-s1" data-nav-label="Gladius · ab Werk" data-screen data-screen-active="true">
+    <div class="mk-page" style="--holo-e:var(--sc-mission-combat)">
+      <div class="lv-head">
+        <div class="lv-ht-left" data-fidelity-approx-part="Schriften"><div class="lv-ht-title"><span class="lv-ht-kicker">Aegis Dynamics</span><span class="lv-ht-name">Gladius</span></div><span class="fidelity-approx-badge">Schriften angenähert</span></div>
+        <div class="lv-ht-centre"><details class="mk-pick" open><summary class="lv-einsatz"><span class="lv-val"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M18 12a6 6 0 1 1-12 0 6 6 0 0 1 12 0z"/></svg><span>Kampf</span></span><span class="lv-caret">▾</span></summary><div class="lv-mission-pop"><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-all)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 9-9 9-9-9z M12 8.5l3.5 3.5-3.5 3.5-3.5-3.5z"/></svg>Alles</span></span><span class="lv-mp lv-on" data-screen-link="r3-d2-s1"><span class="lv-mp-l" style="--h:var(--sc-mission-combat)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M18 12a6 6 0 1 1-12 0 6 6 0 0 1 12 0z"/></svg>Kampf</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-transport)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v8l-8 4-8-4zM4 8l8 4 8-4M12 12v8"/></svg>Transport</span><span class="mk-why">Kein Frachtgitter</span></span><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-travel)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h15M12 6l6 6-6 6"/></svg>Reisen</span></span><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-stealth)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM4 4l16 16"/></svg>Schleichen</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-mining)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12l4 6-10 11L2 10zM2 10h20"/></svg>Bergbau</span><span class="mk-why">Keine Bergbau-Hardpoints</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-salvage)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v8a6 6 0 0 0 12 0V4M3 4h6M15 4h6"/></svg>Bergung</span><span class="mk-why">Keine Bergungs-Hardpoints</span></span></div></details></div>
+        <div class="lv-ht-right"><span class="lv-einsatz mk-own"><span>Standard-Loadout</span><span class="lv-caret">▾</span></span></div>
+      </div>
+      <div class="mk-stage">
+      <div class="lv-sh"><span class="lv-details-toggle">Details ▾</span><span class="lv-rule"></span><span class="lv-switch"><span class="lv-track"></span>UI-Töne</span></div>
+      <div class="lv-persp lv-row lv-docked">
+        <div class="lv-all-line mk-line"><span class="mk-base" role="group" aria-label="Vergleich"><span class="mk-base-k">Vergleich</span><span class="mk-seg mk-on" aria-pressed="true">Werk</span><span class="mk-seg mk-off" aria-disabled="true">Gespeichert</span></span><span class="lv-all-expand" data-screen-link="r3-d2-s4">Alle Werte aller vier ▾</span></div>
+        <article class="lv-ptile mk-col" data-p="offensive">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l10 10-10 10L2 12z M12 7v3 M12 14v3 M7 12h3 M14 12h3"/></svg>Offensive</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">Dauer-DPS</span><span class="d2-vv"><span class="mk-v">1.180</span></span></li><li class="mk-row"><span class="mk-k">Burst-DPS</span><span class="d2-vv"><span class="mk-v">1.640</span></span></li><li class="mk-row"><span class="mk-k">Alpha</span><span class="d2-vv"><span class="mk-v">412</span></span></li><li class="mk-row"><span class="mk-k">Raketen</span><span class="d2-vv"><span class="mk-v">6 × S2</span></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d2-s4">Alle Werte ▾</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="defensive">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L20 5V11C20 16 16.4 20 12 22C7.6 20 4 16 4 11V5Z"/></svg>Verteidigung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">Schild HP</span><span class="d2-vv"><span class="mk-v">4.320</span></span></li><li class="mk-row"><span class="mk-k">Schild-Regen</span><span class="d2-vv"><span class="mk-v">216/s</span></span></li><li class="mk-row"><span class="mk-k">Rumpf HP</span><span class="d2-vv"><span class="mk-v">3.950</span></span></li><li class="mk-row"><span class="mk-k">Panzerung</span><span class="d2-vv"><span class="mk-v">1.850</span></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d2-s4">Alle Werte ▾</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="movement">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6l6 6-6 6 M13 6l6 6-6 6"/></svg>Bewegung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">SCM</span><span class="d2-vv"><span class="mk-v">236 m/s</span></span></li><li class="mk-row"><span class="mk-k">Wendigkeit</span><span class="d2-vv"><span class="mk-v">14,2</span></span></li><li class="mk-row"><span class="mk-k">Boost</span><span class="d2-vv"><span class="mk-v">1.140 m/s</span></span></li><li class="mk-row"><span class="mk-k">Maximal</span><span class="d2-vv"><span class="mk-v">1.240 m/s</span></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d2-s4">Alle Werte ▾</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="signature">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12h.01 M8.5 8.5a5 5 0 0 0 0 7 M15.5 8.5a5 5 0 0 1 0 7 M5.6 5.6a9 9 0 0 0 0 12.8 M18.4 5.6a9 9 0 0 1 0 12.8"/></svg>Signatur &amp; Kühlung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">IR</span><span class="d2-vv"><span class="mk-v">6.400 m</span></span></li><li class="mk-row"><span class="mk-k">EM</span><span class="d2-vv"><span class="mk-v">11.200 m</span></span></li><li class="mk-row"><span class="mk-k">Querschnitt</span><span class="d2-vv"><span class="mk-v">9.800 m</span></span></li><li class="mk-row"><span class="mk-k">Kühllast</span><span class="d2-vv"><span class="mk-v">61 %</span></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d2-s4">Alle Werte ▾</span>
+        </article>
+      </div>
+      <div class="lv-strip"><div class="lv-holo-strip"><div class="lv-hs-row"><div class="lv-seg" data-p="offensive"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l10 10-10 10L2 12z M12 7v3 M12 14v3 M7 12h3 M14 12h3"/></svg><span>Offensive</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Alpha</span><span class="lv-v">412</span></span><span class="lv-tv"><span class="lv-k">Burst-DPS</span><span class="lv-v">1.640</span></span><span class="lv-tv"><span class="lv-k">Dauer-DPS</span><span class="lv-v">1.180</span></span></div></div><div class="lv-seg" data-p="defensive"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L20 5V11C20 16 16.4 20 12 22C7.6 20 4 16 4 11V5Z"/></svg><span>Verteidigung</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Schild HP</span><span class="lv-v">4.320</span></span><span class="lv-tv"><span class="lv-k">Schild-Regen</span><span class="lv-v">216/s</span></span></div></div><div class="lv-seg" data-p="movement"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6l6 6-6 6 M13 6l6 6-6 6"/></svg><span>Bewegung</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Boost</span><span class="lv-v">1.140</span></span><span class="lv-tv"><span class="lv-k">SCM</span><span class="lv-v">236</span></span><span class="lv-tv"><span class="lv-k">Maximal</span><span class="lv-v">1.240</span></span></div></div><div class="lv-seg" data-p="signature"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12h.01 M8.5 8.5a5 5 0 0 0 0 7 M15.5 8.5a5 5 0 0 1 0 7 M5.6 5.6a9 9 0 0 0 0 12.8 M18.4 5.6a9 9 0 0 1 0 12.8"/></svg><span>Signatur &amp; Kühlung</span></span><div class="lv-tile-vals"><span class="lv-fact"><span class="lv-tip-trigger">IR</span><span class="lv-v">6,4<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">EM</span><span class="lv-v">11,2<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">CS</span><span class="lv-v">9,8<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">Kühllast</span><span class="lv-v">11 / 18</span></span></div></div></div><span class="lv-hs-toggle"><span class="lv-bar"></span></span></div></div>
+      </div>
+    </div>
+    <div class="anno-layer" data-anno-layer><div class="anno" data-anno="r3-d2-s1-a1" data-anno-side="bottom" data-anno-target=".lv-ptile[data-p='movement'] .mk-first" style="--anno-x:50%;--anno-y:40%">
+        <button class="anno-pin" type="button" data-anno-pin="r3-d2-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r3-d2-s1-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-r3-d2-s1-a1" data-anno-bubble="r3-d2-s1-a1" data-open="false">
+          <p class="anno-bubble-improved"><strong>{{design.change_improved}}</strong> Rangbalken weg, die Zeile vergleicht mit der Basis</p>
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r3-d2-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r3-d2-s1-a1">
+            <span class="anno-bubble-question">Ohne Änderung steht nur der Wert, kein Hinweis auf den Vergleich: fehlt dir dort etwas?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-r3-d2-s1-a1" data-annotation="r3-d2-s1-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-r3-d2-s1-a1"></div>
+          </div>
+        </div>
+      </div></div>
+  </section>
+  <section id="r3-d2-s2" data-nav-label="Gladius · geändert" data-screen hidden>
+    <div class="mk-page" style="--holo-e:var(--sc-mission-combat)">
+      <div class="lv-head">
+        <div class="lv-ht-left" data-fidelity-approx-part="Schriften"><div class="lv-ht-title"><span class="lv-ht-kicker">Aegis Dynamics</span><span class="lv-ht-name">Gladius</span></div><span class="fidelity-approx-badge">Schriften angenähert</span></div>
+        <div class="lv-ht-centre"><details class="mk-pick"><summary class="lv-einsatz"><span class="lv-val"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M18 12a6 6 0 1 1-12 0 6 6 0 0 1 12 0z"/></svg><span>Kampf</span></span><span class="lv-caret">▾</span></summary><div class="lv-mission-pop"><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-all)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 9-9 9-9-9z M12 8.5l3.5 3.5-3.5 3.5-3.5-3.5z"/></svg>Alles</span></span><span class="lv-mp lv-on" data-screen-link="r3-d2-s2"><span class="lv-mp-l" style="--h:var(--sc-mission-combat)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M18 12a6 6 0 1 1-12 0 6 6 0 0 1 12 0z"/></svg>Kampf</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-transport)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v8l-8 4-8-4zM4 8l8 4 8-4M12 12v8"/></svg>Transport</span><span class="mk-why">Kein Frachtgitter</span></span><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-travel)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h15M12 6l6 6-6 6"/></svg>Reisen</span></span><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-stealth)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM4 4l16 16"/></svg>Schleichen</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-mining)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12l4 6-10 11L2 10zM2 10h20"/></svg>Bergbau</span><span class="mk-why">Keine Bergbau-Hardpoints</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-salvage)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v8a6 6 0 0 0 12 0V4M3 4h6M15 4h6"/></svg>Bergung</span><span class="mk-why">Keine Bergungs-Hardpoints</span></span></div></details></div>
+        <div class="lv-ht-right"><span class="lv-einsatz mk-own"><span>Standard-Loadout</span><span class="lv-caret">▾</span></span></div>
+      </div>
+      <div class="mk-stage">
+      <div class="lv-sh"><span class="lv-details-toggle">Details ▾</span><span class="lv-rule"></span><span class="lv-switch"><span class="lv-track"></span>UI-Töne</span></div>
+      <div class="lv-persp lv-row lv-docked">
+        <div class="lv-all-line mk-line"><span class="mk-base" role="group" aria-label="Vergleich"><span class="mk-base-k">Vergleich</span><span class="mk-seg mk-on" aria-pressed="true">Werk</span><span class="mk-seg mk-off" aria-disabled="true">Gespeichert</span></span><span class="lv-all-expand" data-screen-link="r3-d2-s4">Alle Werte aller vier ▾</span></div>
+        <article class="lv-ptile mk-col" data-p="offensive">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l10 10-10 10L2 12z M12 7v3 M12 14v3 M7 12h3 M14 12h3"/></svg>Offensive</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first mk-ch"><span class="mk-k">Dauer-DPS</span><span class="d2-vv"><s class="d2-was">1.180</s><span class="mk-v">1.310</span><span class="d2-chip d2-good">+130</span></span></li><li class="mk-row mk-ch"><span class="mk-k">Burst-DPS</span><span class="d2-vv"><s class="d2-was">1.640</s><span class="mk-v">1.890</span><span class="d2-chip d2-good">+250</span></span></li><li class="mk-row mk-ch"><span class="mk-k">Alpha</span><span class="d2-vv"><s class="d2-was">412</s><span class="mk-v">598</span><span class="d2-chip d2-good">+186</span></span></li><li class="mk-row"><span class="mk-k">Raketen</span><span class="d2-vv"><span class="mk-v">6 × S2</span></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d2-s4">Alle Werte ▾</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="defensive">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L20 5V11C20 16 16.4 20 12 22C7.6 20 4 16 4 11V5Z"/></svg>Verteidigung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">Schild HP</span><span class="d2-vv"><span class="mk-v">4.320</span></span></li><li class="mk-row"><span class="mk-k">Schild-Regen</span><span class="d2-vv"><span class="mk-v">216/s</span></span></li><li class="mk-row"><span class="mk-k">Rumpf HP</span><span class="d2-vv"><span class="mk-v">3.950</span></span></li><li class="mk-row"><span class="mk-k">Panzerung</span><span class="d2-vv"><span class="mk-v">1.850</span></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d2-s4">Alle Werte ▾</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="movement">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6l6 6-6 6 M13 6l6 6-6 6"/></svg>Bewegung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">SCM</span><span class="d2-vv"><span class="mk-v">236 m/s</span></span></li><li class="mk-row mk-ch"><span class="mk-k">Wendigkeit</span><span class="d2-vv"><s class="d2-was">14,2</s><span class="mk-v">13,9</span><span class="d2-chip d2-bad">−0,3</span></span></li><li class="mk-row"><span class="mk-k">Boost</span><span class="d2-vv"><span class="mk-v">1.140 m/s</span></span></li><li class="mk-row"><span class="mk-k">Maximal</span><span class="d2-vv"><span class="mk-v">1.240 m/s</span></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d2-s4">Alle Werte ▾</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="signature">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12h.01 M8.5 8.5a5 5 0 0 0 0 7 M15.5 8.5a5 5 0 0 1 0 7 M5.6 5.6a9 9 0 0 0 0 12.8 M18.4 5.6a9 9 0 0 1 0 12.8"/></svg>Signatur &amp; Kühlung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first mk-ch"><span class="mk-k">IR</span><span class="d2-vv"><s class="d2-was">6.400 m</s><span class="mk-v">7.100 m</span><span class="d2-chip d2-bad">+700</span></span></li><li class="mk-row mk-ch"><span class="mk-k">EM</span><span class="d2-vv"><s class="d2-was">11.200 m</s><span class="mk-v">11.900 m</span><span class="d2-chip d2-bad">+700</span></span></li><li class="mk-row"><span class="mk-k">Querschnitt</span><span class="d2-vv"><span class="mk-v">9.800 m</span></span></li><li class="mk-row mk-ch"><span class="mk-k">Kühllast</span><span class="d2-vv"><s class="d2-was">61 %</s><span class="mk-v">70 %</span><span class="d2-chip d2-bad">+9</span></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d2-s4">Alle Werte ▾</span>
+        </article>
+      </div>
+      <div class="lv-strip"><div class="lv-holo-strip"><div class="lv-hs-row"><div class="lv-seg" data-p="offensive"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l10 10-10 10L2 12z M12 7v3 M12 14v3 M7 12h3 M14 12h3"/></svg><span>Offensive</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Alpha</span><span class="lv-v">598</span></span><span class="lv-tv"><span class="lv-k">Burst-DPS</span><span class="lv-v">1.890</span></span><span class="lv-tv"><span class="lv-k">Dauer-DPS</span><span class="lv-v">1.310</span></span></div></div><div class="lv-seg" data-p="defensive"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L20 5V11C20 16 16.4 20 12 22C7.6 20 4 16 4 11V5Z"/></svg><span>Verteidigung</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Schild HP</span><span class="lv-v">4.320</span></span><span class="lv-tv"><span class="lv-k">Schild-Regen</span><span class="lv-v">216/s</span></span></div></div><div class="lv-seg" data-p="movement"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6l6 6-6 6 M13 6l6 6-6 6"/></svg><span>Bewegung</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Boost</span><span class="lv-v">1.140</span></span><span class="lv-tv"><span class="lv-k">SCM</span><span class="lv-v">236</span></span><span class="lv-tv"><span class="lv-k">Maximal</span><span class="lv-v">1.240</span></span></div></div><div class="lv-seg" data-p="signature"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12h.01 M8.5 8.5a5 5 0 0 0 0 7 M15.5 8.5a5 5 0 0 1 0 7 M5.6 5.6a9 9 0 0 0 0 12.8 M18.4 5.6a9 9 0 0 1 0 12.8"/></svg><span>Signatur &amp; Kühlung</span></span><div class="lv-tile-vals"><span class="lv-fact"><span class="lv-tip-trigger">IR</span><span class="lv-v">7,1<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">EM</span><span class="lv-v">11,9<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">CS</span><span class="lv-v">9,8<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">Kühllast</span><span class="lv-v">13 / 18</span></span></div></div></div><span class="lv-hs-toggle"><span class="lv-bar"></span></span></div></div>
+      </div>
+    </div>
+    <div class="anno-layer" data-anno-layer><div class="anno" data-anno="r3-d2-s2-a1" data-anno-side="right" data-anno-target=".lv-ptile[data-p='offensive'] .mk-first .d2-was" style="--anno-x:50%;--anno-y:40%">
+        <button class="anno-pin" type="button" data-anno-pin="r3-d2-s2-a1" aria-expanded="false" aria-controls="anno-bubble-r3-d2-s2-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-r3-d2-s2-a1" data-anno-bubble="r3-d2-s2-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r3-d2-s2-a1" aria-expanded="false" aria-controls="anno-bubble-r3-d2-s2-a1">
+            <span class="anno-bubble-question">Alter Wert durchgestrichen neben dem neuen: hilfreich, oder zu viel Text in einer Zeile?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-r3-d2-s2-a1" data-annotation="r3-d2-s2-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-r3-d2-s2-a1"></div>
+          </div>
+        </div>
+      </div>
+<div class="anno" data-anno="r3-d2-s2-a2" data-anno-side="bottom" data-anno-target=".lv-ptile[data-p='offensive'] .mk-first .d2-chip" style="--anno-x:50%;--anno-y:40%">
+        <button class="anno-pin" type="button" data-anno-pin="r3-d2-s2-a2" aria-expanded="false" aria-controls="anno-bubble-r3-d2-s2-a2" aria-label="{{anno.pin_label}}">2</button>
+        <div class="anno-bubble" id="anno-bubble-r3-d2-s2-a2" data-anno-bubble="r3-d2-s2-a2" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r3-d2-s2-a2" aria-expanded="false" aria-controls="anno-bubble-r3-d2-s2-a2">
+            <span class="anno-bubble-question">Chip als Zahl („+130“) oder als Prozent („+11 %“)?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-r3-d2-s2-a2" data-annotation="r3-d2-s2-a2" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-r3-d2-s2-a2"></div>
+          </div>
+        </div>
+      </div></div>
+  </section>
+  <section id="r3-d2-s3" data-nav-label="C2 Hercules · gegen gespeichert" data-screen hidden>
+    <div class="mk-page" style="--holo-e:var(--sc-mission-transport)">
+      <div class="lv-head">
+        <div class="lv-ht-left" data-fidelity-approx-part="Schriften"><div class="lv-ht-title"><span class="lv-ht-kicker">Crusader Industries</span><span class="lv-ht-name">C2 Hercules Starlifter</span></div><span class="fidelity-approx-badge">Schriften angenähert</span></div>
+        <div class="lv-ht-centre"><details class="mk-pick"><summary class="lv-einsatz"><span class="lv-val"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v8l-8 4-8-4zM4 8l8 4 8-4M12 12v8"/></svg><span>Transport</span></span><span class="lv-caret">▾</span></summary><div class="lv-mission-pop"><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-all)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 9-9 9-9-9z M12 8.5l3.5 3.5-3.5 3.5-3.5-3.5z"/></svg>Alles</span></span><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-combat)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M18 12a6 6 0 1 1-12 0 6 6 0 0 1 12 0z"/></svg>Kampf</span></span><span class="lv-mp lv-on" data-screen-link="r3-d2-s3"><span class="lv-mp-l" style="--h:var(--sc-mission-transport)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v8l-8 4-8-4zM4 8l8 4 8-4M12 12v8"/></svg>Transport</span></span><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-travel)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h15M12 6l6 6-6 6"/></svg>Reisen</span></span><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-stealth)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM4 4l16 16"/></svg>Schleichen</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-mining)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12l4 6-10 11L2 10zM2 10h20"/></svg>Bergbau</span><span class="mk-why">Keine Bergbau-Hardpoints</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-salvage)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v8a6 6 0 0 0 12 0V4M3 4h6M15 4h6"/></svg>Bergung</span><span class="mk-why">Keine Bergungs-Hardpoints</span></span></div></details></div>
+        <div class="lv-ht-right"><span class="lv-einsatz mk-own"><span>1× im Hangar · Frachtlauf</span><span class="lv-caret">▾</span></span></div>
+      </div>
+      <div class="mk-stage">
+      <div class="lv-sh"><span class="lv-details-toggle">Details ▾</span><span class="lv-rule"></span><span class="lv-switch"><span class="lv-track"></span>UI-Töne</span></div>
+      <div class="lv-persp lv-row lv-docked">
+        <div class="lv-all-line mk-line"><span class="mk-base" role="group" aria-label="Vergleich"><span class="mk-base-k">Vergleich</span><span class="mk-seg">Werk</span><span class="mk-seg mk-on" aria-pressed="true">Gespeichert</span></span><span class="lv-all-expand" data-screen-link="r3-d2-s4">Alle Werte aller vier ▾</span></div>
+        <article class="lv-ptile mk-col" data-p="offensive">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l10 10-10 10L2 12z M12 7v3 M12 14v3 M7 12h3 M14 12h3"/></svg>Offensive</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">Dauer-DPS</span><span class="d2-vv"><span class="mk-v">2.860</span></span></li><li class="mk-row"><span class="mk-k">Burst-DPS</span><span class="d2-vv"><span class="mk-v">3.900</span></span></li><li class="mk-row"><span class="mk-k">Alpha</span><span class="d2-vv"><span class="mk-v">640</span></span></li><li class="mk-row"><span class="mk-k">Raketen</span><span class="d2-vv"><span class="mk-v">8 × S3</span></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d2-s4">Alle Werte ▾</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="defensive">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L20 5V11C20 16 16.4 20 12 22C7.6 20 4 16 4 11V5Z"/></svg>Verteidigung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">Rumpf HP</span><span class="d2-vv"><span class="mk-v">62.000</span></span></li><li class="mk-row mk-ch"><span class="mk-k">Schild HP</span><span class="d2-vv"><s class="d2-was">31.500</s><span class="mk-v">35.200</span><span class="d2-chip d2-good">+3.700</span></span></li><li class="mk-row"><span class="mk-k">Panzerung</span><span class="d2-vv"><span class="mk-v">9.800</span></span></li><li class="mk-row mk-ch"><span class="mk-k">Schild-Regen</span><span class="d2-vv"><s class="d2-was">540/s</s><span class="mk-v">470/s</span><span class="d2-chip d2-bad">−70</span></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d2-s4">Alle Werte ▾</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="movement">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6l6 6-6 6 M13 6l6 6-6 6"/></svg>Bewegung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">Fracht</span><span class="d2-vv"><span class="mk-v">696 SCU</span></span></li><li class="mk-row"><span class="mk-k">Q-Reichweite</span><span class="d2-vv"><span class="mk-v">11,4 Gm</span></span></li><li class="mk-row"><span class="mk-k">SCM</span><span class="d2-vv"><span class="mk-v">125 m/s</span></span></li><li class="mk-row"><span class="mk-k">Q-Tempo</span><span class="d2-vv"><span class="mk-v">212 Mm/s</span></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d2-s4">Alle Werte ▾</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="signature">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12h.01 M8.5 8.5a5 5 0 0 0 0 7 M15.5 8.5a5 5 0 0 1 0 7 M5.6 5.6a9 9 0 0 0 0 12.8 M18.4 5.6a9 9 0 0 1 0 12.8"/></svg>Signatur &amp; Kühlung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">Querschnitt</span><span class="d2-vv"><span class="mk-v">47.000 m</span></span></li><li class="mk-row mk-ch"><span class="mk-k">IR</span><span class="d2-vv"><s class="d2-was">21.300 m</s><span class="mk-v">22.400 m</span><span class="d2-chip d2-bad">+1.100</span></span></li><li class="mk-row mk-ch"><span class="mk-k">EM</span><span class="d2-vv"><s class="d2-was">38.900 m</s><span class="mk-v">40.100 m</span><span class="d2-chip d2-bad">+1.200</span></span></li><li class="mk-row"><span class="mk-k">Kühllast</span><span class="d2-vv"><span class="mk-v">56 %</span></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d2-s4">Alle Werte ▾</span>
+        </article>
+      </div>
+      <div class="lv-strip"><div class="lv-holo-strip"><div class="lv-hs-row"><div class="lv-seg" data-p="offensive"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l10 10-10 10L2 12z M12 7v3 M12 14v3 M7 12h3 M14 12h3"/></svg><span>Offensive</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Alpha</span><span class="lv-v">640</span></span><span class="lv-tv"><span class="lv-k">Burst-DPS</span><span class="lv-v">3.900</span></span><span class="lv-tv"><span class="lv-k">Dauer-DPS</span><span class="lv-v">2.860</span></span></div></div><div class="lv-seg" data-p="defensive"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L20 5V11C20 16 16.4 20 12 22C7.6 20 4 16 4 11V5Z"/></svg><span>Verteidigung</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Schild HP</span><span class="lv-v">35.200</span></span><span class="lv-tv"><span class="lv-k">Schild-Regen</span><span class="lv-v">470/s</span></span></div></div><div class="lv-seg" data-p="movement"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6l6 6-6 6 M13 6l6 6-6 6"/></svg><span>Bewegung</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Boost</span><span class="lv-v">640</span></span><span class="lv-tv"><span class="lv-k">SCM</span><span class="lv-v">125</span></span><span class="lv-tv"><span class="lv-k">Maximal</span><span class="lv-v">1.050</span></span></div></div><div class="lv-seg" data-p="signature"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12h.01 M8.5 8.5a5 5 0 0 0 0 7 M15.5 8.5a5 5 0 0 1 0 7 M5.6 5.6a9 9 0 0 0 0 12.8 M18.4 5.6a9 9 0 0 1 0 12.8"/></svg><span>Signatur &amp; Kühlung</span></span><div class="lv-tile-vals"><span class="lv-fact"><span class="lv-tip-trigger">IR</span><span class="lv-v">22,4<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">EM</span><span class="lv-v">40,1<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">CS</span><span class="lv-v">47,0<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">Kühllast</span><span class="lv-v">10 / 18</span></span></div></div></div><span class="lv-hs-toggle"><span class="lv-bar"></span></span></div></div>
+      </div>
+    </div>
+    <div class="anno-layer" data-anno-layer><div class="anno" data-anno="r3-d2-s3-a1" data-anno-side="bottom" data-anno-target=".lv-ptile[data-p='defensive'] .mk-ch .d2-chip" style="--anno-x:50%;--anno-y:40%">
+        <button class="anno-pin" type="button" data-anno-pin="r3-d2-s3-a1" aria-expanded="false" aria-controls="anno-bubble-r3-d2-s3-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-r3-d2-s3-a1" data-anno-bubble="r3-d2-s3-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r3-d2-s3-a1" aria-expanded="false" aria-controls="anno-bubble-r3-d2-s3-a1">
+            <span class="anno-bubble-question">Gegen „Gespeichert“ zeigt der Chip nur, was seit dem Speichern geändert ist: so erwartet?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-r3-d2-s3-a1" data-annotation="r3-d2-s3-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-r3-d2-s3-a1"></div>
+          </div>
+        </div>
+      </div></div>
+  </section>
+  <section id="r3-d2-s4" data-nav-label="Alle Werte offen" data-screen hidden>
+    <div class="mk-page" style="--holo-e:var(--sc-mission-combat)">
+      <div class="lv-head">
+        <div class="lv-ht-left" data-fidelity-approx-part="Schriften"><div class="lv-ht-title"><span class="lv-ht-kicker">Aegis Dynamics</span><span class="lv-ht-name">Gladius</span></div><span class="fidelity-approx-badge">Schriften angenähert</span></div>
+        <div class="lv-ht-centre"><details class="mk-pick"><summary class="lv-einsatz"><span class="lv-val"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M18 12a6 6 0 1 1-12 0 6 6 0 0 1 12 0z"/></svg><span>Kampf</span></span><span class="lv-caret">▾</span></summary><div class="lv-mission-pop"><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-all)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 9-9 9-9-9z M12 8.5l3.5 3.5-3.5 3.5-3.5-3.5z"/></svg>Alles</span></span><span class="lv-mp lv-on" data-screen-link="r3-d2-s4"><span class="lv-mp-l" style="--h:var(--sc-mission-combat)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M18 12a6 6 0 1 1-12 0 6 6 0 0 1 12 0z"/></svg>Kampf</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-transport)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v8l-8 4-8-4zM4 8l8 4 8-4M12 12v8"/></svg>Transport</span><span class="mk-why">Kein Frachtgitter</span></span><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-travel)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h15M12 6l6 6-6 6"/></svg>Reisen</span></span><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-stealth)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM4 4l16 16"/></svg>Schleichen</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-mining)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12l4 6-10 11L2 10zM2 10h20"/></svg>Bergbau</span><span class="mk-why">Keine Bergbau-Hardpoints</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-salvage)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v8a6 6 0 0 0 12 0V4M3 4h6M15 4h6"/></svg>Bergung</span><span class="mk-why">Keine Bergungs-Hardpoints</span></span></div></details></div>
+        <div class="lv-ht-right"><span class="lv-einsatz mk-own"><span>Standard-Loadout</span><span class="lv-caret">▾</span></span></div>
+      </div>
+      <div class="mk-stage">
+      <div class="lv-sh"><span class="lv-details-toggle">Details ▾</span><span class="lv-rule"></span><span class="lv-switch"><span class="lv-track"></span>UI-Töne</span></div>
+      <div class="lv-persp lv-row lv-docked">
+        <div class="lv-all-line mk-line"><span class="mk-base" role="group" aria-label="Vergleich"><span class="mk-base-k">Vergleich</span><span class="mk-seg mk-on" aria-pressed="true">Werk</span><span class="mk-seg mk-off" aria-disabled="true">Gespeichert</span></span><span class="lv-all-expand" aria-expanded="true" data-screen-link="r3-d2-s2">Alle Werte zuklappen ▴</span></div>
+        <article class="lv-ptile mk-col" data-p="offensive">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l10 10-10 10L2 12z M12 7v3 M12 14v3 M7 12h3 M14 12h3"/></svg>Offensive</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first mk-ch"><span class="mk-k">Dauer-DPS</span><span class="d2-vv"><s class="d2-was">1.180</s><span class="mk-v">1.310</span><span class="d2-chip d2-good">+130</span></span></li><li class="mk-row mk-ch"><span class="mk-k">Burst-DPS</span><span class="d2-vv"><s class="d2-was">1.640</s><span class="mk-v">1.890</span><span class="d2-chip d2-good">+250</span></span></li><li class="mk-row mk-ch"><span class="mk-k">Alpha</span><span class="d2-vv"><s class="d2-was">412</s><span class="mk-v">598</span><span class="d2-chip d2-good">+186</span></span></li><li class="mk-row"><span class="mk-k">Raketen</span><span class="d2-vv"><span class="mk-v">6 × S2</span></span></li><li class="mk-grp">Waffen</li><li class="mk-row mk-ch"><span class="mk-k">2 × Omnisky IX<small class="mk-was">statt 2 × CF-337 Panther</small></span><span class="d2-vv"><s class="d2-was">640</s><span class="mk-v">770</span><span class="d2-chip d2-good">+130</span></span></li><li class="mk-row"><span class="mk-k">1 × Attrition-3</span><span class="d2-vv"><span class="mk-v">540</span></span></li><li class="mk-grp">Raketen</li><li class="mk-row"><span class="mk-k">6 × Ignite II</span><span class="d2-vv"><span class="mk-v">S2 · IR</span></span></li><li class="mk-row"><span class="mk-k">Salve</span><span class="d2-vv"><span class="mk-v">15.600</span></span></li><li class="mk-row"><span class="mk-k">Aufschalten</span><span class="d2-vv"><span class="mk-v">2,5 s</span></span></li><li class="mk-grp">Schaden &amp; Reichweite</li><li class="mk-row"><span class="mk-k">Energie-Anteil</span><span class="d2-vv"><span class="mk-v">100 %</span></span></li><li class="mk-row mk-ch"><span class="mk-k">Wirkreichweite</span><span class="d2-vv"><s class="d2-was">1.950 m</s><span class="mk-v">2.250 m</span><span class="d2-chip d2-good">+300</span></span></li><li class="mk-row mk-ch"><span class="mk-k">Geschosstempo</span><span class="d2-vv"><s class="d2-was">1.400 m/s</s><span class="mk-v">1.250 m/s</span><span class="d2-chip d2-bad">−150</span></span></li></ol><span class="mk-gaps">2 Werte fehlen ▾</span>
+          <span class="lv-tile-expand mk-open" aria-expanded="true" data-screen-link="r3-d2-s2">Alle Werte ▴</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="defensive">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L20 5V11C20 16 16.4 20 12 22C7.6 20 4 16 4 11V5Z"/></svg>Verteidigung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">Schild HP</span><span class="d2-vv"><span class="mk-v">4.320</span></span></li><li class="mk-row"><span class="mk-k">Schild-Regen</span><span class="d2-vv"><span class="mk-v">216/s</span></span></li><li class="mk-row"><span class="mk-k">Rumpf HP</span><span class="d2-vv"><span class="mk-v">3.950</span></span></li><li class="mk-row"><span class="mk-k">Panzerung</span><span class="d2-vv"><span class="mk-v">1.850</span></span></li><li class="mk-grp">Schild</li><li class="mk-row"><span class="mk-k">Regen-Pause</span><span class="d2-vv"><span class="mk-v">5,6 s</span></span></li><li class="mk-row"><span class="mk-k">Schildflächen</span><span class="d2-vv"><span class="mk-v">1</span></span></li><li class="mk-grp">Rumpf</li><li class="mk-row"><span class="mk-k">Teile</span><span class="d2-vv"><span class="mk-v">7</span></span></li><li class="mk-row"><span class="mk-k">Masse Panzerung</span><span class="d2-vv"><span class="mk-v">3.100 kg</span></span></li></ol><span class="mk-gaps">4 Werte fehlen ▾</span>
+          <span class="lv-tile-expand mk-open" aria-expanded="true" data-screen-link="r3-d2-s2">Alle Werte ▴</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="movement">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6l6 6-6 6 M13 6l6 6-6 6"/></svg>Bewegung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">SCM</span><span class="d2-vv"><span class="mk-v">236 m/s</span></span></li><li class="mk-row mk-ch"><span class="mk-k">Wendigkeit</span><span class="d2-vv"><s class="d2-was">14,2</s><span class="mk-v">13,9</span><span class="d2-chip d2-bad">−0,3</span></span></li><li class="mk-row"><span class="mk-k">Boost</span><span class="d2-vv"><span class="mk-v">1.140 m/s</span></span></li><li class="mk-row"><span class="mk-k">Maximal</span><span class="d2-vv"><span class="mk-v">1.240 m/s</span></span></li><li class="mk-grp">Drehraten</li><li class="mk-row"><span class="mk-k">Nicken</span><span class="d2-vv"><span class="mk-v">72 °/s</span></span></li><li class="mk-row"><span class="mk-k">Gieren</span><span class="d2-vv"><span class="mk-v">60 °/s</span></span></li><li class="mk-row"><span class="mk-k">Rollen</span><span class="d2-vv"><span class="mk-v">160 °/s</span></span></li><li class="mk-grp">Quantum</li><li class="mk-row"><span class="mk-k">Q-Reichweite</span><span class="d2-vv"><span class="mk-v">1,9 Gm</span></span></li><li class="mk-row"><span class="mk-k">Q-Tempo</span><span class="d2-vv"><span class="mk-v">166 Mm/s</span></span></li><li class="mk-row"><span class="mk-k">Spool</span><span class="d2-vv"><span class="mk-v">4,5 s</span></span></li><li class="mk-grp">Masse</li><li class="mk-row mk-ch"><span class="mk-k">Leermasse</span><span class="d2-vv"><s class="d2-was">49.700 kg</s><span class="mk-v">50.020 kg</span><span class="d2-chip d2-bad">+320</span></span></li></ol>
+          <span class="lv-tile-expand mk-open" aria-expanded="true" data-screen-link="r3-d2-s2">Alle Werte ▴</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="signature">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12h.01 M8.5 8.5a5 5 0 0 0 0 7 M15.5 8.5a5 5 0 0 1 0 7 M5.6 5.6a9 9 0 0 0 0 12.8 M18.4 5.6a9 9 0 0 1 0 12.8"/></svg>Signatur &amp; Kühlung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first mk-ch"><span class="mk-k">IR</span><span class="d2-vv"><s class="d2-was">6.400 m</s><span class="mk-v">7.100 m</span><span class="d2-chip d2-bad">+700</span></span></li><li class="mk-row mk-ch"><span class="mk-k">EM</span><span class="d2-vv"><s class="d2-was">11.200 m</s><span class="mk-v">11.900 m</span><span class="d2-chip d2-bad">+700</span></span></li><li class="mk-row"><span class="mk-k">Querschnitt</span><span class="d2-vv"><span class="mk-v">9.800 m</span></span></li><li class="mk-row mk-ch"><span class="mk-k">Kühllast</span><span class="d2-vv"><s class="d2-was">61 %</s><span class="mk-v">70 %</span><span class="d2-chip d2-bad">+9</span></span></li><li class="mk-grp">Signatur</li><li class="mk-row"><span class="mk-k">EM (Ruhe)</span><span class="d2-vv"><span class="mk-v">4.800 m</span></span></li><li class="mk-row"><span class="mk-k">EM (Quantum)</span><span class="d2-vv"><span class="mk-v">15.300 m</span></span></li><li class="mk-grp">Kühlung</li><li class="mk-row mk-ch"><span class="mk-k">Kühllast</span><span class="d2-vv"><s class="d2-was">11 / 18</s><span class="mk-v">13 / 18</span><span class="d2-chip d2-bad">+2</span></span></li><li class="mk-row"><span class="mk-k">Kühler</span><span class="d2-vv"><span class="mk-v">2 × S1</span></span></li></ol><span class="mk-gaps">1 Wert fehlt ▾</span>
+          <span class="lv-tile-expand mk-open" aria-expanded="true" data-screen-link="r3-d2-s2">Alle Werte ▴</span>
+        </article>
+      </div>
+      <div class="lv-strip"><div class="lv-holo-strip"><div class="lv-hs-row"><div class="lv-seg" data-p="offensive"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l10 10-10 10L2 12z M12 7v3 M12 14v3 M7 12h3 M14 12h3"/></svg><span>Offensive</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Alpha</span><span class="lv-v">598</span></span><span class="lv-tv"><span class="lv-k">Burst-DPS</span><span class="lv-v">1.890</span></span><span class="lv-tv"><span class="lv-k">Dauer-DPS</span><span class="lv-v">1.310</span></span></div></div><div class="lv-seg" data-p="defensive"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L20 5V11C20 16 16.4 20 12 22C7.6 20 4 16 4 11V5Z"/></svg><span>Verteidigung</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Schild HP</span><span class="lv-v">4.320</span></span><span class="lv-tv"><span class="lv-k">Schild-Regen</span><span class="lv-v">216/s</span></span></div></div><div class="lv-seg" data-p="movement"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6l6 6-6 6 M13 6l6 6-6 6"/></svg><span>Bewegung</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Boost</span><span class="lv-v">1.140</span></span><span class="lv-tv"><span class="lv-k">SCM</span><span class="lv-v">236</span></span><span class="lv-tv"><span class="lv-k">Maximal</span><span class="lv-v">1.240</span></span></div></div><div class="lv-seg" data-p="signature"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12h.01 M8.5 8.5a5 5 0 0 0 0 7 M15.5 8.5a5 5 0 0 1 0 7 M5.6 5.6a9 9 0 0 0 0 12.8 M18.4 5.6a9 9 0 0 1 0 12.8"/></svg><span>Signatur &amp; Kühlung</span></span><div class="lv-tile-vals"><span class="lv-fact"><span class="lv-tip-trigger">IR</span><span class="lv-v">7,1<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">EM</span><span class="lv-v">11,9<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">CS</span><span class="lv-v">9,8<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">Kühllast</span><span class="lv-v">13 / 18</span></span></div></div></div><span class="lv-hs-toggle"><span class="lv-bar"></span></span></div></div>
+      </div>
+    </div>
+    <div class="anno-layer" data-anno-layer><div class="anno" data-anno="r3-d2-s4-a1" data-anno-side="right" data-anno-target=".lv-ptile[data-p='movement'] .mk-ch" style="--anno-x:50%;--anno-y:40%">
+        <button class="anno-pin" type="button" data-anno-pin="r3-d2-s4-a1" aria-expanded="false" aria-controls="anno-bubble-r3-d2-s4-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-r3-d2-s4-a1" data-anno-bubble="r3-d2-s4-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r3-d2-s4-a1" aria-expanded="false" aria-controls="anno-bubble-r3-d2-s4-a1">
+            <span class="anno-bubble-question">In der langen Liste: findest du die geänderten Zeilen an den Chips schnell genug?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-r3-d2-s4-a1" data-annotation="r3-d2-s4-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-r3-d2-s4-a1"></div>
+          </div>
+        </div>
+      </div></div>
+  </section>
+</section>
+<section data-design="d3" data-nav-label="Zwei Marken auf einer Spur" hidden
+    data-design-motto="Spur mit zwei Marken" data-design-traits="Jede Zeile hat eine Spur über die Spanne der Schiffsklasse|Hohle Marke = Basis, volle Marke = jetzt|Keine Zahl zur Änderung, nur der Abstand der Marken" data-design-icon="gauge" data-design-color="#7fc8a9"
+    data-design-improved="Basis und jetzt als Marken statt Rang" data-ov-demo=".lv-ptile[data-p='signature'] .mk-list">
+  <style data-live-css="assets/03/holo-row.css" data-scope="d3"></style>
+  <section id="r3-d3-s1" data-nav-label="Gladius · ab Werk" data-screen data-screen-active="true">
+    <div class="mk-page" style="--holo-e:var(--sc-mission-combat)">
+      <div class="lv-head">
+        <div class="lv-ht-left" data-fidelity-approx-part="Schriften"><div class="lv-ht-title"><span class="lv-ht-kicker">Aegis Dynamics</span><span class="lv-ht-name">Gladius</span></div><span class="fidelity-approx-badge">Schriften angenähert</span></div>
+        <div class="lv-ht-centre"><details class="mk-pick" open><summary class="lv-einsatz"><span class="lv-val"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M18 12a6 6 0 1 1-12 0 6 6 0 0 1 12 0z"/></svg><span>Kampf</span></span><span class="lv-caret">▾</span></summary><div class="lv-mission-pop"><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-all)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 9-9 9-9-9z M12 8.5l3.5 3.5-3.5 3.5-3.5-3.5z"/></svg>Alles</span></span><span class="lv-mp lv-on" data-screen-link="r3-d3-s1"><span class="lv-mp-l" style="--h:var(--sc-mission-combat)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M18 12a6 6 0 1 1-12 0 6 6 0 0 1 12 0z"/></svg>Kampf</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-transport)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v8l-8 4-8-4zM4 8l8 4 8-4M12 12v8"/></svg>Transport</span><span class="mk-why">Kein Frachtgitter</span></span><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-travel)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h15M12 6l6 6-6 6"/></svg>Reisen</span></span><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-stealth)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM4 4l16 16"/></svg>Schleichen</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-mining)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12l4 6-10 11L2 10zM2 10h20"/></svg>Bergbau</span><span class="mk-why">Keine Bergbau-Hardpoints</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-salvage)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v8a6 6 0 0 0 12 0V4M3 4h6M15 4h6"/></svg>Bergung</span><span class="mk-why">Keine Bergungs-Hardpoints</span></span></div></details></div>
+        <div class="lv-ht-right"><span class="lv-einsatz mk-own"><span>Standard-Loadout</span><span class="lv-caret">▾</span></span></div>
+      </div>
+      <div class="mk-stage">
+      <div class="lv-sh"><span class="lv-details-toggle">Details ▾</span><span class="lv-rule"></span><span class="lv-switch"><span class="lv-track"></span>UI-Töne</span></div>
+      <div class="lv-persp lv-row lv-docked">
+        <div class="lv-all-line mk-line"><span class="mk-base" role="group" aria-label="Vergleich"><span class="mk-base-k">Vergleich</span><span class="mk-seg mk-on" aria-pressed="true">Werk</span><span class="mk-seg mk-off" aria-disabled="true">Gespeichert</span></span><span class="lv-all-expand" data-screen-link="r3-d3-s4">Alle Werte aller vier ▾</span></div>
+        <article class="lv-ptile mk-col" data-p="offensive">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l10 10-10 10L2 12z M12 7v3 M12 14v3 M7 12h3 M14 12h3"/></svg>Offensive</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">Dauer-DPS</span><span class="mk-v">1.180</span><span class="d3-tr"><b class="d3-cur" style="left:62%"></b></span></li><li class="mk-row"><span class="mk-k">Burst-DPS</span><span class="mk-v">1.640</span><span class="d3-tr"><b class="d3-cur" style="left:66%"></b></span></li><li class="mk-row"><span class="mk-k">Alpha</span><span class="mk-v">412</span><span class="d3-tr"><b class="d3-cur" style="left:48%"></b></span></li><li class="mk-row"><span class="mk-k">Raketen</span><span class="mk-v">6 × S2</span><span></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d3-s4">Alle Werte ▾</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="defensive">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L20 5V11C20 16 16.4 20 12 22C7.6 20 4 16 4 11V5Z"/></svg>Verteidigung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">Schild HP</span><span class="mk-v">4.320</span><span class="d3-tr"><b class="d3-cur" style="left:61%"></b></span></li><li class="mk-row"><span class="mk-k">Schild-Regen</span><span class="mk-v">216/s</span><span class="d3-tr"><b class="d3-cur" style="left:66%"></b></span></li><li class="mk-row"><span class="mk-k">Rumpf HP</span><span class="mk-v">3.950</span><span class="d3-tr"><b class="d3-cur" style="left:58%"></b></span></li><li class="mk-row"><span class="mk-k">Panzerung</span><span class="mk-v">1.850</span><span class="d3-tr"><b class="d3-cur" style="left:40%"></b></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d3-s4">Alle Werte ▾</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="movement">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6l6 6-6 6 M13 6l6 6-6 6"/></svg>Bewegung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">SCM</span><span class="mk-v">236 m/s</span><span class="d3-tr"><b class="d3-cur" style="left:84%"></b></span></li><li class="mk-row"><span class="mk-k">Wendigkeit</span><span class="mk-v">14,2</span><span class="d3-tr"><b class="d3-cur" style="left:88%"></b></span></li><li class="mk-row"><span class="mk-k">Boost</span><span class="mk-v">1.140 m/s</span><span class="d3-tr"><b class="d3-cur" style="left:70%"></b></span></li><li class="mk-row"><span class="mk-k">Maximal</span><span class="mk-v">1.240 m/s</span><span class="d3-tr"><b class="d3-cur" style="left:62%"></b></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d3-s4">Alle Werte ▾</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="signature">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12h.01 M8.5 8.5a5 5 0 0 0 0 7 M15.5 8.5a5 5 0 0 1 0 7 M5.6 5.6a9 9 0 0 0 0 12.8 M18.4 5.6a9 9 0 0 1 0 12.8"/></svg>Signatur &amp; Kühlung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">IR</span><span class="mk-v">6.400 m</span><span class="d3-tr"><b class="d3-cur" style="left:72%"></b></span></li><li class="mk-row"><span class="mk-k">EM</span><span class="mk-v">11.200 m</span><span class="d3-tr"><b class="d3-cur" style="left:65%"></b></span></li><li class="mk-row"><span class="mk-k">Querschnitt</span><span class="mk-v">9.800 m</span><span class="d3-tr"><b class="d3-cur" style="left:80%"></b></span></li><li class="mk-row"><span class="mk-k">Kühllast</span><span class="mk-v">61 %</span><span class="d3-tr"><b class="d3-cur" style="left:55%"></b></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d3-s4">Alle Werte ▾</span>
+        </article>
+      </div>
+      <div class="lv-strip"><div class="lv-holo-strip"><div class="lv-hs-row"><div class="lv-seg" data-p="offensive"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l10 10-10 10L2 12z M12 7v3 M12 14v3 M7 12h3 M14 12h3"/></svg><span>Offensive</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Alpha</span><span class="lv-v">412</span></span><span class="lv-tv"><span class="lv-k">Burst-DPS</span><span class="lv-v">1.640</span></span><span class="lv-tv"><span class="lv-k">Dauer-DPS</span><span class="lv-v">1.180</span></span></div></div><div class="lv-seg" data-p="defensive"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L20 5V11C20 16 16.4 20 12 22C7.6 20 4 16 4 11V5Z"/></svg><span>Verteidigung</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Schild HP</span><span class="lv-v">4.320</span></span><span class="lv-tv"><span class="lv-k">Schild-Regen</span><span class="lv-v">216/s</span></span></div></div><div class="lv-seg" data-p="movement"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6l6 6-6 6 M13 6l6 6-6 6"/></svg><span>Bewegung</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Boost</span><span class="lv-v">1.140</span></span><span class="lv-tv"><span class="lv-k">SCM</span><span class="lv-v">236</span></span><span class="lv-tv"><span class="lv-k">Maximal</span><span class="lv-v">1.240</span></span></div></div><div class="lv-seg" data-p="signature"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12h.01 M8.5 8.5a5 5 0 0 0 0 7 M15.5 8.5a5 5 0 0 1 0 7 M5.6 5.6a9 9 0 0 0 0 12.8 M18.4 5.6a9 9 0 0 1 0 12.8"/></svg><span>Signatur &amp; Kühlung</span></span><div class="lv-tile-vals"><span class="lv-fact"><span class="lv-tip-trigger">IR</span><span class="lv-v">6,4<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">EM</span><span class="lv-v">11,2<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">CS</span><span class="lv-v">9,8<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">Kühllast</span><span class="lv-v">11 / 18</span></span></div></div></div><span class="lv-hs-toggle"><span class="lv-bar"></span></span></div></div>
+      </div>
+    </div>
+    <div class="anno-layer" data-anno-layer><div class="anno" data-anno="r3-d3-s1-a1" data-anno-side="bottom" data-anno-target=".lv-ptile[data-p='movement'] .mk-first .d3-tr" style="--anno-x:50%;--anno-y:40%">
+        <button class="anno-pin" type="button" data-anno-pin="r3-d3-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r3-d3-s1-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-r3-d3-s1-a1" data-anno-bubble="r3-d3-s1-a1" data-open="false">
+          <p class="anno-bubble-improved"><strong>{{design.change_improved}}</strong> Spur zeigt Basis und jetzt statt eines Rangs</p>
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r3-d3-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r3-d3-s1-a1">
+            <span class="anno-bubble-question">Die Marke steht in der Spanne der leichten Jäger: stört das, wo der Rang hier egal sein soll?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-r3-d3-s1-a1" data-annotation="r3-d3-s1-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-r3-d3-s1-a1"></div>
+          </div>
+        </div>
+      </div></div>
+  </section>
+  <section id="r3-d3-s2" data-nav-label="Gladius · geändert" data-screen hidden>
+    <div class="mk-page" style="--holo-e:var(--sc-mission-combat)">
+      <div class="lv-head">
+        <div class="lv-ht-left" data-fidelity-approx-part="Schriften"><div class="lv-ht-title"><span class="lv-ht-kicker">Aegis Dynamics</span><span class="lv-ht-name">Gladius</span></div><span class="fidelity-approx-badge">Schriften angenähert</span></div>
+        <div class="lv-ht-centre"><details class="mk-pick"><summary class="lv-einsatz"><span class="lv-val"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M18 12a6 6 0 1 1-12 0 6 6 0 0 1 12 0z"/></svg><span>Kampf</span></span><span class="lv-caret">▾</span></summary><div class="lv-mission-pop"><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-all)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 9-9 9-9-9z M12 8.5l3.5 3.5-3.5 3.5-3.5-3.5z"/></svg>Alles</span></span><span class="lv-mp lv-on" data-screen-link="r3-d3-s2"><span class="lv-mp-l" style="--h:var(--sc-mission-combat)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M18 12a6 6 0 1 1-12 0 6 6 0 0 1 12 0z"/></svg>Kampf</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-transport)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v8l-8 4-8-4zM4 8l8 4 8-4M12 12v8"/></svg>Transport</span><span class="mk-why">Kein Frachtgitter</span></span><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-travel)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h15M12 6l6 6-6 6"/></svg>Reisen</span></span><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-stealth)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM4 4l16 16"/></svg>Schleichen</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-mining)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12l4 6-10 11L2 10zM2 10h20"/></svg>Bergbau</span><span class="mk-why">Keine Bergbau-Hardpoints</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-salvage)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v8a6 6 0 0 0 12 0V4M3 4h6M15 4h6"/></svg>Bergung</span><span class="mk-why">Keine Bergungs-Hardpoints</span></span></div></details></div>
+        <div class="lv-ht-right"><span class="lv-einsatz mk-own"><span>Standard-Loadout</span><span class="lv-caret">▾</span></span></div>
+      </div>
+      <div class="mk-stage">
+      <div class="lv-sh"><span class="lv-details-toggle">Details ▾</span><span class="lv-rule"></span><span class="lv-switch"><span class="lv-track"></span>UI-Töne</span></div>
+      <div class="lv-persp lv-row lv-docked">
+        <div class="lv-all-line mk-line"><span class="mk-base" role="group" aria-label="Vergleich"><span class="mk-base-k">Vergleich</span><span class="mk-seg mk-on" aria-pressed="true">Werk</span><span class="mk-seg mk-off" aria-disabled="true">Gespeichert</span></span><span class="lv-all-expand" data-screen-link="r3-d3-s4">Alle Werte aller vier ▾</span></div>
+        <article class="lv-ptile mk-col" data-p="offensive">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l10 10-10 10L2 12z M12 7v3 M12 14v3 M7 12h3 M14 12h3"/></svg>Offensive</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first mk-ch"><span class="mk-k">Dauer-DPS</span><span class="mk-v">1.310</span><span class="d3-tr"><i class="d3-gap d3-good" style="left:62%;width:8%"></i><b class="d3-base" style="left:62%"></b><b class="d3-cur d3-good" style="left:70%"></b></span></li><li class="mk-row mk-ch"><span class="mk-k">Burst-DPS</span><span class="mk-v">1.890</span><span class="d3-tr"><i class="d3-gap d3-good" style="left:66%;width:10%"></i><b class="d3-base" style="left:66%"></b><b class="d3-cur d3-good" style="left:76%"></b></span></li><li class="mk-row mk-ch"><span class="mk-k">Alpha</span><span class="mk-v">598</span><span class="d3-tr"><i class="d3-gap d3-good" style="left:48%;width:23%"></i><b class="d3-base" style="left:48%"></b><b class="d3-cur d3-good" style="left:71%"></b></span></li><li class="mk-row"><span class="mk-k">Raketen</span><span class="mk-v">6 × S2</span><span></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d3-s4">Alle Werte ▾</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="defensive">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L20 5V11C20 16 16.4 20 12 22C7.6 20 4 16 4 11V5Z"/></svg>Verteidigung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">Schild HP</span><span class="mk-v">4.320</span><span class="d3-tr"><b class="d3-cur" style="left:61%"></b></span></li><li class="mk-row"><span class="mk-k">Schild-Regen</span><span class="mk-v">216/s</span><span class="d3-tr"><b class="d3-cur" style="left:66%"></b></span></li><li class="mk-row"><span class="mk-k">Rumpf HP</span><span class="mk-v">3.950</span><span class="d3-tr"><b class="d3-cur" style="left:58%"></b></span></li><li class="mk-row"><span class="mk-k">Panzerung</span><span class="mk-v">1.850</span><span class="d3-tr"><b class="d3-cur" style="left:40%"></b></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d3-s4">Alle Werte ▾</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="movement">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6l6 6-6 6 M13 6l6 6-6 6"/></svg>Bewegung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">SCM</span><span class="mk-v">236 m/s</span><span class="d3-tr"><b class="d3-cur" style="left:84%"></b></span></li><li class="mk-row mk-ch"><span class="mk-k">Wendigkeit</span><span class="mk-v">13,9</span><span class="d3-tr"><i class="d3-gap d3-bad" style="left:85%;width:3%"></i><b class="d3-base" style="left:88%"></b><b class="d3-cur d3-bad" style="left:85%"></b></span></li><li class="mk-row"><span class="mk-k">Boost</span><span class="mk-v">1.140 m/s</span><span class="d3-tr"><b class="d3-cur" style="left:70%"></b></span></li><li class="mk-row"><span class="mk-k">Maximal</span><span class="mk-v">1.240 m/s</span><span class="d3-tr"><b class="d3-cur" style="left:62%"></b></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d3-s4">Alle Werte ▾</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="signature">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12h.01 M8.5 8.5a5 5 0 0 0 0 7 M15.5 8.5a5 5 0 0 1 0 7 M5.6 5.6a9 9 0 0 0 0 12.8 M18.4 5.6a9 9 0 0 1 0 12.8"/></svg>Signatur &amp; Kühlung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first mk-ch"><span class="mk-k">IR</span><span class="mk-v">7.100 m</span><span class="d3-tr"><i class="d3-gap d3-bad" style="left:64%;width:8%"></i><b class="d3-base" style="left:72%"></b><b class="d3-cur d3-bad" style="left:64%"></b></span></li><li class="mk-row mk-ch"><span class="mk-k">EM</span><span class="mk-v">11.900 m</span><span class="d3-tr"><i class="d3-gap d3-bad" style="left:60%;width:5%"></i><b class="d3-base" style="left:65%"></b><b class="d3-cur d3-bad" style="left:60%"></b></span></li><li class="mk-row"><span class="mk-k">Querschnitt</span><span class="mk-v">9.800 m</span><span class="d3-tr"><b class="d3-cur" style="left:80%"></b></span></li><li class="mk-row mk-ch"><span class="mk-k">Kühllast</span><span class="mk-v">70 %</span><span class="d3-tr"><i class="d3-gap d3-bad" style="left:46%;width:9%"></i><b class="d3-base" style="left:55%"></b><b class="d3-cur d3-bad" style="left:46%"></b></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d3-s4">Alle Werte ▾</span>
+        </article>
+      </div>
+      <div class="lv-strip"><div class="lv-holo-strip"><div class="lv-hs-row"><div class="lv-seg" data-p="offensive"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l10 10-10 10L2 12z M12 7v3 M12 14v3 M7 12h3 M14 12h3"/></svg><span>Offensive</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Alpha</span><span class="lv-v">598</span></span><span class="lv-tv"><span class="lv-k">Burst-DPS</span><span class="lv-v">1.890</span></span><span class="lv-tv"><span class="lv-k">Dauer-DPS</span><span class="lv-v">1.310</span></span></div></div><div class="lv-seg" data-p="defensive"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L20 5V11C20 16 16.4 20 12 22C7.6 20 4 16 4 11V5Z"/></svg><span>Verteidigung</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Schild HP</span><span class="lv-v">4.320</span></span><span class="lv-tv"><span class="lv-k">Schild-Regen</span><span class="lv-v">216/s</span></span></div></div><div class="lv-seg" data-p="movement"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6l6 6-6 6 M13 6l6 6-6 6"/></svg><span>Bewegung</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Boost</span><span class="lv-v">1.140</span></span><span class="lv-tv"><span class="lv-k">SCM</span><span class="lv-v">236</span></span><span class="lv-tv"><span class="lv-k">Maximal</span><span class="lv-v">1.240</span></span></div></div><div class="lv-seg" data-p="signature"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12h.01 M8.5 8.5a5 5 0 0 0 0 7 M15.5 8.5a5 5 0 0 1 0 7 M5.6 5.6a9 9 0 0 0 0 12.8 M18.4 5.6a9 9 0 0 1 0 12.8"/></svg><span>Signatur &amp; Kühlung</span></span><div class="lv-tile-vals"><span class="lv-fact"><span class="lv-tip-trigger">IR</span><span class="lv-v">7,1<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">EM</span><span class="lv-v">11,9<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">CS</span><span class="lv-v">9,8<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">Kühllast</span><span class="lv-v">13 / 18</span></span></div></div></div><span class="lv-hs-toggle"><span class="lv-bar"></span></span></div></div>
+      </div>
+    </div>
+    <div class="anno-layer" data-anno-layer><div class="anno" data-anno="r3-d3-s2-a1" data-anno-side="right" data-anno-target=".lv-ptile[data-p='offensive'] .mk-row:nth-child(3) .d3-tr" style="--anno-x:50%;--anno-y:40%">
+        <button class="anno-pin" type="button" data-anno-pin="r3-d3-s2-a1" aria-expanded="false" aria-controls="anno-bubble-r3-d3-s2-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-r3-d3-s2-a1" data-anno-bubble="r3-d3-s2-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r3-d3-s2-a1" aria-expanded="false" aria-controls="anno-bubble-r3-d3-s2-a1">
+            <span class="anno-bubble-question">Hohle Marke = Basis, volle = jetzt: liest du die Lücke sofort als Änderung?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-r3-d3-s2-a1" data-annotation="r3-d3-s2-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-r3-d3-s2-a1"></div>
+          </div>
+        </div>
+      </div>
+<div class="anno" data-anno="r3-d3-s2-a2" data-anno-side="bottom" data-anno-target=".lv-ptile[data-p='signature'] .mk-first .d3-tr" style="--anno-x:50%;--anno-y:40%">
+        <button class="anno-pin" type="button" data-anno-pin="r3-d3-s2-a2" aria-expanded="false" aria-controls="anno-bubble-r3-d3-s2-a2" aria-label="{{anno.pin_label}}">2</button>
+        <div class="anno-bubble" id="anno-bubble-r3-d3-s2-a2" data-anno-bubble="r3-d3-s2-a2" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r3-d3-s2-a2" aria-expanded="false" aria-controls="anno-bubble-r3-d3-s2-a2">
+            <span class="anno-bubble-question">Ohne Zahl zur Änderung: reicht die Lücke, oder fehlt „+700“?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-r3-d3-s2-a2" data-annotation="r3-d3-s2-a2" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-r3-d3-s2-a2"></div>
+          </div>
+        </div>
+      </div></div>
+  </section>
+  <section id="r3-d3-s3" data-nav-label="C2 Hercules · gegen gespeichert" data-screen hidden>
+    <div class="mk-page" style="--holo-e:var(--sc-mission-transport)">
+      <div class="lv-head">
+        <div class="lv-ht-left" data-fidelity-approx-part="Schriften"><div class="lv-ht-title"><span class="lv-ht-kicker">Crusader Industries</span><span class="lv-ht-name">C2 Hercules Starlifter</span></div><span class="fidelity-approx-badge">Schriften angenähert</span></div>
+        <div class="lv-ht-centre"><details class="mk-pick"><summary class="lv-einsatz"><span class="lv-val"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v8l-8 4-8-4zM4 8l8 4 8-4M12 12v8"/></svg><span>Transport</span></span><span class="lv-caret">▾</span></summary><div class="lv-mission-pop"><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-all)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 9-9 9-9-9z M12 8.5l3.5 3.5-3.5 3.5-3.5-3.5z"/></svg>Alles</span></span><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-combat)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M18 12a6 6 0 1 1-12 0 6 6 0 0 1 12 0z"/></svg>Kampf</span></span><span class="lv-mp lv-on" data-screen-link="r3-d3-s3"><span class="lv-mp-l" style="--h:var(--sc-mission-transport)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v8l-8 4-8-4zM4 8l8 4 8-4M12 12v8"/></svg>Transport</span></span><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-travel)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h15M12 6l6 6-6 6"/></svg>Reisen</span></span><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-stealth)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM4 4l16 16"/></svg>Schleichen</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-mining)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12l4 6-10 11L2 10zM2 10h20"/></svg>Bergbau</span><span class="mk-why">Keine Bergbau-Hardpoints</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-salvage)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v8a6 6 0 0 0 12 0V4M3 4h6M15 4h6"/></svg>Bergung</span><span class="mk-why">Keine Bergungs-Hardpoints</span></span></div></details></div>
+        <div class="lv-ht-right"><span class="lv-einsatz mk-own"><span>1× im Hangar · Frachtlauf</span><span class="lv-caret">▾</span></span></div>
+      </div>
+      <div class="mk-stage">
+      <div class="lv-sh"><span class="lv-details-toggle">Details ▾</span><span class="lv-rule"></span><span class="lv-switch"><span class="lv-track"></span>UI-Töne</span></div>
+      <div class="lv-persp lv-row lv-docked">
+        <div class="lv-all-line mk-line"><span class="mk-base" role="group" aria-label="Vergleich"><span class="mk-base-k">Vergleich</span><span class="mk-seg">Werk</span><span class="mk-seg mk-on" aria-pressed="true">Gespeichert</span></span><span class="lv-all-expand" data-screen-link="r3-d3-s4">Alle Werte aller vier ▾</span></div>
+        <article class="lv-ptile mk-col" data-p="offensive">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l10 10-10 10L2 12z M12 7v3 M12 14v3 M7 12h3 M14 12h3"/></svg>Offensive</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">Dauer-DPS</span><span class="mk-v">2.860</span><span class="d3-tr"><b class="d3-cur" style="left:35%"></b></span></li><li class="mk-row"><span class="mk-k">Burst-DPS</span><span class="mk-v">3.900</span><span class="d3-tr"><b class="d3-cur" style="left:38%"></b></span></li><li class="mk-row"><span class="mk-k">Alpha</span><span class="mk-v">640</span><span class="d3-tr"><b class="d3-cur" style="left:40%"></b></span></li><li class="mk-row"><span class="mk-k">Raketen</span><span class="mk-v">8 × S3</span><span></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d3-s4">Alle Werte ▾</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="defensive">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L20 5V11C20 16 16.4 20 12 22C7.6 20 4 16 4 11V5Z"/></svg>Verteidigung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">Rumpf HP</span><span class="mk-v">62.000</span><span class="d3-tr"><b class="d3-cur" style="left:70%"></b></span></li><li class="mk-row mk-ch"><span class="mk-k">Schild HP</span><span class="mk-v">35.200</span><span class="d3-tr"><i class="d3-gap d3-good" style="left:64%;width:8%"></i><b class="d3-base" style="left:64%"></b><b class="d3-cur d3-good" style="left:72%"></b></span></li><li class="mk-row"><span class="mk-k">Panzerung</span><span class="mk-v">9.800</span><span class="d3-tr"><b class="d3-cur" style="left:61%"></b></span></li><li class="mk-row mk-ch"><span class="mk-k">Schild-Regen</span><span class="mk-v">470/s</span><span class="d3-tr"><i class="d3-gap d3-bad" style="left:50%;width:7%"></i><b class="d3-base" style="left:57%"></b><b class="d3-cur d3-bad" style="left:50%"></b></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d3-s4">Alle Werte ▾</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="movement">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6l6 6-6 6 M13 6l6 6-6 6"/></svg>Bewegung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">Fracht</span><span class="mk-v">696 SCU</span><span class="d3-tr"><b class="d3-cur" style="left:93%"></b></span></li><li class="mk-row"><span class="mk-k">Q-Reichweite</span><span class="mk-v">11,4 Gm</span><span class="d3-tr"><b class="d3-cur" style="left:66%"></b></span></li><li class="mk-row"><span class="mk-k">SCM</span><span class="mk-v">125 m/s</span><span class="d3-tr"><b class="d3-cur" style="left:50%"></b></span></li><li class="mk-row"><span class="mk-k">Q-Tempo</span><span class="mk-v">212 Mm/s</span><span class="d3-tr"><b class="d3-cur" style="left:60%"></b></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d3-s4">Alle Werte ▾</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="signature">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12h.01 M8.5 8.5a5 5 0 0 0 0 7 M15.5 8.5a5 5 0 0 1 0 7 M5.6 5.6a9 9 0 0 0 0 12.8 M18.4 5.6a9 9 0 0 1 0 12.8"/></svg>Signatur &amp; Kühlung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">Querschnitt</span><span class="mk-v">47.000 m</span><span class="d3-tr"><b class="d3-cur" style="left:20%"></b></span></li><li class="mk-row mk-ch"><span class="mk-k">IR</span><span class="mk-v">22.400 m</span><span class="d3-tr"><i class="d3-gap d3-bad" style="left:28%;width:3%"></i><b class="d3-base" style="left:31%"></b><b class="d3-cur d3-bad" style="left:28%"></b></span></li><li class="mk-row mk-ch"><span class="mk-k">EM</span><span class="mk-v">40.100 m</span><span class="d3-tr"><i class="d3-gap d3-bad" style="left:25%;width:3%"></i><b class="d3-base" style="left:28%"></b><b class="d3-cur d3-bad" style="left:25%"></b></span></li><li class="mk-row"><span class="mk-k">Kühllast</span><span class="mk-v">56 %</span><span class="d3-tr"><b class="d3-cur" style="left:52%"></b></span></li></ol>
+          <span class="lv-tile-expand" data-screen-link="r3-d3-s4">Alle Werte ▾</span>
+        </article>
+      </div>
+      <div class="lv-strip"><div class="lv-holo-strip"><div class="lv-hs-row"><div class="lv-seg" data-p="offensive"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l10 10-10 10L2 12z M12 7v3 M12 14v3 M7 12h3 M14 12h3"/></svg><span>Offensive</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Alpha</span><span class="lv-v">640</span></span><span class="lv-tv"><span class="lv-k">Burst-DPS</span><span class="lv-v">3.900</span></span><span class="lv-tv"><span class="lv-k">Dauer-DPS</span><span class="lv-v">2.860</span></span></div></div><div class="lv-seg" data-p="defensive"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L20 5V11C20 16 16.4 20 12 22C7.6 20 4 16 4 11V5Z"/></svg><span>Verteidigung</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Schild HP</span><span class="lv-v">35.200</span></span><span class="lv-tv"><span class="lv-k">Schild-Regen</span><span class="lv-v">470/s</span></span></div></div><div class="lv-seg" data-p="movement"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6l6 6-6 6 M13 6l6 6-6 6"/></svg><span>Bewegung</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Boost</span><span class="lv-v">640</span></span><span class="lv-tv"><span class="lv-k">SCM</span><span class="lv-v">125</span></span><span class="lv-tv"><span class="lv-k">Maximal</span><span class="lv-v">1.050</span></span></div></div><div class="lv-seg" data-p="signature"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12h.01 M8.5 8.5a5 5 0 0 0 0 7 M15.5 8.5a5 5 0 0 1 0 7 M5.6 5.6a9 9 0 0 0 0 12.8 M18.4 5.6a9 9 0 0 1 0 12.8"/></svg><span>Signatur &amp; Kühlung</span></span><div class="lv-tile-vals"><span class="lv-fact"><span class="lv-tip-trigger">IR</span><span class="lv-v">22,4<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">EM</span><span class="lv-v">40,1<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">CS</span><span class="lv-v">47,0<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">Kühllast</span><span class="lv-v">10 / 18</span></span></div></div></div><span class="lv-hs-toggle"><span class="lv-bar"></span></span></div></div>
+      </div>
+    </div>
+    <div class="anno-layer" data-anno-layer><div class="anno" data-anno="r3-d3-s3-a1" data-anno-side="bottom" data-anno-target=".lv-ptile[data-p='defensive'] .mk-ch .d3-tr" style="--anno-x:50%;--anno-y:40%">
+        <button class="anno-pin" type="button" data-anno-pin="r3-d3-s3-a1" aria-expanded="false" aria-controls="anno-bubble-r3-d3-s3-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-r3-d3-s3-a1" data-anno-bubble="r3-d3-s3-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r3-d3-s3-a1" aria-expanded="false" aria-controls="anno-bubble-r3-d3-s3-a1">
+            <span class="anno-bubble-question">Bei kleinen Änderungen (EM +1.200 m) liegen die Marken fast aufeinander: reicht das?</span>
+          </button>
+          <div class="anno-bubble-body">
+            <textarea class="anno-answer" data-comment="anno-r3-d3-s3-a1" data-annotation="r3-d3-s3-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea>
+            <div class="attach-slot" data-attach-slot="anno-r3-d3-s3-a1"></div>
+          </div>
+        </div>
+      </div></div>
+  </section>
+  <section id="r3-d3-s4" data-nav-label="Alle Werte offen" data-screen hidden>
+    <div class="mk-page" style="--holo-e:var(--sc-mission-combat)">
+      <div class="lv-head">
+        <div class="lv-ht-left" data-fidelity-approx-part="Schriften"><div class="lv-ht-title"><span class="lv-ht-kicker">Aegis Dynamics</span><span class="lv-ht-name">Gladius</span></div><span class="fidelity-approx-badge">Schriften angenähert</span></div>
+        <div class="lv-ht-centre"><details class="mk-pick"><summary class="lv-einsatz"><span class="lv-val"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M18 12a6 6 0 1 1-12 0 6 6 0 0 1 12 0z"/></svg><span>Kampf</span></span><span class="lv-caret">▾</span></summary><div class="lv-mission-pop"><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-all)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 9-9 9-9-9z M12 8.5l3.5 3.5-3.5 3.5-3.5-3.5z"/></svg>Alles</span></span><span class="lv-mp lv-on" data-screen-link="r3-d3-s4"><span class="lv-mp-l" style="--h:var(--sc-mission-combat)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M18 12a6 6 0 1 1-12 0 6 6 0 0 1 12 0z"/></svg>Kampf</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-transport)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v8l-8 4-8-4zM4 8l8 4 8-4M12 12v8"/></svg>Transport</span><span class="mk-why">Kein Frachtgitter</span></span><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-travel)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h15M12 6l6 6-6 6"/></svg>Reisen</span></span><span class="lv-mp"><span class="lv-mp-l" style="--h:var(--sc-mission-stealth)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM4 4l16 16"/></svg>Schleichen</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-mining)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12l4 6-10 11L2 10zM2 10h20"/></svg>Bergbau</span><span class="mk-why">Keine Bergbau-Hardpoints</span></span><span class="lv-mp mk-mp-off" aria-disabled="true"><span class="lv-mp-l" style="--h:var(--sc-mission-salvage)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v8a6 6 0 0 0 12 0V4M3 4h6M15 4h6"/></svg>Bergung</span><span class="mk-why">Keine Bergungs-Hardpoints</span></span></div></details></div>
+        <div class="lv-ht-right"><span class="lv-einsatz mk-own"><span>Standard-Loadout</span><span class="lv-caret">▾</span></span></div>
+      </div>
+      <div class="mk-stage">
+      <div class="lv-sh"><span class="lv-details-toggle">Details ▾</span><span class="lv-rule"></span><span class="lv-switch"><span class="lv-track"></span>UI-Töne</span></div>
+      <div class="lv-persp lv-row lv-docked">
+        <div class="lv-all-line mk-line"><span class="mk-base" role="group" aria-label="Vergleich"><span class="mk-base-k">Vergleich</span><span class="mk-seg mk-on" aria-pressed="true">Werk</span><span class="mk-seg mk-off" aria-disabled="true">Gespeichert</span></span><span class="lv-all-expand" aria-expanded="true" data-screen-link="r3-d3-s2">Alle Werte zuklappen ▴</span></div>
+        <article class="lv-ptile mk-col" data-p="offensive">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l10 10-10 10L2 12z M12 7v3 M12 14v3 M7 12h3 M14 12h3"/></svg>Offensive</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first mk-ch"><span class="mk-k">Dauer-DPS</span><span class="mk-v">1.310</span><span class="d3-tr"><i class="d3-gap d3-good" style="left:62%;width:8%"></i><b class="d3-base" style="left:62%"></b><b class="d3-cur d3-good" style="left:70%"></b></span></li><li class="mk-row mk-ch"><span class="mk-k">Burst-DPS</span><span class="mk-v">1.890</span><span class="d3-tr"><i class="d3-gap d3-good" style="left:66%;width:10%"></i><b class="d3-base" style="left:66%"></b><b class="d3-cur d3-good" style="left:76%"></b></span></li><li class="mk-row mk-ch"><span class="mk-k">Alpha</span><span class="mk-v">598</span><span class="d3-tr"><i class="d3-gap d3-good" style="left:48%;width:23%"></i><b class="d3-base" style="left:48%"></b><b class="d3-cur d3-good" style="left:71%"></b></span></li><li class="mk-row"><span class="mk-k">Raketen</span><span class="mk-v">6 × S2</span><span></span></li><li class="mk-grp">Waffen</li><li class="mk-row mk-ch"><span class="mk-k">2 × Omnisky IX<small class="mk-was">statt 2 × CF-337 Panther</small></span><span class="mk-v">770</span><span class="d3-tr"><i class="d3-gap d3-good" style="left:74%;width:4%"></i><b class="d3-base" style="left:74%"></b><b class="d3-cur d3-good" style="left:78%"></b></span></li><li class="mk-row"><span class="mk-k">1 × Attrition-3</span><span class="mk-v">540</span><span class="d3-tr"><b class="d3-cur" style="left:69%"></b></span></li><li class="mk-grp">Raketen</li><li class="mk-row"><span class="mk-k">6 × Ignite II</span><span class="mk-v">S2 · IR</span><span></span></li><li class="mk-row"><span class="mk-k">Salve</span><span class="mk-v">15.600</span><span class="d3-tr"><b class="d3-cur" style="left:58%"></b></span></li><li class="mk-row"><span class="mk-k">Aufschalten</span><span class="mk-v">2,5 s</span><span></span></li><li class="mk-grp">Schaden &amp; Reichweite</li><li class="mk-row"><span class="mk-k">Energie-Anteil</span><span class="mk-v">100 %</span><span></span></li><li class="mk-row mk-ch"><span class="mk-k">Wirkreichweite</span><span class="mk-v">2.250 m</span><span class="d3-tr"><i class="d3-gap d3-good" style="left:62%;width:8%"></i><b class="d3-base" style="left:62%"></b><b class="d3-cur d3-good" style="left:70%"></b></span></li><li class="mk-row mk-ch"><span class="mk-k">Geschosstempo</span><span class="mk-v">1.250 m/s</span><span class="d3-tr"><i class="d3-gap d3-bad" style="left:50%;width:7%"></i><b class="d3-base" style="left:57%"></b><b class="d3-cur d3-bad" style="left:50%"></b></span></li></ol><span class="mk-gaps">2 Werte fehlen ▾</span>
+          <span class="lv-tile-expand mk-open" aria-expanded="true" data-screen-link="r3-d3-s2">Alle Werte ▴</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="defensive">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L20 5V11C20 16 16.4 20 12 22C7.6 20 4 16 4 11V5Z"/></svg>Verteidigung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">Schild HP</span><span class="mk-v">4.320</span><span class="d3-tr"><b class="d3-cur" style="left:61%"></b></span></li><li class="mk-row"><span class="mk-k">Schild-Regen</span><span class="mk-v">216/s</span><span class="d3-tr"><b class="d3-cur" style="left:66%"></b></span></li><li class="mk-row"><span class="mk-k">Rumpf HP</span><span class="mk-v">3.950</span><span class="d3-tr"><b class="d3-cur" style="left:58%"></b></span></li><li class="mk-row"><span class="mk-k">Panzerung</span><span class="mk-v">1.850</span><span class="d3-tr"><b class="d3-cur" style="left:40%"></b></span></li><li class="mk-grp">Schild</li><li class="mk-row"><span class="mk-k">Regen-Pause</span><span class="mk-v">5,6 s</span><span class="d3-tr"><b class="d3-cur" style="left:48%"></b></span></li><li class="mk-row"><span class="mk-k">Schildflächen</span><span class="mk-v">1</span><span></span></li><li class="mk-grp">Rumpf</li><li class="mk-row"><span class="mk-k">Teile</span><span class="mk-v">7</span><span></span></li><li class="mk-row"><span class="mk-k">Masse Panzerung</span><span class="mk-v">3.100 kg</span><span></span></li></ol><span class="mk-gaps">4 Werte fehlen ▾</span>
+          <span class="lv-tile-expand mk-open" aria-expanded="true" data-screen-link="r3-d3-s2">Alle Werte ▴</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="movement">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6l6 6-6 6 M13 6l6 6-6 6"/></svg>Bewegung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first"><span class="mk-k">SCM</span><span class="mk-v">236 m/s</span><span class="d3-tr"><b class="d3-cur" style="left:84%"></b></span></li><li class="mk-row mk-ch"><span class="mk-k">Wendigkeit</span><span class="mk-v">13,9</span><span class="d3-tr"><i class="d3-gap d3-bad" style="left:85%;width:3%"></i><b class="d3-base" style="left:88%"></b><b class="d3-cur d3-bad" style="left:85%"></b></span></li><li class="mk-row"><span class="mk-k">Boost</span><span class="mk-v">1.140 m/s</span><span class="d3-tr"><b class="d3-cur" style="left:70%"></b></span></li><li class="mk-row"><span class="mk-k">Maximal</span><span class="mk-v">1.240 m/s</span><span class="d3-tr"><b class="d3-cur" style="left:62%"></b></span></li><li class="mk-grp">Drehraten</li><li class="mk-row"><span class="mk-k">Nicken</span><span class="mk-v">72 °/s</span><span class="d3-tr"><b class="d3-cur" style="left:80%"></b></span></li><li class="mk-row"><span class="mk-k">Gieren</span><span class="mk-v">60 °/s</span><span class="d3-tr"><b class="d3-cur" style="left:77%"></b></span></li><li class="mk-row"><span class="mk-k">Rollen</span><span class="mk-v">160 °/s</span><span class="d3-tr"><b class="d3-cur" style="left:83%"></b></span></li><li class="mk-grp">Quantum</li><li class="mk-row"><span class="mk-k">Q-Reichweite</span><span class="mk-v">1,9 Gm</span><span class="d3-tr"><b class="d3-cur" style="left:44%"></b></span></li><li class="mk-row"><span class="mk-k">Q-Tempo</span><span class="mk-v">166 Mm/s</span><span class="d3-tr"><b class="d3-cur" style="left:52%"></b></span></li><li class="mk-row"><span class="mk-k">Spool</span><span class="mk-v">4,5 s</span><span class="d3-tr"><b class="d3-cur" style="left:60%"></b></span></li><li class="mk-grp">Masse</li><li class="mk-row mk-ch"><span class="mk-k">Leermasse</span><span class="mk-v">50.020 kg</span><span class="d3-tr"><i class="d3-gap d3-bad" style="left:40%;width:2%"></i><b class="d3-base" style="left:42%"></b><b class="d3-cur d3-bad" style="left:40%"></b></span></li></ol>
+          <span class="lv-tile-expand mk-open" aria-expanded="true" data-screen-link="r3-d3-s2">Alle Werte ▴</span>
+        </article>
+        <article class="lv-ptile mk-col" data-p="signature">
+          <div class="lv-pt-head"><span class="lv-t"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12h.01 M8.5 8.5a5 5 0 0 0 0 7 M15.5 8.5a5 5 0 0 1 0 7 M5.6 5.6a9 9 0 0 0 0 12.8 M18.4 5.6a9 9 0 0 1 0 12.8"/></svg>Signatur &amp; Kühlung</span></div>
+          <ol class="mk-list"><li class="mk-row mk-first mk-ch"><span class="mk-k">IR</span><span class="mk-v">7.100 m</span><span class="d3-tr"><i class="d3-gap d3-bad" style="left:64%;width:8%"></i><b class="d3-base" style="left:72%"></b><b class="d3-cur d3-bad" style="left:64%"></b></span></li><li class="mk-row mk-ch"><span class="mk-k">EM</span><span class="mk-v">11.900 m</span><span class="d3-tr"><i class="d3-gap d3-bad" style="left:60%;width:5%"></i><b class="d3-base" style="left:65%"></b><b class="d3-cur d3-bad" style="left:60%"></b></span></li><li class="mk-row"><span class="mk-k">Querschnitt</span><span class="mk-v">9.800 m</span><span class="d3-tr"><b class="d3-cur" style="left:80%"></b></span></li><li class="mk-row mk-ch"><span class="mk-k">Kühllast</span><span class="mk-v">70 %</span><span class="d3-tr"><i class="d3-gap d3-bad" style="left:46%;width:9%"></i><b class="d3-base" style="left:55%"></b><b class="d3-cur d3-bad" style="left:46%"></b></span></li><li class="mk-grp">Signatur</li><li class="mk-row"><span class="mk-k">EM (Ruhe)</span><span class="mk-v">4.800 m</span><span class="d3-tr"><b class="d3-cur" style="left:70%"></b></span></li><li class="mk-row"><span class="mk-k">EM (Quantum)</span><span class="mk-v">15.300 m</span><span class="d3-tr"><b class="d3-cur" style="left:61%"></b></span></li><li class="mk-grp">Kühlung</li><li class="mk-row mk-ch"><span class="mk-k">Kühllast</span><span class="mk-v">13 / 18</span><span class="d3-tr"><i class="d3-gap d3-bad" style="left:45%;width:10%"></i><b class="d3-base" style="left:55%"></b><b class="d3-cur d3-bad" style="left:45%"></b></span></li><li class="mk-row"><span class="mk-k">Kühler</span><span class="mk-v">2 × S1</span><span></span></li></ol><span class="mk-gaps">1 Wert fehlt ▾</span>
+          <span class="lv-tile-expand mk-open" aria-expanded="true" data-screen-link="r3-d3-s2">Alle Werte ▴</span>
+        </article>
+      </div>
+      <div class="lv-strip"><div class="lv-holo-strip"><div class="lv-hs-row"><div class="lv-seg" data-p="offensive"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l10 10-10 10L2 12z M12 7v3 M12 14v3 M7 12h3 M14 12h3"/></svg><span>Offensive</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Alpha</span><span class="lv-v">598</span></span><span class="lv-tv"><span class="lv-k">Burst-DPS</span><span class="lv-v">1.890</span></span><span class="lv-tv"><span class="lv-k">Dauer-DPS</span><span class="lv-v">1.310</span></span></div></div><div class="lv-seg" data-p="defensive"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L20 5V11C20 16 16.4 20 12 22C7.6 20 4 16 4 11V5Z"/></svg><span>Verteidigung</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Schild HP</span><span class="lv-v">4.320</span></span><span class="lv-tv"><span class="lv-k">Schild-Regen</span><span class="lv-v">216/s</span></span></div></div><div class="lv-seg" data-p="movement"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6l6 6-6 6 M13 6l6 6-6 6"/></svg><span>Bewegung</span></span><div class="lv-tile-vals"><span class="lv-tv"><span class="lv-k">Boost</span><span class="lv-v">1.140</span></span><span class="lv-tv"><span class="lv-k">SCM</span><span class="lv-v">236</span></span><span class="lv-tv"><span class="lv-k">Maximal</span><span class="lv-v">1.240</span></span></div></div><div class="lv-seg" data-p="signature"><span class="lv-lab"><svg class="lv-area-sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12h.01 M8.5 8.5a5 5 0 0 0 0 7 M15.5 8.5a5 5 0 0 1 0 7 M5.6 5.6a9 9 0 0 0 0 12.8 M18.4 5.6a9 9 0 0 1 0 12.8"/></svg><span>Signatur &amp; Kühlung</span></span><div class="lv-tile-vals"><span class="lv-fact"><span class="lv-tip-trigger">IR</span><span class="lv-v">7,1<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">EM</span><span class="lv-v">11,9<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">CS</span><span class="lv-v">9,8<small>km</small></span></span><span class="lv-fact"><span class="lv-tip-trigger">Kühllast</span><span class="lv-v">13 / 18</span></span></div></div></div><span class="lv-hs-toggle"><span class="lv-bar"></span></span></div></div>
+      </div>
+    </div>
+  </section>
+</section>
+<section data-view="r3-analyse" data-view-kind="analysis" data-analysis="full" data-nav-label="Analyse" hidden>
+  <section id="r3-briefing" data-analysis-briefing data-nav-label="Briefing">
+    <p data-briefing-what>Nach einem Waffentausch zeigen die Spalten neue Zahlen, aber nicht, welche sich bewegt haben: Beim Gladius ändern sich 7 von 16 Werten unbemerkt.</p>
+    <p data-briefing-why>Jede Zeile vergleicht künftig mit dem Werk oder dem gespeicherten Exemplar; der Rang bleibt in der Einordnung.</p>
+    <div data-briefing-potential data-viz="kpi" data-viz-spec='{"value":"0 → 7","unit":"Änderungen","label":"sichtbar nach einem Waffentausch"}'>0 → 7 Änderungen</div>
+    <a data-briefing-topic="r3-t-basis" data-share="55">Vergleich zur Basis</a>
+    <a data-briefing-topic="r3-t-einsatz" data-share="45">Einsätze und Werte</a>
+    <p data-briefing-duration>≈ 6 min</p>
+    <div data-alevel="1" data-title="Briefing">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"0 → 7","unit":"Änderungen"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="bars" data-viz-spec='{"items":[{"label":"Werte im ersten Blick","value":16},{"label":"davon nach dem Tausch geändert","value":7}],"unit":"","hl":"davon nach dem Tausch geändert","text":"7 der 16 Werte bewegen sich, wenn der Gladius zwei stärkere S3-Waffen bekommt."}'></div>
+        <p>Gezählt am Gladius mit 2 × Omnisky IX statt 2 × CF-337: drei Werte der Offensive, einer der Bewegung, drei der Signatur. Die Fragen gelten für jeden Entwurf.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="r3-t-basis" data-topic data-nav-label="Vergleich zur Basis">
+    <div data-alevel="2" data-title="Vergleich zur Basis">
+      <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Jede Zeile vergleicht mit dem Werk oder dem gespeicherten Exemplar."}'>Jede Zeile vergleicht mit dem Werk oder dem gespeicherten Exemplar.</div></div>
+      <div data-slot="long"><div data-viz="compare" data-viz-spec='{"before":{"label":"Runde 2: markierte Änderungen nach dem Tausch","value":0},"after":{"label":"mit Basis-Vergleich","value":7},"unit":" Zeilen","text":"Mit einer Basis zeigen 7 Zeilen, dass sie sich bewegt haben."}'></div><p>Offen ist, welche Basis beim Öffnen gilt, was ohne Änderung erscheint und wohin der Patch-Vergleich gehört.</p></div>
+    </div>
+
+    <section id="r3-d-basis" data-nav-label="Basis beim Öffnen" data-decision="r3-d-basis" data-decision-mode="single"
+        data-label="Basis beim Öffnen" data-rec="saved" data-rec-why="Wer ein Exemplar umbaut, will sehen, was er seit dem Speichern geändert hat; ohne Exemplar bleibt nur das Werk." data-applies-to="jede Schiffsseite (Holotisch)" data-finding="f-r3-d-basis">
+      <p data-applies>Gilt für: jede Schiffsseite (Holotisch)</p>
+      <p data-situation>Wer sein gespeichertes Exemplar umbaut, sieht gegen das Werk auch alte Tausche als Änderung: Bei der Hercules „Frachtlauf“ sind 6 Zeilen markiert, neu geändert sind 4.</p>
+      <h3 data-question>Mit welcher Basis vergleichen die Zeilen, wenn die Seite öffnet?</h3>
+      <p data-stakes>Was nach dem Öffnen als Änderung markiert ist.</p>
+      <div data-options>
+        <label data-opt="saved" data-recommended>
+          <input type="radio" name="dm-r3-d-basis" value="saved" checked>
+          <span data-opt-label>Gespeichert, sonst Werk</span>
+          <span data-opt-consequence>Mit Exemplar im Hangar gilt dessen Stand; ein Gladius ohne Exemplar vergleicht mit dem Werk.</span>
+        </label>
+        <label data-opt="werk">
+          <input type="radio" name="dm-r3-d-basis" value="werk">
+          <span data-opt-label>Immer Werk</span>
+          <span data-opt-consequence>Jede Seite zeigt, wie weit das Schiff vom Werk abweicht, auch längst gespeicherte Tausche.</span>
+        </label>
+        <label data-opt="last">
+          <input type="radio" name="dm-r3-d-basis" value="last">
+          <span data-opt-label>Zuletzt gewählte Basis</span>
+          <span data-opt-consequence>Wer einmal Werk wählt, vergleicht auch beim nächsten Schiff mit dem Werk.</span>
+        </label>
+      </div>
+      <textarea data-comment="r3-d-basis-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-r3-d-basis-none" value="">
+      <input type="hidden" name="dm-r3-d-basis-hes" value="">
+      <input type="hidden" name="dm-r3-d-basis-touched" value="">
+      <input type="hidden" name="dm-r3-d-basis-issue" value="">
+      <input type="hidden" name="dm-r3-d-basis-epic" value="">
+      <div data-alevel="3" data-title="Basis beim Öffnen">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Gegen das Werk erscheinen auch gespeicherte Tausche als Änderung."}'>Gegen das Werk erscheinen auch gespeicherte Tausche als Änderung.</div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"markiert gegen Werk","value":6},{"label":"markiert gegen Gespeichert","value":4}],"unit":" Zeilen","hl":"markiert gegen Werk","text":"Hercules „Frachtlauf“ mit neuem Schild: 2 der 6 markierten Zeilen sind alte, schon gespeicherte Tausche."}'></div>
+        </div>
+        <div data-example><pre>Basis Werk         C2 „Frachtlauf“ → Schild HP +3.700 · Schild-Regen −70/s · IR +1.100 m · EM +1.200 m · Q-Reichweite +2,1 Gm · Q-Tempo +18 Mm/s
+Basis Gespeichert  C2 „Frachtlauf“ → Schild HP +3.700 · Schild-Regen −70/s · IR +1.100 m · EM +1.200 m</pre></div>
+      </div>
+    </section>
+
+    <section id="r3-d-gleich" data-nav-label="Vergleich ohne Änderung" data-decision="r3-d-gleich" data-decision-mode="single"
+        data-label="Vergleich ohne Änderung" data-rec="values" data-rec-why="Ohne Abweichung gibt es nichts zu melden; der erste Tausch bringt den Vergleich von selbst." data-applies-to="jede Spalte, solange das Loadout der Basis gleicht" data-finding="f-r3-d-gleich">
+      <p data-applies>Gilt für: jede Spalte, solange das Loadout der Basis gleicht</p>
+      <p data-situation>Ein Schiff ab Werk hat in keiner der 16 Zeilen eine Abweichung; jeder Vergleich hätte dort nichts zu melden und kostet trotzdem Platz.</p>
+      <h3 data-question>Was zeigen die Zeilen, wenn das Loadout der Basis gleicht?</h3>
+      <div data-options>
+        <label data-opt="values" data-recommended>
+          <input type="radio" name="dm-r3-d-gleich" value="values" checked>
+          <span data-opt-label>Nur die Werte, kein Vergleich</span>
+          <span data-opt-consequence>Ein Gladius ab Werk sieht aus wie in Runde 2 ohne Rang; der erste Tausch bringt die Änderungen.</span>
+        </label>
+        <label data-opt="hint">
+          <input type="radio" name="dm-r3-d-gleich" value="hint">
+          <span data-opt-label>Leiser Hinweis „= Werk“ je Spalte</span>
+          <span data-opt-consequence>Jede Spalte bestätigt, dass nichts abweicht; vier kurze Hinweise mehr im ersten Blick.</span>
+        </label>
+        <label data-opt="hide">
+          <input type="radio" name="dm-r3-d-gleich" value="hide">
+          <span data-opt-label>Vergleichsschalter erst ab dem ersten Tausch</span>
+          <span data-opt-consequence>„Vergleich: Werk | Gespeichert“ fehlt ab Werk und erscheint, sobald ein Teil getauscht ist.</span>
+        </label>
+      </div>
+      <textarea data-comment="r3-d-gleich-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-r3-d-gleich-none" value="">
+      <input type="hidden" name="dm-r3-d-gleich-hes" value="">
+      <input type="hidden" name="dm-r3-d-gleich-touched" value="">
+      <input type="hidden" name="dm-r3-d-gleich-issue" value="">
+      <input type="hidden" name="dm-r3-d-gleich-epic" value="">
+      <div data-alevel="3" data-title="Vergleich ohne Änderung">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Ab Werk hat keine Zeile etwas zu vergleichen."}'>Ab Werk hat keine Zeile etwas zu vergleichen.</div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"abweichende Zeilen ab Werk","value":0},{"label":"nach dem Waffentausch","value":7}],"unit":" Zeilen","hl":"abweichende Zeilen ab Werk","text":"Ab Werk weicht keine der 16 Zeilen ab."}'></div>
+        </div>
+        <div data-example><pre>Ab Werk     Gladius · OFFENSIVE  Dauer-DPS 1.180 · Burst-DPS 1.640 · Alpha 412 · Raketen 6 × S2
+Getauscht   Gladius · OFFENSIVE  Dauer-DPS 1.310 (+130) · Burst-DPS 1.890 (+250) · Alpha 598 (+186) · Raketen 6 × S2</pre></div>
+      </div>
+    </section>
+
+    <section id="r3-d-patch" data-nav-label="Patch-Vergleich" data-decision="r3-d-patch" data-decision-mode="single"
+        data-label="Patch-Vergleich" data-rec="third" data-rec-why="Eine Zeile mit genau einem Vergleich bleibt lesbar; der Patch ist nur eine weitere Basis, gegen die man misst." data-applies-to="Patch-Auswahl im Holotisch" data-finding="f-r3-d-patch">
+      <p data-applies>Gilt für: Patch-Auswahl im Holotisch</p>
+      <p data-situation>Mit gewähltem Patch trägt eine Zeile zwei Vergleiche: die Änderung zur Basis und den Geisterwert „4.3.1 · 1.120“ des alten Patches.</p>
+      <h3 data-question>Wie verhält sich der Patch-Vergleich zum Vergleich mit Werk oder Gespeichert?</h3>
+      <div data-options>
+        <label data-opt="third" data-recommended>
+          <input type="radio" name="dm-r3-d-patch" value="third" checked>
+          <span data-opt-label>Patch wird dritte Basis</span>
+          <span data-opt-consequence>„Vergleich: Werk | Gespeichert | 4.3.1“; jede Zeile zeigt immer nur einen Vergleich.</span>
+        </label>
+        <label data-opt="ghost">
+          <input type="radio" name="dm-r3-d-patch" value="ghost">
+          <span data-opt-label>Patch bleibt eigener Geisterwert</span>
+          <span data-opt-consequence>Eine Zeile kann zwei Vergleiche tragen: zur Basis und zum alten Patch.</span>
+        </label>
+      </div>
+      <textarea data-comment="r3-d-patch-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-r3-d-patch-none" value="">
+      <input type="hidden" name="dm-r3-d-patch-hes" value="">
+      <input type="hidden" name="dm-r3-d-patch-touched" value="">
+      <input type="hidden" name="dm-r3-d-patch-issue" value="">
+      <input type="hidden" name="dm-r3-d-patch-epic" value="">
+      <div data-alevel="3" data-title="Patch-Vergleich">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Patch-Geist und Basis wären zwei Vergleiche in einer Zeile."}'>Patch-Geist und Basis wären zwei Vergleiche in einer Zeile.</div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Vergleich zur Basis","value":1},{"label":"Patch-Geisterwert","value":1}],"unit":" je Zeile","hl":"Patch-Geisterwert","text":"Mit gewähltem Patch trägt eine Zeile zwei Vergleiche."}'></div>
+        </div>
+        <div data-example><pre>Zwei Vergleiche   Dauer-DPS 1.310  +130 gegen Werk  · 4.3.1 · 1.120
+Ein Vergleich     Vergleich: Werk | Gespeichert | 4.3.1  →  Dauer-DPS 1.310  +190 gegen 4.3.1</pre></div>
+      </div>
+    </section>
+  </section>
+
+  <section id="r3-t-einsatz" data-topic data-nav-label="Einsätze und Werte">
+    <div data-alevel="2" data-title="Einsätze und Werte">
+      <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Nicht passende Einsätze sind gesperrt; offen sind Datenlücken und drei Vorgaben."}'>Nicht passende Einsätze sind gesperrt; offen sind Datenlücken und drei Vorgaben.</div></div>
+      <div data-slot="long"><div data-viz="bars" data-viz-spec='{"items":[{"label":"Gladius: wählbare Einsätze","value":4},{"label":"Gladius: gesperrte Einsätze","value":3}],"unit":"","hl":"Gladius: gesperrte Einsätze","text":"Transport, Bergbau und Bergung sind beim Gladius gesperrt, jeweils mit Grund."}'></div><p>Drei Vorgaben aus Runde 2 hast du noch nicht angesehen; sie stehen hier kurz zur Bestätigung.</p></div>
+    </div>
+
+    <section id="r3-d-luecke" data-nav-label="Rolle ohne Daten" data-decision="r3-d-luecke" data-decision-mode="single"
+        data-label="Rolle ohne Daten" data-rec="known" data-rec-why="Laser, Hardpoint und Erzladeraum helfen schon bei der Wahl; die Lücke offen zu nennen schützt vor falschen Schlüssen." data-applies-to="Bergbau und Bergung bei Schiffen mit passender Ausstattung" data-finding="f-r3-d-luecke">
+      <p data-applies>Gilt für: Bergbau und Bergung bei Schiffen mit passender Ausstattung</p>
+      <p class="mk-fest">Fest steht: Einsätze ohne passende Ausstattung sind nicht wählbar.</p>
+      <p data-situation>Die Prospector hat einen Bergbau-Hardpoint, ihre Laserleistung fehlt aber in den Spieldaten: Bergbau kennt Laser, Platz und Erz, nur den Kernwert nicht.</p>
+      <h3 data-question>Ist ein Einsatz wählbar, wenn die Ausstattung da ist, ihre Werte aber fehlen?</h3>
+      <div data-options>
+        <label data-opt="known" data-recommended>
+          <input type="radio" name="dm-r3-d-luecke" value="known" checked>
+          <span data-opt-label>Wählbar, Bekanntes plus Lückenhinweis</span>
+          <span data-opt-consequence>Prospector · Bergbau: Arbor MH1 · S1, 32 SCU Erz, dazu „Laserleistung fehlt in den Spieldaten“.</span>
+        </label>
+        <label data-opt="locked">
+          <input type="radio" name="dm-r3-d-luecke" value="locked">
+          <span data-opt-label>Gesperrt, bis die Werte da sind</span>
+          <span data-opt-consequence>Bergbau bleibt grau mit „Werte fehlen noch“, auch bei echten Bergbauschiffen.</span>
+        </label>
+      </div>
+      <textarea data-comment="r3-d-luecke-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-r3-d-luecke-none" value="">
+      <input type="hidden" name="dm-r3-d-luecke-hes" value="">
+      <input type="hidden" name="dm-r3-d-luecke-touched" value="">
+      <input type="hidden" name="dm-r3-d-luecke-issue" value="">
+      <input type="hidden" name="dm-r3-d-luecke-epic" value="">
+      <div data-alevel="3" data-title="Rolle ohne Daten">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Bergbau und Bergung haben Ausstattung, aber keine Kernwerte."}'>Bergbau und Bergung haben Ausstattung, aber keine Kernwerte.</div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Kampf","value":6},{"label":"Transport","value":6},{"label":"Reisen","value":6},{"label":"Schleichen","value":6},{"label":"Bergbau","value":0},{"label":"Bergung","value":0}],"unit":" eigene Werte","hl":"Bergbau","text":"Bergbau und Bergung haben keine eigenen Kennzahlen in den Spieldaten."}'></div>
+        </div>
+        <div data-example><pre>Prospector · Bergbau  OFFENSIVE  Bergbaulaser Arbor MH1 · Bergbau-Hardpoints 1 × S1 · Laserleistung fehlt
+Gladius · Bergbau     nicht wählbar: Keine Bergbau-Hardpoints</pre></div>
+      </div>
+    </section>
+
+    <section id="r3-d-alles" data-nav-label="Leitwerte bei „Alles“" data-decision="r3-d-alles" data-decision-mode="single"
+        data-label="Leitwerte bei „Alles“" data-rec="neutral" data-rec-why="Gleiche Leitwerte machen Schiffe untereinander vergleichbar; worin eines stark ist, steht in der Einordnung." data-applies-to="Einsatz „Alles“ und Schiffe ohne klare Rolle" data-finding="f-r3-d-alles">
+      <p data-applies>Gilt für: Einsatz „Alles“ und Schiffe ohne klare Rolle</p>
+      <p data-situation>Ohne Einsatz führt Bewegung beim Gladius mit Boost, obwohl im Kampf SCM zählt: Jede Spalte nimmt den ersten Wert einer festen Liste.</p>
+      <h3 data-question>Womit führt jede Spalte, wenn der Einsatz „Alles“ ist?</h3>
+      <p data-context>Aus Runde 2 übernommen; dort noch nicht angesehen.</p>
+      <div data-options>
+        <label data-opt="neutral" data-recommended>
+          <input type="radio" name="dm-r3-d-alles" value="neutral" checked>
+          <span data-opt-label>Fester neutraler Leitwert je Spalte</span>
+          <span data-opt-consequence>Dauer-DPS, Schild HP, SCM, IR bei jedem Schiff; Vergleiche zwischen Schiffen bleiben direkt.</span>
+        </label>
+        <label data-opt="strong">
+          <input type="radio" name="dm-r3-d-alles" value="strong">
+          <span data-opt-label>Stärkster Wert des Schiffs je Spalte</span>
+          <span data-opt-consequence>Beim Gladius führt Bewegung mit Wendigkeit, bei der Hercules mit Fracht; je Schiff anders.</span>
+        </label>
+        <label data-opt="role">
+          <input type="radio" name="dm-r3-d-alles" value="role">
+          <span data-opt-label>Leitwerte der Schiffsrolle</span>
+          <span data-opt-consequence>Ein Frachter zeigt schon bei „Alles“ Fracht; „Alles“ und Rolle werden fast gleich.</span>
+        </label>
+      </div>
+      <textarea data-comment="r3-d-alles-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-r3-d-alles-none" value="">
+      <input type="hidden" name="dm-r3-d-alles-hes" value="">
+      <input type="hidden" name="dm-r3-d-alles-touched" value="">
+      <input type="hidden" name="dm-r3-d-alles-issue" value="">
+      <input type="hidden" name="dm-r3-d-alles-epic" value="">
+      <div data-alevel="3" data-title="Leitwerte bei „Alles“">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Bei „Alles“ fehlt eine Regel, welcher Wert je Spalte führt."}'>Bei „Alles“ fehlt eine Regel, welcher Wert je Spalte führt.</div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Boost","value":1140},{"label":"Maximal","value":1240},{"label":"SCM","value":236}],"unit":" m/s","hl":"Boost","text":"Bewegung beim Gladius: Boost führt, weil er zuerst in der Liste steht."}'></div>
+        </div>
+        <div data-example><pre>Bisher  „Alles“ · Gladius → Bewegung 1.140 m/s Boost
+Danach  „Alles“ · Gladius → Offensive 1.180 Dauer-DPS · Verteidigung 4.320 Schild HP · Bewegung 236 m/s SCM · Signatur 6.400 m IR</pre></div>
+      </div>
+    </section>
+
+    <section id="r3-d-leitwert" data-nav-label="Leitwert je Einsatz" data-decision="r3-d-leitwert" data-decision-mode="verify"
+        data-label="Leitwert je Einsatz" data-rec="ok" data-rec-why="Die Zuordnung folgt den Kennzahlen, die jeder Einsatz schon im Kennzahlenband führt." data-applies-to="alle sieben Einsätze, alle vier Spalten" data-finding="f-r3-d-leitwert">
+      <p data-applies>Gilt für: alle sieben Einsätze, alle vier Spalten</p>
+      <p data-situation>Ohne diese Zuordnung führt die Hercules Bewegung mit Boost statt mit ihren 696 SCU, genau wie ein Jäger.</p>
+      <h3 data-question>Stimmt diese Zuordnung von Leitwert, Fokus und leisen Spalten je Einsatz?</h3>
+      <p data-context>Aus Runde 2 übernommen; Korrekturen einzelner Zellen ins Feld „Was stimmt nicht?“.</p>
+      <div data-options>
+        <label data-opt="ok" data-recommended>
+          <input type="radio" name="dm-r3-d-leitwert" value="ok" checked>
+          <span data-opt-label>Stimmt</span>
+          <span data-opt-consequence>Diese Tabelle wird die Vorgabe für Leitwerte, Fokus und leise Spalten.</span>
+        </label>
+        <label data-opt="partial">
+          <input type="radio" name="dm-r3-d-leitwert" value="partial">
+          <span data-opt-label>Teilweise</span>
+          <span data-opt-consequence>Ich korrigiere einzelne Zellen im Feld darunter.</span>
+        </label>
+        <label data-opt="wrong">
+          <input type="radio" name="dm-r3-d-leitwert" value="wrong">
+          <span data-opt-label>Stimmt nicht</span>
+          <span data-opt-consequence>Die Zuordnung muss neu gedacht werden.</span>
+        </label>
+      </div>
+      <input type="text" name="dm-r3-d-leitwert-fix" value="" placeholder="Was stimmt nicht?">
+      <textarea data-comment="r3-d-leitwert-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-r3-d-leitwert-none" value="">
+      <input type="hidden" name="dm-r3-d-leitwert-hes" value="">
+      <input type="hidden" name="dm-r3-d-leitwert-touched" value="">
+      <input type="hidden" name="dm-r3-d-leitwert-issue" value="">
+      <input type="hidden" name="dm-r3-d-leitwert-epic" value="">
+      <div data-alevel="3" data-title="Leitwert je Einsatz">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Je Einsatz ein Leitwert pro Spalte, dazu welche Spalten führen."}'>Je Einsatz ein Leitwert pro Spalte, dazu welche Spalten führen.</div></div>
+        <div data-slot="long">
+          <div data-viz="table" data-viz-spec='{"columns":["Offensive","Verteidigung","Bewegung","Signatur & Kühlung"],"rows":[],"text":"Leitwert je Einsatz und Spalte; ★ = Fokus, „leise“ = tritt zurück."}'><table class="mk-atbl"><thead><tr><th>Einsatz</th><th>Offensive</th><th>Verteidigung</th><th>Bewegung</th><th>Signatur &amp; Kühlung</th></tr></thead><tbody>
+      <tr><td>Kampf</td><td>Dauer-DPS ★</td><td>Schild HP ★</td><td>SCM</td><td>IR</td></tr>
+      <tr><td>Transport</td><td>Dauer-DPS · leise</td><td>Rumpf HP ★</td><td>Fracht ★ (dazu Q-Reichweite)</td><td>Querschnitt · leise</td></tr>
+      <tr><td>Reisen</td><td>Dauer-DPS · leise</td><td>Rumpf HP</td><td>Q-Reichweite ★ (dazu Fracht)</td><td>Kühllast</td></tr>
+      <tr><td>Schleichen</td><td>Alpha · leise</td><td>Schild HP</td><td>SCM</td><td>IR ★ (dazu EM)</td></tr>
+      <tr><td>Bergbau</td><td>Bergbaulaser ★</td><td>Schild HP</td><td>Q-Reichweite (dazu Erz)</td><td>Kühllast ★</td></tr>
+      <tr><td>Bergung</td><td>Bergungswerkzeug ★</td><td>Rumpf HP</td><td>Fracht ★</td><td>Kühllast · leise</td></tr>
+      <tr><td>Alles</td><td colspan="4">nach Antwort zu „Leitwerte bei Alles“</td></tr></tbody></table></div>
+        </div>
+        <div data-example><pre>Kampf · Gladius → Offensive 1.180 Dauer-DPS ★ · Verteidigung 4.320 Schild HP ★ · Bewegung 236 m/s SCM · Signatur 6.400 m IR
+Transport · C2   → Verteidigung 62.000 Rumpf HP ★ · Bewegung 696 SCU Fracht ★ · Offensive und Signatur leise</pre></div>
+      </div>
+    </section>
+
+    <section id="r3-d-werkzeug" data-nav-label="Platz des Werkzeugs" data-decision="r3-d-werkzeug" data-decision-mode="single"
+        data-label="Platz des Werkzeugs" data-rec="offensive" data-rec-why="Offensive ist die Spalte für das, womit das Schiff arbeitet; bei Industrieschiffen bliebe sie sonst immer leer." data-applies-to="Bergbau und Bergung" data-finding="f-r3-d-werkzeug">
+      <p data-applies>Gilt für: Bergbau und Bergung</p>
+      <p data-situation>Eine Prospector zeigt unter Offensive nur „keine Waffen“, obwohl ihr Bergbaulaser das Teil ist, für das man sie kauft.</p>
+      <h3 data-question>In welcher Spalte steht ein Bergbau- oder Bergungswerkzeug?</h3>
+      <p data-context>Aus Runde 2 übernommen; dort noch nicht angesehen.</p>
+      <div data-options>
+        <label data-opt="offensive" data-recommended>
+          <input type="radio" name="dm-r3-d-werkzeug" value="offensive" checked>
+          <span data-opt-label>In der Offensive statt „keine Waffen“</span>
+          <span data-opt-consequence>Prospector: Offensive zeigt Arbor MH1 · S1; Schiffe mit Waffen und Laser zeigen beides untereinander.</span>
+        </label>
+        <label data-opt="signature">
+          <input type="radio" name="dm-r3-d-werkzeug" value="signature">
+          <span data-opt-label>In Signatur &amp; Kühlung neben der Kühllast</span>
+          <span data-opt-consequence>Laser und Hitze stehen zusammen; Offensive bleibt bei „keine Waffen“.</span>
+        </label>
+        <label data-opt="detail">
+          <input type="radio" name="dm-r3-d-werkzeug" value="detail">
+          <span data-opt-label>Nur in „Alle Werte“</span>
+          <span data-opt-consequence>Der erste Blick zeigt kein Werkzeug; wer es sucht, klappt auf.</span>
+        </label>
+      </div>
+      <textarea data-comment="r3-d-werkzeug-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-r3-d-werkzeug-none" value="">
+      <input type="hidden" name="dm-r3-d-werkzeug-hes" value="">
+      <input type="hidden" name="dm-r3-d-werkzeug-touched" value="">
+      <input type="hidden" name="dm-r3-d-werkzeug-issue" value="">
+      <input type="hidden" name="dm-r3-d-werkzeug-epic" value="">
+      <div data-alevel="3" data-title="Platz des Werkzeugs">
+        <div data-slot="short"><div data-viz="text" data-viz-spec='{"text":"Die Offensive der Prospector bleibt leer, ihr Laser steht nirgends."}'>Die Offensive der Prospector bleibt leer, ihr Laser steht nirgends.</div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Offensive","value":0},{"label":"Verteidigung","value":3},{"label":"Bewegung","value":4},{"label":"Signatur","value":4}],"unit":" Werte","hl":"Offensive","text":"Werte je Spalte bei der Prospector: die Offensive bleibt leer."}'></div>
+        </div>
+        <div data-example><pre>Bisher  Prospector · OFFENSIVE —  keine Waffen
+Danach  Prospector · OFFENSIVE Arbor MH1 · S1 Bergbaulaser · Leistung fehlt in den Spieldaten</pre></div>
+      </div>
+    </section>
+  </section>
+</section>
+</section>
