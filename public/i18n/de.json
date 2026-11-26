@@ -1484,6 +1484,40 @@
           "ramp": "Rampentor",
           "cell": "Zellentür"
         }
+      },
+      "energy": {
+        "title": "Energie",
+        "used": "{{used}} / {{total}} Segmente belegt",
+        "generator": "Generator",
+        "generatorUnknown": "Generator unbekannt",
+        "segmentsUsed": "Segmente belegt",
+        "manual": "manuell",
+        "columns": "Energie je Verbraucher",
+        "freed": "{{n}} frei",
+        "less": "{{group}}: ein Segment weniger",
+        "more": "{{group}}: ein Segment mehr",
+        "changes": "Was sich ändert",
+        "emFrom": "EM entdeckt ab",
+        "irFrom": "IR entdeckt ab",
+        "reset": "Zurücksetzen",
+        "coolingNote": "{{used}} von {{total}} Kühlleistung · Reserve {{reserve}} %"
+      },
+      "head": {
+        "rankAria": "Rang {{n}} von 100 in der Klasse",
+        "rankNone": "Kein Klassenrang",
+        "thin": "Nur {{n}} Schiffe in dieser Klasse – zu wenige für einen Rang",
+        "betterThan": "besser als {{n}} % der Klasse",
+        "quieterThan": "leiser als {{n}} % der Klasse",
+        "median": "Mitte",
+        "firstReveals": "zuerst verrät dich",
+        "emKm": "EM entdeckt ab",
+        "irKm": "IR entdeckt ab",
+        "csKm": "Querschnitt",
+        "maxSpeed": "Maximal"
+      },
+      "part": {
+        "grade": "Güte {{grade}}",
+        "share": "{{pct}} % von {{total}}"
       }
     },
     "empty": {
@@ -6853,7 +6887,11 @@
         "more": "Alle {{n}} Änderungen",
         "less": "Weniger",
         "reorder": "Nachbestellen ({{n}})",
-        "logKind": { "in": "Eingelagert", "out": "Entnommen", "reserve": "Reserviert" },
+        "logKind": {
+          "in": "Eingelagert",
+          "out": "Entnommen",
+          "reserve": "Reserviert"
+        },
         "logEmpty": "Noch keine Änderung.",
         "variants": "{{n}} Varianten",
         "inSpace": "Weltall",

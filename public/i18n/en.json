@@ -1484,6 +1484,40 @@
           "ramp": "Ramp door",
           "cell": "Cell door"
         }
+      },
+      "energy": {
+        "title": "Energy",
+        "used": "{{used}} / {{total}} segments used",
+        "generator": "Generator",
+        "generatorUnknown": "Generator unknown",
+        "segmentsUsed": "Segments used",
+        "manual": "manual",
+        "columns": "Energy per consumer",
+        "freed": "{{n}} free",
+        "less": "{{group}}: one segment less",
+        "more": "{{group}}: one segment more",
+        "changes": "What changes",
+        "emFrom": "EM detected from",
+        "irFrom": "IR detected from",
+        "reset": "Reset",
+        "coolingNote": "{{used}} of {{total}} cooling · reserve {{reserve}} %"
+      },
+      "head": {
+        "rankAria": "Rank {{n}} of 100 in the class",
+        "rankNone": "No class rank",
+        "thin": "Only {{n}} ships in this class – too few for a rank",
+        "betterThan": "better than {{n}} % of the class",
+        "quieterThan": "quieter than {{n}} % of the class",
+        "median": "Median",
+        "firstReveals": "gives you away first",
+        "emKm": "EM detected from",
+        "irKm": "IR detected from",
+        "csKm": "Cross-section",
+        "maxSpeed": "Maximum"
+      },
+      "part": {
+        "grade": "Grade {{grade}}",
+        "share": "{{pct}} % of {{total}}"
       }
     },
     "empty": {
@@ -6853,7 +6887,11 @@
         "more": "All {{n}} changes",
         "less": "Less",
         "reorder": "Reorder ({{n}})",
-        "logKind": { "in": "Stored", "out": "Taken out", "reserve": "Reserved" },
+        "logKind": {
+          "in": "Stored",
+          "out": "Taken out",
+          "reserve": "Reserved"
+        },
         "logEmpty": "No change yet.",
         "variants": "{{n}} variants",
         "inSpace": "In space",

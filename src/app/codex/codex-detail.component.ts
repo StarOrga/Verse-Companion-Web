@@ -231,6 +231,7 @@ import {
   rankProfileDisabledReason,
   rankTargetShipInput,
   RankClassId,
+  filterCohort,
   narrowestRankScope,
   readRankScopePref,
   rankShip,
@@ -865,6 +866,8 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
             [reducedMotion]="prefersReducedMotion()"
             [seenThisSession]="holoSeenThisSession()"
             [rankCohort]="rankCohort()"
+            [holoCohort]="holoCohort()"
+            [kpiShip]="kpiShipInput()"
             [recentlyViewedShips]="recentlyViewedShips()"
             [hardpointPortRefs]="hardpointPortRefs()"
             [hardpointFrame]="hardpointFrame()"
@@ -4651,6 +4654,17 @@ export class CodexDetailComponent implements OnInit {
   readonly rankShipClass = computed<RankClassId>(() =>
     rankClassOfCareer((this.detail()?.payload as ShipPayload | undefined)?.career ?? null),
   );
+
+  /** The group the Holotable's category heads rank against: the cohort the ranking itself used (its scope may have widened). */
+  readonly holoCohort = computed<RankShipInput[] | null>(() => {
+    const target = this.rankShipInput();
+    const cohort = this.rankCohort();
+    if (!target || !cohort) return null;
+    return filterCohort(target, cohort, this.rankResult()?.scope ?? this.rankScope(), {
+      careerByClass: true,
+      foldVariants: true,
+    });
+  });
 
   readonly rankResult = computed<RankResult | null>(() => {
     const target = this.rankShipInput();
