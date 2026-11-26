@@ -101,7 +101,19 @@ import { HoloPhase, JournalEntry, PinGroup, PinRing, StagePin, ringPositions, sh
 import type { CodexKind } from '../codex.service';
 import { anchorKey } from './codex-holo-leader';
 import type { CodexBuild } from '../codex.types';
-import type { PowerSheet } from '../codex-power';
+import { computePowerSheet, withPowerSignature, type PowerSheet } from '../codex-power';
+import {
+  buildHoloColumns,
+  compareToWerk,
+  groupGuns,
+  type HoloColumnGap,
+  type HoloColumnGroup,
+  type HoloColumnRow,
+  type HoloColumnView,
+  type HoloGun,
+  type HoloMetric,
+  type HoloMetricId,
+} from './codex-holo-columns';
 import type { SummaryOccupant } from '../ship-summary-panels';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import { AreaSymbolComponent } from '../../shared/area-symbol/area-symbol.component';
@@ -259,6 +271,50 @@ function pinLabel(slot: LayoutSlot | null, section: ShipModuleSection | null, ra
   if (held?.name) return (held.count > 1 ? held.count + '× ' : '') + displayItemName(held.name);
   return slot?.name ? displayItemName(slot.name) : (slot?.port ?? humanizeClassName(raw));
 }
+
+/** One loadout's signature and cooling, as the columns compare them. */
+interface SignatureSide {
+  ir: number | null;
+  emLoad: number | null;
+  crossSection: number | null;
+  coolingLoad: number | null;
+  emIdle: number | null;
+  emMax: number | null;
+  emQuantum: number | null;
+  /** "13 / 18" — coolant used of installed. */
+  coolant: string | null;
+}
+
+/** Sheet keys the dock's power model fills when the extract has no scalar for them. */
+const SIGNATURE_KEYS: ReadonlySet<string> = new Set(['ir', 'emLoad', 'crossSection', 'emIdle']);
+/** Attach types of the work tools that stand in Offensive (`r3-d-werkzeug`). */
+const TOOL_ATTACH: ReadonlySet<string> = new Set(['WeaponMining', 'SalvageHead']);
+type StatFormat = Parameters<typeof formatEquippedStat>[0]['format'];
+/** Formats of the metrics the KPI sheet does not carry. */
+const METRIC_FORMAT: Partial<Record<HoloMetricId, StatFormat>> = {
+  ir: 'int', emLoad: 'int', crossSection: 'int', emIdle: 'int', emMax: 'int', emQuantum: 'int',
+  beamPower: 'int', salvageRange: 'metres',
+};
+
+function toFiniteOrNull(v: unknown): number | null {
+  const n = typeof v === 'number' ? v : typeof v === 'string' && v.trim() !== '' ? Number(v) : NaN;
+  return Number.isFinite(n) ? n : null;
+}
+
+/** A tool's schema-7 weaponParams value over every fitted tool of one attach type: summed, or the largest. */
+function toolParam(occupants: readonly SummaryOccupant[], attach: string, key: string, sum: boolean): number | null {
+  const vals: number[] = [];
+  for (const o of occupants) {
+    const p = o.payload as { attachType?: string | null; weaponParams?: Record<string, unknown> } | null;
+    if ((p?.attachType ?? '') !== attach) continue;
+    const v = toFiniteOrNull(p?.weaponParams?.[key]);
+    if (v != null) for (let i = 0; i < Math.max(1, o.count); i++) vals.push(v);
+  }
+  if (vals.length === 0) return null;
+  return sum ? vals.reduce((a, b) => a + b, 0) : Math.max(...vals);
+}
+const RATE_FACTS = ['codex.hull.pitch', 'codex.hull.yaw', 'codex.hull.roll'] as const;
+const TANK_FACTS = ['codex.detail.quantumFuel', 'codex.detail.fuelCapacity'] as const;
 
 /** The headline key per perspective, in preference order (first with a value wins). */
 const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'][]>> = {
@@ -787,13 +843,9 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
         layout="row"
         [docked]="true"
         [scFeedbackSpot]="'codex.holo.stage.perspectives'"
-        [tiles]="perspectiveViews()"
-        [missionLabelKey]="missionLabelKey()"
-        [cohortSize]="rankResult()?.cohortSize ?? null"
-        [pulse]="pulseTile()"
-        [offensivePanel]="offensivePanel()"
-        [defensivePanel]="defensivePanel()"
-        [shipFactGroups]="shipFactGroups()" />
+        [columns]="holoColumns()"
+        [missionId]="activeMissionId()"
+        [pulse]="pulseTile()" />
     </div></ng-template>
     <ng-template #stripTpl><div class="holo-scope" [class]="scopeClass()" [attr.data-mission]="activeMissionId()" [style.--holo-e]="missionHue()">
       <!-- slot: strip — sticky bottom (mobile: sticky KPI row via its own CSS) -->
@@ -811,13 +863,9 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
           hsDock
           class="in-dock"
           layout="row"
-          [tiles]="perspectiveViews()"
-          [missionLabelKey]="missionLabelKey()"
-          [cohortSize]="rankResult()?.cohortSize ?? null"
-          [pulse]="pulseTile()"
-          [offensivePanel]="offensivePanel()"
-          [defensivePanel]="defensivePanel()"
-          [shipFactGroups]="shipFactGroups()" />
+          [columns]="holoColumns()"
+          [missionId]="activeMissionId()"
+          [pulse]="pulseTile()" />
       </sc-codex-holo-strip>
     </div></ng-template>
   `,
@@ -1316,10 +1364,18 @@ export class CodexHoloStageComponent implements DetailSlotSource {
   readonly rankCohort = input<readonly RankShipInput[] | null>(null);
   readonly recentlyViewedShips = input<readonly string[]>([]);
 
-  // ── Perspectives (reuse today's analysis panels for "Alle Werte") ──
+  // ── The four columns: current (draft) vs. factory loadout, the saved config as a tick ──
   readonly offensivePanel = input<OffensivePanel | null>(null);
   readonly defensivePanel = input<DefensivePanel | null>(null);
   readonly shipFactGroups = input<readonly ShipFactGroup[]>([]);
+  /** The same panels for the factory loadout (Werk) — the baseline of every column row. */
+  readonly factoryOffensivePanel = input<OffensivePanel | null>(null);
+  readonly factoryDefensivePanel = input<DefensivePanel | null>(null);
+  /** The factory loadout's occupants (tools, signature, cooling of Werk). */
+  readonly factoryOccupants = input<readonly SummaryOccupant[]>([]);
+  /** The saved hangar configuration's occupants and sheet; null = the ship has none on the table. */
+  readonly savedOccupants = input<readonly SummaryOccupant[] | null>(null);
+  readonly savedKpiSheet = input<KpiSheet | null>(null);
 
   // ── Patch chooser / Δ (slot: patch-delta) ──────────────────────────
   readonly channel = input('LIVE');
@@ -3006,6 +3062,254 @@ export class CodexHoloStageComponent implements DetailSlotSource {
       };
     }),
   );
+
+  // ── The four columns (concept 2026-11-23: value list per Einsatz, bar against Werk) ──
+  /** IR / EM / cross-section / cooling of one loadout under the dock's current mode, preset and cuts. */
+  private signatureOf(occupants: readonly SummaryOccupant[] | null, live: PowerSheet | null): SignatureSide | null {
+    if (!occupants) return null;
+    const stats = this.shipStats() as Record<string, Record<string, unknown>> | null;
+    const schema = this.schemaVersion();
+    const dock = this.powerSheet();
+    const sheet = live ?? computePowerSheet({
+      occupants, shipStats: stats, schemaVersion: schema,
+      mode: dock?.mode, preset: dock?.preset, cutGroups: dock?.cutGroups,
+    });
+    const fact = (k: string): number | null => sheet.facts.find((f) => f.key === k)?.value ?? null;
+    const em = withPowerSignature({} as KpiSheet, occupants, stats, schema);
+    const { used, total } = sheet.coolant;
+    return {
+      ir: fact('ir'), emLoad: fact('em'), crossSection: fact('crossSection'), coolingLoad: sheet.coolant.percent,
+      emIdle: em.emIdle ?? null, emMax: em.emMax ?? null, emQuantum: em.emQuantum ?? null,
+      coolant: used != null && total != null ? `${formatNumber(Math.round(used))} / ${formatNumber(Math.round(total))}` : null,
+    };
+  }
+
+  private readonly signatureSides = computed(() => ({
+    current: this.signatureOf(this.occupants(), this.powerSheet()),
+    factory: this.signatureOf(this.factoryOccupants().length > 0 ? this.factoryOccupants() : null, null),
+    saved: this.signatureOf(this.savedOccupants(), null),
+  }));
+
+  /** className → the name the ports list prints (draft names included). */
+  private readonly nameByClass = computed(() => {
+    const out = new Map<string, string>();
+    for (const sec of this.allSections()) {
+      for (const slot of sec.slots) {
+        if (slot.className && slot.name) out.set(slot.className, displayItemName(slot.name));
+        for (const c of slot.children ?? []) if (c.className && c.name) out.set(c.className, displayItemName(c.name));
+      }
+    }
+    return out;
+  });
+
+  private nameOf(className: string): string {
+    return this.nameByClass().get(className) ?? humanizeClassName(className);
+  }
+
+  /** "2 × Arbor MH1" for one tool kind, read off the occupants' attach type. */
+  private toolText(occupants: readonly SummaryOccupant[], attach: string): string | null {
+    const counts = new Map<string, number>();
+    for (const o of occupants) {
+      const p = o.payload as { attachType?: string | null; className?: string | null } | null;
+      if (!p?.className || (p.attachType ?? '') !== attach) continue;
+      counts.set(p.className, (counts.get(p.className) ?? 0) + o.count);
+    }
+    if (counts.size === 0) return null;
+    return [...counts].map(([cn, n]) => `${n} × ${this.nameOf(cn)}`).join(', ');
+  }
+
+  private readonly toolClasses = computed(() => {
+    const out = new Set<string>();
+    for (const o of this.occupants()) {
+      const p = o.payload as { attachType?: string | null; className?: string | null } | null;
+      if (p?.className && TOOL_ATTACH.has(p.attachType ?? '')) out.add(p.className);
+    }
+    return out;
+  });
+
+  /** Every metric of the four columns: current, Werk and saved, resolved once. */
+  private readonly holoMetrics = computed<HoloMetric[]>(() => {
+    const saved = this.savedKpiSheet();
+    const sig = this.signatureSides();
+    const out: HoloMetric[] = this.allKpiCells().map((c) => {
+      // The cell carries current and current − Werk; Werk is what is left.
+      const factory = c.value == null ? null : c.delta ? c.value - c.delta.raw : c.value;
+      const base: HoloMetric = { id: c.key, labelKey: `codex.kpi.short.${c.key}`, current: c.value, factory, saved: saved?.[c.key] ?? null, gapKey: c.gapKey };
+      if (c.value == null && SIGNATURE_KEYS.has(c.key) && sig.current) {
+        const k = c.key as 'ir' | 'emLoad' | 'crossSection' | 'emIdle';
+        const cur = sig.current[k];
+        return { ...base, current: cur, factory: sig.factory?.[k] ?? cur, saved: sig.saved?.[k] ?? null, gapKey: cur == null ? c.gapKey : null };
+      }
+      return base;
+    });
+    for (const k of ['emMax', 'emQuantum'] as const) {
+      const cur = sig.current?.[k] ?? null;
+      out.push({ id: k, labelKey: `codex.kpi.short.${k}`, current: cur, factory: sig.factory?.[k] ?? cur, saved: sig.saved?.[k] ?? null, gapKey: null });
+    }
+    const cool = sig.current?.coolingLoad ?? null;
+    out.push({
+      id: 'coolingLoad', labelKey: 'codex.holo.col.metric.coolingLoad', current: cool, factory: sig.factory?.coolingLoad ?? cool,
+      saved: sig.saved?.coolingLoad ?? null, gapKey: cool == null ? 'codex.holo.col.gap.noCooling' : null,
+    });
+    const factoryOcc = this.factoryOccupants();
+    for (const [id, attach] of [['miningTool', 'WeaponMining'], ['salvageTool', 'SalvageHead']] as const) {
+      const text = this.toolText(this.occupants(), attach);
+      const factoryText = factoryOcc.length > 0 ? this.toolText(factoryOcc, attach) : text;
+      out.push({ id, labelKey: `codex.holo.col.metric.${id}`, current: null, factory: null, saved: null, text, factoryText, gapKey: null });
+    }
+    // Schema-7 tool values (weaponParams `mining.beamPower`, `salvage.maxBeamDistance`): an older
+    // extract lacks them and the row simply stays away — never a "missing" message (r3-d-luecke).
+    const savedOcc = this.savedOccupants();
+    const side = (occ: readonly SummaryOccupant[] | null, attach: string, key: string, sum: boolean): number | null =>
+      occ ? toolParam(occ, attach, key, sum) : null;
+    for (const [id, attach, key, sum] of [['beamPower', 'WeaponMining', 'mining.beamPower', true], ['salvageRange', 'SalvageHead', 'salvage.maxBeamDistance', false]] as const) {
+      const cur = side(this.occupants(), attach, key, sum);
+      out.push({ id, labelKey: `codex.holo.col.metric.${id}`, current: cur, factory: factoryOcc.length > 0 ? side(factoryOcc, attach, key, sum) : cur,
+        saved: side(savedOcc, attach, key, sum), gapKey: null });
+    }
+    // Ore rides in the hull's cargo grid (`cargoScu`); the salvage hold has its own figure (`salvageScu`).
+    const cargo = this.allKpiCells().find((c) => c.key === 'cargo')?.value ?? null;
+    out.push({ id: 'ore', labelKey: 'codex.holo.col.metric.ore', current: cargo, factory: cargo, saved: null, gapKey: null });
+    const salvageScu = toFiniteOrNull((this.detail().payload as { salvageScu?: unknown } | null)?.salvageScu);
+    out.push({ id: 'salvageScu', labelKey: 'codex.holo.col.metric.salvageScu', current: salvageScu, factory: salvageScu, saved: null, gapKey: null });
+    return out;
+  });
+
+  private fmtMetric(m: HoloMetric, v: number, unit: boolean): string {
+    if (m.id === 'coolingLoad') return unit ? `${formatNumber(Math.round(v))} %` : formatNumber(Math.round(v));
+    if (m.id === 'ore' || m.id === 'salvageScu') return unit ? `${formatNumber(v)} SCU` : formatNumber(v);
+    const format: StatFormat = METRIC_FORMAT[m.id] ?? this.allKpiCells().find((c) => c.key === m.id)?.format ?? 'dec';
+    const stat = { labelKey: m.labelKey, value: v, format };
+    return unit ? formatEquippedStat(stat) : formatEquippedStatNumber(stat);
+  }
+
+  /** A numeric detail row with its comparison against Werk. */
+  private detailRow(key: string, labelKey: string, cur: number | null, fac: number | null, lowerIsBetter: boolean, format: StatFormat): HoloColumnRow | null {
+    if (cur == null) return null;
+    const fmt = (v: number, unit: boolean) => (unit ? formatEquippedStat : formatEquippedStatNumber)({ labelKey, value: v, format });
+    const cmp = compareToWerk(cur, fac, null, lowerIsBetter);
+    return { key, labelKey, value: fmt(cur, true), cmp, deltaText: cmp?.delta != null ? (cmp.delta > 0 ? '+' : '−') + fmt(Math.abs(cmp.delta), false) : null, savedText: null };
+  }
+
+  /** "Alle Werte" beyond the KPI rows: grouped guns, missiles, shield timings, rates, cooling. */
+  private readonly holoDetail = computed(() => {
+    const off = this.offensivePanel();
+    const offF = this.factoryOffensivePanel();
+    const def = this.defensivePanel();
+    const defF = this.factoryDefensivePanel();
+    const tools = this.toolClasses();
+    const gunValue = (p: OffensivePanel | null, cn: string): number | null => {
+      const r = p?.weaponRows.find((w) => w.className === cn);
+      return r ? (r.sustainedDps ?? r.burstDps) : null;
+    };
+    const guns: HoloGun[] = [];
+    for (const sec of this.allSections()) {
+      if (sec.section !== 'weapons' && sec.section !== 'remoteTurrets' && sec.section !== 'mannedTurrets') continue;
+      for (const slot of sec.slots) {
+        const held = (slot.children ?? []).filter((c) => !!c.className && c.kind === 'weapon' && !tools.has(c.className));
+        if (held.length > 0) {
+          for (const c of held) {
+            for (let i = 0; i < Math.max(1, c.count); i++) {
+              guns.push({ className: c.className!, name: this.nameOf(c.className!), port: `${slot.port} · ${c.port}`, value: gunValue(off, c.className!) });
+            }
+          }
+        } else if (slot.className && slot.kind === 'weapon' && !tools.has(slot.className)) {
+          guns.push({ className: slot.className, name: this.nameOf(slot.className), port: slot.port, value: gunValue(off, slot.className) });
+        }
+      }
+    }
+    const factoryByClass = new Map<string, number>();
+    for (const w of offF?.weaponRows ?? []) {
+      const v = w.sustainedDps ?? w.burstDps;
+      if (v != null) factoryByClass.set(w.className, (factoryByClass.get(w.className) ?? 0) + v);
+    }
+    const dpsFmt = (v: number, unit: boolean) => (unit ? formatEquippedStat : formatEquippedStatNumber)({ labelKey: 'codex.kpi.sustainedDps', value: v, format: 'perSec' });
+    const gunRows: HoloColumnRow[] = groupGuns(guns).map((g) => {
+      const fac = factoryByClass.get(g.className);
+      const cmp = g.total != null && fac != null ? compareToWerk(g.total, fac, null, false) : null;
+      return {
+        key: 'gun:' + g.className,
+        labelKey: null,
+        label: `${g.count} × ${g.name}`,
+        value: g.total != null ? dpsFmt(g.total, true) : '—',
+        cmp,
+        deltaText: cmp?.delta != null ? (cmp.delta > 0 ? '+' : '−') + dpsFmt(Math.abs(cmp.delta), false) : null,
+        savedText: null,
+        ports: g.count > 1 ? g.ports.map((p) => ({ label: p.port, value: p.value != null ? dpsFmt(p.value, true) : '—' })) : undefined,
+      };
+    });
+    const missileRows: HoloColumnRow[] = (off?.missileRows ?? []).map((r) => ({
+      key: 'missile:' + r.className, labelKey: null, label: `${r.count} × ${this.nameOf(r.className)}`,
+      value: r.size != null ? `S${r.size}` : '—', cmp: null, deltaText: null, savedText: null,
+    }));
+    const keep = (rows: (HoloColumnRow | null)[]): HoloColumnRow[] => rows.filter((r): r is HoloColumnRow => !!r);
+    const offensive: HoloColumnGroup[] = [
+      { topic: 'weapons', rows: gunRows },
+      {
+        topic: 'missiles',
+        rows: [...missileRows, ...keep([
+          this.detailRow('salvo', 'codex.analysis.offensive.salvoDamage', off?.missileSalvoDamage ?? null, offF?.missileSalvoDamage ?? null, false, 'int'),
+          this.detailRow('lock', 'codex.analysis.offensive.lockTime', off?.missileLockTime ?? null, offF?.missileLockTime ?? null, true, 'seconds'),
+          this.detailRow('mrange', 'codex.analysis.offensive.range', off?.missileRange ?? null, offF?.missileRange ?? null, false, 'metres'),
+        ])],
+      },
+      {
+        topic: 'damage',
+        rows: keep([
+          this.detailRow('range', 'codex.analysis.offensive.effectiveRange', off?.effectiveRange ?? null, offF?.effectiveRange ?? null, false, 'metres'),
+          this.detailRow('speed', 'codex.holo.col.metric.projectileSpeed', off?.projectileSpeed ?? null, offF?.projectileSpeed ?? null, false, 'mps'),
+        ]),
+      },
+    ];
+    const defensive: HoloColumnGroup[] = [
+      {
+        topic: 'shield',
+        rows: keep([
+          this.detailRow('fullIn', 'codex.analysis.defensive.fullIn', def?.fullInSeconds ?? null, defF?.fullInSeconds ?? null, true, 'seconds'),
+          this.detailRow('regenDelay', 'codex.analysis.defensive.regenDelay', def?.regenDelay ?? null, defF?.regenDelay ?? null, true, 'seconds'),
+          this.detailRow('downedDelay', 'codex.analysis.defensive.downedDelay', def?.downedDelay ?? null, defF?.downedDelay ?? null, true, 'seconds'),
+          def && def.shieldGeneratorCount > 0
+            ? { key: 'generators', labelKey: 'codex.holo.col.metric.shieldGenerators', value: String(def.shieldGeneratorCount), cmp: null, deltaText: null, savedText: null }
+            : null,
+        ]),
+      },
+    ];
+    // Ship constants (rates, tanks, hull mass): one value — the loadout never moves them.
+    const facts = this.shipFactGroups().flatMap((g) => g.rows);
+    const pick = (keys: readonly string[]) => keys.map((k) => facts.find((r) => r.labelKey === k)).filter((r): r is NonNullable<typeof r> => !!r);
+    const factRows = (keys: readonly string[]): HoloColumnRow[] =>
+      pick(keys).filter((r) => r.value != null).map((r) => ({ key: r.labelKey, labelKey: r.labelKey, value: r.value!, cmp: null, deltaText: null, savedText: null }));
+    const factGaps = (keys: readonly string[]): HoloColumnGap[] =>
+      pick(keys).filter((r) => r.value == null && !!r.gapKey).map((r) => ({ labelKey: r.labelKey, reasonKey: r.gapKey! }));
+    const movement: HoloColumnGroup[] = [
+      { topic: 'rates', rows: factRows(RATE_FACTS) },
+      { topic: 'quantum', rows: factRows(TANK_FACTS) },
+      { topic: 'mass', rows: factRows(['codex.hull.hullMass']) },
+    ];
+    const coolant = this.signatureSides().current?.coolant ?? null;
+    const signature: HoloColumnGroup[] = [
+      { topic: 'cooling', rows: coolant ? [{ key: 'coolant', labelKey: 'codex.holo.col.metric.coolant', value: coolant, cmp: null, deltaText: null, savedText: null }] : [] },
+    ];
+    return {
+      detail: { offensive, defensive, movement, signature },
+      gaps: { movement: factGaps([...RATE_FACTS, ...TANK_FACTS]) },
+    };
+  });
+
+  /** The four columns as the row renders them. */
+  readonly holoColumns = computed<HoloColumnView[]>(() => {
+    const d = this.holoDetail();
+    return buildHoloColumns({
+      mission: this.activeMissionId(),
+      metrics: this.holoMetrics(),
+      detail: d.detail,
+      detailGaps: d.gaps,
+      fmt: (m, v) => this.fmtMetric(m, v, true),
+      fmtDelta: (m, v) => this.fmtMetric(m, v, false),
+      wasText: (was) => this.t.instant('codex.holo.col.was', { was }),
+      savedText: (v) => this.t.instant('codex.holo.col.saved', { v }),
+    });
+  });
 
   // ── Change journal ───────────────────────────────────────────────
   readonly journal = computed<JournalEntry[]>(() => {

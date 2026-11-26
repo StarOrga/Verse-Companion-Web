@@ -80,6 +80,8 @@ export const EVENTS = {
   'codex:stats_sheet_change': ev<{ snap: 'peek' | 'half' | 'full' }>('codex', 'Das Werteblatt am unteren Rand des Holotisch-Handys rastete auf einer Höhe ein (Einrastpunkt).'),
   'codex:interior_element_select': ev<{ ship: string; kind: string; deck: string }>('codex', 'Im Holotisch wurde ein Innen-Element gewählt (Schiff, Art des Elements, Deck).'),
   'codex:parts_search': ev<{ scope: 'outer' | 'inner' | 'both'; hits: number }>('codex', 'Die Bauteile-Suche des Holotischs lieferte ein Ergebnis (Außen-, Innen- oder beide Treffer, Anzahl; nie der Suchtext).'),
+  'codex:einsatz_select': ev<{ mission: 'all' | 'combat' | 'transport' | 'travel' | 'stealth' | 'mining' | 'salvage'; source: 'default' | 'user' }>('codex', 'Auf dem Holotisch wurde ein Einsatz aktiv (Einsatz; default = beim Öffnen aus der Schiffsrolle abgeleitet, user = im Einsatz-Wähler gewählt).'),
+  'codex:perspective_detail_open': ev<{ perspective: 'offensive' | 'defensive' | 'movement' | 'signature' | 'all'; mission: string }>('codex', 'Unter dem Holotisch wurde „Alle Werte“ einer Spalte aufgeklappt (Spalte oder all = alle vier, aktiver Einsatz).'),
   'codex:filter_change': ev<{ kind: string; filter_count: number }>('codex', 'Im Codex-Index wurden Filter angewendet (Art, Anzahl aktiver Filter, nie die Werte).'),
   'codex:ship_link_create': ev<{ shipSlug: string }>('codex', 'Ein Codex-Schiff wurde mit einem Hangar-Schiff verknüpft.'),
   'codex:ship_link_remove': ev<{ shipSlug: string }>('codex', 'Die Verknüpfung eines Codex-Schiffs wurde gelöst.'),

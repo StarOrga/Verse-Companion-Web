@@ -121,6 +121,9 @@ export class CodexLoadoutDraftStore implements OnDestroy {
   /** Paths whose current draft value is already reflected in the stored config. */
   private readonly savedPathsState = signal<ReadonlySet<string>>(new Set());
   readonly savedPaths = this.savedPathsState.asReadonly();
+  /** The saved hangar configuration as a draft map (path → class, stock omitted); null = none on the table. */
+  private readonly savedDraftState = signal<DraftMap | null>(null);
+  readonly savedDraft = this.savedDraftState.asReadonly();
   private readonly hydrationEpoch: HydrationEpoch = newHydrationEpoch();
   private readonly savingState = signal(false);
   readonly saving = this.savingState.asReadonly();
@@ -162,6 +165,7 @@ export class CodexLoadoutDraftStore implements OnDestroy {
     this.pendingClasses.set(new Set());
     this.unresolvableState.set(new Set());
     this.savedPathsState.set(new Set());
+    this.savedDraftState.set(null);
     this.saveErrorState.set(null);
     this.readOnlySourceState.set(null);
     this.targetConfigId = null;
@@ -195,6 +199,7 @@ export class CodexLoadoutDraftStore implements OnDestroy {
     this.readOnlySourceState.set(opts.readOnly ?? null);
     this.targetConfigId = opts.configId ?? null;
     this.savedPathsState.set(opts.configId ? new Set(draft.keys()) : new Set());
+    this.savedDraftState.set(opts.configId ? new Map(draft) : null);
     for (const value of new Set(draft.values())) {
       if (value) void this.hydrateDraftClass(value);
     }
@@ -389,6 +394,11 @@ export class CodexLoadoutDraftStore implements OnDestroy {
       if (this.targetConfigId === snap.targetId) {
         this.targetConfigId = updated.id;
         this.savedPathsState.set(new Set(snap.entries.map((e) => e.portName)));
+        const saved = new Map<string, string | null>();
+        for (const e of snap.entries) {
+          if (e?.portName && e.className && e.className !== this.stockValueForPath(e.portName)) saved.set(e.portName, e.className);
+        }
+        this.savedDraftState.set(saved);
       }
       // The share popover snapshots the page's active config — hand it the
       // config that was just written, not the one loaded at page open.
@@ -647,6 +657,8 @@ export class CodexLoadoutDraftStore implements OnDestroy {
     // Saved against THIS build, every class was picked from it: hydrate them
     // all (the swap picker's classes are not in the page's loadout entities).
     this.applyRestored([...entries], sourceBuildId, buildId, sourceBuildId === buildId);
+    // The named loadout is what the reader saved: the columns mark it on their bars.
+    this.savedDraftState.set(new Map(this.draftState()));
     this.persistDraftMirror();
     return true;
   }

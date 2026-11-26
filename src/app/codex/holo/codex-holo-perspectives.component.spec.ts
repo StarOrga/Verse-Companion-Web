@@ -1,179 +1,142 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideTranslateService } from '@ngx-translate/core';
-import { CodexHoloPerspectivesComponent, HoloPerspectiveView } from './codex-holo-perspectives.component';
+import { CodexHoloPerspectivesComponent } from './codex-holo-perspectives.component';
+import { AnalyticsService } from '../../core/analytics.service';
+import type { HoloColumnRow, HoloColumnView } from './codex-holo-columns';
 
-function tile(over: Partial<HoloPerspectiveView> = {}): HoloPerspectiveView {
-  return {
-    id: 'offensive',
-    titleKey: 'codex.perspective.offensive',
-    pct: 50,
-    leadText: '1,200',
-    leadLabelKey: 'codex.kpi.dps',
-    leadShortKey: 'codex.kpi.dpsShort',
-    deltaText: null,
-    deltaTone: null,
-    ghost: null,
-    say: 'Hits harder than most.',
-    subs: [
-      { key: 'alpha', shortKey: 'codex.kpi.alphaShort', text: '340', ghost: null },
-      { key: 'range', shortKey: 'codex.kpi.rangeShort', text: '2.1 km', ghost: null },
-    ],
-    ...over,
-  };
+function row(key: string, over: Partial<HoloColumnRow> = {}): HoloColumnRow {
+  return { key, labelKey: `codex.kpi.short.${key}`, value: '100', cmp: null, deltaText: null, savedText: null, ...over };
 }
 
-const TILES: HoloPerspectiveView[] = [
-  tile(),
-  tile({ id: 'defensive', titleKey: 'codex.perspective.defensive', pct: 80, leadText: '9,000', say: 'Very sturdy.', subs: [] }),
-  tile({ id: 'movement', titleKey: 'codex.perspective.movement', pct: null, leadText: null, say: 'No ranking yet.', subs: [] }),
+function col(id: HoloColumnView['id'], over: Partial<HoloColumnView> = {}): HoloColumnView {
+  return { id, titleKey: `codex.holo.stage.perspective.${id}`, focus: false, quiet: false, rows: [], groups: [], gaps: [], ...over };
+}
+
+const COLUMNS: HoloColumnView[] = [
+  col('offensive', {
+    focus: true,
+    rows: [
+      row('sustainedDps', { value: '1.310/s', cmp: { tone: 'up', fill: 20, delta: 130, savedAt: 57 }, deltaText: '+130', savedText: 'Gespeichert: 1.250/s' }),
+      row('burstDps', { value: '1.640/s' }),
+    ],
+    groups: [{
+      topic: 'weapons',
+      rows: [row('gun:KLWE', { labelKey: null, label: '2 × KLWE Laser Repeater S3', ports: [{ label: 'Wing L', value: '320/s' }, { label: 'Wing R', value: '320/s' }] })],
+    }],
+    gaps: [{ labelKey: 'codex.kpi.short.missiles', reasonKey: 'codex.summary.gap.noMissiles' }],
+  }),
+  col('defensive', { rows: [row('shieldHp')] }),
+  col('movement', { quiet: true, rows: [row('scm', { cmp: { tone: null, fill: 0, delta: null, savedAt: 40 }, savedText: 'Gespeichert: 200 m/s' })] }),
+  col('signature', { rows: [row('ir', { value: '7.100', cmp: { tone: 'down', fill: 18, delta: 700, savedAt: null }, deltaText: '+700' })] }),
 ];
 
-describe('CodexHoloPerspectivesComponent', () => {
+describe('CodexHoloPerspectivesComponent (value list per Einsatz, bar against Werk)', () => {
+  let track: ReturnType<typeof vi.fn>;
+
   function setup(inputs: Record<string, unknown> = {}): ComponentFixture<CodexHoloPerspectivesComponent> {
+    track = vi.fn();
     TestBed.configureTestingModule({
       imports: [CodexHoloPerspectivesComponent],
-      providers: [provideTranslateService({ fallbackLang: 'en' })],
+      providers: [provideTranslateService({ fallbackLang: 'en' }), { provide: AnalyticsService, useValue: { track } }],
     });
     const fixture = TestBed.createComponent(CodexHoloPerspectivesComponent);
-    fixture.componentRef.setInput('tiles', TILES);
-    fixture.componentRef.setInput('missionLabelKey', 'codex.mission.combat');
+    fixture.componentRef.setInput('columns', COLUMNS);
+    fixture.componentRef.setInput('missionId', 'combat');
+    fixture.componentRef.setInput('layout', 'row');
     for (const [k, v] of Object.entries(inputs)) fixture.componentRef.setInput(k, v);
     fixture.detectChanges();
     return fixture;
   }
-
-  const root = (f: ComponentFixture<CodexHoloPerspectivesComponent>): HTMLElement => f.nativeElement as HTMLElement;
-  const tileEl = (f: ComponentFixture<CodexHoloPerspectivesComponent>, id: string): HTMLElement =>
-    root(f).querySelector<HTMLElement>(`article.ptile[data-p="${id}"]`)!;
+  const el = (f: ComponentFixture<CodexHoloPerspectivesComponent>): HTMLElement => f.nativeElement as HTMLElement;
+  const colEl = (f: ComponentFixture<CodexHoloPerspectivesComponent>, id: string): HTMLElement => el(f).querySelector<HTMLElement>(`article.ptile[data-p="${id}"]`)!;
 
   afterEach(() => TestBed.resetTestingModule());
 
-  it('renders one tile per input with the tile count in the head', () => {
-    const fixture = setup();
-    expect(root(fixture).querySelectorAll('article.ptile').length).toBe(3);
-    expect(root(fixture).querySelector('.sh .n')!.textContent).toBe('3');
+  it('keeps the four columns in the strip order and marks focus and quiet', () => {
+    const f = setup();
+    expect(Array.from(el(f).querySelectorAll('article.ptile')).map((a) => a.getAttribute('data-p'))).toEqual(['offensive', 'defensive', 'movement', 'signature']);
+    expect(colEl(f, 'offensive').classList).toContain('focus');
+    expect(colEl(f, 'movement').classList).toContain('quiet');
   });
 
-  it('shows the mission label in the head and the cohort size only when given', () => {
-    const without = setup();
-    expect(root(without).querySelector('.sh .ctx')!.textContent).toContain('codex.mission.combat');
-    expect(root(without).querySelector('.sh .ctx')!.textContent).not.toContain('codex.holo.strip.shipCount');
-    TestBed.resetTestingModule();
-
-    const withCohort = setup({ cohortSize: 42 });
-    expect(root(withCohort).querySelector('.sh .ctx')!.textContent).toContain('codex.holo.strip.shipCount');
+  it('shows no rank: no ring, no P-number, no rank sentence', () => {
+    const f = setup();
+    expect(el(f).querySelector('.gauge, .pp, .say, .ghost')).toBeNull();
+    expect(el(f).textContent).not.toMatch(/P\d{1,3}\b/);
   });
 
-  it('shows the headline value, its label and the reading line from the input', () => {
-    const el = tileEl(setup(), 'offensive');
-    expect(el.querySelector('.big .num')!.textContent).toBe('1,200');
-    expect(el.querySelector('.big small')!.textContent).toContain('codex.kpi.dps');
-    expect(el.querySelector('.say')!.textContent).toBe('Hits harder than most.');
-    expect(el.querySelector('.pt-head .pp')!.textContent).toBe('P50');
+  it('a changed row draws the bar from the centre with its delta in the tone of the metric', () => {
+    const f = setup();
+    const lead = colEl(f, 'offensive').querySelector<HTMLElement>('.vr.first')!;
+    expect(lead.querySelector('.v')!.textContent).toBe('1.310/s');
+    const fill = lead.querySelector<HTMLElement>('.dv i.up')!;
+    expect(fill.style.width).toBe('20%');
+    expect(lead.querySelector('.dd')!.textContent!.trim()).toBe('+130');
+    expect(lead.querySelector('.dd')!.classList).toContain('good');
+    const ir = colEl(f, 'signature').querySelector<HTMLElement>('.vr')!;
+    expect(ir.querySelector('.dv i.down')).not.toBeNull();
+    expect(ir.querySelector('.dd')!.classList).toContain('bad');
   });
 
-  it('draws the gauge from the percentile: label, arc length and text', () => {
-    const el = tileEl(setup(), 'defensive');
-    const gauge = el.querySelector('.gauge')!;
-    expect(gauge.getAttribute('aria-label')).toContain('codex.holo.stage.percentileAria');
-    expect(gauge.querySelector('text.p')!.textContent).toBe('P80');
-    const circumference = 2 * Math.PI * 36;
-    const [on, rest] = gauge.querySelector('circle.va')!.getAttribute('stroke-dasharray')!.split(' ').map(Number);
-    expect(on).toBeCloseTo(0.8 * circumference, 0);
-    expect(on + rest).toBeCloseTo(circumference, 0);
+  it('marks the saved value as a tick with an accessible label, also on an unchanged row', () => {
+    const f = setup();
+    const tick = colEl(f, 'offensive').querySelector<HTMLElement>('.vr.first .tick')!;
+    expect(tick.getAttribute('aria-label')).toBe('Gespeichert: 1.250/s');
+    expect(tick.style.getPropertyValue('--at')).toBe('57%');
+    const scm = colEl(f, 'movement').querySelector<HTMLElement>('.vr')!;
+    expect(scm.querySelector('.tick')).not.toBeNull();
+    expect(scm.querySelector('.dv i')).toBeNull();
   });
 
-  it('clamps the arc for out-of-range percentiles', () => {
-    const fixture = setup();
-    expect(fixture.componentInstance.ringDash(150)).toBe(fixture.componentInstance.ringDash(100));
-    expect(fixture.componentInstance.ringDash(-5)).toBe(fixture.componentInstance.ringDash(0));
+  it('a row equal to Werk shows only its value', () => {
+    const f = setup();
+    const burst = colEl(f, 'offensive').querySelectorAll<HTMLElement>('.vr')[1];
+    expect(burst.querySelector('.dv.none')).not.toBeNull();
+    expect(burst.querySelector('.tick')).toBeNull();
+    expect(burst.querySelector('.dd')!.textContent!.trim()).toBe('');
   });
 
-  it('renders the sub-lines with their short labels and values', () => {
-    const fixture = setup();
-    const subs = Array.from(tileEl(fixture, 'offensive').querySelectorAll('.subs .sv'));
-    expect(subs.map((s) => s.querySelector('.k')!.textContent)).toEqual(['codex.kpi.alphaShort', 'codex.kpi.rangeShort']);
-    expect(subs.map((s) => s.querySelector('.v')!.textContent)).toEqual(['340', '2.1 km']);
-    expect(tileEl(fixture, 'defensive').querySelector('.subs')).toBeNull();
-  });
-
-  it('a tile without a rank has no gauge and shows the gap placeholder', () => {
-    const el = tileEl(setup(), 'movement');
-    expect(el.querySelector('.gauge')).toBeNull();
-    expect(el.querySelector('.pt-head .pp')).toBeNull();
-    expect(el.querySelector('.big.gap .num')!.textContent).toBe('—');
-    expect(el.querySelector('.pt-main')!.classList).toContain('no-gauge');
-  });
-
-  it('shows a patch ghost beside the value and on a sub-line', () => {
-    const ghost = { patch: '4.9', text: '+12', tone: 'up' as const };
-    const fixture = setup({
-      tiles: [
-        tile({
-          ghost,
-          deltaText: '+5%',
-          deltaTone: 'up',
-          subs: [{ key: 'alpha', shortKey: 'codex.kpi.alphaShort', text: '340', ghost: { patch: '4.9', text: '-3', tone: 'down' } }],
-        }),
-      ],
-    });
-    const el = tileEl(fixture, 'offensive');
-    expect(el.querySelector('.big .ghost')!.textContent).toContain('4.9 · +12');
-    expect(el.querySelector('.big .d')!.textContent).toBe('+5%');
-    expect(el.querySelector('.big .d')!.classList).toContain('up');
-    expect(el.querySelector('.sv.ghosted .gv')!.textContent).toBe('-3');
-  });
-
-  it('pulses only the tile named by the pulse input', () => {
-    const fixture = setup({ pulse: 'defensive' });
-    expect(tileEl(fixture, 'defensive').classList).toContain('pulse');
-    expect(tileEl(fixture, 'offensive').classList).not.toContain('pulse');
-  });
-
-  it('"all values" toggles the full analysis panel of that tile', () => {
-    const fixture = setup({ offensivePanel: null, defensivePanel: null });
-    const off = tileEl(fixture, 'offensive');
-    const btn = off.querySelector<HTMLButtonElement>('.tile-expand')!;
-    expect(btn.getAttribute('aria-expanded')).toBe('false');
-    expect(off.querySelector('sc-codex-offensive-panel')).toBeNull();
-
-    btn.click();
-    fixture.detectChanges();
-    expect(btn.getAttribute('aria-expanded')).toBe('true');
-    expect(btn.textContent).toContain('codex.holo.stage.allValuesHide');
-    expect(off.querySelector('sc-codex-offensive-panel')).not.toBeNull();
-    expect(tileEl(fixture, 'defensive').querySelector('sc-codex-defensive-panel')).toBeNull();
-
-    btn.click();
-    fixture.detectChanges();
-    expect(off.querySelector('sc-codex-offensive-panel')).toBeNull();
-    expect(btn.textContent).not.toContain('codex.holo.stage.allValuesHide');
-    expect(btn.textContent).toContain('codex.holo.stage.allValues');
-  });
-});
-
-describe('CodexHoloPerspectivesComponent row layout (concept holotisch-unten r1)', () => {
-  it('lays out a lead cell and the four areas; "Alle Werte aller vier" opens every full panel', async () => {
-    await TestBed.configureTestingModule({
-      imports: [CodexHoloPerspectivesComponent],
-      providers: [provideTranslateService({})],
-    }).compileComponents();
-    const f = TestBed.createComponent(CodexHoloPerspectivesComponent);
-    const tile = (id: 'offensive' | 'defensive' | 'movement' | 'signature') => ({
-      id, titleKey: 't.' + id, pct: null, leadText: null, leadLabelKey: null, leadShortKey: null, deltaText: null, deltaTone: null, ghost: null, say: '', subs: [],
-    });
-    f.componentRef.setInput('tiles', [tile('offensive'), tile('defensive'), tile('movement'), tile('signature')]);
-    f.componentRef.setInput('missionLabelKey', 'codex.mission.all');
-    f.componentRef.setInput('layout', 'row');
+  it('"Alle Werte" continues the list in the column, groups by topic, counts the gaps and logs the open', () => {
+    const f = setup();
+    const off = colEl(f, 'offensive');
+    expect(off.querySelector('.grp')).toBeNull();
+    off.querySelector<HTMLButtonElement>('.tile-expand')!.click();
     f.detectChanges();
-    const el: HTMLElement = f.nativeElement;
-    expect(el.classList).toContain('row');
-    expect(el.querySelector('.lead'), 'no lead column').toBeNull();
-    expect(el.querySelector('.all-line .all-expand'), 'the switch keeps a slim line').toBeTruthy();
-    expect(el.querySelectorAll('.ptile').length).toBe(4);
-    (el.querySelector('.all-expand') as HTMLButtonElement).click();
+    expect(off.querySelector('.grp')!.textContent).toContain('codex.holo.col.topic.weapons');
+    expect(off.querySelector('sc-codex-offensive-panel')).toBeNull();
+    expect(track).toHaveBeenCalledWith('codex:perspective_detail_open', { perspective: 'offensive', mission: 'combat' });
+    const gaps = off.querySelector<HTMLButtonElement>('.gaps')!;
+    expect(gaps.textContent).toContain('codex.holo.col.gapsOne');
+    expect(off.querySelector('.gap-list')).toBeNull();
+    gaps.click();
+    f.detectChanges();
+    expect(off.querySelector('.gap-list')!.textContent).toContain('codex.summary.gap.noMissiles');
+  });
+
+  it('a grouped weapon row opens to its ports', () => {
+    const f = setup();
+    const off = colEl(f, 'offensive');
+    off.querySelector<HTMLButtonElement>('.tile-expand')!.click();
+    f.detectChanges();
+    const toggle = off.querySelector<HTMLButtonElement>('.pk')!;
+    expect(toggle.textContent).toContain('2 × KLWE Laser Repeater S3');
+    expect(off.querySelectorAll('.vr.port').length).toBe(0);
+    toggle.click();
+    f.detectChanges();
+    expect(Array.from(off.querySelectorAll('.vr.port .k')).map((k) => k.textContent)).toEqual(['Wing L', 'Wing R']);
+  });
+
+  it('"Alle Werte aller vier" opens every column', () => {
+    const f = setup();
+    el(f).querySelector<HTMLButtonElement>('.all-expand')!.click();
     f.detectChanges();
     expect(f.componentInstance.allOpen()).toBe(true);
-    expect(el.querySelectorAll('.tile-full').length).toBe(3);
+    expect(track).toHaveBeenCalledWith('codex:perspective_detail_open', { perspective: 'all', mission: 'combat' });
+  });
+
+  it('pulses only the named column', () => {
+    const f = setup({ pulse: 'defensive' });
+    expect(colEl(f, 'defensive').classList).toContain('pulse');
+    expect(colEl(f, 'offensive').classList).not.toContain('pulse');
   });
 });

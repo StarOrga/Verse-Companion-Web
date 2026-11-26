@@ -230,13 +230,13 @@ describe('CodexHoloStageComponent', () => {
   });
 
   // The tiles read the FULL sheet: a combat Einsatz still fills "Bewegung".
-  it('fills every perspective tile from allKpiCells with formatted values', async () => {
+  it('fills every column from allKpiCells with formatted values, the Einsatz lead first', async () => {
     const fixture = await setup({
       allKpiCells: [cell('sustainedDps', 1944.58), cell('shieldHp', 6336), cell('boost', 520), cell('ir', 14520)],
     });
-    const tiles = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('.ptile'));
+    const tiles = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('sc-codex-holo-perspectives.below-persp .ptile'));
     expect(tiles.length).toBe(4);
-    const nums = tiles.map((t) => t.querySelector('.big .num')!.textContent!.trim());
+    const nums = tiles.map((t) => t.querySelector('.vr.first .v')!.textContent!.trim());
     expect(nums[0]).toBe('1,945');
     expect(nums[2]).toBe('520');
     expect(nums[3]).toBe('14,520');
