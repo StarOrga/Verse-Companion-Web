@@ -98,6 +98,18 @@ function listen(): void {
   window.addEventListener('popstate', onPopstate, true);
 }
 
+/**
+ * Install the popstate listener before the app boots (main.ts). It must be the FIRST popstate
+ * listener on window: Chrome runs window's popstate listeners in the order they were added, the
+ * capture flag does not put ours ahead of Angular's. Added lazily with the first popup it came
+ * after the router's, so the step back of a closing popup reached the router as a same-URL
+ * navigation and the scroll policy threw the page to the top (admin feedback #403: closing the
+ * swap picker on a ship's loadout jumped up the page).
+ */
+export function installPopupHistory(): void {
+  listen();
+}
+
 /** Push the popup's history entry; returns its id. */
 export function pushPopupEntry(onBack: () => void): string {
   const id = `p${++seq}-${Date.now().toString(36)}`;
