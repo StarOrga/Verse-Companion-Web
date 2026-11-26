@@ -1525,6 +1525,115 @@
         "gap": {
           "noCooling": "The game data gives no cooling output for these coolers."
         }
+      },
+      "energy": {
+        "title": "Energy",
+        "used": "{{used}} / {{total}} segments used",
+        "generator": "Generator",
+        "generatorUnknown": "Generator unknown",
+        "segmentsUsed": "Segments used",
+        "manual": "manual",
+        "columns": "Energy per consumer",
+        "freed": "{{n}} free",
+        "less": "{{group}}: one segment less",
+        "more": "{{group}}: one segment more",
+        "changes": "What changes",
+        "emFrom": "EM detected from",
+        "irFrom": "IR detected from",
+        "reset": "Reset",
+        "coolingNote": "{{used}} of {{total}} cooling · reserve {{reserve}} %"
+      },
+      "head": {
+        "rankAria": "Rank {{n}} of 100 in the class",
+        "rankNone": "No class rank",
+        "thin": "Only {{n}} ships in this class – too few for a rank",
+        "betterThan": "better than {{n}} % of the class",
+        "quieterThan": "quieter than {{n}} % of the class",
+        "median": "Median",
+        "firstReveals": "gives you away first",
+        "emKm": "EM detected from",
+        "irKm": "IR detected from",
+        "csKm": "Cross-section",
+        "maxSpeed": "Maximum"
+      },
+      "part": {
+        "grade": "Grade {{grade}}",
+        "share": "{{pct}} % of {{total}}"
+      },
+      "panel": {
+        "close": "Close overview",
+        "aria": "Overview: {{area}}",
+        "cellAria": "{{area}}: open overview",
+        "noData": "no data",
+        "limiter": {
+          "heat": "Heat",
+          "magazine": "Magazine",
+          "energyPool": "Energy"
+        },
+        "limiterAcc": {
+          "heat": "heat",
+          "magazine": "the magazine",
+          "energyPool": "energy"
+        },
+        "damage": {
+          "physical": "Bullets & collision",
+          "energy": "Energy weapons",
+          "distortion": "Distortion"
+        },
+        "emSource": {
+          "generator": "Generator",
+          "shields": "Shields",
+          "weapons": "Weapons",
+          "coolers": "Coolers",
+          "rest": "Rest"
+        },
+        "offensive": {
+          "title": "How long can I fire at full power – and what stops me?",
+          "phaseUntil": "until {{sec}} s",
+          "phaseOpen": "then sustained",
+          "classMedian": "Class median (sustained)",
+          "takeaway": "Full fire for {{sec}} s, then {{limiter}} slows you; after that {{sustained}}/s sustained (class {{median}}/s)",
+          "takeawayNoClass": "Full fire for {{sec}} s, then {{limiter}} slows you; after that {{sustained}}/s sustained",
+          "takeawayPartial": "Full fire for {{sec}} s, then {{limiter}} slows you",
+          "takeawayOpen": "Nothing slows you down – {{sustained}}/s throughout",
+          "incomplete": "Incomplete: not every weapon has a fire cycle.",
+          "noTimeline": "No weapons fitted – no fire timeline.",
+          "alpha": "Alpha",
+          "burst": "Burst",
+          "sustained": "Sustained",
+          "missiles": "Missiles",
+          "gunner": "{{pct}} % of the damage comes from weapons that need a gunner."
+        },
+        "defensive": {
+          "title": "Damage path",
+          "shieldDown": "Shield down in (class-median fire)",
+          "regenDelay": "Shield pause after a hit / after going down",
+          "regenFull": "Shield full again after",
+          "armor": "Armour (HP)"
+        },
+        "movement": {
+          "title": "Speed and agility",
+          "scm": "SCM",
+          "boost": "Boost",
+          "max": "Top speed",
+          "pitch": "Pitch",
+          "yaw": "Yaw",
+          "roll": "Roll",
+          "quantumSpeed": "Quantum speed",
+          "quantumRange": "Quantum range",
+          "acceleration": "Acceleration"
+        },
+        "signature": {
+          "title": "How far can you be seen?",
+          "ir": "Infrared",
+          "em": "Electromagnetic",
+          "crossSection": "Cross section",
+          "lowerBetter": "A shorter distance is better.",
+          "emSources": "Where the EM signal comes from",
+          "cooling": "Cooling load",
+          "decoys": "Decoys to outshine you: IR {{ir}}, EM {{em}}, cross section {{cs}}",
+          "decoysNone": "No decoy figures available."
+        }
       }
     },
     "empty": {

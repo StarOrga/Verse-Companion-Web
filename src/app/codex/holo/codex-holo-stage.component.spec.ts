@@ -234,7 +234,10 @@ describe('CodexHoloStageComponent', () => {
     const fixture = await setup({
       allKpiCells: [cell('sustainedDps', 1944.58), cell('shieldHp', 6336), cell('boost', 520), cell('ir', 14520)],
     });
-    const tiles = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('sc-codex-holo-perspectives.below-persp .ptile'));
+    // The four tiles live in the strip's dock now (the page-end copy is gone): open it.
+    (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('.hs-toggle')!.click();
+    fixture.detectChanges();
+    const tiles = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('.ptile'));
     expect(tiles.length).toBe(4);
     const nums = tiles.map((t) => t.querySelector('.vr.first .v')!.textContent!.trim());
     expect(nums[0]).toBe('1,945');
@@ -248,10 +251,12 @@ describe('CodexHoloStageComponent — column values (QA D2–D4)', () => {
   it('prints the equipment mass in tonnes under its own name and EM as plain "EM"', async () => {
     const fixture = await setup({ allKpiCells: [cell('mass', 1039397), cell('emLoad', 11200)] });
     const el = fixture.nativeElement as HTMLElement;
-    const mass = el.querySelector('sc-codex-holo-perspectives.below-persp .ptile[data-p="movement"] .vr[data-key="mass"]')!;
+    el.querySelector<HTMLButtonElement>('.hs-toggle')!.click();
+    fixture.detectChanges();
+    const mass = el.querySelector('.ptile[data-p="movement"] .vr[data-key="mass"]')!;
     expect(mass.querySelector('.v')!.textContent!.trim()).toBe('1,039 t');
     expect(mass.querySelector('.k')!.textContent).toContain('codex.hull.equippedMass');
-    const em = el.querySelector('sc-codex-holo-perspectives.below-persp .ptile[data-p="signature"] .vr[data-key="emLoad"]')!;
+    const em = el.querySelector('.ptile[data-p="signature"] .vr[data-key="emLoad"]')!;
     expect(em.querySelector('.k')!.textContent).toContain('codex.kpi.short.em');
   });
 });
@@ -906,14 +911,8 @@ describe('CodexHoloStageComponent lower part (concept holotisch-unten r1, d2)', 
     expect(secs(areas[3])).toEqual(['coolers']);
     // No "Antrieb & Systeme" merge across columns.
     expect(el.querySelector('.holo-below .mod-sec.merged')).toBeNull();
-    // Perspectives come after the parts and are the last thing before the strip (C4/C9).
-    const below = el.querySelector('.holo-below')!;
-    const persp = el.querySelector('sc-codex-holo-perspectives.below-persp')!;
-    expect(below.compareDocumentPosition(persp) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    // Each region stands in its own display:contents scope: the perspectives close theirs, the strip opens the next one.
-    expect(persp.nextElementSibling).toBeNull();
-    expect(persp.parentElement!.nextElementSibling?.firstElementChild?.tagName.toLowerCase()).toBe('sc-codex-holo-strip');
-    expect(persp.classList).toContain('row');
+    // The page ends with the parts: the perspective tiles are gone (the strip's fold-out panels replace them).
+    expect(el.querySelector('sc-codex-holo-perspectives.below-persp')).toBeNull();
   });
 
   it('has no side column below the first screen (sources live in the Akte) and holds no chip filter row (C6/C8)', async () => {

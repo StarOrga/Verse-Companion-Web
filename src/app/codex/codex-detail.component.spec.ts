@@ -1292,7 +1292,9 @@ describe('CodexDetailComponent — Holotable (Nomad fixture)', () => {
     const fixture = renderOnFakeClock();
     arrive(fixture);
     const el: HTMLElement = fixture.nativeElement;
-    // Every column unfolded ("Alle Werte"): the mass row sits in Bewegung.
+    // The columns live in the strip's dock: open it, then unfold every column ("Alle Werte"): the mass row sits in Bewegung.
+    el.querySelector<HTMLButtonElement>('.hs-toggle')?.click();
+    fixture.detectChanges();
     el.querySelectorAll<HTMLButtonElement>('.tile-expand').forEach((b) => b.click());
     fixture.detectChanges();
     const massRows = Array.from(el.querySelectorAll('.ptile[data-p="movement"] .vr[data-key="mass"]'));

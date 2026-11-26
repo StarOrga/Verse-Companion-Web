@@ -78,6 +78,7 @@ export const EVENTS = {
   'codex:immersive_open': ev<{ surface: 'holo' | '3d' | 'schema'; orientation: 'landscape' | 'portrait' }>('codex', 'Die Vollbild-Ansicht des Holotisch-Modells wurde per Knopf geöffnet (Ansicht, Ausrichtung des Geräts).'),
   'codex:immersive_close': ev<{ via: 'button' | 'escape' | 'back' }>('codex', 'Die Vollbild-Ansicht des Holotisch-Modells wurde verlassen (Schließen-Knopf, Escape oder Zurück-Geste).'),
   'codex:stats_sheet_change': ev<{ snap: 'peek' | 'half' | 'full' }>('codex', 'Das Werteblatt am unteren Rand des Holotisch-Handys rastete auf einer Höhe ein (Einrastpunkt).'),
+  'codex:stats_panel_open': ev<{ area: 'offensive' | 'defensive' | 'movement' | 'signature' }>('codex', 'Im Holotisch wurde die Übersicht eines Bereichs der Werteleiste (Offensive, Verteidigung, Bewegung, Signatur) aufgeklappt.'),
   'codex:interior_element_select': ev<{ ship: string; kind: string; deck: string }>('codex', 'Im Holotisch wurde ein Innen-Element gewählt (Schiff, Art des Elements, Deck).'),
   'codex:parts_search': ev<{ scope: 'outer' | 'inner' | 'both'; hits: number }>('codex', 'Die Bauteile-Suche des Holotischs lieferte ein Ergebnis (Außen-, Innen- oder beide Treffer, Anzahl; nie der Suchtext).'),
   'codex:einsatz_select': ev<{ mission: 'all' | 'combat' | 'transport' | 'travel' | 'stealth' | 'mining' | 'salvage'; source: 'default' | 'user' }>('codex', 'Auf dem Holotisch wurde ein Einsatz aktiv (Einsatz; default = beim Öffnen aus der Schiffsrolle abgeleitet, user = im Einsatz-Wähler gewählt).'),

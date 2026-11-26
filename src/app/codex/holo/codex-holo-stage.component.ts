@@ -117,6 +117,10 @@ import {
 import type { SummaryOccupant } from '../ship-summary-panels';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import { AreaSymbolComponent } from '../../shared/area-symbol/area-symbol.component';
+import { CodexHoloEnergyComponent } from './codex-holo-energy.component';
+import { CodexHoloCategoryHeadComponent } from './codex-holo-category-head.component';
+import { EnergyConsequences, buildHoloCategoryModels } from './holo-category-model';
+import { KpiShipInput } from '../codex-loadout-stats';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ScSegmentedComponent, ScSegmentOption } from '../../shared/segmented-control.component';
 import { HoloHotkeyAction, HoloSurface, holoHotkeyFor, holoHotkeyLabel, nextHoloSurface } from './codex-holo-hotkeys';
@@ -352,7 +356,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   selector: 'sc-codex-holo-stage',
   standalone: true,
   host: { '[class.slotted]': 'slotted' },
-  imports: [FeedbackSpotDirective, AreaSymbolComponent,
+  imports: [FeedbackSpotDirective, AreaSymbolComponent, CodexHoloEnergyComponent, CodexHoloCategoryHeadComponent,
     CodexDetailPanelComponent,
     ScActionDirective,
     ScSegmentedComponent,
@@ -754,6 +758,11 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
            (no side column since the Akte carries description, sources and
            variants), then the details. ─────────────── -->
       <div class="holo-below mobile-data">
+        <!-- Zone ②: the energy, in the game's column form. -->
+        <sc-codex-holo-energy class="below-energy"
+          [occupants]="occupants()" [shipStats]="shipStats()" [schemaVersion]="schemaVersion()"
+          [baseLead]="categoryModels().offensive.lead.value" [resetKey]="detail().classNameSlug ?? null"
+          (changed)="energyEdit.set($event)" />
         <div class="below-head sh" [scFeedbackSpot]="'codex.detail.columnLoadout'">
           <span class="t">{{ 'codex.holo.below.parts' | translate }}</span>
           <span class="n">{{ 'codex.holo.below.partsCount' | translate: { n: pins().length } }}</span>
@@ -762,9 +771,13 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
         @for (a of partAreas(); track a.id) {
           <section class="below-area" [attr.data-p]="a.id" [attr.aria-label]="a.labelKey | translate">
             <h3 class="area-h"><sc-area-symbol [area]="a.id" />{{ a.labelKey | translate }}</h3>
+            <sc-codex-holo-category-head [area]="a.id" [models]="categoryModels()"
+              [off]="a.id === 'offensive' && weaponsOff()" />
             @if (a.sections.length > 0) {
               <sc-codex-hardpoint-layout
                 [calm]="true"
+                [partShares]="a.id === 'offensive' ? offensiveShares() : emptyShares"
+                [partShareOf]="a.id === 'offensive' ? offensiveShareOf() : null"
                 [nestGroups]="false"
                 [sections]="a.sections"
                 [foldedSections]="foldedModuleSections()"
@@ -844,18 +857,6 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
       @if (saveErrorElsewhere(); as err) {
         <p class="save-err" role="alert">{{ err }}</p>
       }
-
-      <!-- Perspektiven at the very end (concept r1-dock-open "both"): at the
-           page's end they stand on their own, docked onto the sticky strip;
-           the strip's arrow opens the same four areas anywhere as its dock. -->
-      <sc-codex-holo-perspectives
-        class="below-persp mobile-data"
-        layout="row"
-        [docked]="true"
-        [scFeedbackSpot]="'codex.holo.stage.perspectives'"
-        [columns]="holoColumns()"
-        [missionId]="activeMissionId()"
-        [pulse]="pulseTile()" />
     </div></ng-template>
     <ng-template #stripTpl><div class="holo-scope" [class]="scopeClass()" [attr.data-mission]="activeMissionId()" [style.--holo-e]="missionHue()">
       <!-- slot: strip — sticky bottom (mobile: sticky KPI row via its own CSS) -->
@@ -868,6 +869,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
         [crossSection]="crossSection()"
         [cells]="allKpiCells()"
         [capabilities]="shipCapabilities()"
+        [models]="categoryModels()"
         (sheetChange)="onSheetChange($event)">
         <sc-codex-holo-perspectives
           hsDock
@@ -1089,22 +1091,19 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
 
   /* ── Below: side column | four area columns (the strip's columns) ── */
   .holo-below { display: grid; grid-template-columns: var(--holo-cols); column-gap: 0; row-gap: 12px; align-items: start; margin-top: 24px; }
-  .below-head { grid-column: 1 / 5; grid-row: 1; margin-bottom: 0; }
+  .below-energy { grid-column: 1 / 5; grid-row: 1; min-width: 0; }
+  .below-head { grid-column: 1 / 5; grid-row: 2; margin-bottom: 0; }
   .below-head .n { font-family: var(--m); letter-spacing: 0; text-transform: none; color: var(--sc-fg-2); }
-  .below-area { grid-row: 2; min-width: 0; padding: 8px 16px 16px; border-inline-start: 1px solid var(--l1); box-shadow: inset 0 2px 0 var(--p); }
+  .below-area { grid-row: 3; min-width: 0; padding: 8px 16px 16px; border-inline-start: 1px solid var(--l1); box-shadow: inset 0 2px 0 var(--p); }
   .below-area[data-p="offensive"] { --p: var(--holo-p-offensive); }
   .below-area[data-p="defensive"] { --p: var(--holo-p-defensive); }
   .below-area[data-p="movement"] { --p: var(--holo-p-movement); }
   .below-area[data-p="signature"] { --p: var(--holo-p-signature); border-inline-end: 1px solid var(--l1); }
   .area-h { display: flex; align-items: center; gap: 6px; margin: 4px 0 12px; font-family: var(--d); font-weight: 400; text-transform: uppercase; font-size: max(9.5px, var(--f)); letter-spacing: 0.14em; color: var(--p, var(--sc-accent)); }
   .area-empty { margin: 4px 0; font-size: max(11.5px, var(--f)); color: var(--sc-fg-2); }
-  .holo-below .holo-details { grid-column: 1 / 5; grid-row: 3; min-width: 0; }
-  /* At the page's end the perspectives sit right on the strip. */
-  .below-persp { margin-top: 14px; margin-bottom: 0; }
-  /* The stage is a flex column with gap: 6px; the panel cancels it toward the strip so the two meet without a seam (feedback #4). */
-  @media (min-width: 901px) { .below-persp { margin-bottom: -6px; } }
+  .holo-below .holo-details { grid-column: 1 / 5; grid-row: 4; min-width: 0; }
   /* The strip ends before the launcher lane (it measures --holo-fab-clear): what stands on its columns ends there too, or the four columns drift apart. */
-  @media (min-width: 641px) { .holo-below, .below-persp { margin-inline-end: var(--holo-fab-clear, 0px); } }
+  @media (min-width: 641px) { .holo-below { margin-inline-end: var(--holo-fab-clear, 0px); } }
   .holo-scope.first:is(.ph-wait, .ph-hero) .holo-below { opacity: 0; }
   .first.ph-reveal .holo-below { animation: rise 600ms var(--e-out) 440ms backwards; }
   .holo-below { transition: opacity var(--holo-t-fast) var(--e-io); }
@@ -1153,7 +1152,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   /* Narrower: two area columns, the side column after the parts. */
   @media (max-width: 1180px) {
   .holo-below { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .below-head, .holo-below .holo-details { grid-column: 1 / -1; grid-row: auto; }
+  .below-energy, .below-head, .holo-below .holo-details { grid-column: 1 / -1; grid-row: auto; }
   .below-area { grid-row: auto; }
   .below-area[data-p="defensive"], .below-area[data-p="signature"] { border-inline-end: 1px solid var(--l1); }
   .holo-below .holo-details { order: 6; }
@@ -1372,6 +1371,35 @@ export class CodexHoloStageComponent implements DetailSlotSource {
   );
   readonly rankDisabledReasons = input<Partial<Record<RankProfileId, string | null>>>({});
   readonly rankCohort = input<readonly RankShipInput[] | null>(null);
+  /** The ranking group the category heads measure against (scope-filtered cohort, `filterCohort`); null = no rank / median. */
+  readonly holoCohort = input<readonly RankShipInput[] | null>(null);
+  /** The ship's own sheet input (hull, armour, flight, stats) the category model reads. */
+  readonly kpiShip = input<KpiShipInput | null>(null);
+  protected readonly emptyShares: ReadonlyMap<string, number> = new Map();
+  /** What the energy zone's what-if currently does (null = untouched). */
+  protected readonly energyEdit = signal<EnergyConsequences | null>(null);
+  protected readonly weaponsOff = computed(() => this.energyEdit()?.energy.sheet.weaponsCut === true);
+
+  /** The four categories' numbers (lead, rank, median, per-part shares) — one model, rebuilt on every loadout change. */
+  readonly categoryModels = computed(() =>
+    buildHoloCategoryModels({
+      occupants: this.occupants(),
+      ship: this.kpiShip() ?? { stats: this.shipStats() },
+      schemaVersion: this.schemaVersion(),
+      cohort: this.holoCohort(),
+    }),
+  );
+  protected readonly offensiveShares = computed<ReadonlyMap<string, number>>(() => {
+    const m = new Map<string, number>();
+    for (const p of this.categoryModels().offensive.parts) {
+      if (p.share !== null) m.set(p.id, (m.get(p.id) ?? 0) + p.share);
+    }
+    return m;
+  });
+  protected readonly offensiveShareOf = computed<string | null>(() => {
+    const v = this.categoryModels().offensive.detail.weapons.reduce((s, w) => s + w.burstDps, 0);
+    return v > 0 ? formatEquippedStat({ labelKey: '', value: v, format: 'perSec' }) : null;
+  });
   readonly recentlyViewedShips = input<readonly string[]>([]);
 
   // ── The four columns: current (draft) vs. factory loadout, the saved config as a tick ──
