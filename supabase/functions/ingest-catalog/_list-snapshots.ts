@@ -93,6 +93,14 @@ export const CARD_PAYLOAD_KEYS: readonly string[] = ['name', 'previewImage', 'ma
  * per ship, several MB for the whole file - so they stay out; the client reads
  * them from the table as before. Shorten this one list to shrink the file.
  */
+/**
+ * Card keys of the item-like files plus `renderImage` (#402): the colour still
+ * of the item's 3D model the Data Uploader ships next to `previewImage`. A key
+ * at the end, so a client that only asks for CARD_PAYLOAD_KEYS still matches;
+ * the web reads it as an optional card key (codex-list-engine.ts).
+ */
+export const ITEM_CARD_PAYLOAD_KEYS: readonly string[] = [...CARD_PAYLOAD_KEYS, 'renderImage'];
+
 export const SHIP_PAYLOAD_KEYS: readonly string[] = [...CARD_PAYLOAD_KEYS, 'sizeClass', 'career', 'dimensions'];
 
 /**
@@ -115,9 +123,9 @@ export const RANK_PAGED: readonly ListName[] = ['ship-rank', 'missile', 'compone
 export const PAYLOAD_KEYS: Record<ListName, readonly string[]> = {
   ship: SHIP_PAYLOAD_KEYS,
   'ship-rank': SHIP_RANK_PAYLOAD_KEYS,
-  weapon: CARD_PAYLOAD_KEYS,
-  component: CARD_PAYLOAD_KEYS,
-  item: CARD_PAYLOAD_KEYS,
+  weapon: ITEM_CARD_PAYLOAD_KEYS,
+  component: ITEM_CARD_PAYLOAD_KEYS,
+  item: ITEM_CARD_PAYLOAD_KEYS,
   ammunition: CARD_PAYLOAD_KEYS,
   manufacturer: CARD_PAYLOAD_KEYS,
   blueprint: CARD_PAYLOAD_KEYS,

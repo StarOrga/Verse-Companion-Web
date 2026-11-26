@@ -21,6 +21,13 @@ import { ilikeTokenGroups, searchMatcher } from './codex-search';
 export const CARD_PAYLOAD_KEYS: readonly string[] = ['name', 'previewImage', 'manufacturer'];
 
 /**
+ * Card keys a read takes along when they are there, never a reason to decline
+ * a file: `renderImage` (#402, the colour still of an item's 3D model) only
+ * exists in files published after the Data Uploader started shipping it.
+ */
+export const OPTIONAL_CARD_PAYLOAD_KEYS: readonly string[] = ['renderImage'];
+
+/**
  * Ship-table records that are no ship a player can own or fly (salvage
  * wrecks, orbital sentries, comm probes) — see applyDefaultBrowseFilters.
  */
@@ -330,6 +337,12 @@ export function toRecord(snap: ListSnapshot, row: readonly unknown[], keys: read
   const columns = SNAPSHOT_COLUMNS[snap.name];
   for (const c of columns) out[c] = row[snap.col.get(c)!] ?? null;
   for (const k of keys) out[`p_${k}`] = row[snap.key.get(k)!] ?? null;
+  if (keys === CARD_PAYLOAD_KEYS) {
+    for (const k of OPTIONAL_CARD_PAYLOAD_KEYS) {
+      const i = snap.key.get(k);
+      if (i !== undefined && row[i] != null) out[`p_${k}`] = row[i];
+    }
+  }
   return out;
 }
 

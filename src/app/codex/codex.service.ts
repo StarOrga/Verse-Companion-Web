@@ -64,6 +64,7 @@ import {
   ByClassName,
   CARD_PAYLOAD_KEYS,
   INTERNAL_ITEM_ATTACH_TYPES,
+  OPTIONAL_CARD_PAYLOAD_KEYS,
   ListSnapshot,
   ListSnapshotName,
   NON_SHIP_VEHICLE_PREFIXES,
@@ -553,12 +554,20 @@ export type ListPayload = 'full' | 'card' | 'none' | readonly string[];
 
 const PAYLOAD_ALIAS = 'p_';
 
+/** Kinds whose rows can carry `renderImage` (#402): the item-like tables. */
+const RENDER_IMAGE_KINDS: ReadonlySet<CodexKind> = new Set<CodexKind>(['weapon', 'component', 'item']);
+
 /** The select string of one kind's list read with the requested payload slice. */
 export function listSelect(kind: CodexKind, payload: ListPayload = 'card'): string {
   const full = LIST_SELECT[kind];
   if (payload === 'full') return full;
   const columns = full.replace(/,\s*payload$/, '');
-  const keys = payload === 'card' ? CARD_PAYLOAD_KEYS : payload === 'none' ? [] : payload;
+  const keys =
+    payload === 'card'
+      ? [...CARD_PAYLOAD_KEYS, ...(RENDER_IMAGE_KINDS.has(kind) ? OPTIONAL_CARD_PAYLOAD_KEYS : [])]
+      : payload === 'none'
+        ? []
+        : payload;
   return [columns, ...keys.map((k) => `${PAYLOAD_ALIAS}${k}:payload->${k}`)].join(', ');
 }
 

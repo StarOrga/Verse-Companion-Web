@@ -61,6 +61,11 @@ export interface PolySearchHit {
   name?: LocalizedText | null;
   /** Item/weapon `attach_type` — `Paints` marks a livery. */
   attachType?: string | null;
+  /**
+   * Colour still of the item's 3D model (payload `renderImage`, a WebP name in
+   * the build's preview bucket, #402); absent on ships and items without one.
+   */
+  renderImage?: string | null;
   size: number | null;
   grade: string | null;
   scope: PolyScope;
@@ -173,6 +178,12 @@ function payloadName(payload: unknown): LocalizedText | null {
   return typeof t.en === 'string' || typeof t.de === 'string' ? (t as LocalizedText) : null;
 }
 
+/** A string payload field, or null. */
+function payloadString(payload: unknown, key: string): string | null {
+  const v = (payload as Record<string, unknown> | null | undefined)?.[key];
+  return typeof v === 'string' && v ? v : null;
+}
+
 /** Map a generic list row + its kind to a scope-tagged poly hit. */
 export function toPolyHit(kind: CodexKind, row: CodexListRow): PolySearchHit {
   return {
@@ -185,6 +196,7 @@ export function toPolyHit(kind: CodexKind, row: CodexListRow): PolySearchHit {
         ?.name ?? null,
     name: payloadName(row.payload),
     attachType: row.attachType ?? null,
+    renderImage: payloadString(row.payload, 'renderImage'),
     size: row.size,
     grade: row.grade,
     scope: scopeForKind(kind),

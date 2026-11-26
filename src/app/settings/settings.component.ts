@@ -26,6 +26,7 @@ import { PwaInstallService } from '../core/pwa/pwa-install.service';
 import { FeedbackFabPrefsService } from '../core/feedback-fab-prefs.service';
 import { RoutineTintPrefsService } from '../admin/feedback/routine-tint-prefs.service';
 import { CodexPrefsService } from '../codex/codex-prefs.service';
+import { ItemArtPrefsService } from '../codex/item-art-prefs.service';
 import { isPlainLeftClick } from '../core/modified-click.util';
 import { AnalyticsService } from '../core/analytics.service';
 import { LocaleService } from '../core/locale/locale.service';
@@ -429,6 +430,19 @@ const DELETE_ACCOUNT_ERROR_KEYS: Readonly<Record<string, string>> = {
                       ? 'settings.codex.showNonUsable.descOn'
                       : 'settings.codex.showNonUsable.descOff') | translate
                   }}
+                </p>
+                <!-- #402: model renders or the flat icons in search rows and on item pages (per account). -->
+                <div class="row">
+                  <span class="label">{{ 'settings.codex.itemArt.label' | translate }}</span>
+                  <span class="value">
+                    <label class="consent-toggle">
+                      <input type="checkbox" [checked]="itemArt.renders()" (change)="onItemArtToggle($event)" />
+                      {{ (itemArt.renders() ? 'settings.codex.itemArt.renders' : 'settings.codex.itemArt.icons') | translate }}
+                    </label>
+                  </span>
+                </div>
+                <p class="consent-desc">
+                  {{ (itemArt.renders() ? 'settings.codex.itemArt.descRenders' : 'settings.codex.itemArt.descIcons') | translate }}
                 </p>
               </div>
             </div>
@@ -854,6 +868,7 @@ export class SettingsComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly feedbackFabPrefs = inject(FeedbackFabPrefsService);
   readonly routineTintPrefs = inject(RoutineTintPrefsService);
   readonly codexPrefs = inject(CodexPrefsService);
+  readonly itemArt = inject(ItemArtPrefsService);
   readonly locale = inject(LocaleService);
   private readonly sb = inject(SupabaseClientProvider);
   private readonly translate = inject(TranslateService);
@@ -1267,6 +1282,12 @@ export class SettingsComponent implements OnInit, AfterViewInit, OnDestroy {
     const on = (e.target as HTMLInputElement).checked;
     this.codexPrefs.setShowNonUsable(on);
     this.analytics.track('settings:codex_non_usable_toggle', { on });
+  }
+
+  onItemArtToggle(e: Event) {
+    const renders = (e.target as HTMLInputElement).checked;
+    this.itemArt.set(renders ? 'renders' : 'icons');
+    this.analytics.track('settings:codex_item_art_change', { art: renders ? 'renders' : 'icons' });
   }
 
   onConsentToggle(e: Event) {

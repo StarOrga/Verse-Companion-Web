@@ -124,6 +124,7 @@ export const EVENTS = {
   'settings:routine_tint_toggle': ev<{ on: boolean }>('settings', 'Die Routine-Färbung wurde umgeschaltet.'),
   'settings:routine_pc_light_toggle': ev<{ on: boolean }>('settings', 'Das grüne PC-Licht der Routine wurde umgeschaltet.'),
   'settings:codex_non_usable_toggle': ev<{ on: boolean }>('settings', 'Nicht nutzbare Codex-Einträge wurden ein- oder ausgeblendet.'),
+  'settings:codex_item_art_change': ev<{ art: 'renders' | 'icons' }>('settings', 'Bilder in Suche & Item-Seiten: Originalbilder oder Icons gewählt.'),
   'settings:language_change': ev<{ lang: string }>('settings', 'Die Sprache wurde geändert (Einstellung, auch „auto“).'),
   'settings:region_change': ev<{ region: string }>('settings', 'Die Region wurde geändert (Einstellung, auch „auto“).'),
   'settings:beta_toggle': ev<{ area: BetaArea; enabled: boolean }>('settings', 'Der β-Schalter eines Navigationspunkts wurde umgelegt.'),

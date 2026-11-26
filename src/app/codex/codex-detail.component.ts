@@ -239,6 +239,7 @@ import {
   writeRankScopePref,
 } from './codex-rank';
 import { CodexPrefsService } from './codex-prefs.service';
+import { ItemArtPrefsService } from './item-art-prefs.service';
 import {
   CodexDefensivePanelComponent,
   CodexOffensivePanelComponent,
@@ -414,7 +415,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
           <sc-codex-item-stage shellStage class="it-stage ce" style="--ce: 1"
             [kind]="detail()!.kind" [className]="detail()!.classNameSlug" [displayName]="displayName()"
             [heroArt]="heroArt()" [heroSub]="heroSub()" [heroAttachType]="heroAttachType()" [package]="itemPackage()"
-            [still]="prefersReducedMotion()">
+            [render]="itemRenderUrl()" [still]="prefersReducedMotion()">
             @if (!shareFab()) {
               <button stageTools type="button" class="tt-share" (click)="copyShareLink()">
                 ↗ {{ 'codex.detail.actionCopyLink' | translate }}
@@ -3850,10 +3851,22 @@ export class CodexDetailComponent implements OnInit {
    * not always rendered, so the list goes to `sc-fallback-image`, which walks
    * it and only projects the glyph once every candidate has actually failed.
    */
+  /**
+   * The colour still of a non-ship entity's 3D model (`payload.renderImage`,
+   * #402), unless the reader chose icons in Settings. Null = none.
+   */
+  readonly itemRenderUrl = computed<string | null>(() => {
+    const d = this.detail();
+    if (!d || d.kind === 'ship' || !this.itemArt.renders()) return null;
+    return this.svc.previewUrl((d.payload as BaseEntityPayload | undefined)?.renderImage);
+  });
+
   readonly heroArt = computed<readonly string[]>(() => {
     const d = this.detail();
     if (!d) return [];
     const out: string[] = [];
+    const render = this.itemRenderUrl();
+    if (render) out.push(render);
     // Ships lead with the RSI render (a photo of the hull) and keep the
     // datamined silhouette as the fallback. Other kinds have no RSI
     // counterpart, so their datamined render is all there is.
@@ -4543,6 +4556,7 @@ export class CodexDetailComponent implements OnInit {
   /** The stored/picked group; null = never chosen. */
   readonly rankScopeChosen = signal<RankScope | null>(readRankScopePref(null));
   private readonly codexPrefs = inject(CodexPrefsService);
+  private readonly itemArt = inject(ItemArtPrefsService);
   /** The Holotable's default group: the narrowest one this ship belongs to. */
   private readonly holoNarrowestScope = computed<RankScope>(() => {
     const target = this.rankShipInput();
