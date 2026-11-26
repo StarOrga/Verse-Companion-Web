@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideTranslateService } from '@ngx-translate/core';
 import { ScPopupComponent, type ScPopupKind } from './sc-popup.component';
-import { popupEntryDepth, pushPopupEntry, releasePopupEntry } from './popup-history';
+import { installPopupHistory, popupEntryDepth, pushPopupEntry, releasePopupEntry } from './popup-history';
 import { useViewport } from '../../testing/viewport';
 
 const marker = () => (history.state as { scPopup?: string } | null)?.scPopup ?? null;
@@ -14,6 +14,27 @@ describe('popup-history bookkeeping', () => {
   afterEach(async () => {
     // Leave no entry behind for the next spec.
     await tick();
+  });
+
+  it('installed before the router, the step back of a closing popup never reaches a later popstate listener (#403)', async () => {
+    // main.ts installs the listener before bootstrap. Window popstate listeners run in the order they were
+    // added (capture or not), so the router's own listener, added later, must never see the step back:
+    // it would run a same-URL navigation and the scroll policy would throw the page to the top.
+    installPopupHistory();
+    await idle();
+    let routerSaw = 0;
+    const router = () => routerSaw++;
+    window.addEventListener('popstate', router);
+    try {
+      const id = pushPopupEntry(() => undefined);
+      expect(marker()).toBe(id);
+      releasePopupEntry(id);
+      await idle();
+      await tick();
+      expect(routerSaw).toBe(0);
+    } finally {
+      window.removeEventListener('popstate', router);
+    }
   });
 
   it('a push takes one entry, releasing it steps back over it', async () => {
