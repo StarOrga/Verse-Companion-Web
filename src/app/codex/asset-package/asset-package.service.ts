@@ -31,6 +31,23 @@ interface RowQuery {
 const ROW_COLS =
   'kind, entity_class, ship_id, manifest_sha256, root_sha256, interior_sha256, part_count, total_bytes, schema_version';
 
+/**
+ * A cached GLB download. `background` = started by an idle prefetch (#404): its
+ * own controller aborts it when the prefetch is cancelled, unless a foreground
+ * caller joined it first (that clears the flag, and the download then runs to
+ * the end for that caller).
+ */
+interface BufferEntry {
+  p: Promise<ArrayBuffer>;
+  bytes: number;
+  background: boolean;
+}
+
+/** An idle prefetch's handle: cancelled with `signal`, fetched at low network priority. */
+export interface BackgroundFetch {
+  readonly signal: AbortSignal;
+}
+
 /** Keep at most this many GLB bytes in the session cache (parts are shared between entities). */
 const BUFFER_BUDGET = 96 * 1024 * 1024;
 
@@ -44,7 +61,7 @@ export class AssetPackageService {
   private readonly sb = inject(SupabaseClientProvider);
   private readonly rows = new Map<string, Promise<AssetPackageRow | null>>();
   private readonly manifests = new Map<string, Promise<AssetPackageManifest>>();
-  private readonly buffers = new Map<string, { p: Promise<ArrayBuffer>; bytes: number }>();
+  private readonly buffers = new Map<string, BufferEntry>();
   private bufferedBytes = 0;
 
   /** `…/ship-skins/` (or the dev fixture folder). */
@@ -112,17 +129,32 @@ export class AssetPackageService {
     return hit;
   }
 
-  /** GLB bytes by URL (URLs are sha-keyed, so the URL is the cache key). */
-  glb(url: string): Promise<ArrayBuffer> {
+  /**
+   * GLB bytes by URL (URLs are sha-keyed, so the URL is the cache key). With `bg`
+   * the download is an idle prefetch: low priority and cancelled by `bg.signal`.
+   * A foreground call that finds a background download joins it and keeps it alive.
+   */
+  glb(url: string, bg?: BackgroundFetch): Promise<ArrayBuffer> {
     const hit = this.buffers.get(url);
     if (hit) {
       // LRU touch.
       this.buffers.delete(url);
       this.buffers.set(url, hit);
+      if (!bg) hit.background = false;
       return hit.p;
     }
-    const entry = { p: Promise.resolve(new ArrayBuffer(0)), bytes: 0 };
-    entry.p = this.fetchOk(url)
+    const entry: BufferEntry = { p: Promise.resolve(new ArrayBuffer(0)), bytes: 0, background: !!bg };
+    let init: RequestInit | undefined;
+    if (bg) {
+      const ctrl = new AbortController();
+      const cancel = (): void => {
+        if (entry.background) ctrl.abort();
+      };
+      if (bg.signal.aborted) cancel();
+      else bg.signal.addEventListener('abort', cancel, { once: true });
+      init = lowPriority(ctrl.signal);
+    }
+    entry.p = this.fetchOk(url, init)
       .then((r) => r.arrayBuffer())
       .then((buf) => {
         entry.bytes = buf.byteLength;
@@ -130,7 +162,9 @@ export class AssetPackageService {
         this.evict();
         return buf;
       });
-    entry.p.catch(() => this.buffers.delete(url));
+    entry.p.catch(() => {
+      if (this.buffers.get(url) === entry) this.buffers.delete(url);
+    });
     this.buffers.set(url, entry);
     return entry.p;
   }
@@ -178,6 +212,34 @@ export class AssetPackageService {
     return true;
   }
 
+  /**
+   * The idle prefetch of one ship's package (#404): row, manifest, root and part
+   * GLBs one after the other at low priority, stopping as soon as `bg.signal`
+   * aborts. Everything lands in the same caches the viewer reads, so a click on
+   * "3D" finds it ready or joins the download in flight. Resolves true when all
+   * of it is cached; false when there is no package, it was cancelled or failed.
+   * Never throws.
+   */
+  async prefetchShip(shipId: string, bg: BackgroundFetch): Promise<boolean> {
+    try {
+      const row = await this.findRow(['ship'], shipId);
+      if (!row || bg.signal.aborted) return false;
+      const m = await this.manifest(row.manifestSha256);
+      const urls = [
+        ...(m.root ? [this.urls.root(m.kind, m.root.sha256)] : []),
+        ...new Set(m.placements.filter((p) => p.partSha256 && p.position).map((p) => this.urls.part(p.partSha256!))),
+      ];
+      for (const url of urls) {
+        if (bg.signal.aborted) return false;
+        await this.glb(url, bg);
+      }
+      return !bg.signal.aborted;
+    } catch (err) {
+      if (!bg.signal.aborted) logWarn('asset-package', 'prefetch failed', { shipId, err });
+      return false;
+    }
+  }
+
   /** Fetch the lazy three.js scene chunk ahead of the viewer (idempotent; failures only retry later). */
   preloadScene(): Promise<unknown> {
     this.scenePreload ??= import('./asset-package-scene').catch((err: unknown) => {
@@ -187,9 +249,14 @@ export class AssetPackageService {
     return this.scenePreload;
   }
 
-  private async fetchOk(url: string): Promise<Response> {
-    const res = await fetch(url);
+  private async fetchOk(url: string, init?: RequestInit): Promise<Response> {
+    const res = await fetch(url, init);
     if (!res.ok) throw Object.assign(new Error(`GET ${url} → ${res.status}`), { status: res.status });
     return res;
   }
+}
+
+/** Request options of an idle prefetch: low fetch priority (where supported) and cancellable. */
+function lowPriority(signal: AbortSignal): RequestInit {
+  return { signal, priority: 'low' } as RequestInit;
 }

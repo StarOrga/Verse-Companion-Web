@@ -36,6 +36,20 @@ const BINARY_STATE_CLASS: Record<HeartbeatState, string | null> = {
 };
 
 /**
+ * The opt-in "PC on" light (feedback #405): every live state is green, and
+ * the title additionally carries `is-glow`, a steady halo, so the admin sees
+ * at a glance that the watcher on the PC is ticking.
+ */
+const PC_LIGHT_STATE_CLASS: Record<HeartbeatState, string | null> = {
+  online: 'is-online',
+  running: 'is-online',
+  paused: 'is-online',
+  offline: 'is-offline',
+  unknown: null,
+};
+const GLOW_CLASS = 'is-glow';
+
+/**
  * "Is the dev PC reachable?" painted onto the feedback panel's own title
  * (feedback a7573f0e).
  *
@@ -98,7 +112,8 @@ export class RoutineStatusDirective {
     this.renderer.addClass(host, TINT_CLASS);
 
     effect(() => {
-      const state = this.heartbeat.state();
+      const pcLight = this.tintPrefs.pcLight();
+      const state = pcLight ? this.heartbeat.pcState() : this.heartbeat.state();
       this.langChange();
       // Resolved language + region (feedback 38b3d25a), not the bare ngx-translate
       // tag — the region decides the relative-time wording just like the date order.
@@ -128,8 +143,11 @@ export class RoutineStatusDirective {
       for (const cls of Object.values(STATE_CLASS)) {
         if (cls) this.renderer.removeClass(host, cls);
       }
-      const active = (this.tintPrefs.binary() ? BINARY_STATE_CLASS : STATE_CLASS)[state];
+      this.renderer.removeClass(host, GLOW_CLASS);
+      const palette = pcLight ? PC_LIGHT_STATE_CLASS : this.tintPrefs.binary() ? BINARY_STATE_CLASS : STATE_CLASS;
+      const active = palette[state];
       if (active) this.renderer.addClass(host, active);
+      if (pcLight && active === 'is-online') this.renderer.addClass(host, GLOW_CLASS);
 
       this.renderer.setAttribute(host, 'title', detail);
       // Without a key we would rather name only the state than silently rename

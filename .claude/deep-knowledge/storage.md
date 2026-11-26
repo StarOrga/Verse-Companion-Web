@@ -501,6 +501,13 @@ manifest names any more) are not collected yet; a GC pass would list the three
 prefixes, subtract everything the current manifests name, delete the rest. They
 count against the 8 GB write gate like everything else.
 
+Idle prefetch (#404): the classic ship page fetches the open ship's package
+ahead of the "3D" press (`src/app/codex/ship-prefetch.service.ts`), one ship,
+one file at a time at low priority, cancelled on navigation and foreground
+loads. Each file is a Worker request, so it runs only on a desktop-class screen
+and connection (no save-data, no 2G/3G, no phone); files are immutable, so a
+browser pays the requests once per package.
+
 ## R2 cost guard (R2 has no hard spending cap)
 
 - **Reads** only through the Worker on `*.workers.dev`. Its Free plan stops at
