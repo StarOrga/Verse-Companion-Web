@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.300.4] - 2026-11-27
+
+### Fixed
+- Classic ship view: the Analyse column's first card (Offensive) starts at the same height as Bewaffnung in the Loadout column, and every Loadout box shares the analysis cards' rounder 8px corner (#408).
+
 ## [0.300.3] - 2026-11-27
 
 ### Changed
