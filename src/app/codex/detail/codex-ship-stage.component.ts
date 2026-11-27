@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { CodexKind } from '../codex.service';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
@@ -17,6 +17,27 @@ export interface StageHeroChip {
   accent?: boolean;
   ghost?: boolean;
   gap?: boolean;
+}
+
+const SIDE_CHIP_KEYS: ReadonlySet<string> = new Set(['career', 'crew', 'cargo']);
+
+/** Blocks a pilot does not read off the picture (#407: "unrelevant"). */
+const CLASSIC_HIDDEN_GROUPS: ReadonlySet<string> = new Set(['systems', 'countermeasures']);
+
+/**
+ * The classic stage's census (#407): systems and countermeasures drop out,
+ * the armament reads "Waffen", and the missile block is one figure, the
+ * missiles, without the launcher count beside it.
+ */
+export function classicStageCounts(counts: readonly StageCountChip[]): StageCountChip[] {
+  return counts
+    .filter((c) => !CLASSIC_HIDDEN_GROUPS.has(c.group))
+    .map((c) => {
+      if (c.group === 'weapons' && c.labelKey === 'codex.moduleSection.weapons') {
+        return { ...c, labelKey: 'codex.detail.stageWeapons', detailKey: null, detailCount: 0 };
+      }
+      return c.detailKey ? { ...c, detailKey: null, detailCount: 0 } : c;
+    });
 }
 
 /**
@@ -125,39 +146,39 @@ export interface StageHeroChip {
       </button>
     }
 
-    <!-- The bottom band of the stage: the figures, right-aligned.
-         Nothing in here is clickable — the four frequent actions sit in
-         their own row directly beneath the picture (feedback 140dfb7e:
-         "die anklickbaren Links raus aus dem Bild"). The name moved to
-         the top-left corner (#239), so the band carries only the stat
-         chips and, under them, the module census. Every figure takes
-         one and the same treatment (#239: "Werte gleichmäßig") — no
-         category is tinted on its own. -->
-    <div class="stage-foot">
-      @if (heroChips().length > 0) {
-        <ul class="chips stage-side">
-          @for (c of heroChips(); track c.key) {
-            @if (c.key !== 'role') {
-              <li class="hchip" [class.gap]="c.gap">{{ c.text }}</li>
-            }
+    <!-- #407: the hull facts (career, crew, cargo) are a short list on the
+         right edge, directly under the 2D/3D switch: information beside
+         the ship, not a band across it. Mass left the classic stage: it
+         said nothing the pilot decides on. -->
+    @if (sideChips().length > 0) {
+      <ul class="stage-side" [class.below-switch]="has3dView()">
+        @for (c of sideChips(); track c.key) {
+          @if (c.gap) {
+            <!-- A disclosed gap keeps its sentence as the tooltip; the list
+                 itself stays one short line per fact. -->
+            <li class="hchip gap" tabindex="0" [scTooltip]="c.text" [attr.aria-label]="c.text">{{ 'codex.detail.chipCargoGap' | translate }}</li>
+          } @else {
+            <li class="hchip" [class.ghost]="c.ghost">{{ c.text }}</li>
           }
-        </ul>
-      }
-      <!-- Module census, bottom-right ON the art, on its own line so
-           it can use the full width of the stage and wraps into two or
-           three short rows instead of a tall column. Read from the
-           same resolved sections the loadout column renders, so "3
-           Bewaffnung" here is the "Bewaffnung · 3 Slots" heading down
-           there — never a second classifier with its own opinion. -->
-      @if (stageCounts().length > 0) {
+        }
+      </ul>
+    }
+
+    <!-- The bottom band of the stage: the module census, right-aligned at
+         the very foot of the picture. Nothing in here is clickable; the
+         frequent actions sit in their own row beneath the picture (feedback
+         140dfb7e). Read from the same resolved sections the loadout column
+         renders; #407 keeps only what a pilot reads off a picture (weapons,
+         turrets, tractor beams, missiles, shields) and drops the systems and
+         countermeasure counts. Every figure takes one and the same treatment
+         (#239: "Werte gleichmaessig"). -->
+    <div class="stage-foot">
+      @if (footCounts().length > 0) {
         <ul class="loadout-summary stage-counts" [attr.aria-label]="'codex.detail.equipment' | translate">
-          @for (s of stageCounts(); track s.group + s.labelKey) {
+          @for (s of footCounts(); track s.group + s.labelKey) {
             <li class="ls-item" [attr.data-cat]="s.group">
               <span class="ls-count">{{ s.count }}</span>
               <span class="ls-cat">{{ s.labelKey | translate }}</span>
-              @if (s.detailKey) {
-                <span class="ls-detail">· {{ s.detailKey | translate: { n: s.detailCount } }}</span>
-              }
             </li>
           }
         </ul>
@@ -234,19 +255,29 @@ export interface StageHeroChip {
       text-transform: uppercase; color: var(--sc-fg-1); }
     h1 { margin: 2px 0 0; font-size: clamp(19px, 1.9vw, 25px); font-weight: 700;
       line-height: 1.15; color: var(--sc-accent); overflow-wrap: normal; }
-    .stage-foot { grid-row: 2; position: relative; z-index: 1;
+    /* #407: the census sits on the bottom edge of the picture; half the
+       stage's padding is pulled back so the chips hug the frame instead of
+       floating a band above it. */
+    .stage-foot { grid-row: 2; position: relative; z-index: 1; align-self: end;
+      margin-block-end: -4px; /* ds-ok: pulls the census onto the frame's foot (4px step) */
       display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
-    .chips { list-style: none; margin: 0; padding: 0;
-      display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
-    .stage-side { align-self: flex-end; max-width: 70%; }
+    /* #407: a vertical list on the right edge, under the 2D/3D switch (or in
+       its corner when there is no switch). Right-aligned, each fact its own
+       short chip, so the hull stays visible. */
+    .stage-side { position: absolute; z-index: 1; top: 12px; inset-inline-end: 12px;
+      list-style: none; margin: 0; padding: 0; max-width: 40%;
+      display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+    /* 12px inset + the 48px switch + 8px gap. */
+    .stage-side.below-switch { top: 68px; }
+    .stage-side .hchip.ghost { color: var(--sc-fg-2); }
+    .stage-side .hchip.gap { cursor: help; }
+    .stage-side .hchip.gap:focus-visible { outline: 1px solid transparent; box-shadow: var(--sc-focus-ring); }
     /* The census takes the full width of the band, right-aligned. */
     .stage-counts { margin: 0; justify-content: flex-end; }
     /* The census chips sit on the art, so they take the stat chips' opaque-ish
        ground rather than the tool row's near-transparent one. */
     .stage-counts .ls-item {
       background: color-mix(in srgb, var(--sc-bg-0) 82%, transparent); }
-    .ls-detail { font-size: max(10px, var(--sc-fs-floor)); text-transform: uppercase;
-      letter-spacing: 0.12em; color: var(--sc-fg-2); }
 
     /* No artwork anywhere: say so instead of leaving a lost glyph in a big
        empty frame — the catalog simply has no render for this hull yet. */
@@ -258,8 +289,8 @@ export interface StageHeroChip {
     /* Module census (bottom-right of the stage). The mock has no element of
        its own for it, so it takes the chip vocabulary (part-02:156): count and
        category are one 10px uppercase run at .12em inside a 3px rectangle. */
-    .loadout-summary { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
-    .ls-item { display: inline-flex; align-items: baseline; gap: 5px; padding: 3px 7px; border-radius: 3px;
+    .loadout-summary { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px; }
+    .ls-item { display: inline-flex; align-items: baseline; gap: 4px; padding: 2px 6px; border-radius: 3px;
       background: color-mix(in srgb, var(--sc-bg-0) 72%, transparent); border: 1px solid var(--sc-border); }
     /* One treatment for every figure (#239): the number in the primary text
        colour, the word after it in the chips' secondary one, the same border
@@ -308,8 +339,11 @@ export interface StageHeroChip {
       .stage-ident { position: absolute; top: 8px; inset-inline-start: 8px;
         max-width: calc(100% - 72px); padding: 6px 10px; }
       .stage-foot { padding: 10px 0 12px; }
-      .stage-side { max-width: none; }
-      .chips, .stage-counts { justify-content: flex-start;
+      /* The side list joins the flow under the art, like the census. */
+      .stage-side { position: static; max-width: none; flex-direction: row; flex-wrap: wrap;
+        justify-content: flex-start; padding: 10px 14px 0; }
+      .stage-foot { margin-block-end: 0; }
+      .stage-counts { justify-content: flex-start;
         padding: 0 14px; }
       .view-switch { top: 8px; inset-inline-end: 8px; }
     }
@@ -330,6 +364,12 @@ export class CodexShipStageComponent {
   readonly showIdent = input(true);
   readonly heroChips = input<StageHeroChip[]>([]);
   readonly stageCounts = input<StageCountChip[]>([]);
+
+  /** #407: career, crew and cargo, the side list. Role lives in the eyebrow, mass left the classic stage. */
+  readonly sideChips = computed(() => this.heroChips().filter((c) => SIDE_CHIP_KEYS.has(c.key)));
+
+  /** #407: the census at the picture's foot, shortened for the classic stage (the Holotable keeps the full one). */
+  readonly footCounts = computed(() => classicStageCounts(this.stageCounts()));
 
   readonly hovered = output<string[] | null>();
   readonly locatable = output<string[]>();

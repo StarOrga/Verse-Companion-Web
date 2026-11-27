@@ -76,7 +76,7 @@ export interface ComponentInspectEntry {
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (entry(); as e) {
-      <sc-popup kind="large" [title]="e.name" [eyebrow]="eyebrow()" initialFocus="container"
+      <sc-popup [closeBeside]="true" kind="large" [title]="e.name" [eyebrow]="eyebrow()" initialFocus="container"
                 scPopupMotion="large" scPopupMotionPlate=".scp-frame" scPopupMotionRows=".cm-headline .hs, .cm-table tbody tr" scPopupMotionFoot=".scp-f"
                 (closed)="dismiss()">
         <div class="cm-body">

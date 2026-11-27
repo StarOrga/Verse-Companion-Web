@@ -239,15 +239,22 @@ describe('codex-detail facts', () => {
       expect(chips[2].accent).toBe(true);
     });
 
-    it('asks the capability only when the payload carries no cargo status', () => {
+    it('asks the capability only when the payload has no cargo status or says none', () => {
       const hasCargo = vi.fn().mockName('hasCargo').mockReturnValue(true);
-      const withStatus = buildHeroChips({ detail: ship({ cargoStatus: 'none' }), localeMap: new Map(), hasCargo }, t);
+      const measured = buildHeroChips({ detail: ship({ cargoStatus: 'unmeasured' }), localeMap: new Map(), hasCargo }, t);
       expect(hasCargo).not.toHaveBeenCalled();
-      expect(withStatus.find((c) => c.key === 'cargo')?.ghost).toBe(true);
+      expect(measured.find((c) => c.key === 'cargo')?.gap).toBe(true);
 
       const legacy = buildHeroChips({ detail: ship({}), localeMap: new Map(), hasCargo }, t);
       expect(hasCargo).toHaveBeenCalledTimes(1);
       expect(legacy.find((c) => c.key === 'cargo')?.gap).toBe(true);
+    });
+
+    it('never claims "no cargo hold" on a `none` hull that names a cargo part (#407: the Nomad bed)', () => {
+      const nomad = buildHeroChips({ detail: ship({ cargoStatus: 'none' }), localeMap: new Map(), hasCargo: () => true }, t);
+      expect(nomad.find((c) => c.key === 'cargo')?.gap).toBe(true);
+      const gladius = buildHeroChips({ detail: ship({ cargoStatus: 'none' }), localeMap: new Map(), hasCargo: () => false }, t);
+      expect(gladius.find((c) => c.key === 'cargo')?.ghost).toBe(true);
     });
 
     it('has no chips off a ship', () => {
