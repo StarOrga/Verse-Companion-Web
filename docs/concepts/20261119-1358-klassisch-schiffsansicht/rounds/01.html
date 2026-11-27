@@ -1,0 +1,583 @@
+<section data-iteration="1" data-iteration-template="decision" data-analysis="full">
+  <div class="iteration-intro">
+    <h2>Klassische Schiffsansicht: Live-Analyse</h2>
+    <p>Geprüft an der Avenger Titan, Patch 4.10.3, am 19.11.2026: Energie, Andocken, mitlaufende Analyse und Karten.</p>
+  </div>
+
+  <section id="briefing" data-analysis-briefing data-nav-label="Briefing">
+    <p data-briefing-what>Die Energieplanung bewegt nur eine von sechs Kennzahlen: Pips ändern die EM-Signatur, aber weder DPS noch Schild. Dazu springt jede Änderung an den Seitenanfang.</p>
+    <p data-briefing-why>Die Verbindung „Ich stelle ein, ich sehe die Wirkung“ ist der Kern der klassischen Ansicht, und genau die fehlt heute.</p>
+    <div data-briefing-potential data-viz="kpi" data-viz-spec='{"value":"1 / 6","unit":"Kennzahlen","label":"reagieren heute auf die Energie"}'>1 / 6 Kennzahlen</div>
+    <a data-briefing-topic="t-power" data-share="35">Energie mit Wirkung</a>
+    <a data-briefing-topic="t-dock" data-share="25">Energieleiste immer da</a>
+    <a data-briefing-topic="t-sync" data-share="20">Mitlaufende Analyse</a>
+    <a data-briefing-topic="t-cards" data-share="12">Karten verdichten</a>
+    <a data-briefing-topic="t-fix" data-share="8">Fehler zuerst</a>
+    <p data-briefing-duration>≈ 8 min</p>
+    <div data-alevel="1" data-title="Briefing">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"1 / 6","unit":"Kennzahlen","label":"folgen der Energie"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="bars" data-viz-spec='{"items":[{"label":"Energie mit Wirkung","value":35},{"label":"Energieleiste immer da","value":25},{"label":"Mitlaufende Analyse","value":20},{"label":"Karten verdichten","value":12},{"label":"Fehler zuerst","value":8}],"unit":"%"}'></div>
+        <p>Die Aufteilung oben Schiff, darunter links Konfiguration und rechts Analyse trägt. Was fehlt, ist die Rückkopplung: Energie und Tausch zeigen ihre Wirkung nicht dort, wo man hinschaut.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── Thema 1 ───────── -->
+  <section id="t-power" data-topic data-nav-label="Energie mit Wirkung">
+    <div data-alevel="2" data-title="Energie mit Wirkung">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"EM","unit":"einzige Wirkung","label":"von Waffen- und Schild-Pips"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="compare" data-viz-spec='{"before":{"label":"Waffen 3 Seg","value":972},"after":{"label":"Waffen 1 Seg","value":972},"unit":"Dauer-DPS"}'></div>
+        <p>Waffen von 3 auf 1 Segment und Schilde von 4 auf 1: Dauer-DPS, Schild-HP und Regeneration bleiben gleich, der Status bleibt „Gefechtsbereit“. Nur ganz abschalten setzt DPS auf 0.</p>
+      </div>
+    </div>
+
+    <section id="d-pw-effect" data-nav-label="Was Energie bewegt" data-decision="d-pw-effect" data-decision-mode="multi"
+             data-label="Was Energie bewegt" data-rec="weapons shields thrust cool"
+             data-rec-why="Das sind die Werte, die ein Pilot im Spiel über die Energie steuert; Radar und Quantum spielen im Gefecht kaum eine Rolle."
+             data-applies-to="Energie-Dock, Kennzahlenband, Analyse" data-finding="f-pw-effect">
+      <p data-applies>Gilt für: Energie-Dock, Kennzahlenband, Analyse</p>
+      <p data-situation>Wer Waffen von 3 auf 1 Segment senkt, sieht weiter 972 Dauer-DPS; die Einstellung wirkt nur auf EM.</p>
+      <h3 data-question>Welche Werte sollen live auf die Energie reagieren?</h3>
+      <p data-stakes>Ob die Energieplanung für Piloten einen Nutzen hat.</p>
+      <div data-options>
+        <label data-opt="weapons" data-recommended><input type="checkbox" name="dm-d-pw-effect.weapons" checked>
+          <span data-opt-label>Waffen: Dauer-DPS anteilig</span>
+          <span data-opt-consequence>1 von 2,33 Segmenten zeigt etwa 43 % Dauer-DPS bei Energiewaffen.</span></label>
+        <label data-opt="shields" data-recommended><input type="checkbox" name="dm-d-pw-effect.shields" checked>
+          <span data-opt-label>Schilde: Regeneration anteilig</span>
+          <span data-opt-consequence>Schild-Regen und „Voll in“ folgen den Segmenten.</span></label>
+        <label data-opt="thrust" data-recommended><input type="checkbox" name="dm-d-pw-effect.thrust" checked>
+          <span data-opt-label>Triebwerke: Tempo und Beschleunigung</span>
+          <span data-opt-consequence>SCM und Boost reagieren sichtbar.</span></label>
+        <label data-opt="cool" data-recommended><input type="checkbox" name="dm-d-pw-effect.cool" checked>
+          <span data-opt-label>Kühler: Kühllast und IR</span>
+          <span data-opt-consequence>Zeigt, wann das Schiff überhitzt.</span></label>
+        <label data-opt="quantum"><input type="checkbox" name="dm-d-pw-effect.quantum">
+          <span data-opt-label>Quantum und Radar</span>
+          <span data-opt-consequence>Spool-Zeit und Radarreichweite; selten im Gefecht gebraucht.</span></label>
+      </div>
+      <textarea data-comment="d-pw-effect-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-pw-effect-none" value=""><input type="hidden" name="dm-d-pw-effect-hes" value="">
+      <input type="hidden" name="dm-d-pw-effect-touched" value=""><input type="hidden" name="dm-d-pw-effect-issue" value=""><input type="hidden" name="dm-d-pw-effect-epic" value="">
+      <div data-alevel="3" data-title="Was Energie bewegt">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"0","unit":"Δ DPS","label":"bei Waffen 3 → 1 Segment"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"EM","value":1},{"label":"Dauer-DPS","value":0},{"label":"Schild-HP","value":0},{"label":"Schild-Regen","value":0},{"label":"Tempo","value":0},{"label":"Kühllast","value":0}],"hl":"EM"}'></div>
+          <p>Gemessen im Dock: nur EM ändert sich (13.890 → 12.237). Im Code wirkt Energie nur beim vollständigen Abschalten auf die DPS.</p>
+        </div>
+        <div data-example><pre>Waffen 3 Seg  →  Dauer-DPS 972/s   EM 13.890
+Waffen 1 Seg  →  Dauer-DPS 972/s   EM 12.237  (−1.653)
+Schild 1 Seg  →  Schild-HP 4.320   Regen 820/s   Status „Gefechtsbereit“</pre></div>
+      </div>
+    </section>
+
+    <section id="d-pw-status" data-nav-label="Unterversorgung zeigen" data-decision="d-pw-status" data-decision-mode="single"
+             data-label="Unterversorgung zeigen" data-rec="group"
+             data-rec-why="Der Pilot muss sehen, welche Gruppe zu wenig hat, nicht nur dass irgendwo etwas fehlt."
+             data-applies-to="Energie-Dock" data-finding="f-pw-status">
+      <p data-applies>Gilt für: Energie-Dock</p>
+      <p data-situation>Schilde mit 1 von 4 benötigten Segmenten melden weiter „Gefechtsbereit“; der Pilot merkt die Lücke nicht.</p>
+      <h3 data-question>Wie soll das Dock eine unterversorgte Gruppe melden?</h3>
+      <div data-options>
+        <label data-opt="group" data-recommended><input type="radio" name="dm-d-pw-status" value="group" checked>
+          <span data-opt-label>Pro Gruppe markieren, Status wechselt</span>
+          <span data-opt-consequence>Spalte gelb mit „1/4“, Status „Schilde unterversorgt“.</span></label>
+        <label data-opt="total"><input type="radio" name="dm-d-pw-status" value="total">
+          <span data-opt-label>Nur der Gesamtstatus wechselt</span>
+          <span data-opt-consequence>Ruhiger, aber man muss die Gruppe selbst suchen.</span></label>
+        <label data-opt="keep"><input type="radio" name="dm-d-pw-status" value="keep">
+          <span data-opt-label>So lassen</span>
+          <span data-opt-consequence>Gold-Pips zeigen den Mindestbedarf, kein Statuswechsel.</span></label>
+      </div>
+      <textarea data-comment="d-pw-status-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-pw-status-none" value=""><input type="hidden" name="dm-d-pw-status-hes" value="">
+      <input type="hidden" name="dm-d-pw-status-touched" value=""><input type="hidden" name="dm-d-pw-status-issue" value=""><input type="hidden" name="dm-d-pw-status-epic" value="">
+      <div data-alevel="3" data-title="Unterversorgung zeigen">
+        <div data-slot="short"><div data-viz="bar" data-viz-spec='{"value":1,"max":4,"label":"Schild-Segmente von Mindestbedarf","unit":"Seg"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bar" data-viz-spec='{"value":25,"max":100,"label":"Schild-Versorgung","unit":"%"}'></div>
+          <p>Die Info steckt nur im Tooltip („1 Segment zugeteilt · Mindestbedarf 4“). Sichtbar bleibt der grüne Haken.</p>
+        </div>
+        <div data-example><pre>Heute:   Schild-Spalte 1 Pip   ✓ Gefechtsbereit
+Besser:  Schild-Spalte 1/4 gelb   ⚠ Schilde unterversorgt</pre></div>
+      </div>
+    </section>
+
+    <section id="d-pw-delta" data-nav-label="Wirkung anzeigen" data-decision="d-pw-delta" data-decision-mode="single"
+             data-label="Wirkung anzeigen" data-rec="both"
+             data-rec-why="Beim Einstellen schaut man aufs Dock, beim Lesen auf die Karte; die Wirkung muss an beiden Stellen stehen."
+             data-applies-to="Kennzahlenband, Analyse, Dock" data-finding="f-pw-delta">
+      <p data-applies>Gilt für: Kennzahlenband, Analyse, Dock</p>
+      <p data-situation>Die EM-Änderung steht klein im Dock (−1.653); im Kennzahlenband und in der Analyse sieht man nichts davon.</p>
+      <h3 data-question>Wo soll die Wirkung einer Energieänderung erscheinen?</h3>
+      <div data-options>
+        <label data-opt="both" data-recommended><input type="radio" name="dm-d-pw-delta" value="both" checked>
+          <span data-opt-label>Im Band und in der Analyse als ±-Chip</span>
+          <span data-opt-consequence>Dauer-DPS 972 → 418 (−554) oben und in der Offensive.</span></label>
+        <label data-opt="band"><input type="radio" name="dm-d-pw-delta" value="band">
+          <span data-opt-label>Nur im Kennzahlenband</span>
+          <span data-opt-consequence>Immer sichtbar, aber ohne Aufschlüsselung je Waffe.</span></label>
+        <label data-opt="dock"><input type="radio" name="dm-d-pw-delta" value="dock">
+          <span data-opt-label>Vorher/Nachher-Zeile im Dock</span>
+          <span data-opt-consequence>Alles an einer Stelle, das Dock wird größer.</span></label>
+      </div>
+      <textarea data-comment="d-pw-delta-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-pw-delta-none" value=""><input type="hidden" name="dm-d-pw-delta-hes" value="">
+      <input type="hidden" name="dm-d-pw-delta-touched" value=""><input type="hidden" name="dm-d-pw-delta-issue" value=""><input type="hidden" name="dm-d-pw-delta-epic" value="">
+      <div data-alevel="3" data-title="Wirkung anzeigen">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"1","unit":"Stelle","label":"zeigt heute eine Energie-Wirkung"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="flow" data-viz-spec='{"steps":[{"label":"Pip ändern","value":"Dock"},{"label":"EM-Chip","value":"Dock"},{"label":"Band","value":"keine Änderung"},{"label":"Analyse","value":"keine Änderung"}]}'></div>
+          <p>Beim Modultausch funktioniert das schon: Band und Karte zeigen +840 Schild-HP. Für Energie fehlt dasselbe.</p>
+        </div>
+        <div data-example><pre>Modultausch:  SCHILD-HP 5.160  +840   (Band + Karte)
+Energie:      EM 12.237  −1.653        (nur Dock)</pre></div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ───────── Thema 2 ───────── -->
+  <section id="t-dock" data-topic data-nav-label="Energieleiste immer da">
+    <div data-alevel="2" data-title="Energieleiste immer da">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"530 × 180","unit":"px","label":"verdeckt das Dock mitten im Inhalt"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="bars" data-viz-spec='{"items":[{"label":"Unten mittig","value":180},{"label":"In der Analyse-Spalte","value":0},{"label":"Rand links/rechts","value":0}],"unit":"px verdeckt","hl":"Unten mittig"}'></div>
+        <p>Unten mittig verdeckt das Dock Loadout-Karten und Analyse gleichzeitig. „In der Analyse-Spalte“ verdeckt nichts, scrollt aber weg und bricht die neunte Gruppe in eine zweite Zeile um.</p>
+      </div>
+    </div>
+
+    <section id="d-dock-place" data-nav-label="Ort der Energieleiste" data-decision="d-dock-place" data-decision-mode="picture"
+             data-label="Ort der Energieleiste" data-rec="band"
+             data-rec-why="Ein fester Stapel Kopfzeile → Kennzahlen → Energie verdeckt nichts und ist bei jedem Scrollstand da, wie das Power-Management bei erkul."
+             data-applies-to="Klassische Ansicht, Desktop" data-finding="f-dock-place">
+      <p data-applies>Gilt für: klassische Ansicht, Desktop</p>
+      <p data-situation>Unten mittig liegt das Dock über Karten und Analyse; in der Analyse-Spalte scrollt es beim ersten Runterscrollen weg.</p>
+      <h3 data-question>Wo soll die Energieleiste dauerhaft sitzen?</h3>
+      <p data-stakes>Ob Einstellen und Wirkung-Sehen gleichzeitig möglich sind.</p>
+      <div data-options>
+        <label data-opt="band" data-recommended><input type="radio" name="dm-d-dock-place" value="band" checked>
+          <span data-opt-media><svg viewBox="0 0 160 100" role="img" aria-label="Energie unter dem Kennzahlenband"><rect x="4" y="4" width="152" height="10" rx="2" fill="#2a4a5e"/><rect x="4" y="16" width="152" height="10" rx="2" fill="#4cc9e8"/><rect x="4" y="28" width="152" height="12" rx="2" fill="#e2b34b"/><rect x="4" y="44" width="72" height="52" rx="2" fill="#1d3547"/><rect x="82" y="44" width="74" height="52" rx="2" fill="#16293a"/></svg></span>
+          <span data-opt-label>Als Leiste unter dem Kennzahlenband</span>
+          <span data-opt-consequence>Kopfzeile, Kennzahlen und Energie docken zusammen an; nichts wird verdeckt.</span></label>
+        <label data-opt="rail"><input type="radio" name="dm-d-dock-place" value="rail">
+          <span data-opt-media><svg viewBox="0 0 160 100" role="img" aria-label="Energie als Spalte rechts"><rect x="4" y="4" width="152" height="10" rx="2" fill="#2a4a5e"/><rect x="4" y="16" width="152" height="10" rx="2" fill="#4cc9e8"/><rect x="4" y="30" width="62" height="66" rx="2" fill="#1d3547"/><rect x="70" y="30" width="58" height="66" rx="2" fill="#16293a"/><rect x="132" y="30" width="24" height="66" rx="2" fill="#e2b34b"/></svg></span>
+          <span data-opt-label>Als schmale Spalte am rechten Rand</span>
+          <span data-opt-consequence>Senkrechte Pips wie im Spiel; Loadout und Analyse werden schmaler.</span></label>
+        <label data-opt="col"><input type="radio" name="dm-d-dock-place" value="col">
+          <span data-opt-media><svg viewBox="0 0 160 100" role="img" aria-label="Energie oben in der Analyse, mitlaufend"><rect x="4" y="4" width="152" height="10" rx="2" fill="#2a4a5e"/><rect x="4" y="16" width="152" height="10" rx="2" fill="#4cc9e8"/><rect x="4" y="30" width="72" height="66" rx="2" fill="#1d3547"/><rect x="82" y="30" width="74" height="22" rx="2" fill="#e2b34b"/><rect x="82" y="56" width="74" height="40" rx="2" fill="#16293a"/></svg></span>
+          <span data-opt-label>Oben in der Analyse-Spalte, mitlaufend</span>
+          <span data-opt-consequence>Energie neben der Konfiguration; die Analyse darunter hat weniger Höhe.</span></label>
+        <label data-opt="float"><input type="radio" name="dm-d-dock-place" value="float">
+          <span data-opt-media><svg viewBox="0 0 160 100" role="img" aria-label="Schwebendes Dock unten mittig, heute"><rect x="4" y="4" width="152" height="10" rx="2" fill="#2a4a5e"/><rect x="4" y="16" width="152" height="10" rx="2" fill="#4cc9e8"/><rect x="4" y="30" width="72" height="66" rx="2" fill="#1d3547"/><rect x="82" y="30" width="74" height="66" rx="2" fill="#16293a"/><rect x="44" y="66" width="72" height="28" rx="2" fill="#e2b34b"/></svg></span>
+          <span data-opt-label>Schwebend unten mittig wie heute</span>
+          <span data-opt-consequence>Bleibt beweglich, verdeckt aber Inhalt in beiden Spalten.</span></label>
+      </div>
+      <textarea data-comment="d-dock-place-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-dock-place-none" value=""><input type="hidden" name="dm-d-dock-place-hes" value="">
+      <input type="hidden" name="dm-d-dock-place-touched" value=""><input type="hidden" name="dm-d-dock-place-issue" value=""><input type="hidden" name="dm-d-dock-place-epic" value="">
+      <div data-alevel="3" data-title="Ort der Energieleiste">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"7","unit":"Positionen","label":"wählbar, keine bleibt sichtbar ohne zu verdecken"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Rand links/rechts","value":1},{"label":"Unten links/mittig/rechts","value":3},{"label":"Analyse-Spalte","value":1},{"label":"Im Seitenfluss","value":1}],"unit":"Positionen"}'></div>
+          <p>Die Positionen gibt es schon. Keine sitzt im festen Stapel mit dem Kennzahlenband, das als Einziges beim Scrollen sauber andockt.</p>
+        </div>
+        <div data-example><pre>Kopfzeile        ── dockt an
+Kennzahlenband   ── dockt an (Alpha 500,7 · DPS 2.359 · …)
+Energie          ── schwebt unten mittig, 530 × 180 px über dem Inhalt</pre></div>
+      </div>
+    </section>
+
+    <section id="d-dock-labels" data-nav-label="Pip-Spalten beschriften" data-decision="d-dock-labels" data-decision-mode="single"
+             data-label="Pip-Spalten beschriften" data-rec="iconword"
+             data-rec-why="Neun Icons ohne Namen muss man erst per Tooltip lernen; ein Kurzwort darunter kostet kaum Platz."
+             data-applies-to="Energie-Dock" data-finding="f-dock-labels">
+      <p data-applies>Gilt für: Energie-Dock</p>
+      <p data-situation>Neun Pip-Spalten tragen nur ein Icon und eine Zahl; welche Spalte Kühler oder Radar ist, zeigt erst der Tooltip.</p>
+      <h3 data-question>Wie sollen die Pip-Spalten beschriftet sein?</h3>
+      <div data-options>
+        <label data-opt="iconword" data-recommended><input type="radio" name="dm-d-dock-labels" value="iconword" checked>
+          <span data-opt-label>Icon plus Kurzwort</span>
+          <span data-opt-consequence>„Waffen · Schild · Schub · Kühler …“ unter jeder Spalte.</span></label>
+        <label data-opt="word"><input type="radio" name="dm-d-dock-labels" value="word">
+          <span data-opt-label>Nur Kurzwort, kein Icon</span>
+          <span data-opt-consequence>Eindeutig, aber breiter.</span></label>
+        <label data-opt="icon"><input type="radio" name="dm-d-dock-labels" value="icon">
+          <span data-opt-label>Nur Icon wie heute</span>
+          <span data-opt-consequence>Kompakt, Namen nur im Tooltip.</span></label>
+      </div>
+      <textarea data-comment="d-dock-labels-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-dock-labels-none" value=""><input type="hidden" name="dm-d-dock-labels-hes" value="">
+      <input type="hidden" name="dm-d-dock-labels-touched" value=""><input type="hidden" name="dm-d-dock-labels-issue" value=""><input type="hidden" name="dm-d-dock-labels-epic" value="">
+      <div data-alevel="3" data-title="Pip-Spalten beschriften">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"9","unit":"Spalten","label":"ohne Namen"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bar" data-viz-spec='{"value":0,"max":9,"label":"Spalten mit sichtbarem Namen","unit":""}'></div>
+          <p>Zwei Spalten haben dasselbe Schneeflocken-Icon (zwei Kühler), zwei zeigen „—“ ohne Erklärung.</p>
+        </div>
+        <div data-example><pre>Heute:   ⌖ 3   ▯ 3   ⛉ 4   ✈ —   ⍋ —   ◔ 2   ⚲ 1   ❄ 1   ❄ 1
+Besser:  Waffen 3 · Schub 3 · Schild 4 · Quantum — · Radar 2 · … · Kühler 1 · Kühler 1</pre></div>
+      </div>
+    </section>
+
+    <section id="d-dock-text" data-nav-label="Erklärtexte im Dock" data-decision="d-dock-text" data-decision-mode="single"
+             data-label="Erklärtexte im Dock" data-rec="tip"
+             data-rec-why="Das Dock ist ein Bedienfeld; ein ganzer Satz sprengt seine Breite und läuft in der Spalte sogar über den Rand."
+             data-applies-to="Energie-Dock" data-finding="f-dock-text">
+      <p data-applies>Gilt für: Energie-Dock</p>
+      <p data-situation>Der Kühllast-Satz macht das Dock breit und läuft in der Analyse-Spalte rechts über den Kartenrand hinaus.</p>
+      <h3 data-question>Wohin sollen Erklärungen im Dock?</h3>
+      <div data-options>
+        <label data-opt="tip" data-recommended><input type="radio" name="dm-d-dock-text" value="tip" checked>
+          <span data-opt-label>Wert „—“ mit ⓘ, Satz im Tooltip</span>
+          <span data-opt-consequence>Dock bleibt schmal, die Erklärung ist einen Hover entfernt.</span></label>
+        <label data-opt="short"><input type="radio" name="dm-d-dock-text" value="short">
+          <span data-opt-label>Kurzer Hinweis „keine Daten“</span>
+          <span data-opt-consequence>Sichtbar ohne Hover, aber ohne Grund.</span></label>
+        <label data-opt="keep"><input type="radio" name="dm-d-dock-text" value="keep">
+          <span data-opt-label>Ganzer Satz wie heute</span>
+          <span data-opt-consequence>Alles lesbar, das Dock bleibt breit.</span></label>
+      </div>
+      <textarea data-comment="d-dock-text-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-dock-text-none" value=""><input type="hidden" name="dm-d-dock-text-hes" value="">
+      <input type="hidden" name="dm-d-dock-text-touched" value=""><input type="hidden" name="dm-d-dock-text-issue" value=""><input type="hidden" name="dm-d-dock-text-epic" value="">
+      <div data-alevel="3" data-title="Erklärtexte im Dock">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"17","unit":"Wörter","label":"für einen fehlenden Wert"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="compare" data-viz-spec='{"before":{"label":"Satz","value":17},"after":{"label":"— mit ⓘ","value":1},"unit":"Wörter"}'></div>
+          <p>In der Analyse-Spalte endet der Satz rund 210 px rechts außerhalb der Karte.</p>
+        </div>
+        <div data-example><pre>KÜHLLAST  Die Spieldaten nennen nicht, wie viel Kühlmittel die Bauteile ziehen — die Kühllast bleibt leer.
+→ KÜHLLAST  —  ⓘ</pre></div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ───────── Thema 3 ───────── -->
+  <section id="t-sync" data-topic data-nav-label="Mitlaufende Analyse">
+    <div data-alevel="2" data-title="Mitlaufende Analyse">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"0","unit":"Kopplung","label":"zwischen linker und rechter Spalte"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="flow" data-viz-spec='{"steps":[{"label":"Bewaffnung + Raketen","value":"Offensive"},{"label":"Schild-Generatoren","value":"Verteidigung"},{"label":"Antrieb und Systeme","value":"Schiff"}]}'></div>
+        <p>Die rechte Spalte läuft unabhängig. Dass Offensive neben den Waffen steht, ist Zufall der Kartenhöhe; bei einem Schiff mit mehr Waffen rutscht sie weg.</p>
+      </div>
+    </div>
+
+    <section id="d-sync" data-nav-label="Kopplung links und rechts" data-decision="d-sync" data-decision-mode="single"
+             data-label="Kopplung links und rechts" data-rec="sticky"
+             data-rec-why="Jeder Analyse-Block klebt nur solange oben, wie sein Gegenstück links sichtbar ist. Das ist reines CSS (sticky je Abschnitt) und verdeckt nichts."
+             data-applies-to="Loadout- und Analyse-Spalte" data-finding="f-sync">
+      <p data-applies>Gilt für: Loadout- und Analyse-Spalte</p>
+      <p data-situation>Beim Scrollen durch die Schilde steht rechts mal Offensive, mal Schiff; die Wirkung des Moduls, das man ansieht, ist oft nicht im Bild.</p>
+      <h3 data-question>Wie soll die Analyse beim Scrollen mitlaufen?</h3>
+      <p data-stakes>Ob man die Wirkung eines Tauschs sieht, ohne zu scrollen.</p>
+      <div data-options>
+        <label data-opt="sticky" data-recommended><input type="radio" name="dm-d-sync" value="sticky" checked>
+          <span data-opt-label>Abschnittsweise andocken</span>
+          <span data-opt-consequence>Offensive klebt neben Waffen und Raketen, ab dem ersten Schild übernimmt Verteidigung.</span></label>
+        <label data-opt="swap"><input type="radio" name="dm-d-sync" value="swap">
+          <span data-opt-label>Ganze Spalte fest, Inhalt wechselt</span>
+          <span data-opt-consequence>Immer genau ein Block sichtbar; der Rest erst beim Hinscrollen.</span></label>
+        <label data-opt="free"><input type="radio" name="dm-d-sync" value="free">
+          <span data-opt-label>Unabhängig wie heute</span>
+          <span data-opt-consequence>Einfach, aber die Zuordnung bleibt Zufall.</span></label>
+      </div>
+      <textarea data-comment="d-sync-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-sync-none" value=""><input type="hidden" name="dm-d-sync-hes" value="">
+      <input type="hidden" name="dm-d-sync-touched" value=""><input type="hidden" name="dm-d-sync-issue" value=""><input type="hidden" name="dm-d-sync-epic" value="">
+      <div data-alevel="3" data-title="Kopplung links und rechts">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"3","unit":"Paare","label":"Konfiguration ↔ Analyse"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="flow" data-viz-spec='{"steps":[{"label":"Bewaffnung sichtbar","value":"Offensive klebt"},{"label":"erster Schild","value":"Verteidigung schiebt hoch"},{"label":"Antrieb","value":"Schiff übernimmt"}]}'></div>
+          <p>Live: Bei den Schild-Generatoren zeigte die rechte Spalte schon „Schiff“, die Verteidigung war oben aus dem Bild.</p>
+        </div>
+        <div data-example><pre>links:  SCHILD-GENERATOREN  Bulwark 4.320
+rechts: SCHIFF  Flugleistung 262 m/s …     ← Verteidigung bereits weggescrollt</pre></div>
+      </div>
+    </section>
+
+    <section id="d-sync-map" data-nav-label="Zuordnung prüfen" data-decision="d-sync-map" data-decision-mode="verify"
+             data-label="Zuordnung prüfen" data-rec="ok"
+             data-rec-why="So entspricht jede Analyse-Karte genau den Modulen, die ihre Werte bestimmen."
+             data-applies-to="Analyse-Spalte" data-finding="f-sync-map">
+      <p data-applies>Gilt für: Analyse-Spalte</p>
+      <p data-situation>Ohne feste Paare weiß die Seite nicht, welche Analyse zu welchem Loadout-Block gehört.</p>
+      <h3 data-question>Stimmt die Zuordnung Waffen → Offensive, Schilde → Verteidigung, Systeme → Schiff?</h3>
+      <div data-options>
+        <label data-opt="ok" data-recommended><input type="radio" name="dm-d-sync-map" value="ok" checked>
+          <span data-opt-label>Stimmt so</span>
+          <span data-opt-consequence>Drei Paare, Gegenmaßnahmen hängen an der Verteidigung.</span></label>
+        <label data-opt="partial"><input type="radio" name="dm-d-sync-map" value="partial">
+          <span data-opt-label>Stimmt teilweise</span>
+          <span data-opt-consequence>Korrektur unten eintragen.</span></label>
+        <label data-opt="wrong"><input type="radio" name="dm-d-sync-map" value="wrong">
+          <span data-opt-label>Stimmt nicht</span>
+          <span data-opt-consequence>Bitte deine Zuordnung unten beschreiben.</span></label>
+      </div>
+      <input type="text" name="dm-d-sync-map-fix" value="" placeholder="Korrektur (optional)">
+      <textarea data-comment="d-sync-map-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-sync-map-none" value=""><input type="hidden" name="dm-d-sync-map-hes" value="">
+      <input type="hidden" name="dm-d-sync-map-touched" value=""><input type="hidden" name="dm-d-sync-map-issue" value=""><input type="hidden" name="dm-d-sync-map-epic" value="">
+      <div data-alevel="3" data-title="Zuordnung prüfen">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"3","unit":"Paare"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="flow" data-viz-spec='{"steps":[{"label":"Waffen + Raketen","value":"Offensive"},{"label":"Schilde + Gegenmaßnahmen","value":"Verteidigung"},{"label":"Antrieb, Kühler, Radar, Lebenserhaltung","value":"Schiff"}]}'></div>
+          <p>Gegenmaßnahmen stehen links ganz unten, gehören inhaltlich aber zur Verteidigung.</p>
+        </div>
+        <div data-example><pre>Loadout                    Analyse
+Bewaffnung, Raketen   ↔   Offensive
+Schild-Generatoren    ↔   Verteidigung (+ Gegenmaßnahmen)
+Antrieb & Systeme     ↔   Schiff (Flug, Quantum, Signatur)</pre></div>
+      </div>
+    </section>
+
+    <section id="d-band" data-nav-label="Andock-Stapel" data-decision="d-band" data-decision-mode="single"
+             data-label="Andock-Stapel" data-rec="solid"
+             data-rec-why="Ein lückenloser Stapel liest sich wie eine Leiste; durchscheinender Text darunter wirkt kaputt."
+             data-applies-to="Kopfzeile und Kennzahlenband" data-finding="f-band">
+      <p data-applies>Gilt für: Kopfzeile und Kennzahlenband</p>
+      <p data-situation>Zwischen Kopfzeile und angedocktem Kennzahlenband scheinen beim Scrollen Kartenzeilen durch, oben und unten an der Kopfzeile.</p>
+      <h3 data-question>Wie sollen Kopfzeile und Kennzahlenband zusammen andocken?</h3>
+      <div data-options>
+        <label data-opt="solid" data-recommended><input type="radio" name="dm-d-band" value="solid" checked>
+          <span data-opt-label>Ein lückenloser, deckender Stapel</span>
+          <span data-opt-consequence>Band sitzt direkt unter der Kopfzeile, Hintergrund dahinter deckend.</span></label>
+        <label data-opt="merge"><input type="radio" name="dm-d-band" value="merge">
+          <span data-opt-label>Kennzahlen wandern in die Kopfzeile</span>
+          <span data-opt-consequence>Spart eine Zeile, die Suche wird schmaler.</span></label>
+        <label data-opt="keep"><input type="radio" name="dm-d-band" value="keep">
+          <span data-opt-label>So lassen</span>
+          <span data-opt-consequence>Zwei getrennte Leisten mit Spalt.</span></label>
+      </div>
+      <textarea data-comment="d-band-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-band-none" value=""><input type="hidden" name="dm-d-band-hes" value="">
+      <input type="hidden" name="dm-d-band-touched" value=""><input type="hidden" name="dm-d-band-issue" value=""><input type="hidden" name="dm-d-band-epic" value="">
+      <div data-alevel="3" data-title="Andock-Stapel">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"2","unit":"Spalten","label":"in denen Inhalt durchscheint"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="flow" data-viz-spec='{"steps":[{"label":"Kopfzeile","value":"y 20–68"},{"label":"Spalt","value":"Inhalt sichtbar"},{"label":"Kennzahlenband","value":"y 80–112"}]}'></div>
+          <p>Der Rand der Kopfzeile ist abgerundet und schwebt; dahinter laufen Kartenzeilen sichtbar durch.</p>
+        </div>
+        <div data-example><pre>[ VERSE COMPANION · Suche …                ]
+  Alpha-Schaden 63,3  Feuerrate 1.200 …      ← Kartenzeile scheint durch
+[ ALPHA 500,7 · SALVEN-DPS 2.359/s · …     ]</pre></div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ───────── Thema 4 ───────── -->
+  <section id="t-cards" data-topic data-nav-label="Karten verdichten">
+    <div data-alevel="2" data-title="Karten verdichten">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"4","unit":"Knöpfe","label":"an jeder Modulkarte"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="bars" data-viz-spec='{"items":[{"label":"Wunsch","value":1},{"label":"3D","value":1},{"label":"Info","value":1},{"label":"Tausch","value":1}],"unit":"je Karte"}'></div>
+        <p>Jede Karte trägt eine eigene Knopfspalte; bei 15 Modulen sind das 60 Knöpfe. Gerade die Waffe in der Halterung hat aber keinen Tausch.</p>
+      </div>
+    </div>
+
+    <section id="d-actions" data-nav-label="Knöpfe an den Karten" data-decision="d-actions" data-decision-mode="single"
+             data-label="Knöpfe an den Karten" data-rec="swapmenu"
+             data-rec-why="Tauschen ist die Hauptaktion der Ansicht; Wunsch, 3D und Info braucht man selten."
+             data-applies-to="alle Modulkarten" data-finding="f-actions">
+      <p data-applies>Gilt für: alle Modulkarten</p>
+      <p data-situation>60 Knöpfe in 15 Karten lenken vom Wert ab; der eine, den man meist will, ist der Tausch.</p>
+      <h3 data-question>Welche Knöpfe sollen an jeder Karte sichtbar sein?</h3>
+      <div data-options>
+        <label data-opt="swapmenu" data-recommended><input type="radio" name="dm-d-actions" value="swapmenu" checked>
+          <span data-opt-label>Tausch sichtbar, Rest im ⋯-Menü</span>
+          <span data-opt-consequence>Eine Taste je Karte, ruhigeres Bild.</span></label>
+        <label data-opt="hover"><input type="radio" name="dm-d-actions" value="hover">
+          <span data-opt-label>Alle erst beim Überfahren</span>
+          <span data-opt-consequence>Sehr ruhig, aber auf Touch versteckt.</span></label>
+        <label data-opt="keep"><input type="radio" name="dm-d-actions" value="keep">
+          <span data-opt-label>Alle vier sichtbar wie heute</span>
+          <span data-opt-consequence>Alles direkt, viel Wiederholung.</span></label>
+      </div>
+      <textarea data-comment="d-actions-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-actions-none" value=""><input type="hidden" name="dm-d-actions-hes" value="">
+      <input type="hidden" name="dm-d-actions-touched" value=""><input type="hidden" name="dm-d-actions-issue" value=""><input type="hidden" name="dm-d-actions-epic" value="">
+      <div data-alevel="3" data-title="Knöpfe an den Karten">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"60","unit":"Knöpfe","label":"in 15 Karten"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="compare" data-viz-spec='{"before":{"label":"heute","value":60},"after":{"label":"Tausch + ⋯","value":30},"unit":"Knöpfe"}'></div>
+          <p>Ohne die drei Nebenknöpfe gewinnt jede Karte etwa 40 px Breite für Werte.</p>
+        </div>
+        <div data-example><pre>[S4 VariPuck S4 Gimbal Mount …]  [♡][⬡]  [ⓘ]  [⇄]
+→ [S4 VariPuck S4 Gimbal Mount …]              [⇄] [⋯]</pre></div>
+      </div>
+    </section>
+
+    <section id="d-nested" data-nav-label="Waffe in der Halterung" data-decision="d-nested" data-decision-mode="yesnoalt"
+             data-label="Waffe in der Halterung" data-rec="yes"
+             data-rec-why="Meist will man die Waffe tauschen, nicht die Halterung; heute geht das gar nicht."
+             data-applies-to="Bewaffnung, Raketen" data-finding="f-nested">
+      <p data-applies>Gilt für: Bewaffnung, Raketen</p>
+      <p data-situation>Die Revenant Gatling in der VariPuck-Halterung hat keinen Tausch-Knopf; tauschbar ist nur die Halterung.</p>
+      <h3 data-question>Soll jede Waffe in einer Halterung einen eigenen Tausch bekommen?</h3>
+      <div data-options>
+        <label data-opt="yes" data-recommended><input type="radio" name="dm-d-nested" value="yes" checked>
+          <span data-opt-label>Ja, eigener Tausch, der wirklich wirkt</span>
+          <span data-opt-consequence>Waffe, Alpha und DPS ändern sich sofort.</span></label>
+        <label data-opt="no"><input type="radio" name="dm-d-nested" value="no">
+          <span data-opt-label>Nein, nur die Halterung</span>
+          <span data-opt-consequence>Wie im Spiel-Menü, aber umständlich.</span></label>
+        <label data-opt="alt"><input type="radio" name="dm-d-nested" value="alt">
+          <span data-opt-label>Anders</span>
+          <span data-opt-consequence>Beschreibe deine Lösung.</span></label>
+      </div>
+      <input type="text" name="dm-d-nested-alt" value="" placeholder="Deine Lösung">
+      <textarea data-comment="d-nested-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-nested-none" value=""><input type="hidden" name="dm-d-nested-hes" value="">
+      <input type="hidden" name="dm-d-nested-touched" value=""><input type="hidden" name="dm-d-nested-issue" value=""><input type="hidden" name="dm-d-nested-epic" value="">
+      <div data-alevel="3" data-title="Waffe in der Halterung">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"0","unit":"Tausch-Knöpfe","label":"an Waffen in Halterungen"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Halterung","value":1},{"label":"Waffe darin","value":0}],"unit":"Tausch","hl":"Waffe darin"}'></div>
+          <p>Am 10.11. getestet: Ein Tausch über den Holotisch meldete „1 Slot geändert“, Waffe und DPS blieben gleich.</p>
+        </div>
+        <div data-example><pre>S4 VariPuck S4 Gimbal Mount     [♡][⬡][ⓘ][⇄]
+  └ S4 Revenant Gatling 63,3    [♡][⬡][ⓘ]       ← kein ⇄</pre></div>
+      </div>
+    </section>
+
+    <section id="d-names" data-nav-label="Namen in der Analyse" data-decision="d-names" data-decision-mode="single"
+             data-label="Namen in der Analyse" data-rec="display"
+             data-rec-why="Links und rechts muss dieselbe Waffe gleich heißen, sonst findet man die Zeile nicht wieder."
+             data-applies-to="Offensive, Raketen, Hinweise" data-finding="f-names">
+      <p data-applies>Gilt für: Offensive, Raketen, Hinweise</p>
+      <p data-situation>Links heißt die Waffe „Revenant Gatling“, rechts „APAR Ballistic Gatling S4“ und im Hinweis „APAR_BallisticGatling_S4“.</p>
+      <h3 data-question>Welcher Name soll in der Analyse stehen?</h3>
+      <div data-options>
+        <label data-opt="display" data-recommended><input type="radio" name="dm-d-names" value="display" checked>
+          <span data-opt-label>Anzeigename, interner Name im Tooltip</span>
+          <span data-opt-consequence>„Revenant Gatling“ links und rechts.</span></label>
+        <label data-opt="both"><input type="radio" name="dm-d-names" value="both">
+          <span data-opt-label>Anzeigename plus Hersteller-Kürzel</span>
+          <span data-opt-consequence>„Revenant Gatling · APAR“, etwas breiter.</span></label>
+        <label data-opt="keep"><input type="radio" name="dm-d-names" value="keep">
+          <span data-opt-label>Interne Namen wie heute</span>
+          <span data-opt-consequence>Technisch genau, für Spieler fremd.</span></label>
+      </div>
+      <textarea data-comment="d-names-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-names-none" value=""><input type="hidden" name="dm-d-names-hes" value="">
+      <input type="hidden" name="dm-d-names-touched" value=""><input type="hidden" name="dm-d-names-issue" value=""><input type="hidden" name="dm-d-names-epic" value="">
+      <div data-alevel="3" data-title="Namen in der Analyse">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"3","unit":"Namen","label":"für dieselbe Waffe"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Loadout","value":1},{"label":"Analyse-Tabelle","value":1},{"label":"Hinweistext","value":1}],"unit":"Name"}'></div>
+          <p>Bei Raketen genauso: „Ignite II Missile“ links, „MISL S02 IR FSKI Ignite“ rechts.</p>
+        </div>
+        <div data-example><pre>Loadout:   Revenant Gatling · Omnisky IX Cannon · Ignite II Missile
+Analyse:   APAR Ballistic Gatling S4 · AMRS Laser Cannon S3 · MISL S02 IR FSKI Ignite</pre></div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ───────── Thema 5 ───────── -->
+  <section id="t-fix" data-topic data-nav-label="Fehler zuerst">
+    <div data-alevel="2" data-title="Fehler zuerst">
+      <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"5","unit":"Fehler","label":"stören das Einstellen direkt"}'></div></div>
+      <div data-slot="long">
+        <div data-viz="bars" data-viz-spec='{"items":[{"label":"Sprung nach oben","value":5},{"label":"Energie ohne Wirkung","value":5},{"label":"Waffentausch","value":4},{"label":"Quantum ×1000","value":3},{"label":"Rohnamen","value":2}],"unit":"Schwere"}'></div>
+        <p>Bevor neue Layout-Ideen greifen, müssen diese Fehler weg: Sie zerstören genau die Rückkopplung, um die es geht.</p>
+      </div>
+    </div>
+
+    <section id="d-jump" data-nav-label="Sprung nach oben" data-decision="d-jump" data-decision-mode="verify"
+             data-label="Sprung nach oben" data-rec="ok"
+             data-rec-why="Ursache im Code belegt: eine Navigation, die nur die Adresse ändert, scrollt trotzdem nach oben."
+             data-applies-to="Energie, Modultausch" data-finding="f-jump">
+      <p data-applies>Gilt für: Energie, Modultausch</p>
+      <p data-situation>Jede Pip-Änderung und jeder Modultausch wirft die Seite an den Anfang; wer bei den Kühlern ist, muss jedes Mal zurückscrollen.</p>
+      <h3 data-question>Stimmt die Ursache: Die Adressänderung (?pw=, ?loadout=) löst das Hochscrollen aus?</h3>
+      <div data-options>
+        <label data-opt="ok" data-recommended><input type="radio" name="dm-d-jump" value="ok" checked>
+          <span data-opt-label>Stimmt, so beheben</span>
+          <span data-opt-consequence>Reine Adressänderungen behalten die Scrollposition.</span></label>
+        <label data-opt="partial"><input type="radio" name="dm-d-jump" value="partial">
+          <span data-opt-label>Teilweise</span>
+          <span data-opt-consequence>Korrektur unten eintragen.</span></label>
+        <label data-opt="wrong"><input type="radio" name="dm-d-jump" value="wrong">
+          <span data-opt-label>Stimmt nicht</span>
+          <span data-opt-consequence>Bitte beschreiben, was du siehst.</span></label>
+      </div>
+      <input type="text" name="dm-d-jump-fix" value="" placeholder="Korrektur (optional)">
+      <textarea data-comment="d-jump-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-jump-none" value=""><input type="hidden" name="dm-d-jump-hes" value="">
+      <input type="hidden" name="dm-d-jump-touched" value=""><input type="hidden" name="dm-d-jump-issue" value=""><input type="hidden" name="dm-d-jump-epic" value="">
+      <div data-alevel="3" data-title="Sprung nach oben">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"0 px","unit":"Scrollposition","label":"nach jeder Änderung"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="flow" data-viz-spec='{"steps":[{"label":"Pip klicken","value":"?pw= ändert sich"},{"label":"Router-Navigation","value":"ohne Overlay"},{"label":"Scroll-Handler","value":"scrollt auf 0"}]}'></div>
+          <p>Der Scroll-Handler behält die Position nur bei Overlays; eine Navigation, die nur die Adresse ändert, gilt als neue Seite.</p>
+        </div>
+        <div data-example><pre>core/overlay-route-scroll.ts   keepsScroll() → false bei reiner Query-Änderung
+codex-energy-dock.component.ts persistDraft() → router.navigate({ queryParams: { pw } })</pre></div>
+      </div>
+    </section>
+
+    <section id="d-order" data-nav-label="Reihenfolge der Fixes" data-decision="d-order" data-decision-mode="order"
+             data-label="Reihenfolge der Fixes" data-rec="jump,power,nested,dock,quantum,names"
+             data-rec-why="Erst was jede Einstellung kaputt macht (Sprung, Energie, Waffentausch), dann Platz (Dock), dann Daten."
+             data-applies-to="klassische Ansicht" data-finding="f-order">
+      <p data-applies>Gilt für: klassische Ansicht</p>
+      <p data-situation>Sechs Punkte blockieren das Einstellen unterschiedlich stark; die Reihenfolge entscheidet, wann die Ansicht nutzbar wird.</p>
+      <h3 data-question>In welcher Reihenfolge sollen die Punkte angegangen werden?</h3>
+      <p data-context>Ziehe die Einträge in deine Reihenfolge.</p>
+      <div data-options>
+        <div data-opt="jump"><span data-opt-label>Sprung nach oben beheben</span><span data-opt-consequence>Jede Einstellung bleibt im Blick.</span></div>
+        <div data-opt="power"><span data-opt-label>Energie wirkt auf DPS, Schild, Tempo</span><span data-opt-consequence>Die Energieplanung bekommt Sinn.</span></div>
+        <div data-opt="nested"><span data-opt-label>Waffe in Halterung tauschbar</span><span data-opt-consequence>Die häufigste Änderung funktioniert.</span></div>
+        <div data-opt="dock"><span data-opt-label>Energieleiste andocken</span><span data-opt-consequence>Nichts wird mehr verdeckt.</span></div>
+        <div data-opt="quantum"><span data-opt-label>Quantum-Einheit und Sprungreichweite</span><span data-opt-consequence>189.309 km/s statt ×1000.</span></div>
+        <div data-opt="names"><span data-opt-label>Anzeigenamen in der Analyse</span><span data-opt-consequence>Links und rechts gleiche Namen.</span></div>
+      </div>
+      <input type="hidden" name="dm-d-order" value="jump,power,nested,dock,quantum,names">
+      <textarea data-comment="d-order-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-order-none" value=""><input type="hidden" name="dm-d-order-hes" value="">
+      <input type="hidden" name="dm-d-order-touched" value=""><input type="hidden" name="dm-d-order-issue" value=""><input type="hidden" name="dm-d-order-epic" value="">
+      <div data-alevel="3" data-title="Reihenfolge der Fixes">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"6","unit":"Punkte"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Sprung nach oben","value":5},{"label":"Energie ohne Wirkung","value":5},{"label":"Waffentausch","value":4},{"label":"Dock verdeckt","value":4},{"label":"Quantum ×1000","value":3},{"label":"Rohnamen","value":2}],"unit":"Schwere"}'></div>
+          <p>Schon behoben seit dem 10.11.: Raketensalve (5.760), Hüllen-HP (11.900), Rumpfmasse, Radar-Werte.</p>
+        </div>
+        <div data-example><pre>Quantum heute:  Karte 189.309 km/s   Analyse 189.309.104 km/s   Sprungreichweite ∞ Gm</pre></div>
+      </div>
+    </section>
+
+    <section id="d-misc" data-nav-label="Kleinere Funde" data-decision="d-misc" data-decision-mode="multi"
+             data-label="Kleinere Funde" data-rec="score paints battery"
+             data-rec-why="Alle drei sind kleine, klar abgegrenzte Korrekturen ohne Designfrage."
+             data-applies-to="Einordnung, Lackierungen, Radar" data-finding="f-misc">
+      <p data-applies>Gilt für: Einordnung, Lackierungen, Radar</p>
+      <p data-situation>Drei kleine Funde lassen die Seite unfertig wirken, obwohl die Werte stimmen.</p>
+      <h3 data-question>Welche kleinen Funde sollen mit erledigt werden?</h3>
+      <div data-options>
+        <label data-opt="score" data-recommended><input type="checkbox" name="dm-d-misc.score" checked>
+          <span data-opt-label>Einordnung: Prozent und Wort passen zusammen</span>
+          <span data-opt-consequence>74,7 % heißt heute „im Mittelfeld“, früher „oberes Viertel“.</span></label>
+        <label data-opt="paints" data-recommended><input type="checkbox" name="dm-d-misc.paints" checked>
+          <span data-opt-label>Lackierungen ohne Dopplungen</span>
+          <span data-opt-consequence>„Avenger Avenger …“ und doppelte Invictus-Lackierung weg.</span></label>
+        <label data-opt="battery" data-recommended><input type="checkbox" name="dm-d-misc.battery" checked>
+          <span data-opt-label>Leerer Battery-Port erklärt</span>
+          <span data-opt-consequence>Statt „—“ ein Satz, was dort hinein kann.</span></label>
+      </div>
+      <textarea data-comment="d-misc-note" placeholder="Notiz (optional)"></textarea>
+      <input type="hidden" name="dm-d-misc-none" value=""><input type="hidden" name="dm-d-misc-hes" value="">
+      <input type="hidden" name="dm-d-misc-touched" value=""><input type="hidden" name="dm-d-misc-issue" value=""><input type="hidden" name="dm-d-misc-epic" value="">
+      <div data-alevel="3" data-title="Kleinere Funde">
+        <div data-slot="short"><div data-viz="kpi" data-viz-spec='{"value":"3","unit":"Funde"}'></div></div>
+        <div data-slot="long">
+          <div data-viz="bars" data-viz-spec='{"items":[{"label":"Einordnung","value":1},{"label":"Lackierungen","value":2},{"label":"Battery-Port","value":1}],"unit":"Stellen"}'></div>
+          <p>Gesehen an der Avenger Titan, Patch 4.10.3.</p>
+        </div>
+        <div data-example><pre>74.7 % — im Mittelfeld gegenüber 13 Schiffen.
+Avenger Avenger Fleetweek Grey Beige Tigerstripe
+Radar Ecouter  └ —  Battery  [Auswählen]</pre></div>
+      </div>
+    </section>
+  </section>
+</section>

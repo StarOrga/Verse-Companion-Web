@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, effect, input, untracked, signal } from '@angular/core';
-import { TranslatePipe } from '@ngx-translate/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, untracked, signal } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
 import { HintTipComponent } from '../shared/hint-tip/hint-tip.component';
 import { AreaSymbolComponent, type AreaSymbolKey } from '../shared/area-symbol/area-symbol.component';
@@ -27,6 +27,8 @@ const DAMAGE_CHANNEL_COLORS: Readonly<Record<string, string>> = {
 };
 
 const PANEL_STYLES = `
+  .src-table tr.empty td { color: var(--sc-fg-2); }
+  .src-table .src-note { color: var(--sc-fg-2); font-size: 0.85em; text-align: left; }
   :host { display: block; }
 
   /* Area colours and symbols (feedback #377, after #330): the Analyse cards
@@ -195,6 +197,36 @@ const PANEL_STYLES = `
           @if (p.gapKeys.includes('codex.summary.gap.noStockGuns')) {
             <p class="gap-row">{{ 'codex.summary.gap.noStockGuns' | translate }}</p>
           } @else {
+            <h3 class="section-title" data-area="offensive">{{ 'codex.analysis.offensive.bySource' | translate }}</h3>
+            <div class="table-wrap">
+            <table class="analysis-table src-table">
+              <thead>
+                <tr>
+                  <th>{{ 'codex.analysis.offensive.colSource' | translate }}</th>
+                  <th>{{ 'codex.analysis.offensive.colAlpha' | translate }}</th>
+                  <th>{{ 'codex.analysis.offensive.colSustained' | translate }}</th>
+                  <th>{{ 'codex.analysis.offensive.colBurst' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (s of p.sources; track s.key) {
+                  <tr [class.empty]="s.weapons === 0">
+                    <td>{{ ('codex.analysis.offensive.source.' + s.key) | translate: { count: s.weapons } }}</td>
+                    <td>{{ s.alpha != null ? num(s.alpha) : '—' }}</td>
+                    <td>{{ s.sustainedDps != null ? num(s.sustainedDps) : '—' }}</td>
+                    <td>{{ s.burstDps != null ? num(s.burstDps) : '—' }}</td>
+                  </tr>
+                }
+                @if (p.missileCount > 0) {
+                  <tr>
+                    <td>{{ 'codex.analysis.offensive.source.missiles' | translate: { count: p.missileCount } }}</td>
+                    <td>{{ p.missileSalvoDamage != null ? num(p.missileSalvoDamage) : '—' }}</td>
+                    <td colspan="2" class="src-note">{{ 'codex.analysis.offensive.source.salvoOnce' | translate }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+            </div>
             <h3 class="section-title" data-area="offensive"><sc-area-symbol class="area-sym" area="weapons" />{{ 'codex.analysis.offensive.weapons' | translate: { count: p.weaponCount } }}</h3>
             <div class="table-wrap">
             <table class="analysis-table">
@@ -210,7 +242,7 @@ const PANEL_STYLES = `
               <tbody>
                 @for (r of p.weaponRows; track $index) {
                   <tr>
-                    <td>{{ itemName(r.className) }}</td>
+                    <td>{{ rowName(r.className, r.name) }}</td>
                     <td>{{ r.size != null ? 'S' + r.size : '—' }}</td>
                     @if (p.hasAlphaColumn) { <td>{{ r.alpha != null ? num(r.alpha) : '—' }}</td> }
                     @if (p.hasDpsColumn) { <td>{{ r.sustainedDps != null ? num(r.sustainedDps) : '—' }}</td> }
@@ -332,7 +364,15 @@ const PANEL_STYLES = `
   styles: [PANEL_STYLES],
 })
 export class CodexOffensivePanelComponent {
+  private readonly translateSvc = inject(TranslateService);
   /** A weapon row names the gun, never its raw class. */
+  /** The in-game name in the UI language, the readable class name otherwise. */
+  rowName(className: string, name: { de?: string | null; en?: string | null } | null | undefined): string {
+    const lang = (this.translateSvc.getCurrentLang() || 'de').startsWith('de') ? 'de' : 'en';
+    const loc = name?.[lang] || name?.en || name?.de;
+    return loc && loc.trim() && !loc.startsWith('@') ? loc : displayItemName(className);
+  }
+
   itemName(className: string): string {
     return displayItemName(className);
   }

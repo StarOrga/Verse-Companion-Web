@@ -41,11 +41,15 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
                   [attr.aria-label]="c.gapKey ? (c.gapKey | translate) : null"
                   [scTooltip]="c.gapKey ? (c.gapKey | translate) : null" scTooltipTier="label">—</span>
           }
-          @if (c.delta; as d) {
-            @if (deltaText(c); as body) {
-              <span class="kpi-delta" tabindex="0" [class.good]="d.good" [class.bad]="!d.good" [scTooltip]="d.pctText" scTooltipTier="label">{{ body }}</span>
+          <!-- A fixed slot: the chip comes and goes with every pip click, the
+               value beside it must not move (feedback: "die Texte wackeln"). -->
+          <span class="kpi-delta-slot">
+            @if (c.delta; as d) {
+              @if (deltaText(c); as body) {
+                <span class="kpi-delta" tabindex="0" [class.good]="d.good" [class.bad]="!d.good" [scTooltip]="d.pctText" scTooltipTier="label">{{ body }}</span>
+              }
             }
-          }
+          </span>
         </div>
       }
     </div>
@@ -124,6 +128,8 @@ import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
     .kpi-value { flex: none; margin-left: auto; font-family: var(--sc-font-display); font-variant-numeric: tabular-nums; font-size: 17px; color: var(--sc-fg-0); }
     .kpi-cell.gap .kpi-value.gap-dash { color: var(--sc-fg-2); font-size: 15px; cursor: help; }
     /* The delta is a tinted CHIP, not bare text (part-02.html:184-186). */
+    .kpi-delta-slot { flex: none; display: inline-flex; min-width: 4.6em; }
+    @media (max-width: 720px) { .kpi-delta-slot:empty { min-width: 0; } }
     .kpi-delta { flex: none; font-size: max(10px, var(--sc-fs-floor)); font-variant-numeric: tabular-nums;
       padding: 1px 4px; border-radius: 2px; }
     .kpi-delta.good { color: var(--sc-success); background: color-mix(in srgb, var(--sc-success) 12%, transparent); }

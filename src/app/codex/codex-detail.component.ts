@@ -213,6 +213,11 @@ import { HeightVarDirective } from '../shared/height-var.directive';
 import type { DockPosition } from './codex-power';
 import { CodexMissionBarComponent } from './codex-mission-bar.component';
 import { buildKpiStrip, buildKpiStripForKeys, KpiStripCell } from './codex-kpi-sets';
+import { applyPowerToOccupants, poweredPayloadQueues } from './codex-power-effects';
+import { CodexCraftDialogComponent, CraftDialogEntry } from './codex-craft-dialog.component';
+import { CraftRecipe, applyCraftMultipliers, craftMultipliers, parseCraftRecipe } from './codex-crafting';
+import { CraftQualityStore } from './detail/codex-craft-quality.store';
+import { computePowerSheet, withReserveShields } from './codex-power';
 import { isPassiveShield, withPowerSignature } from './codex-power';
 import { groupOccupants } from './codex-fold-preview';
 import type { PowerSheet } from './codex-power';
@@ -321,7 +326,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
 @Component({
   selector: 'sc-codex-detail',
   standalone: true,
-  imports: [ScSkeletonComponent, DeferErrorComponent, ShipArrivalComponent, CompareIconComponent, FeedbackSpotDirective, PageHeaderComponent, NeuroFieldDirective, RouterLink, TranslatePipe, CodexCompareTrayComponent, CodexHardpointLayoutComponent, CodexComponentModalComponent, CodexSwapPickerComponent, CodexWeaponDetailComponent, ShipDeckPlanComponent, ShipSkinViewerComponent, CodexLoadoutSaveBarComponent, CodexSavedLoadoutsComponent, CodexKpiBandComponent, ScTooltipDirective, ScActionDirective, CodexMissionBarComponent, CodexOffensivePanelComponent, CodexDefensivePanelComponent, CodexShipPanelComponent, CodexRankCardComponent, CodexEnergyDockComponent, InfoNoteComponent, CodexHoloStageComponent, CodexShipStageComponent, CodexHeroHoloOverlayComponent, CodexHeroPartPopupComponent, CodexVariantPickerComponent, CodexShipActionsComponent, CodexShipLinkFormComponent, CodexPortListComponent, CodexSpecSheetComponent, CodexRecipeCardComponent, AssetPackageViewerComponent, NgTemplateOutlet, AddToSetComponent, ClassChipComponent, CodexModeSwitchComponent, CodexPersonalUsesComponent, HangarPickerComponent, CodexHoloShareComponent, ScDialogDirective, NotFoundComponent, CodexOwnSegmentComponent, CodexOwnStationsComponent, ShareButtonComponent, HeightVarDirective, ScEntryDirective, CodexItemStageComponent, CodexDetailClassicComponent, CodexHoloAkteComponent, CodexHoloHangarMenuComponent, CodexDetailHeadComponent, CodexDetailShellComponent, HintTipComponent],
+  imports: [ScSkeletonComponent, DeferErrorComponent, ShipArrivalComponent, CompareIconComponent, FeedbackSpotDirective, PageHeaderComponent, NeuroFieldDirective, RouterLink, TranslatePipe, CodexCompareTrayComponent, CodexHardpointLayoutComponent, CodexComponentModalComponent, CodexSwapPickerComponent, CodexWeaponDetailComponent, ShipDeckPlanComponent, ShipSkinViewerComponent, CodexLoadoutSaveBarComponent, CodexSavedLoadoutsComponent, CodexKpiBandComponent, ScTooltipDirective, ScActionDirective, CodexMissionBarComponent, CodexOffensivePanelComponent, CodexDefensivePanelComponent, CodexShipPanelComponent, CodexRankCardComponent, CodexEnergyDockComponent, InfoNoteComponent, CodexHoloStageComponent, CodexShipStageComponent, CodexHeroHoloOverlayComponent, CodexHeroPartPopupComponent, CodexVariantPickerComponent, CodexShipActionsComponent, CodexShipLinkFormComponent, CodexPortListComponent, CodexSpecSheetComponent, CodexRecipeCardComponent, AssetPackageViewerComponent, NgTemplateOutlet, AddToSetComponent, ClassChipComponent, CodexModeSwitchComponent, CodexPersonalUsesComponent, HangarPickerComponent, CodexHoloShareComponent, ScDialogDirective, NotFoundComponent, CodexOwnSegmentComponent, CodexOwnStationsComponent, ShareButtonComponent, HeightVarDirective, ScEntryDirective, CodexItemStageComponent, CodexDetailClassicComponent, CodexHoloAkteComponent, CodexHoloHangarMenuComponent, CodexDetailHeadComponent, CodexDetailShellComponent, HintTipComponent, CodexCraftDialogComponent],
   providers: [ShipLinkFormStore, CodexLoadoutDraftStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -749,6 +754,10 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
                 (hovered)="setActivePorts($event)"
                 (inspected)="openInspect($event)"
                 (swapRequested)="openSwapPicker($event)"
+              [extraStats]="true"
+              [craftable]="craftable()"
+              [craftQualities]="craftQualities()"
+              (craftRequested)="openCraft($event)"
                 (swapWarm)="prepareSwapPicker($event)" />
             </section>
           }
@@ -1013,6 +1022,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
       <!-- Full stat sheet for one clicked module (461288f9). Rendered last so
            its fixed-position backdrop sits above everything on the page. -->
       <sc-codex-component-modal [entry]="inspected()" (closed)="closeInspect()" />
+      <sc-codex-craft-dialog [entry]="craftDialog()" (apply)="applyCraft($event)" (resetToStock)="resetCraft()" (closed)="craftTarget.set(null)" />
       <sc-codex-swap-picker #swapPicker [target]="swapTarget()" (closed)="swapTarget.set(null)" (picked)="onSwapPicked($event)" />
       <sc-codex-weapon-detail [entry]="weaponDetail()" [shipSignature]="shipSignature()" (closed)="closeWeaponDetail()" />
 
@@ -1323,6 +1333,10 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
               (hovered)="setActivePorts($event)"
               (inspected)="openInspect($event)"
               (swapRequested)="openSwapPicker($event)"
+              [extraStats]="true"
+              [craftable]="craftable()"
+              [craftQualities]="craftQualities()"
+              (craftRequested)="openCraft($event)"
                 (swapWarm)="prepareSwapPicker($event)" />
           </section>
         }
@@ -1332,7 +1346,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
       <ng-template #energyDock>
         <sc-codex-energy-dock
           [scFeedbackSpot]="'codex.energy.title'"
-          [occupants]="draftSummaryOccupants()"
+          [occupants]="craftedOccupants()"
           [shipStats]="shipPayload()?.stats ?? null"
           [shipClassName]="shipClassName()"
           [schemaVersion]="build()?.schemaVersion ?? null"
@@ -3175,6 +3189,38 @@ export class CodexDetailComponent implements OnInit {
   private readonly lang = signal<Lang>(toLang(this.t.getCurrentLang() || this.t.getFallbackLang()));
 
   constructor() {
+    // Crafting: which parts have a recipe, this ship's stored qualities, and
+    // the recipes those qualities need (a reload restores the crafted cards).
+    effect(() => {
+      const ship = this.kind() === 'ship' ? this.shipClassName() : null;
+      untracked(() => this.craftStore.openShip(ship || null));
+    });
+    effect(() => {
+      if (this.kind() !== 'ship') return;
+      untracked(() => {
+        if (this.craftable().size > 0) return;
+        // Wrapped: a synchronous throw (an older service, a test double) must
+        // land in .catch, never break the page.
+        Promise.resolve()
+          .then(() => this.svc.craftableOutputs())
+          .then((m) => this.craftable.set(m))
+          .catch((err) => logWarn('codex-detail', 'craftable outputs failed to load', err));
+      });
+    });
+    effect(() => {
+      const q = this.craftQualities();
+      const craftable = this.craftable();
+      if (q.size === 0 || craftable.size === 0) return;
+      const occ = this.draftSummaryOccupants();
+      untracked(() => {
+        for (const o of occ) {
+          if (!o.slotKey || !q.has(o.slotKey)) continue;
+          const cls = (o.payload as { className?: string } | null)?.className;
+          const bp = cls ? craftable.get(cls) : undefined;
+          if (bp) this.loadCraftRecipe(bp);
+        }
+      });
+    });
     // #404: on the classic ship page the model loads only on "3D". Once the page
     // settled and the stage reported a model, fetch it in idle time, so the press
     // opens straight into it (the Holotable preloads in its own stage).
@@ -4461,6 +4507,7 @@ export class CodexDetailComponent implements OnInit {
           ammoPayload: pending ? undefined : overlay.item.ammoPayload,
           count: 1,
           passive: this.passiveByPort(r.section, r.item.port),
+          slotKey: r.item.port,
         },
       ];
       if (draftEntry === undefined) {
@@ -4493,12 +4540,160 @@ export class CodexDetailComponent implements OnInit {
   /** Public since Wave 2.5: the patch-Δ trigger's `activeKpiSheet` input is
    * this EXACT stock sheet, never the viewer's unsaved draft (patch-share
    * handoff §A: "compares two PATCHES, not the draft against a patch"). */
-  readonly stockKpiSheet = computed(() =>
-    computeKpiSheet(this.summaryOccupants(), this.kpiShipInput()),
-  );
+  /** The factory loadout under the dock's own default deal (auto, no pins,
+   * SCM): the baseline a fresh page compares against, so opening a ship never
+   * shows a delta the pilot did not cause (shield regen -123 on the Nomad). */
+  readonly stockKpiSheet = computed(() => {
+    const stock = this.summaryOccupants();
+    const auto = computePowerSheet({
+      occupants: stock,
+      shipStats: (this.shipPayload()?.stats ?? null) as Record<string, Record<string, unknown>> | null,
+      schemaVersion: this.build()?.schemaVersion ?? null,
+    });
+    return computeKpiSheet(applyPowerToOccupants(stock, auto), this.kpiShipInput());
+  });
+
+  /** Shield bays the game runs as RESERVE (beyond the two active generators,
+   * `withReserveShields`): their card is tagged passive like a hidden bay. */
+  private readonly reserveShieldPorts = computed(() => {
+    const shields = this.resolvedLoadout()
+      .filter((r) => r.section === 'shields' && !!r.item.className)
+      .map((r) => ({
+        port: r.item.port,
+        occ: {
+          section: r.section,
+          kind: r.kind,
+          payload: r.payload,
+          ammoPayload: r.ammoPayload,
+          count: 1,
+          passive: this.passiveByPort(r.section, r.item.port),
+        } as SummaryOccupant,
+      }));
+    const marked = withReserveShields(shields.map((s) => s.occ));
+    return new Set(shields.filter((_, i) => marked[i]?.passive === true).map((s) => s.port));
+  });
   private readonly currentKpiSheet = computed(() =>
-    computeKpiSheet(this.draftSummaryOccupants(), this.kpiShipInput()),
+    computeKpiSheet(this.poweredOccupants(), this.kpiShipInput()),
   );
+
+  /** The draft loadout as the energy dock's pips leave it (codex-power-effects):
+   * shield generators below their floor drop out, regen follows the power band,
+   * energy guns carry the capacitor their pips fund. Every analysis surface reads
+   * this list, so one pip change reaches the KPI band, the Offensive/Defensive
+   * panels and the Schiff facts alike. The dock itself keeps reading the raw
+   * draft — it is what decides the allocation. */
+  readonly poweredOccupants = computed(() =>
+    applyPowerToOccupants(this.craftedOccupants(), this.powerSheet()),
+  );
+
+  // ── crafting quality (codex-crafting) ─────────────────────────────────────
+  private readonly craftStore = inject(CraftQualityStore);
+  /** output class → blueprint class, for every ship blueprint of the build. */
+  readonly craftable = signal<ReadonlyMap<string, string>>(new Map());
+  /** parsed recipes by blueprint class (null = loaded, no recipe). */
+  private readonly craftRecipes = signal<ReadonlyMap<string, CraftRecipe | null>>(new Map());
+  private readonly craftRecipeFailed = signal<ReadonlySet<string>>(new Set());
+  readonly craftQualities = this.craftStore.qualities;
+  /** The card whose quality dialog is open. */
+  readonly craftTarget = signal<{ slotKeys: string[]; className: string; name: string } | null>(null);
+
+  /** The draft loadout with the pilot's crafting qualities applied. */
+  readonly craftedOccupants = computed(() => {
+    const occ = this.draftSummaryOccupants();
+    const q = this.craftQualities();
+    // Crafting is a classic-view feature: the Holotable reads stock parts.
+    if (q.size === 0 || this.holoView()) return occ;
+    const craftable = this.craftable();
+    const recipes = this.craftRecipes();
+    return occ.map((o) => {
+      const qualities = o.slotKey ? q.get(o.slotKey) : undefined;
+      const cls = (o.payload as { className?: string } | null)?.className;
+      const bp = cls ? craftable.get(cls) : undefined;
+      const recipe = bp ? recipes.get(bp) : undefined;
+      return qualities && recipe ? applyCraftMultipliers(o, craftMultipliers(recipe, qualities)) : o;
+    });
+  });
+
+  readonly craftDialog = computed<CraftDialogEntry | null>(() => {
+    const t = this.craftTarget();
+    if (!t) return null;
+    const bp = this.craftable().get(t.className);
+    return {
+      slotKeys: t.slotKeys,
+      name: t.name,
+      recipe: bp ? this.craftRecipes().get(bp) ?? null : null,
+      qualities: this.craftQualities().get(t.slotKeys[0]) ?? null,
+      loadFailed: !!bp && this.craftRecipeFailed().has(bp),
+    };
+  });
+
+  openCraft(t: { slotKeys: string[]; className: string; name: string }): void {
+    this.craftTarget.set(t);
+    const bp = this.craftable().get(t.className);
+    if (bp) this.loadCraftRecipe(bp);
+  }
+
+  applyCraft(qualities: number[]): void {
+    const t = this.craftTarget();
+    if (!t) return;
+    for (const k of t.slotKeys) this.craftStore.set(k, qualities);
+    this.craftTarget.set(null);
+  }
+
+  resetCraft(): void {
+    const t = this.craftTarget();
+    if (!t) return;
+    for (const k of t.slotKeys) this.craftStore.set(k, null);
+    this.craftTarget.set(null);
+  }
+
+  private loadCraftRecipe(bp: string): void {
+    if (this.craftRecipes().has(bp)) return;
+    Promise.resolve()
+      .then(() => this.svc.blueprintPayload(bp))
+      .then((payload) => {
+        const next = new Map(this.craftRecipes());
+        next.set(bp, parseCraftRecipe(payload));
+        this.craftRecipes.set(next);
+      })
+      .catch((err) => {
+        logWarn('codex-detail', 'blueprint recipe failed to load', err);
+        this.craftRecipeFailed.set(new Set([...this.craftRecipeFailed(), bp]));
+      });
+  }
+
+  /** The loadout cards' view of the same allocation: the powered payload per
+   * top-level hardpoint (a shield bay with one generator below its floor shows
+   * that one at 0), and per class for carried items (the guns in a gimbal all
+   * share the weapon pips). Empty while the dock has not run. */
+  private readonly cardPower = computed(() => {
+    const queues = poweredPayloadQueues(this.craftedOccupants(), this.powerSheet());
+    const byPort = new Map<string, { payload: unknown; ammoPayload?: unknown }>();
+    const byClass = new Map<string, { payload: unknown; ammoPayload?: unknown }>();
+    if (queues.size === 0) return { byPort, byClass };
+    const taken = new Map<string, number>();
+    const draft = this.draft();
+    for (const r of this.resolvedLoadout()) {
+      // A draft value is the swapped-in class name (null = emptied).
+      const entry = draft.get(r.item.port);
+      const cls = entry === undefined ? r.item.className : entry;
+      if (!cls) continue;
+      const q = queues.get(cls);
+      if (!q || q.length === 0) continue;
+      const k = taken.get(cls) ?? 0;
+      byPort.set(r.item.port, q[Math.min(k, q.length - 1)]);
+      taken.set(cls, k + 1);
+    }
+    for (const [cls, q] of queues) if (q.length > 0) byClass.set(cls, q[0]);
+    return { byPort, byClass };
+  });
+
+  /** `item` with the payload the current pips leave it (cards only). */
+  private poweredCardItem<T extends { payload: unknown; ammoPayload?: unknown }>(item: T, port: string | null, className: string | null): T {
+    const power = this.cardPower();
+    const hit = (port !== null ? power.byPort.get(port) : undefined) ?? (className ? power.byClass.get(className) : undefined);
+    return hit === undefined ? item : { ...item, payload: hit.payload, ammoPayload: hit.ammoPayload ?? item.ammoPayload };
+  }
 
   /** The energy dock's current allocation state — null until the dock has run
    * once (or on ships too old to compute one, R3/MASTER §8a). */
@@ -4643,7 +4838,7 @@ export class CodexDetailComponent implements OnInit {
     const payload = this.kind() === 'ship' ? (this.detail()?.payload as ShipPayload | undefined) : undefined;
     const occ = this.draftSummaryOccupants();
     return withPowerSignature(
-      computeKpiSheet(occ, rankTargetShipInput(payload)),
+      computeKpiSheet(this.poweredOccupants(), rankTargetShipInput(payload)),
       occ,
       (payload?.stats ?? null) as Record<string, Record<string, unknown>> | null,
       this.build()?.schemaVersion ?? null,
@@ -4837,13 +5032,13 @@ export class CodexDetailComponent implements OnInit {
 
   readonly offensivePanel = computed(() => {
     if (this.kind() !== 'ship') return null;
-    return buildOffensivePanel(this.draftSummaryOccupants());
+    return buildOffensivePanel(this.poweredOccupants());
   });
 
   readonly defensivePanel = computed(() => {
     if (this.kind() !== 'ship') return null;
     const hull = (this.detail()?.payload as ShipPayload | undefined)?.hull;
-    return buildDefensivePanel(this.draftSummaryOccupants(), this.armorPayload(), hull?.hp ?? null);
+    return buildDefensivePanel(this.poweredOccupants(), this.armorPayload(), hull?.hp ?? null);
   });
 
   /** Sections the active mission folds away — feeds both the loadout layout
@@ -4873,7 +5068,7 @@ export class CodexDetailComponent implements OnInit {
         dimensions: this.dimensions(),
         techStats: this.techStats(),
         kpiSheet: this.currentKpiSheet(),
-        occupants: this.draftSummaryOccupants(),
+        occupants: this.poweredOccupants(),
         decks: shipDeckNames(d.payload as ShipPayload | undefined, this.lang()),
         decksDerived: shipDecksDerived(d.payload as ShipPayload | undefined),
       },
@@ -5015,7 +5210,7 @@ export class CodexDetailComponent implements OnInit {
           grade: o.grade,
           manufacturerCode: o.manufacturerCode,
           damageChannels: damageChannelsOf(o.item.payload, o.item.ammoPayload),
-          stats: pending ? [] : equippedStats(o.item),
+          stats: pending ? [] : equippedStats(this.poweredCardItem(o.item, null, o.className)),
           statsMissing: pending ? false : weaponStatsUnavailable(o.item),
           statsNoteKey: pending ? null : equippedStatsNoteKey(o.item),
           draftState: o.state,
@@ -5030,7 +5225,7 @@ export class CodexDetailComponent implements OnInit {
         grade: hit?.grade ?? null,
         manufacturerCode: hit?.manufacturerCode ?? null,
         damageChannels: damageChannelsOf(item.payload, item.ammoPayload),
-        stats: equippedStats(item),
+        stats: equippedStats(this.poweredCardItem(item, null, slot.className)),
         statsMissing: weaponStatsUnavailable(item),
         statsNoteKey: equippedStatsNoteKey(item),
       };
@@ -5082,7 +5277,14 @@ export class CodexDetailComponent implements OnInit {
       },
     );
     return [
-      ...items.map((i) => ({ section, kind: i.kind as CodexKind | null, payload: i.payload, ammoPayload: i.ammoPayload, count: 1 })),
+      ...items.map((i) => ({
+        section,
+        kind: i.kind as CodexKind | null,
+        payload: i.payload,
+        ammoPayload: i.ammoPayload,
+        count: 1,
+        slotKey: `${topPort}>${(i.payload as { className?: string } | null)?.className ?? ''}`,
+      })),
       ...this.carriedOccupants(section, new Map(), nested),
     ];
   }
@@ -5169,7 +5371,7 @@ export class CodexDetailComponent implements OnInit {
               payload: r.payload,
               ammoPayload: r.ammoPayload,
               count: 1,
-              passive: this.passiveByPort(r.section, l.port),
+              passive: this.passiveByPort(r.section, l.port) || this.reserveShieldPorts().has(l.port),
             })
             ? 'passive'
             : 'active'
@@ -5199,7 +5401,7 @@ export class CodexDetailComponent implements OnInit {
         statChip: qdChip && l.className === tech!.quantumDriveClassName ? qdChip : null,
         typeLabel: equippedTypeLabel(overlay.item),
         damageChannels: damageChannelsOf(overlay.item.payload, overlay.item.ammoPayload),
-        stats: overlay.state === 'pending' ? [] : equippedStats(overlay.item),
+        stats: overlay.state === 'pending' ? [] : equippedStats(this.poweredCardItem(overlay.item, l.port, overlay.className)),
         statsMissing: overlay.state === 'pending' ? false : weaponStatsUnavailable(overlay.item),
         statsNoteKey: overlay.state === 'pending' ? null : equippedStatsNoteKey(overlay.item),
         children,
