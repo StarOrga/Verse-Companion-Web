@@ -75,7 +75,9 @@ describe('CodexShipStageComponent', () => {
     ] satisfies StageCountChip[]);
     fixture.detectChanges();
     const items = Array.from(fixture.nativeElement.querySelectorAll('.stage-counts .ls-item')) as HTMLElement[];
-    expect(items.map((i) => i.textContent?.replace(/\s+/g, ' ').trim())).toEqual([
+    const read = (i: HTMLElement) =>
+      `${i.querySelector('.ls-count')?.textContent?.trim()} ${i.querySelector('.ls-cat')?.textContent?.trim()}`;
+    expect(items.map(read)).toEqual([
       '3 codex.detail.stageWeapons',
       '8 codex.moduleSection.missiles',
       '3 codex.moduleSection.shields',
