@@ -49,8 +49,6 @@ describe('SettingsComponent layout', () => {
     } as unknown as User;
   }
 
-  const pcLightCalls: boolean[] = [];
-
   interface ConfigureOpts {
     isAdmin?: boolean;
     invoke?: Mock;
@@ -123,12 +121,7 @@ describe('SettingsComponent layout', () => {
         // Account-synced (profiles.ui_prefs): stubbed so the spec never reads a profile.
         {
           provide: RoutineTintPrefsService,
-          useValue: {
-            binary: signal(false),
-            setBinary: () => undefined,
-            pcLight: signal(false),
-            setPcLight: (on: boolean) => pcLightCalls.push(on),
-          },
+          useValue: { binary: signal(false), setBinary: () => undefined },
         },
         {
           provide: SupabaseClientProvider,
@@ -394,23 +387,6 @@ describe('SettingsComponent layout', () => {
     const viewer: HTMLElement = setup(makeUser(), '1100px', { isAdmin: false }).nativeElement;
     expect(viewer.textContent).toContain('settings.feedbackFab.show.label');
     expect(viewer.innerHTML).not.toContain('settings.feedbackFab.staff');
-  });
-
-  // Feedback #405: the steady green "PC on" light is a per-account opt-in that
-  // only an admin (who sees the feedback panel) is offered.
-  it('offers the PC light toggle to admins only and stores the choice', () => {
-    pcLightCalls.length = 0;
-    const admin: HTMLElement = setup(makeUser(), '1100px', { isAdmin: true }).nativeElement;
-    const toggle = admin.querySelector<HTMLInputElement>('[data-testid="routine-pc-light-toggle"]');
-    expect(toggle).toBeTruthy();
-    expect(admin.textContent).toContain('settings.feedbackFab.routinePcLight.label');
-    toggle!.checked = true;
-    toggle!.dispatchEvent(new Event('change'));
-    expect(pcLightCalls).toEqual([true]);
-
-    TestBed.resetTestingModule();
-    const viewer: HTMLElement = setup(makeUser(), '1100px', { isAdmin: false }).nativeElement;
-    expect(viewer.querySelector('[data-testid="routine-pc-light-toggle"]')).toBeNull();
   });
 
   it('mentions no friends anywhere in Settings', () => {

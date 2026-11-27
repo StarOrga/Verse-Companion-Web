@@ -95,7 +95,7 @@ function num(v: number | null, format: 'int' | 'dec' | 'perSec' | 'seconds' | 'm
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (entry(); as e) {
-      <sc-popup kind="dialog" [title]="e.name" [eyebrow]="eyebrow()" initialFocus="container" (closed)="closed.emit()">
+      <sc-popup [closeBeside]="true" kind="dialog" [title]="e.name" [eyebrow]="eyebrow()" initialFocus="container" (closed)="closed.emit()">
         <div class="wd-body">
           <p class="note info">{{ 'codex.weaponDetail.intro' | translate }}</p>
 

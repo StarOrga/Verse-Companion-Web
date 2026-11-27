@@ -45,7 +45,7 @@ export interface CraftDialogEntry {
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (entry(); as e) {
-      <sc-popup kind="dialog" [title]="e.name" [eyebrow]="'codex.craft.eyebrow' | translate" (closed)="closed.emit()">
+      <sc-popup [closeBeside]="true" kind="dialog" [title]="e.name" [eyebrow]="'codex.craft.eyebrow' | translate" (closed)="closed.emit()">
         <div class="cd-body">
           @if (e.loadFailed) {
             <p class="cd-note">{{ 'errors.generic' | translate }}</p>

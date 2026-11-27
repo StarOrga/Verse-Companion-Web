@@ -7,7 +7,7 @@ import type { AssetPackageRow } from '../asset-package/asset-package.model';
 import { ShipSkinViewerComponent } from '../ship-skin-viewer.component';
 import type { HardpointPortRef } from '../hardpoint-port-ref';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
-import { ScPopupComponent } from '../../shared/popup/sc-popup.component';
+import { ScPopupComponent, type ScPopupCloseReason } from '../../shared/popup/sc-popup.component';
 import { logWarn } from '../../core/log';
 import { DeferErrorComponent } from '../../shared/defer-error/defer-error.component';
 
@@ -148,7 +148,7 @@ export class CodexHeroHoloOverlayComponent {
   }
 
   /** Escape steps back one level (fullscreen → panel → closed); the X and the back gesture close. */
-  onClosed(reason: 'close' | 'escape' | 'back'): void {
+  onClosed(reason: ScPopupCloseReason): void {
     if (reason === 'escape') this.onEscape();
     else this.closed.emit();
   }
