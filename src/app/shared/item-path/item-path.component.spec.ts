@@ -57,7 +57,16 @@ function setup(o: Opts = {}) {
 }
 
 describe('ItemPathComponent: the two-node path', () => {
+  // Several cases click real anchors (the Operation strip, the picker's footer
+  // link). Left alone the test browser follows them, leaves the page and
+  // Vitest loses its connection. Capture phase: the component's own handlers
+  // still run, only the browser's navigation is stopped.
+  const stayOnPage = (e: MouseEvent): void => {
+    if ((e.target as Element | null)?.closest?.('a[href]')) e.preventDefault();
+  };
+  beforeEach(() => document.addEventListener('click', stayOnPage, true));
   afterEach(() => {
+    document.removeEventListener('click', stayOnPage, true);
     TestBed.inject(UndoToastService).flush();
     document.querySelector('.cdk-overlay-container')?.replaceChildren();
   });
