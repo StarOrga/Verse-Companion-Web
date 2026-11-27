@@ -43,6 +43,7 @@ import {
   shipModuleGroupOf,
 } from './ship-module-sections';
 import { trackingSignalOf } from './codex-missile';
+import { overallQuality } from './codex-crafting';
 import { displayItemName, formatNumber } from './codex-format';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
 import { ScActionDirective } from '../shared/action/sc-action.directive';
@@ -98,6 +99,16 @@ export interface LayoutChild {
 }
 
 /** The stat scaled to `mult` units where that is a sum, unchanged where it is not. */
+/** Card rows only the classic view shows (the Holotable keeps its own look). */
+const CLASSIC_ONLY_STATS: ReadonlySet<string> = new Set([
+  'codex.equipped.sustainedDps',
+  'codex.equipped.fireTime',
+  'codex.equipped.pauseTime',
+  'codex.equipped.fullCharge',
+  'codex.equipped.coolingFull',
+  'codex.equipped.aimAssistFull',
+]);
+
 function scaledFigure(stat: EquippedStat, mult: number): { stat: EquippedStat; summed: boolean } {
   if (mult <= 1 || !statAddsUp(stat)) return { stat, summed: false };
   return { stat: { ...stat, value: stat.value * mult }, summed: true };
@@ -630,6 +641,15 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                       @if (row.slot.kind) {
                         <sc-item-path [kind]="row.slot.kind" [className]="row.slot.className" [name]="row.slot.name" />
                       }
+                      @if (craftable().has(row.slot.className)) {
+                        <button type="button" class="slot-craft" [class.set]="rowQuality(row) !== null"
+                                (click)="craftRow(row)"
+                                [attr.aria-label]="'codex.craft.open' | translate"
+                                [scTooltip]="'codex.craft.open' | translate" scTooltipTier="label">
+                          <span class="q-l">{{ 'codex.craft.chipLabel' | translate }}</span>
+                          {{ rowQuality(row) ?? ('codex.craft.chipStock' | translate) }}
+                        </button>
+                      }
                       @if (row.slot.draftState && row.slot.draftPaths?.length) {
                         <button type="button" scAction tier="tertiary" class="slot-revert" (click)="revertRow(row)"
                                 [attr.aria-label]="'codex.loadout.revert' | translate"
@@ -704,9 +724,9 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                                 }
                               </span>
                               <span class="slot-port">{{ kid.port }}</span>
-                              @if (kid.stats?.length) {
+                              @if (visibleStats(kid.stats).length) {
                                 <dl class="slot-stats">
-                                  @for (st of kid.stats; track st.labelKey) {
+                                  @for (st of visibleStats(kid.stats); track st.labelKey) {
                                     <div class="stat" [scTooltip]="st.hintKey ? (st.hintKey | translate) : null">
                                       <dt>
                                         @if (kidMult(row, kid) > 1 && addsUp(st)) { <span class="mult">{{ kidMult(row, kid) }}×</span> }
@@ -739,6 +759,15 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                             <span class="tools" [class.bare]="!kid.kind">
                               @if (kid.kind) {
                                 <sc-item-path [kind]="kid.kind" [className]="kid.className" [name]="kid.name" />
+                              }
+                              @if (kid.className && craftable().has(kid.className)) {
+                                <button type="button" class="slot-craft" [class.set]="kidQuality(row, kid) !== null"
+                                        (click)="craftKid(row, kid)"
+                                        [attr.aria-label]="'codex.craft.open' | translate"
+                                        [scTooltip]="'codex.craft.open' | translate" scTooltipTier="label">
+                                  <span class="q-l">{{ 'codex.craft.chipLabel' | translate }}</span>
+                                  {{ kidQuality(row, kid) ?? ('codex.craft.chipStock' | translate) }}
+                                </button>
                               }
                               <!-- #345: a swapped sub-slot (the gun in a gimbal) resets on its own, too. -->
                               @if (kid.draftState && kid.draftPaths?.length) {
@@ -809,20 +838,22 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
     .layout { display: flex; flex-direction: column; gap: 14px; }
 
     /* A block box is built like the Offensive / Defensive cards beside it in
-       the Analyse column (codex-detail .detail-page .sc-card): the same 4px
-       corner, the same even 1px border all round and the same bg-2 to bg-1
+       the Analyse column (their app-wide .sc-card): the same 8px corner (#408:
+       the boxes had 4px while the cards beside them drew 8px — the
+       page-scoped 4px rule in codex-detail never reaches into the panel
+       components — so every box now takes the rounder 8px of the cards), the same even 1px border all round and the same bg-2 to bg-1
        card surface (#346). The 2px accent bar a configurable block used to
        carry on its top edge squared off the top corners, so the boxes read as
        a different build from the cards next to them; the airframe still steps
        back through .fixed below. Concept section 0 keeps the hot accent and
        mock literals off this page. */
-    .mod-sec { border-radius: 4px; background: linear-gradient(180deg, var(--sc-bg-2), var(--sc-bg-1));
+    .mod-sec { border-radius: 8px; background: linear-gradient(180deg, var(--sc-bg-2), var(--sc-bg-1));
       border: 1px solid var(--sc-border); padding: 10px 12px; }
     /* Area colours (feedback #330, concept 2026-11-10-bereichs-symbole-umrandung):
        every block carries its Holotable area — Offensive, Verteidigung,
        Bewegung, Signatur & Kühlung — as a 2px line on top at --sc-area-line
        strength and in its heading. The line is an inset shadow, so it follows
-       the 4px corners instead of squaring them off. "Antrieb & Systeme" stays
+       the 8px corners instead of squaring them off. "Antrieb & Systeme" stays
        neutral outside; its sub-blocks carry their own area. */
     .mod-sec, .mod-sub { --p: var(--sc-accent); --pb: color-mix(in srgb, var(--p) var(--sc-area-line), transparent);
       box-shadow: inset 0 2px 0 var(--pb); }
@@ -835,7 +866,7 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
     .mod-sec.fixed { --pb: color-mix(in srgb, var(--p) 30%, transparent); }
     /* "Antrieb & Systeme": the merged block and its nested sections. */
     .sub-stack { display: flex; flex-direction: column; gap: 8px; }
-    .mod-sub { border-radius: 4px; background: var(--sc-bg-2); border: 1px solid var(--sc-border);
+    .mod-sub { border-radius: 8px; background: var(--sc-bg-2); border: 1px solid var(--sc-border);
       padding: 8px 10px; }
     .mod-sub > .sub-head { margin: 0; }
     .mod-sub[open] > .sub-head { margin-bottom: 8px; }
@@ -1083,6 +1114,13 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
     .slot-empty { font-size: max(0.74rem, var(--sc-fs-floor)); color: var(--sc-fg-2); font-style: italic; }
     .kid-empty { font-size: 0.84rem; color: var(--sc-fg-2); }
 
+    .slot-craft { font: inherit; font-size: max(0.66rem, var(--sc-fs-floor)); line-height: 1; padding: 3px 7px; border-radius: 999px;
+      cursor: pointer; background: transparent; color: var(--sc-fg-2); border: 1px solid var(--sc-border); white-space: nowrap;
+      font-variant-numeric: tabular-nums; }
+    .slot-craft .q-l { opacity: 0.75; margin-right: 2px; }
+    .slot-craft.set { color: var(--sc-warning); border-color: var(--sc-warning); }
+    .slot-craft:hover { color: var(--sc-accent); border-color: var(--sc-accent); }
+    .slot-craft:focus-visible { outline: none; box-shadow: var(--sc-focus-ring); }
     .slot-stats { margin: 5px 0 0; padding: 5px 0 0; display: flex; flex-wrap: wrap;
       gap: 2px 14px;
       border-top: 1px solid color-mix(in srgb, var(--sc-border) 70%, transparent); }
@@ -1171,6 +1209,12 @@ export class CodexHardpointLayoutComponent {
    * stats hide behind a per-group "Detail ▾" (concept round 5: per box, not
    * a global density switch); everything else keeps working as in classic. */
   readonly calm = input(false);
+  /**
+   * Show the classic view's extra card rows (fire cycle, full charge, values
+   * at full pips). The Holotable leaves them off: its design is untouched,
+   * only the numbers it already shows follow the shared model.
+   */
+  readonly extraStats = input(false);
   /** Calm only: className → its share (0..1) of the column's category total (`HoloPart.share`). */
   readonly partShares = input<ReadonlyMap<string, number>>(new Map());
   /** Calm only: the total the shares refer to, as text ("506/s"). */
@@ -1254,6 +1298,43 @@ export class CodexHardpointLayoutComponent {
   readonly expandAll = input<boolean>(false);
   /** Occupants grouped by section, for the folded-preview chips (MASTER §6). */
   readonly occupantsBySection = input<ReadonlyMap<ShipModuleSection, readonly SummaryOccupant[]>>(new Map());
+  /** Output class names that have a crafting recipe (they get a quality chip). */
+  readonly craftable = input<ReadonlyMap<string, string>>(new Map());
+  /** The pilot's crafting qualities per hardpoint key (`port` / `port>Class`). */
+  readonly craftQualities = input<ReadonlyMap<string, readonly number[]>>(new Map());
+  /** A quality chip was clicked: the hardpoints it stands for and the part. */
+  readonly craftRequested = output<{ slotKeys: string[]; className: string; name: string }>();
+
+  private rowCraftKeys(row: GroupedSlot<LayoutSlot>): string[] {
+    return this.rawPorts(row);
+  }
+
+  private kidCraftKeys(row: GroupedSlot<LayoutSlot>, kid: LayoutChild): string[] {
+    return this.rawPorts(row).map((p) => `${p}>${kid.className ?? ''}`);
+  }
+
+  private qualityOf(keys: readonly string[]): number | null {
+    const q = keys.length > 0 ? this.craftQualities().get(keys[0]) : undefined;
+    return q ? overallQuality(q, q.length) : null;
+  }
+
+  rowQuality(row: GroupedSlot<LayoutSlot>): number | null {
+    return this.qualityOf(this.rowCraftKeys(row));
+  }
+
+  kidQuality(row: GroupedSlot<LayoutSlot>, kid: LayoutChild): number | null {
+    return this.qualityOf(this.kidCraftKeys(row, kid));
+  }
+
+  craftRow(row: GroupedSlot<LayoutSlot>): void {
+    if (!row.slot.className) return;
+    this.craftRequested.emit({ slotKeys: this.rowCraftKeys(row), className: row.slot.className, name: row.slot.name ?? row.slot.className });
+  }
+
+  craftKid(row: GroupedSlot<LayoutSlot>, kid: LayoutChild): void {
+    if (!kid.className) return;
+    this.craftRequested.emit({ slotKeys: this.kidCraftKeys(row, kid), className: kid.className, name: kid.name ?? kid.className });
+  }
 
   private readonly swapSource = inject(CodexSwapCandidatesService);
   private readonly translate = inject(TranslateService);
@@ -1741,7 +1822,13 @@ export class CodexHardpointLayoutComponent {
    * concept/part-06.html:322-324 + :461).
    */
   secondaryStats(row: GroupedSlot<LayoutSlot>): EquippedStat[] {
-    return row.slot.stats ?? [];
+    return this.visibleStats(row.slot.stats);
+  }
+
+  /** The card rows this layout shows (see {@link extraStats}). */
+  visibleStats(stats: readonly EquippedStat[] | null | undefined): EquippedStat[] {
+    const all = stats ?? [];
+    return this.extraStats() ? [...all] : all.filter((s) => !CLASSIC_ONLY_STATS.has(s.labelKey));
   }
 
   /**

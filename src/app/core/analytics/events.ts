@@ -125,7 +125,6 @@ export const EVENTS = {
   'settings:send_on_enter_toggle': ev<{ on: boolean }>('settings', 'Enter-sendet im Composer wurde umgeschaltet.'),
   'settings:feedback_fab_toggle': ev<{ on: boolean }>('settings', 'Der Feedback-Knopf wurde ein- oder ausgeblendet.'),
   'settings:routine_tint_toggle': ev<{ on: boolean }>('settings', 'Die Routine-Färbung wurde umgeschaltet.'),
-  'settings:routine_pc_light_toggle': ev<{ on: boolean }>('settings', 'Das grüne PC-Licht der Routine wurde umgeschaltet.'),
   'settings:codex_non_usable_toggle': ev<{ on: boolean }>('settings', 'Nicht nutzbare Codex-Einträge wurden ein- oder ausgeblendet.'),
   'settings:language_change': ev<{ lang: string }>('settings', 'Die Sprache wurde geändert (Einstellung, auch „auto“).'),
   'settings:region_change': ev<{ region: string }>('settings', 'Die Region wurde geändert (Einstellung, auch „auto“).'),

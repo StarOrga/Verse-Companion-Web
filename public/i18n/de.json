@@ -2070,6 +2070,8 @@
       "stageMannedTurret": "Bemannter Turm",
       "stageTractorBeam": "Traktorstrahl",
       "stageTractorBeams": "Traktorstrahlen",
+      "stageWeapons": "Waffen",
+      "chipCargoGap": "Laderaum · ?",
       "linkCopied": "Link kopiert",
       "columnLoadout": "Loadout",
       "columnAnalysis": "Analyse",
@@ -2537,7 +2539,12 @@
       "tractorAngle": "Max. Winkel",
       "tractorTetherBreak": "Reißzeit",
       "tractorSpeed": "Max. Bewegungstempo",
-      "tractorNoStats": "Reichweite und Zugkraft dieses Traktorstrahls stecken noch nicht in diesem Extract — sie kommen mit dem nächsten Re-Extract."
+      "tractorNoStats": "Reichweite und Zugkraft dieses Traktorstrahls stecken noch nicht in diesem Extract — sie kommen mit dem nächsten Re-Extract.",
+      "coolingFull": "bei vollen Pips",
+      "aimAssistFull": "Zielhilfe bei vollen Pips",
+      "fireTime": "Feuer bis Pause",
+      "pauseTime": "Pause",
+      "fullCharge": "Voll in"
     },
     "shipLink": {
       "add": "Pledge-Link hinzufügen",
@@ -2767,7 +2774,16 @@
         "salvoNote": "Eine Salve aller Raketen auf einmal — einmaliger Schaden, nicht in der Waffen-DPS enthalten.",
         "salvoPartial": "Nicht für jede Rakete liegen Sprengkopf-Werte vor; die Salve zählt nur die bekannten.",
         "noWarheadData": "Für diese Raketen enthält der Datenstand noch keine Sprengkopf-Werte.",
-        "hintMissiles": "{{value}} Raketen-Salve"
+        "hintMissiles": "{{value}} Raketen-Salve",
+        "bySource": "Schaden nach Quelle",
+        "colSource": "Quelle",
+        "source": {
+          "pilot": "Pilot ({{count}} Waffen)",
+          "remoteTurrets": "Ferngesteuerte Türme ({{count}})",
+          "mannedTurrets": "Bemannte Türme ({{count}})",
+          "missiles": "Raketen ({{count}})",
+          "salvoOnce": "eine Salve, einmaliger Schaden"
+        }
       },
       "defensive": {
         "title": "Verteidigung",
@@ -3362,6 +3378,39 @@
       "share": "Link zu „{{name}}“ kopieren",
       "shareCopied": "Link kopiert – wer ihn öffnet, sieht dieses Layout.",
       "shareFailed": "Link konnte nicht kopiert werden."
+    },
+    "craft": {
+      "eyebrow": "Crafting",
+      "quality": "Qualität",
+      "appliesTo": "gilt für {{n}} gleiche Bauteile",
+      "presets": "Schnellwahl",
+      "min": "MIN",
+      "max": "MAX",
+      "loading": "Rezept wird geladen …",
+      "effect": "Wirkung auf das Bauteil",
+      "apply": "Übernehmen",
+      "stock": "Werkszustand",
+      "cancel": "Abbrechen",
+      "open": "Crafting-Qualität einstellen",
+      "chipStock": "Werk",
+      "chipLabel": "Q",
+      "stat": {
+        "damage": "Schaden",
+        "fireRate": "Feuerrate",
+        "health": "Haltbarkeit",
+        "shieldHp": "Schild-HP",
+        "coolant": "Kühlleistung",
+        "power": "Energieerzeugung",
+        "radarMin": "Zielhilfe ab",
+        "radarMax": "Zielhilfe bis",
+        "quantumSpeed": "Quantum-Tempo",
+        "quantumFuel": "Quantum-Verbrauch",
+        "tractorForce": "Zugkraft",
+        "tractorRange": "Reichweite",
+        "tractorFull": "Volle Kraft bis",
+        "tractorVolume": "Max. Volumen",
+        "other": "Weitere Eigenschaft"
+      }
     }
   },
   "blueprint": {
@@ -4315,11 +4364,6 @@
         "audience": "(nur für Admins)",
         "descOn": "Der Titel „Feedback“ leuchtet grün, solange die Routine läuft oder arbeitet, und rot, solange nichts bearbeitet wird. Gilt nur für deinen Account.",
         "descOff": "Der Titel „Feedback“ zeigt vier Zustände: grün bereit, blau gerade in Arbeit, gelb pausiert, rot nicht erreichbar."
-      },
-      "routinePcLight": {
-        "label": "Grünes Licht, solange der PC an ist",
-        "descOn": "Der Titel „Feedback“ leuchtet dauerhaft grün, solange die Routine auf dem Dev-PC tickt – auch während sie gerade arbeitet oder pausiert – und wird wenige Minuten nach dem letzten Tick rot. Gilt nur für deinen Account.",
-        "descOff": "Aus: der Titel „Feedback“ folgt der Einstellung darüber."
       }
     },
     "danger": {

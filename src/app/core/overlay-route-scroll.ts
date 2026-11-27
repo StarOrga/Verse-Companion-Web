@@ -35,6 +35,8 @@ export interface OverlayScrollState {
   readonly base: readonly { readonly route: unknown; readonly params: string }[];
   /** True when the chain ends in an overlay route. */
   readonly overlay: boolean;
+  /** The URL's query string, serialized; absent = not tracked. */
+  readonly query?: string;
 }
 
 export function overlayScrollState(root: ActivatedRouteSnapshot): OverlayScrollState {
@@ -47,18 +49,25 @@ export function overlayScrollState(root: ActivatedRouteSnapshot): OverlayScrollS
     }
     if (node.routeConfig) base.push({ route: node.routeConfig, params: JSON.stringify(node.params) });
   }
-  return { base, overlay };
+  return { base, overlay, query: JSON.stringify(root.queryParams ?? {}) };
 }
 
 /**
- * True when a navigation only opens, closes or swaps a routed overlay over
- * the same page: the page underneath never left, so its scroll position must
- * not move.
+ * True when a navigation leaves the page underneath where it is, so its
+ * scroll position must not move:
+ *   * it only opens, closes or swaps a routed overlay over the same page;
+ *   * it only rewrites the QUERY of the same page — in-page state that the
+ *     page mirrors into its URL (the ship page's energy pips `?pw=`, a module
+ *     swap `?loadout=`, a view switch). Every energy click used to throw the
+ *     pilot back to the top of the ship (feedback on the classic view).
  */
 export function keepsScroll(prev: OverlayScrollState | null, next: OverlayScrollState): boolean {
-  if (!prev || (!prev.overlay && !next.overlay)) return false;
+  if (!prev) return false;
   if (prev.base.length !== next.base.length) return false;
-  return prev.base.every((b, i) => b.route === next.base[i].route && b.params === next.base[i].params);
+  const samePage = prev.base.every((b, i) => b.route === next.base[i].route && b.params === next.base[i].params);
+  if (!samePage) return false;
+  if (prev.overlay || next.overlay) return true;
+  return prev.query !== undefined && next.query !== undefined && prev.query !== next.query;
 }
 
 /**

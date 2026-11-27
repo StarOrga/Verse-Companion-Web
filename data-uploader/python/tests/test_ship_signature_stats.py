@@ -111,3 +111,16 @@ def test_ship_stats_cross_section_absent_when_no_radar_properties() -> None:
     stats = _extractor()._ship_stats(comps)
     sig = stats["SSCSignatureSystemParams"]
     assert not any(k.startswith("crossSection.") for k in sig)
+
+
+def test_ship_stats_keeps_the_weapon_regen_pool() -> None:
+    """The ship-level energy-weapon pool (4.x) rides along by type-name
+    pattern; unrelated structs still stay out."""
+    comps = [
+        _comp("SCItemWeaponRegenPoolComponentParams", regenFillRate=120.0, ammoLoad=900.0),
+        _comp("SomethingElseParams", noise=1.0),
+    ]
+    stats = _extractor()._ship_stats(comps)
+    assert stats == {
+        "SCItemWeaponRegenPoolComponentParams": {"regenFillRate": 120.0, "ammoLoad": 900.0}
+    }
