@@ -45,6 +45,43 @@ describe('CodexShipStageComponent', () => {
     expect(chips).toEqual(['2 Crew']);
   });
 
+  it('lists crew and cargo on the right edge, drops mass, and keeps the census at the foot (#407)', () => {
+    fixture.componentRef.setInput('heroChips', [
+      { key: 'role', text: 'Multi-role' },
+      { key: 'crew', text: '1 Crew' },
+      { key: 'cargo', text: 'codex.detail.chipCargoUnknown', gap: true },
+      { key: 'mass', text: '216 t' },
+    ]);
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    const side = el.querySelector('.stage-side') as HTMLElement;
+    expect(side).toBeTruthy();
+    expect(side.closest('.stage-foot')).toBeNull();
+    const items = Array.from(side.querySelectorAll('.hchip')) as HTMLElement[];
+    expect(items.map((c) => c.textContent?.trim())).toEqual(['1 Crew', 'codex.detail.chipCargoGap']);
+    // The gap keeps its full sentence for assistive tech and the tooltip.
+    expect(items[1].getAttribute('aria-label')).toBe('codex.detail.chipCargoUnknown');
+    expect(el.textContent).not.toContain('216 t');
+    expect(getComputedStyle(side).flexDirection).toBe('column');
+  });
+
+  it('shortens the census: no systems or countermeasures, "Waffen", missiles without launchers (#407)', () => {
+    fixture.componentRef.setInput('stageCounts', [
+      { group: 'weapons', count: 3, labelKey: 'codex.moduleSection.weapons', detailKey: null, detailCount: 0 },
+      { group: 'missiles', count: 8, labelKey: 'codex.moduleSection.missiles', detailKey: 'codex.detail.stageLaunchers', detailCount: 2 },
+      { group: 'shields', count: 3, labelKey: 'codex.moduleSection.shields', detailKey: null, detailCount: 0 },
+      { group: 'systems', count: 6, labelKey: 'codex.moduleSection.systems', detailKey: null, detailCount: 0 },
+      { group: 'countermeasures', count: 2, labelKey: 'codex.moduleSection.countermeasures', detailKey: null, detailCount: 0 },
+    ] satisfies StageCountChip[]);
+    fixture.detectChanges();
+    const items = Array.from(fixture.nativeElement.querySelectorAll('.stage-counts .ls-item')) as HTMLElement[];
+    expect(items.map((i) => i.textContent?.replace(/\s+/g, ' ').trim())).toEqual([
+      '3 codex.detail.stageWeapons',
+      '8 codex.moduleSection.missiles',
+      '3 codex.moduleSection.shields',
+    ]);
+  });
+
   it('puts the eyebrow above the name at the top of the stage, not in the foot (#239)', () => {
     const el: HTMLElement = fixture.nativeElement;
     const ident = el.querySelector('.stage-ident') as HTMLElement;
