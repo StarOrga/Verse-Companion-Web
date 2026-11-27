@@ -84,7 +84,7 @@ interface PinnedRef {
       @if (open() && refs().length >= 2) {
         <!-- Outside the aside on purpose: the tray is centred with a transform, which would
              make a fixed child position against the tray instead of the viewport. -->
-        <sc-popup kind="large" [title]="'codex.compare.tray' | translate: { count: refs().length }"
+        <sc-popup [closeBeside]="true" kind="large" [title]="'codex.compare.tray' | translate: { count: refs().length }"
                   [eyebrow]="'codex.kindSingular.' + refs()[0].kind | translate"
                   scPopupMotion="large" scPopupMotionPlate=".scp-frame" scPopupMotionRows=".cmp tbody tr" animate.leave="pm-out"
                   (closed)="open.set(false)">

@@ -12,7 +12,7 @@ import { dayKey, eventLabel } from './hq-live.util';
   imports: [TranslatePipe, ScDatePipe, ScPopupComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <sc-popup kind="dialog" [eyebrow]="'hq.title' | translate" [title]="'hq.log.title' | translate" (closed)="closed.emit()">
+    <sc-popup [closeBeside]="true" kind="dialog" [eyebrow]="'hq.title' | translate" [title]="'hq.log.title' | translate" (closed)="closed.emit()">
       <div class="body">
         @if (live.error()) { <p class="err" role="alert">{{ live.error()! | translate }}</p> }
         @if (days().length === 0 && !live.error()) {

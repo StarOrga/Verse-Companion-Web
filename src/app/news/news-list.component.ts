@@ -344,7 +344,7 @@ const SAFE_SVG = new Map<string, SafeHtml>();
     <!-- Enlarged in-app detail (CDK overlay, portaled to <body>). -->
     <ng-template #detailTpl>
       @if (selected(); as item) {
-        <sc-popup kind="large" [eyebrow]="'news.detail.eyebrow' | translate" [title]="item.title" (closed)="closeDetail()">
+        <sc-popup [closeBeside]="true" kind="large" [eyebrow]="'news.detail.eyebrow' | translate" [title]="item.title" (closed)="closeDetail()">
           <div class="thumb-wrap nd-media">
             <sc-news-thumb
               [images]="imagesOf(item)"
