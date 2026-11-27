@@ -4,6 +4,21 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.300.0] - 2026-11-27
+
+### Added
+- Classic Codex ship page: energy pips now act on shields, energy weapons, radar and coolers; cards, KPI band and analysis read the powered loadout.
+- Crafting quality on the classic ship page: quality chip per blueprint part, slider dialog per recipe slot with presets, crafted stats in every number.
+- Damage-by-source table (pilot, remote turrets, manned turrets, missiles) and real item names in the offensive table.
+- Data uploader 0.86.0 keeps the ship-level weapon regen pool and capacitor-assignment data.
+
+### Fixed
+- Sustained DPS no longer mixes shot and energy units (Nomad now 837 sustained, matching erkul).
+- Reserve shield generators count as HP pool only, without power or regen.
+- Quantum speed in the ship facts was shown 1000x too high.
+- Quantum drive is all-or-nothing in NAV; pip clicks and module swaps keep the scroll position; the KPI delta chip no longer shifts the band.
+- The factory baseline is compared under the same power deal, so no phantom regen delta shows on open.
+
 ## [0.299.0] - 2026-11-26
 
 ### Added
