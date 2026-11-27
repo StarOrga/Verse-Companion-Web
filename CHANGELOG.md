@@ -4,6 +4,41 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.299.0] - 2026-11-26
+
+### Added
+- Ship page, Holotisch view: an energy zone like the game's power screen. Each consumer has a column of segments you can set; the effect on firepower, signature and cooling shows as chips.
+- Ship page, Holotisch view: each part column opens with its key number, the rank in the class and the class median; part cards show the grade as "Güte C" on an A–D scale, the state as a dot and the part's share.
+- Ship page, Holotisch view: the bottom strip appears once you scroll past the columns, and each category opens a panel (at most a third of the screen) with its graphics, e.g. "How long can I fire flat out, and what stops me?".
+
+### Changed
+- Ship page, Holotisch view: the perspective tiles at the page end are gone; their figures live in the strip panels.
+
+## [0.298.15] - 2026-11-26
+
+### Added
+- Settings (admins): "Green light while the PC is on" makes the feedback title glow steadily green while the feedback routine's PC is alive.
+
+## [0.298.14] - 2026-11-26
+
+### Changed
+- Ship page: the ship's 3D model now downloads quietly in idle time on desktop connections, so pressing "3D" opens straight into the model; the prefetch steps aside for anything the user opens.
+
+## [0.298.13] - 2026-11-26
+
+### Added
+- Search: ship rows in the quick search and the Codex search show a small colour picture of the ship.
+
+## [0.298.12] - 2026-11-26
+
+### Fixed
+- Ship loadout: closing the swap picker or another large popup no longer jumps the page back to the top; it stays where you were.
+
+## [0.298.11] - 2026-11-25
+
+### Fixed
+- Verse hub: scrolling down to the footer no longer snaps the page back up; the footer is now reachable below the events teaser.
+
 ## [0.298.10] - 2026-11-24
 
 ### Fixed

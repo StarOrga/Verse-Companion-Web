@@ -12,6 +12,7 @@ import { rankShip, RankShipInput } from '../codex-rank';
 import { dockPositionStorageKey, powerStorageKey, serializeLocalPowerDraft } from '../codex-loadout-draft';
 import { setNumberLocale } from '../codex-format';
 import { useViewport } from '../../testing/viewport';
+import { buildHoloCategoryModels } from './holo-category-model';
 
 const SHIP = 'CNOU_Nomad';
 const SHIP_B = 'AEGS_Avenger';
@@ -68,7 +69,7 @@ describe('CodexHoloStripComponent', () => {
     const el: HTMLElement = fixture.nativeElement;
     expect(el.querySelector('.hs-mini')).toBeNull();
     expect(el.querySelector('.einsatz'), 'the Einsatz moved to the head').toBeNull();
-    expect(el.querySelectorAll('.hs-row > button').length).toBe(0);
+    expect(el.querySelectorAll('.hs-row > button.seg').length, 'the four cells are buttons').toBe(4);
     expect(el.querySelectorAll('.hs-row > .seg.tile').length).toBe(4);
     const handle = el.querySelector('.holo-strip > .hs-toggle')!;
     expect(handle).toBeTruthy();
@@ -115,7 +116,7 @@ describe('CodexHoloStripComponent', () => {
     const km = el.querySelector('.sig .fact .v')!.textContent!.trim();
     expect(/^\d+(\.\d)?km$/.test(km.replace(/\s/g, ''))).toBe(true);
     // The exact value rides on the app's tooltip, not a CSS hover box.
-    const factDe = fixture.debugElement.query(By.css('.sig .fact[tabindex]'));
+    const factDe = fixture.debugElement.query(By.css('.sig .fact'));
     const tip = factDe.injector.get(ScTooltipDirective).scTooltip()!;
     expect(tip).toMatch(/\u00a0m$/);
   });
@@ -302,5 +303,96 @@ describe('CodexHoloStripComponent as a phone sheet', () => {
     expect(cs.position).toBe('fixed');
     expect(cs.clipPath).not.toBe('none');
     expect(getComputedStyle(bar(f).querySelector('.hs-panel')!).transitionProperty).toContain('translate');
+  });
+});
+
+describe('CodexHoloStripComponent fold-out panels', () => {
+  type Cb = (entries: Partial<IntersectionObserverEntry>[]) => void;
+  let cb: Cb | null;
+  let head: HTMLElement;
+  const RealIO = globalThis.IntersectionObserver;
+
+  beforeEach(() => {
+    localStorage.clear();
+    cb = null;
+    head = document.createElement('sc-codex-holo-category-head');
+    document.body.appendChild(head);
+    globalThis.IntersectionObserver = class {
+      constructor(c: Cb) { cb = c; }
+      observe = (): void => undefined;
+      disconnect = (): void => undefined;
+      unobserve = (): void => undefined;
+      takeRecords(): IntersectionObserverEntry[] { return []; }
+    } as unknown as typeof IntersectionObserver;
+  });
+  afterEach(() => {
+    head.remove();
+    globalThis.IntersectionObserver = RealIO;
+  });
+
+  async function withModels(): Promise<ComponentFixture<CodexHoloStripComponent>> {
+    const f = await setup();
+    const ship = { flight: { scmSpeed: 200, maxSpeed: 1000, boostSpeed: 300 }, hull: { hp: 21500, mass: 78000 }, armorHp: null, cargoScu: 24, stats: NOMAD_SHIP_STATS };
+    f.componentRef.setInput('models', buildHoloCategoryModels({ occupants: nomadOccupants(), ship, schemaVersion: POWER_REQUIRED_SCHEMA }));
+    f.detectChanges();
+    return f;
+  }
+  const strip = (f: ComponentFixture<CodexHoloStripComponent>) => (f.nativeElement as HTMLElement).querySelector('.holo-strip') as HTMLElement;
+  const cell = (f: ComponentFixture<CodexHoloStripComponent>, p: string) =>
+    (f.nativeElement as HTMLElement).querySelector(`button.seg[data-p="${p}"]`) as HTMLButtonElement;
+
+  it('stays hidden while the category heads are on screen and appears once they scrolled out above', async () => {
+    const f = await withModels();
+    expect(strip(f).classList).toContain('away');
+    cb!([{ target: head, isIntersecting: true, boundingClientRect: { bottom: 300, width: 100, height: 80 } as DOMRectReadOnly }]);
+    f.detectChanges();
+    expect(strip(f).classList).toContain('away');
+    cb!([{ target: head, isIntersecting: false, boundingClientRect: { bottom: -20, width: 100, height: 80 } as DOMRectReadOnly }]);
+    f.detectChanges();
+    expect(strip(f).classList).not.toContain('away');
+    // Scrolled back up: the heads are below the top edge again.
+    cb!([{ target: head, isIntersecting: false, boundingClientRect: { bottom: 900, width: 100, height: 80 } as DOMRectReadOnly }]);
+    f.detectChanges();
+    expect(strip(f).classList).toContain('away');
+  });
+
+  it('a cell toggles its panel (aria-expanded), one at a time; Escape closes and returns focus', async () => {
+    const f = await withModels();
+    cb!([{ target: head, isIntersecting: false, boundingClientRect: { bottom: -20, width: 100, height: 80 } as DOMRectReadOnly }]);
+    f.detectChanges();
+    const root = f.nativeElement as HTMLElement;
+    expect(root.querySelector('.cat-panel')).toBeNull();
+    expect(cell(f, 'defensive').getAttribute('aria-expanded')).toBe('false');
+    cell(f, 'defensive').click();
+    f.detectChanges();
+    expect(cell(f, 'defensive').getAttribute('aria-expanded')).toBe('true');
+    expect(cell(f, 'defensive').classList).toContain('sel');
+    expect(root.querySelector('.cat-panel')!.id).toBe(cell(f, 'defensive').getAttribute('aria-controls'));
+    expect(root.querySelector('sc-codex-holo-category-panel')!.getAttribute('data-p')).toBe('defensive');
+    cell(f, 'movement').click();
+    f.detectChanges();
+    expect(root.querySelectorAll('.cat-panel').length).toBe(1);
+    expect(cell(f, 'defensive').getAttribute('aria-expanded')).toBe('false');
+    expect(root.querySelector('sc-codex-holo-category-panel')!.getAttribute('data-p')).toBe('movement');
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    f.detectChanges();
+    expect(cell(f, 'movement').getAttribute('aria-expanded')).toBe('false');
+    expect(document.activeElement).toBe(cell(f, 'movement'));
+  });
+
+  it('clicking the open cell again, or the close control, closes the panel', async () => {
+    const f = await withModels();
+    const root = f.nativeElement as HTMLElement;
+    cell(f, 'offensive').click();
+    f.detectChanges();
+    expect(root.querySelector('.cat-panel')).toBeTruthy();
+    cell(f, 'offensive').click();
+    f.detectChanges();
+    expect(f.componentInstance['openArea']()).toBeNull();
+    cell(f, 'signature').click();
+    f.detectChanges();
+    (root.querySelector('.cp-close') as HTMLButtonElement).click();
+    f.detectChanges();
+    expect(f.componentInstance['openArea']()).toBeNull();
   });
 });

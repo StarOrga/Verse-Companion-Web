@@ -23,7 +23,7 @@ import { ChangeDetectionStrategy, Component, computed, input, output, signal } f
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (src(); as url) {
-      <img [src]="url" [alt]="alt()" [attr.loading]="eager() ? null : 'lazy'"
+      <img [src]="url" [alt]="alt()" [attr.width]="width()" [attr.height]="height()" [attr.loading]="eager() ? null : 'lazy'"
            [attr.decoding]="eager() ? null : 'async'" (error)="onError(url)" (load)="loaded.emit(url)" />
     } @else {
       <ng-content />
@@ -57,6 +57,9 @@ export class FallbackImageComponent {
   /** Ordered art candidates, best first. Empty = render the projected fallback. */
   readonly candidates = input<readonly string[]>([]);
   readonly alt = input('');
+  /** Intrinsic size hint (the `width`/`height` attributes) for a fixed slot: the browser reserves the box before the file arrives. */
+  readonly width = input<number | null>(null);
+  readonly height = input<number | null>(null);
   /** Skip lazy-loading for above-the-fold art (hero renders). */
   readonly eager = input(false);
   /** The shown candidate finished loading (its url) — hosts cross-fade a placeholder on this. */

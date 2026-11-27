@@ -155,6 +155,45 @@ export function sustainedDps(
   };
 }
 
+/** One limit's cycle of a weapon, with the DPS that limit alone would give. */
+export interface SustainedCycleInfo {
+  limit: SustainedLimit;
+  /** Seconds of uninterrupted fire before this limit stops the gun. */
+  fireTime: number;
+  /** Seconds the gun is down afterwards. */
+  downtime: number;
+  /** Cycle-averaged DPS if only this limit applied. */
+  value: number;
+}
+
+/**
+ * EVERY limit cycle a weapon carries, shortest burst first — the data the
+ * fire timeline draws ("until 3,4 s (heat), until 12 s (magazine)").
+ * {@link sustainedDps} stays the one source for the sustained number; the
+ * binding cycle there is the one with the lowest `value` here.
+ */
+export function sustainedCycles(
+  burstDps: number | null,
+  fireRateRpm: number | null,
+  weaponParams: Params,
+): SustainedCycleInfo[] {
+  if (burstDps === null || !(burstDps > 0)) return [];
+  const rpm = positive(fireRateRpm);
+  if (rpm === null) return [];
+  const sps = rpm / 60;
+  const out: SustainedCycleInfo[] = [];
+  for (const c of [energyCycle(weaponParams, sps), magazineCycle(weaponParams, sps), heatCycle(weaponParams, sps)]) {
+    if (!c) continue;
+    out.push({
+      limit: c.limit,
+      fireTime: c.fireTime,
+      downtime: c.downtime,
+      value: Math.round(((burstDps * c.fireTime) / (c.fireTime + c.downtime)) * 100) / 100,
+    });
+  }
+  return out.sort((a, b) => a.fireTime - b.fireTime);
+}
+
 /** `weaponParams` of a weapon payload, or undefined. */
 export function weaponParamsOf(payload: unknown): Record<string, unknown> | undefined {
   const wp = (payload as { weaponParams?: unknown } | null | undefined)?.weaponParams;

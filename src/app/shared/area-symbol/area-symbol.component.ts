@@ -32,7 +32,8 @@ export type AreaSymbolKey =
   | 'quantum'
   | 'coolers'
   | 'radar'
-  | 'lifeSupport';
+  | 'lifeSupport'
+  | 'thrusters';
 
 /** `main` follows the area colour; `ice` is the fixed light blue (cooler flake). */
 interface AreaSymbolPaths {
@@ -92,6 +93,8 @@ export const AREA_SYMBOLS: Readonly<Record<AreaSymbolKey, AreaSymbolPaths>> = {
   },
   // Radarschirm
   radar: { main: 'M12 12l6.4-6.4 M20 12a8 8 0 1 1-8-8 M16 12a4 4 0 1 1-4-4 M12 12h.01' },
+  // ds-new: Energie-Symbole — Triebwerksdüse for the energy columns (concept holotisch-kategorien r3); the other five energy groups reuse the symbols above
+  thrusters: { main: 'M8 3H16L14.5 13H9.5Z M9.5 13C9.5 17 8.5 19 12 22C15.5 19 14.5 17 14.5 13' },
   // O₂
   lifeSupport: { main: 'M3 11.5a6 6 0 1 0 12 0a6 6 0 1 0-12 0 M16.8 15.6a2.1 2.1 0 1 1 3.4 1.7L16.8 21H21' },
 };

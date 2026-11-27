@@ -38,18 +38,25 @@ describe('RoutineStatusDirective', () => {
   let state: WritableSignal<HeartbeatState>;
   let note: WritableSignal<string | null>;
   let binary: WritableSignal<boolean>;
+  let pcLight: WritableSignal<boolean>;
+  let pcState: WritableSignal<HeartbeatState>;
 
   async function setup(
     initial: HeartbeatState,
     seenAt: string | null,
     initialNote: string | null = null,
     binaryTint = false,
+    pcLightOn = false,
+    initialPcState: HeartbeatState = initial,
   ) {
     binary = signal(binaryTint);
+    pcLight = signal(pcLightOn);
+    pcState = signal(initialPcState);
     state = signal(initial);
     note = signal<string | null>(initialNote);
     const stub = {
       state,
+      pcState,
       lastSeen: signal(seenAt),
       note,
       nextRunAt: signal<string | null>(null),
@@ -61,7 +68,7 @@ describe('RoutineStatusDirective', () => {
     await TestBed.configureTestingModule({
       imports: [HostComponent],
       providers: [provideTranslateService({ fallbackLang: 'en' }), { provide: RoutineHeartbeatService, useValue: stub },
-        { provide: RoutineTintPrefsService, useValue: { binary, setBinary: (on: boolean) => binary.set(on) } },
+        { provide: RoutineTintPrefsService, useValue: { binary, pcLight, setBinary: (on: boolean) => binary.set(on) } },
       ],
     }).compileComponents();
 
@@ -206,5 +213,39 @@ describe('RoutineStatusDirective', () => {
     fixture.detectChanges();
     expect(title().classList).toContain('is-online');
     expect(title().classList).not.toContain('is-running');
+  });
+
+  // Feedback #405: "grün leuchten, wenn der PC an ist … dauerhaftes Grün". With
+  // the PC light on, every live state is green with a halo — the cyan of a
+  // working run is exactly what it replaces — and the verdict comes from the
+  // tighter-grace `pcState`.
+  it('glows green for every live state when the account turned the PC light on', async () => {
+    for (const live of ['online', 'running', 'paused'] as HeartbeatState[]) {
+      await setup(live, iso(MIN), null, false, true);
+      expect(title().classList).toContain('is-online');
+      expect(title().classList).toContain('is-glow');
+      expect(title().classList).not.toContain('is-running');
+      expect(title().classList).not.toContain('is-paused');
+    }
+    expect(title().getAttribute('aria-label')).toBe('Feedback - Routine paused');
+  });
+
+  it('reads the tighter PC verdict and turns red without a glow once the ticks stop', async () => {
+    await setup('online', iso(6 * MIN), null, false, true, 'offline');
+    expect(title().classList).toContain('is-offline');
+    expect(title().classList).not.toContain('is-glow');
+    await setup('unknown', null, null, false, true);
+    expect(title().classList).not.toContain('is-online');
+    expect(title().classList).not.toContain('is-glow');
+  });
+
+  it('outranks the two-colour tint and drops the glow when switched off', async () => {
+    await setup('paused', iso(MIN), null, true, true);
+    expect(title().classList).toContain('is-online');
+    expect(title().classList).toContain('is-glow');
+    pcLight.set(false);
+    fixture.detectChanges();
+    expect(title().classList).toContain('is-offline');
+    expect(title().classList).not.toContain('is-glow');
   });
 });
