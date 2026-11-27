@@ -4,6 +4,14 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.300.5] - 2026-11-27
+
+### Changed
+- Classic ship view: the analysis cards follow their loadout sections while scrolling — Offensive stays pinned until the missiles end, Verteidigung starts at the shield generators, and the ship card is pulled up smoothly to Antrieb & Systeme (#409).
+
+### Fixed
+- Classic ship view: a leftover 16px gap no longer pushes the Offensive card below Bewaffnung (#408).
+
 ## [0.300.4] - 2026-11-27
 
 ### Fixed

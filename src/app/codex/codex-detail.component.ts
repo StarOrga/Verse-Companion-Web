@@ -209,6 +209,7 @@ import {
   rankMissile,
 } from './codex-missile';
 import { ShellChromeService } from '../shell/fusion-bar/shell-chrome.service';
+import { AnalysisScrollSyncDirective } from './analysis-scroll-sync';
 import { HeightVarDirective } from '../shared/height-var.directive';
 import type { DockPosition } from './codex-power';
 import { CodexMissionBarComponent } from './codex-mission-bar.component';
@@ -326,7 +327,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
 @Component({
   selector: 'sc-codex-detail',
   standalone: true,
-  imports: [ScSkeletonComponent, DeferErrorComponent, ShipArrivalComponent, CompareIconComponent, FeedbackSpotDirective, PageHeaderComponent, NeuroFieldDirective, RouterLink, TranslatePipe, CodexCompareTrayComponent, CodexHardpointLayoutComponent, CodexComponentModalComponent, CodexSwapPickerComponent, CodexWeaponDetailComponent, ShipDeckPlanComponent, ShipSkinViewerComponent, CodexLoadoutSaveBarComponent, CodexSavedLoadoutsComponent, CodexKpiBandComponent, ScTooltipDirective, ScActionDirective, CodexMissionBarComponent, CodexOffensivePanelComponent, CodexDefensivePanelComponent, CodexShipPanelComponent, CodexRankCardComponent, CodexEnergyDockComponent, InfoNoteComponent, CodexHoloStageComponent, CodexShipStageComponent, CodexHeroHoloOverlayComponent, CodexHeroPartPopupComponent, CodexVariantPickerComponent, CodexShipActionsComponent, CodexShipLinkFormComponent, CodexPortListComponent, CodexSpecSheetComponent, CodexRecipeCardComponent, AssetPackageViewerComponent, NgTemplateOutlet, AddToSetComponent, ClassChipComponent, CodexModeSwitchComponent, CodexPersonalUsesComponent, HangarPickerComponent, CodexHoloShareComponent, ScDialogDirective, NotFoundComponent, CodexOwnSegmentComponent, CodexOwnStationsComponent, ShareButtonComponent, HeightVarDirective, ScEntryDirective, CodexItemStageComponent, CodexDetailClassicComponent, CodexHoloAkteComponent, CodexHoloHangarMenuComponent, CodexDetailHeadComponent, CodexDetailShellComponent, HintTipComponent, CodexCraftDialogComponent],
+  imports: [ScSkeletonComponent, DeferErrorComponent, ShipArrivalComponent, CompareIconComponent, FeedbackSpotDirective, PageHeaderComponent, NeuroFieldDirective, RouterLink, TranslatePipe, CodexCompareTrayComponent, CodexHardpointLayoutComponent, CodexComponentModalComponent, CodexSwapPickerComponent, CodexWeaponDetailComponent, ShipDeckPlanComponent, ShipSkinViewerComponent, CodexLoadoutSaveBarComponent, CodexSavedLoadoutsComponent, CodexKpiBandComponent, ScTooltipDirective, ScActionDirective, CodexMissionBarComponent, CodexOffensivePanelComponent, CodexDefensivePanelComponent, CodexShipPanelComponent, CodexRankCardComponent, CodexEnergyDockComponent, InfoNoteComponent, CodexHoloStageComponent, CodexShipStageComponent, CodexHeroHoloOverlayComponent, CodexHeroPartPopupComponent, CodexVariantPickerComponent, CodexShipActionsComponent, CodexShipLinkFormComponent, CodexPortListComponent, CodexSpecSheetComponent, CodexRecipeCardComponent, AssetPackageViewerComponent, NgTemplateOutlet, AddToSetComponent, ClassChipComponent, CodexModeSwitchComponent, CodexPersonalUsesComponent, HangarPickerComponent, CodexHoloShareComponent, ScDialogDirective, NotFoundComponent, CodexOwnSegmentComponent, CodexOwnStationsComponent, ShareButtonComponent, HeightVarDirective, AnalysisScrollSyncDirective, ScEntryDirective, CodexItemStageComponent, CodexDetailClassicComponent, CodexHoloAkteComponent, CodexHoloHangarMenuComponent, CodexDetailHeadComponent, CodexDetailShellComponent, HintTipComponent, CodexCraftDialogComponent],
   providers: [ShipLinkFormStore, CodexLoadoutDraftStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -770,19 +771,31 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
                  bottom at the viewport edge, so it never runs out to an
                  empty column. The energy dock can sit in here at a slot the
                  pilot picks (position "Analyse"). -->
-            <div class="analysis-col col-analyse col-stick" scHeightVar="--_h" [scFeedbackSpot]="'codex.detail.columnAnalysis'">
+            <!-- #409: on desktop each card also follows its own loadout
+                 blocks (scAnalysisScrollSync): Offensive stays until the
+                 missiles end, Verteidigung starts at the shield generators,
+                 Schiff at Antrieb & Systeme. The slots are what it moves; an
+                 energy dock rides in the slot of the card it stands before
+                 (or, at the end, after). -->
+            <div class="analysis-col col-analyse col-stick" scHeightVar="--_h" scAnalysisScrollSync [scFeedbackSpot]="'codex.detail.columnAnalysis'">
               <h2 class="col-head">
                 <span class="label">{{ 'codex.detail.columnAnalysis' | translate }}</span>
                 <span class="n">3</span>
                 <span class="rule" aria-hidden="true"></span>
               </h2>
-              @if (dockInAnalysis(0)) { <ng-container [ngTemplateOutlet]="energyDock" /> }
-              <sc-codex-offensive-panel [panel]="offensivePanel()" [startCollapsed]="offensiveStartsCollapsed()" />
-              @if (dockInAnalysis(1)) { <ng-container [ngTemplateOutlet]="energyDock" /> }
-              <sc-codex-defensive-panel [panel]="defensivePanel()" />
-              @if (dockInAnalysis(2)) { <ng-container [ngTemplateOutlet]="energyDock" /> }
-              <sc-codex-ship-panel [groups]="shipFactGroups()" />
-              @if (dockInAnalysis(3)) { <ng-container [ngTemplateOutlet]="energyDock" /> }
+              <div class="an-slot" data-an-anchor="offense">
+                @if (dockInAnalysis(0)) { <ng-container [ngTemplateOutlet]="energyDock" /> }
+                <sc-codex-offensive-panel [panel]="offensivePanel()" [startCollapsed]="offensiveStartsCollapsed()" />
+              </div>
+              <div class="an-slot" data-an-anchor="defense">
+                @if (dockInAnalysis(1)) { <ng-container [ngTemplateOutlet]="energyDock" /> }
+                <sc-codex-defensive-panel [panel]="defensivePanel()" />
+              </div>
+              <div class="an-slot" data-an-anchor="ship">
+                @if (dockInAnalysis(2)) { <ng-container [ngTemplateOutlet]="energyDock" /> }
+                <sc-codex-ship-panel [groups]="shipFactGroups()" />
+                @if (dockInAnalysis(3)) { <ng-container [ngTemplateOutlet]="energyDock" /> }
+              </div>
             </div>
           }
         </div>
@@ -1483,9 +1496,10 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
        Offensive card 12px further below its heading than Bewaffnung sits below
        the Loadout heading (5px, the heading's own margin). The 12px now goes
        only between the cards, never between the heading and the first one. */
-    .col-analyse { display: flex; flex-direction: column; }
+    .col-analyse { display: flex; flex-direction: column; gap: 0; }
     .col-analyse > * + * { margin-top: 12px; }
     .col-analyse > .col-head + * { margin-top: 0; }
+    .an-slot { display: flex; flex-direction: column; gap: 12px; position: relative; }
     /* The two headings must be one height too: the Loadout one holds the 18px
        ⓘ dot and the reset slot (24px on touch), the Analyse one only text, so
        both rows are held at the taller of the two. */
@@ -1501,7 +1515,12 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
       --_stick-top: calc(max(var(--sc-chrome-top, 24px), calc(var(--sc-imp-banner-h, 0px) + var(--sc-topbar-h, 0px) + 8px)) + var(--_kpi-h, 0px) + 12px);
       position: sticky;
       top: min(var(--_stick-top), calc(100dvh - var(--_h, 0px) - 16px));
+      /* Carries the stick line, resolved to px, to scAnalysisScrollSync (#409). */
+      scroll-margin-top: var(--_stick-top);
     }
+    /* #409: while scAnalysisScrollSync drives the cards, the column spans the
+       whole row and each slot is offset (relative top) on its own. */
+    .m-cols:not(.single) > .col-analyse.an-synced { position: relative; top: auto; align-self: stretch; }
 
     @media (max-width: 1100px) {
       .m-top.ship-mode, .m-top.missile-mode { grid-template-columns: 1fr; }
