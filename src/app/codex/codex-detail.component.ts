@@ -1496,7 +1496,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
        Offensive card 12px further below its heading than Bewaffnung sits below
        the Loadout heading (5px, the heading's own margin). The 12px now goes
        only between the cards, never between the heading and the first one. */
-    .col-analyse { display: flex; flex-direction: column; }
+    .col-analyse { display: flex; flex-direction: column; gap: 0; }
     .col-analyse > * + * { margin-top: 12px; }
     .col-analyse > .col-head + * { margin-top: 0; }
     .an-slot { display: flex; flex-direction: column; gap: 12px; position: relative; }
