@@ -3,7 +3,6 @@ import { SupabaseClientProvider } from '../../core/supabase.client';
 import {
   HEARTBEAT_FRESH_MS,
   HEARTBEAT_GRACE_MS,
-  HEARTBEAT_PC_GRACE_MS,
   HeartbeatState,
   RUN_LOCK_MAX_MS,
   RoutineHeartbeatService,
@@ -59,30 +58,6 @@ describe('routine heartbeat', () => {
       expect(heartbeatState('', NOW)).toBe('unknown');
       expect(heartbeatState('not-a-date', NOW)).toBe('unknown');
       expect(heartbeatState({ last_seen_at: null, next_run_at: ahead(MIN) }, NOW)).toBe('unknown');
-    });
-  });
-
-  // Feedback #405: the PC light stays green from one 3-minute tick to the next
-  // plus a short buffer, not the default palette's fifteen minutes.
-  describe('heartbeatState — the tighter PC-light grace', () => {
-    it('stays live until the announced tick plus the short grace, then goes offline', () => {
-      const row = (dueIn: number) => ({ last_seen_at: iso(3 * MIN - dueIn), next_run_at: ahead(dueIn) });
-      expect(heartbeatState(row(MIN), NOW, HEARTBEAT_PC_GRACE_MS)).toBe('online');
-      expect(heartbeatState(row(-(HEARTBEAT_PC_GRACE_MS - 1)), NOW, HEARTBEAT_PC_GRACE_MS)).toBe('online');
-      expect(heartbeatState(row(-HEARTBEAT_PC_GRACE_MS), NOW, HEARTBEAT_PC_GRACE_MS)).toBe('offline');
-      // The default grace still calls the same row online.
-      expect(heartbeatState(row(-HEARTBEAT_PC_GRACE_MS), NOW)).toBe('online');
-    });
-
-    it('keeps a live run lock and the paused state as they are', () => {
-      expect(
-        heartbeatState(
-          { last_seen_at: iso(MIN), next_run_at: ahead(2 * MIN), state: 'paused' },
-          NOW,
-          HEARTBEAT_PC_GRACE_MS,
-        ),
-      ).toBe('paused');
-      expect(HEARTBEAT_PC_GRACE_MS).toBeLessThan(HEARTBEAT_GRACE_MS);
     });
   });
 

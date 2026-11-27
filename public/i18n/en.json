@@ -4321,11 +4321,6 @@
         "audience": "(admins only)",
         "descOn": "The “Feedback” title glows green while the routine is up or working, and red while nothing is being worked on. Applies to your account only.",
         "descOff": "The “Feedback” title shows four states: green ready, blue working right now, amber paused, red unreachable."
-      },
-      "routinePcLight": {
-        "label": "Green light while the PC is on",
-        "descOn": "The “Feedback” title glows steady green while the routine on the dev PC keeps ticking – also while it is working or paused – and turns red a few minutes after the last tick. Applies to your account only.",
-        "descOff": "Off: the “Feedback” title follows the setting above."
       }
     },
     "danger": {
