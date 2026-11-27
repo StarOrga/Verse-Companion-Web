@@ -1575,28 +1575,6 @@ button {
   color: var(--sc-warning, #e0b452);
   color: color-mix(in srgb, var(--sc-warning, #e0b452) 80%, var(--sc-fg-0));
 }
-/* The opt-in "PC on" light (feedback #405, `RoutineTintPrefsService.pcLight`):
-   while the watcher on the dev PC keeps ticking the title is full success
-   green with a steady halo, so it reads as a light that is on, not as a
-   tint. Steady on purpose — no pulse, nothing to switch off for
-   prefers-reduced-motion except the colour fade itself.
-   ds-new: text-shadow halo from --status-success-rgb; StarUI has a glow
-   shadow (--sc-glow) for surfaces but none for a status word. */
-[scRoutineStatus].sc-routine-tint.is-online.is-glow {
-  color: var(--sc-success);
-  text-shadow:
-    0 0 6px rgba(var(--status-success-rgb), 0.55),
-    0 0 14px rgba(var(--status-success-rgb), 0.3);
-}
-.sc-routine-tint.is-glow {
-  transition: color 0.4s ease, text-shadow 0.4s ease;
-}
-@media (prefers-reduced-motion: reduce) {
-  .sc-routine-tint,
-  .sc-routine-tint.is-glow {
-    transition: none;
-  }
-}
 /* No rule for hidden wording here on purpose. An earlier round put the
    state into a clip-rect <span> inside the title; it showed up on screen
    as "(DEV-PC ERREICHBAR)Feedback", the exact line the admin had asked us

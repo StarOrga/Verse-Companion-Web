@@ -4321,11 +4321,6 @@
         "audience": "(nur für Admins)",
         "descOn": "Der Titel „Feedback“ leuchtet grün, solange die Routine läuft oder arbeitet, und rot, solange nichts bearbeitet wird. Gilt nur für deinen Account.",
         "descOff": "Der Titel „Feedback“ zeigt vier Zustände: grün bereit, blau gerade in Arbeit, gelb pausiert, rot nicht erreichbar."
-      },
-      "routinePcLight": {
-        "label": "Grünes Licht, solange der PC an ist",
-        "descOn": "Der Titel „Feedback“ leuchtet dauerhaft grün, solange die Routine auf dem Dev-PC tickt – auch während sie gerade arbeitet oder pausiert – und wird wenige Minuten nach dem letzten Tick rot. Gilt nur für deinen Account.",
-        "descOff": "Aus: der Titel „Feedback“ folgt der Einstellung darüber."
       }
     },
     "danger": {
