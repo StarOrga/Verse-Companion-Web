@@ -838,20 +838,22 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
     .layout { display: flex; flex-direction: column; gap: 14px; }
 
     /* A block box is built like the Offensive / Defensive cards beside it in
-       the Analyse column (codex-detail .detail-page .sc-card): the same 4px
-       corner, the same even 1px border all round and the same bg-2 to bg-1
+       the Analyse column (their app-wide .sc-card): the same 8px corner (#408:
+       the boxes had 4px while the cards beside them drew 8px — the
+       page-scoped 4px rule in codex-detail never reaches into the panel
+       components — so every box now takes the rounder 8px of the cards), the same even 1px border all round and the same bg-2 to bg-1
        card surface (#346). The 2px accent bar a configurable block used to
        carry on its top edge squared off the top corners, so the boxes read as
        a different build from the cards next to them; the airframe still steps
        back through .fixed below. Concept section 0 keeps the hot accent and
        mock literals off this page. */
-    .mod-sec { border-radius: 4px; background: linear-gradient(180deg, var(--sc-bg-2), var(--sc-bg-1));
+    .mod-sec { border-radius: 8px; background: linear-gradient(180deg, var(--sc-bg-2), var(--sc-bg-1));
       border: 1px solid var(--sc-border); padding: 10px 12px; }
     /* Area colours (feedback #330, concept 2026-11-10-bereichs-symbole-umrandung):
        every block carries its Holotable area — Offensive, Verteidigung,
        Bewegung, Signatur & Kühlung — as a 2px line on top at --sc-area-line
        strength and in its heading. The line is an inset shadow, so it follows
-       the 4px corners instead of squaring them off. "Antrieb & Systeme" stays
+       the 8px corners instead of squaring them off. "Antrieb & Systeme" stays
        neutral outside; its sub-blocks carry their own area. */
     .mod-sec, .mod-sub { --p: var(--sc-accent); --pb: color-mix(in srgb, var(--p) var(--sc-area-line), transparent);
       box-shadow: inset 0 2px 0 var(--pb); }
@@ -864,7 +866,7 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
     .mod-sec.fixed { --pb: color-mix(in srgb, var(--p) 30%, transparent); }
     /* "Antrieb & Systeme": the merged block and its nested sections. */
     .sub-stack { display: flex; flex-direction: column; gap: 8px; }
-    .mod-sub { border-radius: 4px; background: var(--sc-bg-2); border: 1px solid var(--sc-border);
+    .mod-sub { border-radius: 8px; background: var(--sc-bg-2); border: 1px solid var(--sc-border);
       padding: 8px 10px; }
     .mod-sub > .sub-head { margin: 0; }
     .mod-sub[open] > .sub-head { margin-bottom: 8px; }
