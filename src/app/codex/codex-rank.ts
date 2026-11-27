@@ -730,9 +730,11 @@ export function rankTargetShipInput(payload: {
   armorHp?: number | null;
   cargoScu?: number | null;
   stats?: unknown;
-} | null | undefined): Pick<KpiShipInput, 'flight' | 'hull' | 'armorHp' | 'cargoScu' | 'stats'> | null {
+  fuel?: { quantum?: number | null } | null;
+} | null | undefined): Pick<KpiShipInput, 'flight' | 'hull' | 'armorHp' | 'cargoScu' | 'stats' | 'fuelQuantum'> | null {
   if (!payload) return null;
   return {
+    fuelQuantum: payload.fuel?.quantum ?? null,
     flight: (payload.flight ?? null) as KpiShipInput['flight'],
     hull: (payload.hull ?? null) as KpiShipInput['hull'],
     armorHp: payload.armorHp ?? null,

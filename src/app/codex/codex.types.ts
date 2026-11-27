@@ -365,6 +365,8 @@ export interface ShipPayload extends BaseEntityPayload {
   armorHp?: number | null;
   /** Cargo grid capacity in SCU (interiorDimensions ÷ 1.25³). */
   cargoScu?: number | null;
+  /** Σ stock fuel tanks in SCU; `quantum` is the quantum range's numerator. */
+  fuel?: { hydrogen: number | null; quantum: number | null } | null;
   /**
    * Why `cargoScu` is what it is — `cargoScu` alone cannot say it, because a
    * fighter and a Nomad are both `null`:

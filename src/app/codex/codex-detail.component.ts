@@ -196,6 +196,7 @@ import {
   computeKpiSheet,
   crossSectionAxes,
   findArmorPayload,
+  quantumRangeGm,
 } from './codex-loadout-stats';
 import { CodexKpiBandComponent } from './codex-kpi-band.component';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
@@ -2215,7 +2216,7 @@ export class CodexDetailComponent implements OnInit {
       const section = classifyShipModule(e.itemPortName, occ) as ShipModuleSection;
       summary.push({ section, kind: hit?.kind ?? null, payload: pl, ammoPayload: undefined, count: 1, passive: false });
     }
-    const kpiShipInput: KpiShipInput = { flight: payload.flight, stats: payload.stats ?? null };
+    const kpiShipInput: KpiShipInput = { flight: payload.flight, fuelQuantum: payload.fuel?.quantum ?? null, stats: payload.stats ?? null };
     return { kpiSheet: computeKpiSheet(summary, kpiShipInput), occupants };
   };
 
@@ -3682,8 +3683,14 @@ export class CodexDetailComponent implements OnInit {
           qdClassName = line.className;
         }
       }
+      // Range = the ship's quantum tank over this drive's fuel use (the extract's
+      // own jumpRange is FLT_MAX and stays only a fallback). Unit: km, see fmtGm.
+      const rangeGm = quantumRangeGm(
+        (d.payload as ShipPayload | undefined)?.fuel?.quantum ?? qtFuel,
+        stats.quantum.fuelCapacity,
+      );
       this.techStats.set({
-        quantum: stats.quantum,
+        quantum: rangeGm !== null ? { ...stats.quantum, jumpRangeMm: rangeGm * 1_000_000 } : stats.quantum,
         quantumDriveClassName: qdClassName,
         hydrogenCapacity: hydrogen,
         quantumFuelCapacity: qtFuel,

@@ -40,6 +40,27 @@ function usable(v: number | null): number | null {
   return v >= FLT_MAX_SENTINEL ? null : v;
 }
 
+/**
+ * A ship's quantum range in Gm: quantum fuel (SCU) ÷ the drive's
+ * `quantumFuelRequirement` (SCU burnt per Gm). `null` when either input is
+ * missing or not positive.
+ *
+ * Unit verified against the published values (4.10, expcarry.com "Star Citizen
+ * 4.10 fuel changes"; Kama 0.03864 and Pontes 0.12236 also on the
+ * starcitizen.tools drive pages, identical to the extract): C2 Hercules
+ * 20.9 SCU with the stock Kama (0.03864) = 541 Gm; Gladius 0.6 SCU with the
+ * stock Beacon (0.01862) = 32 Gm. The extract's `jumpRange` is FLT_MAX and
+ * says nothing.
+ */
+export function quantumRangeGm(fuelQuantum: number | null | undefined, fuelRequirement: number | null | undefined): number | null {
+  if (fuelQuantum == null || fuelRequirement == null) return null;
+  if (!Number.isFinite(fuelQuantum) || !Number.isFinite(fuelRequirement) || fuelQuantum <= 0 || fuelRequirement <= 0) return null;
+  return fuelQuantum / fuelRequirement;
+}
+
+/** Gm → the KPI sheet's range unit (km; the `gm` formatter divides by 1e6). */
+const GM_TO_SHEET_UNIT = 1_000_000;
+
 function statsOf(payload: unknown): Record<string, Record<string, unknown>> | undefined {
   const s = (payload as { stats?: unknown } | undefined)?.stats;
   return s && typeof s === 'object' ? (s as Record<string, Record<string, unknown>>) : undefined;
@@ -95,6 +116,8 @@ export interface KpiShipInput {
   armorHp?: number | null;
   /** schema 3: cargo grid capacity in SCU. */
   cargoScu?: number | null;
+  /** Σ stock quantum tanks in SCU (`payload.fuel.quantum`) — the range's numerator. */
+  fuelQuantum?: number | null;
   /** Ship-level whitelisted stats (currently just SSCSignatureSystemParams, when present). */
   stats?: Record<string, Record<string, unknown>> | null;
 }
@@ -227,7 +250,13 @@ export function computeKpiSheet(
     if (componentKindOf(o.payload) === 'QuantumDrive') {
       const stats = statsOf(o.payload);
       sheet.quantumSpeed = usable(findStat(stats, 'quantum', ['params.driveSpeed', 'driveSpeed']));
-      sheet.quantumRange = usable(findStat(stats, 'quantum', ['jumpRange']));
+      // Derived from the ship's quantum tank and THIS drive's fuel use, so a
+      // swapped drive changes it; a real finite `jumpRange` is only the fallback.
+      const gm = quantumRangeGm(
+        ship?.fuelQuantum,
+        findStat(stats, 'quantum', ['params.quantumFuelRequirement', 'quantumFuelRequirement']),
+      );
+      sheet.quantumRange = gm !== null ? gm * GM_TO_SHEET_UNIT : usable(findStat(stats, 'quantum', ['jumpRange']));
       sheet.spool = usable(findStat(stats, 'quantum', ['params.spoolUpTime', 'spoolUpTime']));
     }
   }

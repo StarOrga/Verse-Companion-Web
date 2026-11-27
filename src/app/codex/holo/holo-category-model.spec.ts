@@ -2,12 +2,14 @@ import { sustainedCycles } from '../codex-sustained-dps';
 import { NOMAD_SHIP_STATS, nomadOccupants } from '../testing/nomad-power.fixture';
 import type { RankShipInput } from '../codex-rank';
 import type { SummaryOccupant } from '../ship-summary-panels';
+import { computeKpiSheet } from '../codex-loadout-stats';
 import {
   EM_SOURCES,
   buildEnergy,
   buildFireTimeline,
   buildHoloCategoryModels,
   buildLead,
+  buildMovement,
   classShare,
   decoysNeeded,
   effectiveHpByType,
@@ -297,5 +299,25 @@ describe('buildHoloCategoryModels', () => {
     const shield = withCohort.defensive.detail.panel.shieldHp;
     expect(shield).not.toBeNull();
     expect(withCohort.defensive.detail.shieldDownInSec).toBe(Math.round((shield! / 450) * 10) / 10);
+  });
+});
+
+describe('buildMovement — quantum range (Reisen lead)', () => {
+  it('carries the derived range of the C2 into the Holotisch movement column', () => {
+    const ship = { fuelQuantum: 20.9 };
+    const qd: SummaryOccupant = {
+      section: 'quantum',
+      kind: 'component',
+      payload: {
+        entityKind: 'component',
+        kind: 'QuantumDrive',
+        className: 'QDRV_JUST_S03_Kama_SCItem',
+        stats: { quantum: { 'params.quantumFuelRequirement': 0.03864, jumpRange: 3.4028230607370965e38 } },
+      },
+      ammoPayload: undefined,
+      count: 1,
+    };
+    const m = buildMovement(ship, computeKpiSheet([qd], ship));
+    expect(m.quantumRange! / 1_000_000).toBeCloseTo(541, -1);
   });
 });
