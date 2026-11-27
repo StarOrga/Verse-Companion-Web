@@ -201,9 +201,13 @@ export function buildHeroChips(
   // printing "Kein Laderaum" on the second is a false statement. The
   // extractor says which via `cargoStatus`; pre-schema-3 payloads have no
   // such field, so fall back to the loadout-derived capability.
+  // #407: `none` alone is not proof either. The extractor files the Nomad's
+  // bed, the Mustang's cargo module and several grid-only hulls as `none`
+  // (no SIZED hold), yet they do haul; when the hull names a cargo port or
+  // part, the chip discloses the gap instead of claiming "Kein Laderaum".
   const cargo = p.cargoScu ?? null;
   const cargoStatus = p.cargoStatus ?? null;
-  const hauls = cargoStatus ? cargoStatus !== 'none' : input.hasCargo();
+  const hauls = cargoStatus && cargoStatus !== 'none' ? true : input.hasCargo();
   if (cargo != null && cargo > 0) {
     out.push({ key: 'cargo', text: `${formatNumber(cargo)} SCU`, accent: true });
   } else if (hauls) {

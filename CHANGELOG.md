@@ -4,6 +4,14 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.300.3] - 2026-11-27
+
+### Changed
+- Classic ship view: career, crew and cargo sit as a short list on the right under the 3D switch; mass, systems and countermeasure counts are gone, the remaining counts ("3 Waffen", "8 Raketen", tractor beam, shield generators) are smaller chips on the picture's bottom edge (#407).
+
+### Fixed
+- Ships whose cargo bed the extract lists without SCU (Nomad, Mustang, Reliant …) no longer claim "Kein Laderaum"; they show "Laderaum · ?" with an explanation (#407).
+
 ## [0.300.2] - 2026-11-27
 
 ### Changed
