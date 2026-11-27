@@ -1478,7 +1478,19 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
       .col-head .head-reset-slot { flex-basis: 48px; height: 24px; }
       .col-head .head-reset { width: 48px; height: 48px; }
     }
-    .col-analyse { display: flex; flex-direction: column; gap: 12px; }
+    /* #408: both columns' first boxes start on one line. The Analyse column
+       used to space its children with a 12px flex gap, which also pushed the
+       Offensive card 12px further below its heading than Bewaffnung sits below
+       the Loadout heading (5px, the heading's own margin). The 12px now goes
+       only between the cards, never between the heading and the first one. */
+    .col-analyse { display: flex; flex-direction: column; }
+    .col-analyse > * + * { margin-top: 12px; }
+    .col-analyse > .col-head + * { margin-top: 0; }
+    /* The two headings must be one height too: the Loadout one holds the 18px
+       ⓘ dot and the reset slot (24px on touch), the Analyse one only text, so
+       both rows are held at the taller of the two. */
+    .m-cols > .col-stick > .col-head { min-height: 18px; }
+    @media (pointer: coarse) { .m-cols > .col-stick > .col-head { min-height: 24px; } }
     /* The shorter column stays on screen (the longer one fills the grid row,
        so it has no sticky travel at all). It parks under the sticky KPI strip
        (same top as the strip + its height + a gap); a column taller than the
