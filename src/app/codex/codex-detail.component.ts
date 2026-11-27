@@ -213,11 +213,11 @@ import { HeightVarDirective } from '../shared/height-var.directive';
 import type { DockPosition } from './codex-power';
 import { CodexMissionBarComponent } from './codex-mission-bar.component';
 import { buildKpiStrip, buildKpiStripForKeys, KpiStripCell } from './codex-kpi-sets';
-import { applyPowerToOccupants, poweredPayloadQueues, withReserveShieldPayloads } from './codex-power-effects';
+import { applyPowerToOccupants, poweredPayloadQueues } from './codex-power-effects';
 import { CodexCraftDialogComponent, CraftDialogEntry } from './codex-craft-dialog.component';
 import { CraftRecipe, applyCraftMultipliers, craftMultipliers, parseCraftRecipe } from './codex-crafting';
 import { CraftQualityStore } from './detail/codex-craft-quality.store';
-import { withReserveShields } from './codex-power';
+import { computePowerSheet, withReserveShields } from './codex-power';
 import { isPassiveShield, withPowerSignature } from './codex-power';
 import { groupOccupants } from './codex-fold-preview';
 import type { PowerSheet } from './codex-power';
@@ -752,6 +752,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
                 (hovered)="setActivePorts($event)"
                 (inspected)="openInspect($event)"
                 (swapRequested)="openSwapPicker($event)"
+              [extraStats]="true"
               [craftable]="craftable()"
               [craftQualities]="craftQualities()"
               (craftRequested)="openCraft($event)"
@@ -1328,6 +1329,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
               (hovered)="setActivePorts($event)"
               (inspected)="openInspect($event)"
               (swapRequested)="openSwapPicker($event)"
+              [extraStats]="true"
               [craftable]="craftable()"
               [craftQualities]="craftQualities()"
               (craftRequested)="openCraft($event)"
@@ -4515,9 +4517,18 @@ export class CodexDetailComponent implements OnInit {
   /** Public since Wave 2.5: the patch-Δ trigger's `activeKpiSheet` input is
    * this EXACT stock sheet, never the viewer's unsaved draft (patch-share
    * handoff §A: "compares two PATCHES, not the draft against a patch"). */
-  readonly stockKpiSheet = computed(() =>
-    computeKpiSheet(withReserveShieldPayloads(this.summaryOccupants()), this.kpiShipInput()),
-  );
+  /** The factory loadout under the dock's own default deal (auto, no pins,
+   * SCM): the baseline a fresh page compares against, so opening a ship never
+   * shows a delta the pilot did not cause (shield regen -123 on the Nomad). */
+  readonly stockKpiSheet = computed(() => {
+    const stock = this.summaryOccupants();
+    const auto = computePowerSheet({
+      occupants: stock,
+      shipStats: (this.shipPayload()?.stats ?? null) as Record<string, Record<string, unknown>> | null,
+      schemaVersion: this.build()?.schemaVersion ?? null,
+    });
+    return computeKpiSheet(applyPowerToOccupants(stock, auto), this.kpiShipInput());
+  });
 
   /** Shield bays the game runs as RESERVE (beyond the two active generators,
    * `withReserveShields`): their card is tagged passive like a hidden bay. */
@@ -4567,7 +4578,8 @@ export class CodexDetailComponent implements OnInit {
   readonly craftedOccupants = computed(() => {
     const occ = this.draftSummaryOccupants();
     const q = this.craftQualities();
-    if (q.size === 0) return occ;
+    // Crafting is a classic-view feature: the Holotable reads stock parts.
+    if (q.size === 0 || this.holoView()) return occ;
     const craftable = this.craftable();
     const recipes = this.craftRecipes();
     return occ.map((o) => {

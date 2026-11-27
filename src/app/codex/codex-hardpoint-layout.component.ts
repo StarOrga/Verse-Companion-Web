@@ -99,6 +99,16 @@ export interface LayoutChild {
 }
 
 /** The stat scaled to `mult` units where that is a sum, unchanged where it is not. */
+/** Card rows only the classic view shows (the Holotable keeps its own look). */
+const CLASSIC_ONLY_STATS: ReadonlySet<string> = new Set([
+  'codex.equipped.sustainedDps',
+  'codex.equipped.fireTime',
+  'codex.equipped.pauseTime',
+  'codex.equipped.fullCharge',
+  'codex.equipped.coolingFull',
+  'codex.equipped.aimAssistFull',
+]);
+
 function scaledFigure(stat: EquippedStat, mult: number): { stat: EquippedStat; summed: boolean } {
   if (mult <= 1 || !statAddsUp(stat)) return { stat, summed: false };
   return { stat: { ...stat, value: stat.value * mult }, summed: true };
@@ -688,9 +698,9 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                                 }
                               </span>
                               <span class="slot-port">{{ kid.port }}</span>
-                              @if (kid.stats?.length) {
+                              @if (visibleStats(kid.stats).length) {
                                 <dl class="slot-stats">
-                                  @for (st of kid.stats; track st.labelKey) {
+                                  @for (st of visibleStats(kid.stats); track st.labelKey) {
                                     <div class="stat" [scTooltip]="st.hintKey ? (st.hintKey | translate) : null">
                                       <dt>
                                         @if (kidMult(row, kid) > 1 && addsUp(st)) { <span class="mult">{{ kidMult(row, kid) }}×</span> }
@@ -1158,6 +1168,12 @@ export class CodexHardpointLayoutComponent {
    * stats hide behind a per-group "Detail ▾" (concept round 5: per box, not
    * a global density switch); everything else keeps working as in classic. */
   readonly calm = input(false);
+  /**
+   * Show the classic view's extra card rows (fire cycle, full charge, values
+   * at full pips). The Holotable leaves them off: its design is untouched,
+   * only the numbers it already shows follow the shared model.
+   */
+  readonly extraStats = input(false);
   /** Merged groups ("Antrieb & Systeme") nest their sections; false = every section stands as its own block (the Holotable's area columns). */
   readonly nestGroups = input(true);
   private readonly detailOpenSections = signal<ReadonlySet<ShipModuleSection>>(new Set());
@@ -1739,7 +1755,13 @@ export class CodexHardpointLayoutComponent {
    * concept/part-06.html:322-324 + :461).
    */
   secondaryStats(row: GroupedSlot<LayoutSlot>): EquippedStat[] {
-    return row.slot.stats ?? [];
+    return this.visibleStats(row.slot.stats);
+  }
+
+  /** The card rows this layout shows (see {@link extraStats}). */
+  visibleStats(stats: readonly EquippedStat[] | null | undefined): EquippedStat[] {
+    const all = stats ?? [];
+    return this.extraStats() ? [...all] : all.filter((s) => !CLASSIC_ONLY_STATS.has(s.labelKey));
   }
 
   /**
