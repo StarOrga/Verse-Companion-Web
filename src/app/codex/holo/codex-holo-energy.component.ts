@@ -271,7 +271,9 @@ const round1 = (v: number): number => Math.round(v * 10) / 10;
         .col { min-inline-size: 104px; max-inline-size: 120px; }
         .stp { inline-size: 44px; block-size: 44px; }
         .gbtn { inline-size: 44px; block-size: 44px; }
-        .seg { block-size: 16px; inline-size: 44px; }
+        /* The global coarse-pointer 48 px floor (styles.scss) made every segment a 48 px square; a segment is a display cell
+           (tabindex -1), the steppers and the cut button are the touch path (N2 round 2). */
+        .seg { block-size: 16px; inline-size: 44px; min-block-size: 0; min-inline-size: 0; }
         .stack { block-size: calc(var(--n, 1) * 20px - 4px); }
       }
       @media (max-width: 1180px) {

@@ -345,7 +345,7 @@ let uidSeq = 0;
         box-shadow: 0 -10px 30px rgb(0 0 0 / 0.5);
         transition: border-color var(--holo-t-base) ease;
         color: var(--sc-fg-0);
-        font-size: max(12px, var(--sc-fs-floor));
+        font-size: max(13px, var(--sc-fs-floor));
       }
       /* Desktop, touching the Perspektiven panel above (--holo-join, set by the
          stage): one box with it — top corners square, no top edge or shadow,
@@ -372,7 +372,7 @@ let uidSeq = 0;
       /* The open cell lights up in its area's colour. */
       button.seg.sel { background: color-mix(in srgb, var(--p) 14%, transparent); box-shadow: inset 0 -2px 0 var(--p); }
       .seg { display: flex; flex-direction: column; justify-content: center; gap: 2px; padding: 6px clamp(7px, 0.6vw, 11px); min-width: 0; flex: 1 1 auto; }
-      .seg .lab { display: inline-flex; align-items: baseline; gap: 8px; font-family: var(--sc-font-display); font-size: max(9px, var(--sc-fs-floor));
+      .seg .lab { display: inline-flex; align-items: baseline; gap: 8px; font-family: var(--sc-font-display); font-size: max(13px, var(--sc-fs-floor));
         letter-spacing: 0.1em; text-transform: uppercase; color: var(--sc-accent); white-space: nowrap; }
       /* Each area's symbol in its colour (#330); the label beside it stays the accent. */
       .seg[data-p="offensive"] { --p: var(--p-offensive); }
@@ -382,7 +382,7 @@ let uidSeq = 0;
       .seg .lab .area-sym { align-self: center; color: var(--p, var(--sc-accent)); font-size: max(13px, var(--sc-fs-floor)); }
       .tile-vals { display: flex; justify-content: space-between; gap: clamp(6px, 0.5vw, 9px); flex-wrap: nowrap; }
       .tv { display: flex; flex-direction: column; gap: 1px; }
-      .tv .k { font-size: max(9px, var(--sc-fs-floor)); color: var(--sc-fg-2); white-space: nowrap; }
+      .tv .k { font-size: max(13px, var(--sc-fs-floor)); color: var(--sc-fg-2); white-space: nowrap; }
       .tv .v { font-family: var(--hs-mono); font-variant-numeric: tabular-nums; font-size: clamp(14px, 0.89vw, 17px); line-height: 1.1; color: var(--sc-fg-0); white-space: nowrap; letter-spacing: -0.02em;
         border-radius: 2px; transition: color 0.4s ease; }
       .tv.none .v { color: var(--sc-fg-2); }
@@ -390,17 +390,17 @@ let uidSeq = 0;
       .tv.flash .v { animation: val-flash 900ms var(--e-out); }
       @keyframes val-flash { 0% { color: var(--sc-accent); text-shadow: 0 0 10px color-mix(in srgb, var(--sc-accent) 70%, transparent);
         background: color-mix(in srgb, var(--sc-accent) 16%, transparent); } }
-      .d { font-family: var(--hs-mono); font-size: max(9.5px, var(--sc-fs-floor)); font-variant-numeric: tabular-nums; }
+      .d { font-family: var(--hs-mono); font-size: max(13px, var(--sc-fs-floor)); font-variant-numeric: tabular-nums; }
       .d.up { color: var(--sc-success); }
       .d.down { color: var(--sc-warning); }
       .fact { display: flex; flex-direction: column; gap: 1px; align-items: flex-start; }
       .fact .v { font-family: var(--hs-mono); font-variant-numeric: tabular-nums; font-size: clamp(14px, 0.89vw, 17px); line-height: 1.1; white-space: nowrap; letter-spacing: -0.02em; }
-      .fact .v small { color: var(--sc-fg-2); margin-inline-start: 3px; font-size: max(10px, var(--sc-fs-floor)); }
+      .fact .v small { color: var(--sc-fg-2); margin-inline-start: 3px; font-size: max(13px, var(--sc-fs-floor)); }
       .fact[tabindex] { cursor: help; border-radius: var(--holo-r-xs); }
       .fact[tabindex]:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       /* Touch: a focusable fact (tooltip in metres) reaches the tap minimum. */
       @media (pointer: coarse) { .fact[tabindex] { min-block-size: var(--sc-tap-min); min-inline-size: var(--sc-tap-min); justify-content: center; } }
-      .tip-trigger { font-size: max(9px, var(--sc-fs-floor)); color: var(--sc-fg-2); white-space: nowrap; }
+      .tip-trigger { font-size: max(13px, var(--sc-fs-floor)); color: var(--sc-fg-2); white-space: nowrap; }
       .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
       .gapv { color: var(--sc-fg-2); }
 
@@ -431,8 +431,9 @@ let uidSeq = 0;
         .holo-strip { margin-inline-end: var(--fab-clear, 0px); }
         .hs-row { padding-inline-end: 0; }
       }
-      /* Tablet: the "continue on the phone" button owns the bottom-left corner the same way (it lay over "Offensive"). */
-      @media (min-width: 641px) and (max-width: 1000px) {
+      /* The "continue on the phone" button owns the bottom-left corner the same way (it lay over "Offensive"): from the
+         tablet up, on the desktop too (U2, round 2: at 1280 it still lay over the first cell). */
+      @media (min-width: 641px) {
         .holo-strip { margin-inline-start: var(--fab-clear-start, 0px); }
       }
       .hs-panel { position: absolute; inset-inline: -1px; inset-block-end: 100%; z-index: 4;
@@ -470,12 +471,12 @@ let uidSeq = 0;
       .seg-pick { display: grid; gap: 6px; }
       .m { display: flex; align-items: center; justify-content: space-between; gap: 8px; border: 1px solid var(--sc-border); border-radius: 3px;
         background: transparent; color: var(--sc-fg-1); padding: 5px 10px; min-block-size: var(--sc-tap-min, 30px); cursor: pointer;
-        font-family: var(--sc-font-display); font-size: max(9.5px, var(--sc-fs-floor)); letter-spacing: 0.14em; text-transform: uppercase; text-align: start; }
+        font-family: var(--sc-font-display); font-size: max(13px, var(--sc-fs-floor)); letter-spacing: 0.14em; text-transform: uppercase; text-align: start; }
       .m small { font-family: var(--hs-mono); letter-spacing: 0; text-transform: none; font-size: 13px; color: var(--sc-fg-2); }
       .m.on { color: var(--sc-accent); border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 12%, transparent); }
       .m.preset { border-style: dashed; border-color: rgba(var(--accent-gold-rgb, 200, 168, 75), 0.5); color: var(--p-signature); }
       .m.preset.on { background: rgba(var(--accent-gold-rgb, 200, 168, 75), 0.12); border-style: solid; border-color: var(--p-signature); }
-      .m.reset { justify-content: center; padding: 3px 8px; min-block-size: 26px; font-size: max(8.5px, var(--sc-fs-floor)); }
+      .m.reset { justify-content: center; padding: 3px 8px; min-block-size: 26px; font-size: max(13px, var(--sc-fs-floor)); }
       .hp-pips { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; --pip-h: 10px; --pip-gap: 3px; --pip-w: 26px; --pips: 1; }
       .hp-col { display: flex; flex-direction: column; align-items: center; gap: 4px; }
       .stack { display: flex; flex-direction: column-reverse; gap: var(--pip-gap);
@@ -514,14 +515,14 @@ let uidSeq = 0;
       .hp-cooling text.l { font-family: var(--sc-font-display); font-size: 5.5px; letter-spacing: 0.14em; fill: var(--sc-fg-2); text-transform: uppercase; }
       .hp-cool-txt { display: grid; gap: 1px; }
       .hp-cool-txt .v { font-family: var(--hs-mono); font-size: 14px; color: var(--sc-fg-0); }
-      .hp-cool-txt .k { font-family: var(--sc-font-display); font-size: max(8px, var(--sc-fs-floor)); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-fg-2); }
+      .hp-cool-txt .k { font-family: var(--sc-font-display); font-size: max(13px, var(--sc-fs-floor)); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-fg-2); }
       .hp-summary { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-variant-numeric: tabular-nums; color: var(--sc-fg-1); }
       .hp-summary .v { font-family: var(--hs-mono); font-size: 13px; color: var(--sc-fg-0); }
       .hp-summary .v small { font-size: 13px; color: var(--sc-fg-2); }
-      .hp-summary .mode { font-family: var(--sc-font-display); text-transform: uppercase; letter-spacing: 0.14em; font-size: max(8.5px, var(--sc-fs-floor)); color: var(--sc-fg-2); }
-      .hp-summary .ok { font-size: max(10px, var(--sc-fs-floor)); color: var(--sc-success); }
+      .hp-summary .mode { font-family: var(--sc-font-display); text-transform: uppercase; letter-spacing: 0.14em; font-size: max(13px, var(--sc-fs-floor)); color: var(--sc-fg-2); }
+      .hp-summary .ok { font-size: max(13px, var(--sc-fs-floor)); color: var(--sc-success); }
       .hp-summary .ok.no { color: var(--sc-danger); }
-      .draft-note { margin: 0; font-size: max(10px, var(--sc-fs-floor)); color: var(--sc-fg-2); font-style: italic; }
+      .draft-note { margin: 0; font-size: max(13px, var(--sc-fs-floor)); color: var(--sc-fg-2); font-style: italic; }
       @media (max-width: 1100px) {
         .hp-energy { grid-template-columns: 1fr; gap: 12px; }
         .hp-modes { padding-inline-end: 0; border-inline-end: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -766,6 +767,7 @@ export class CodexHoloStripComponent {
     const handoff = document.querySelector('sc-handoff-button .wrap')?.getBoundingClientRect();
     const startClear = handoff && handoff.width > 0 ? Math.max(0, Math.round(handoff.right + gutter / 2 - box.left)) : 0;
     el.style.setProperty('--fab-clear-start', `${startClear}px`);
+    (el.closest('.holo-stage, [data-holo-root]') as HTMLElement | null)?.style.setProperty('--holo-fab-clear-start', `${startClear}px`);
     // The stage's shared columns end with the same lane, so the parts and the
     // perspectives above stay on the bar's columns (concept r1 d2).
     (el.closest('.holo-stage, [data-holo-root]') as HTMLElement | null)?.style.setProperty('--holo-fab-clear', `${clear}px`);
