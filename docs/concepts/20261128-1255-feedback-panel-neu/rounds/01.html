@@ -1,0 +1,474 @@
+<section data-iteration="1" data-iteration-template="design" data-tab-label="Runde 1" data-design-set="alternatives">
+<style>
+.mock-fb { --fb-acc: #00d4ff; --fb-col: #c27a5a; --fb-hot: #f06a6a; --fb-warn: #f2b84b; --fb-ok: #5fd39a; --fb-fg: #e3f2f8; --fb-dim: #8aa7b5; --fb-bd: rgba(0,212,255,.22); --fb-bg0: #07141f; --fb-bg1: #0c1f2e; --fb-bg2: #12293b;
+  position: relative; box-sizing: border-box; min-height: 680px; height: 100%; display: grid; grid-template-columns: minmax(0,1fr) 380px; background: var(--fb-bg0); color: var(--fb-fg); font: 500 13px/1.45 Inter, system-ui, sans-serif; overflow: hidden; text-align: left; }
+.mock-fb.solo { grid-template-columns: minmax(0,1fr); }
+.mock-fb * { box-sizing: border-box; }
+.mock-fb button { font: inherit; color: inherit; }
+.mock-fb small { display: block; font-size: 11px; color: var(--fb-dim); letter-spacing: .04em; }
+.mock-fb-page { position: relative; padding: 18px 24px; display: flex; flex-direction: column; gap: 14px; }
+.mock-fb-page.dim > *:not(.mock-fb-hl):not(.mock-fb-bubble):not(.mock-fb-pin):not(.mock-fb-dock) { opacity: .45; }
+.mock-fb-bar { display: flex; align-items: center; gap: 12px; padding: 9px 14px; border: 1px solid var(--fb-bd); border-radius: 8px; background: var(--fb-bg1); font-size: 12px; color: var(--fb-dim); }
+.mock-fb-bar b { color: var(--fb-fg); font-weight: 600; letter-spacing: .08em; }
+.mock-fb-h1 { font: 600 26px/1.1 Orbitron, Inter, sans-serif; letter-spacing: .08em; }
+.mock-fb-blocks { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.mock-fb-block { min-height: 120px; border: 1px solid var(--fb-bd); border-radius: 8px; background: var(--fb-bg1); padding: 12px; color: var(--fb-dim); font-size: 12px; }
+.mock-fb-block.wide { grid-column: 1 / -1; min-height: 90px; }
+.mock-fb-block strong { display: block; color: var(--fb-fg); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; }
+.mock-fb-hl { outline: 2px solid var(--fb-acc); outline-offset: 3px; box-shadow: 0 0 0 9999px rgba(0,0,0,.0), 0 0 22px rgba(0,212,255,.35); opacity: 1 !important; }
+.mock-fb-panel { border-left: 1px solid var(--fb-bd); background: linear-gradient(180deg, var(--fb-bg2), var(--fb-bg1)); display: flex; flex-direction: column; min-height: 0; }
+.mock-fb-ph { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid var(--fb-bd); font: 600 12px/1 Orbitron, Inter, sans-serif; letter-spacing: .14em; color: var(--fb-acc); }
+.mock-fb-ph span { font: 500 11px/1 Inter, sans-serif; letter-spacing: 0; color: var(--fb-dim); }
+.mock-fb-pb { flex: 1; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
+.mock-fb-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.mock-fb-chip { padding: 4px 10px; border: 1px solid var(--fb-bd); border-radius: 999px; font-size: 12px; color: var(--fb-dim); }
+.mock-fb-chip.on { border-color: var(--fb-acc); color: var(--fb-fg); background: rgba(0,212,255,.14); }
+.mock-fb-field { min-height: 78px; padding: 10px; border: 1px solid var(--fb-bd); border-radius: 8px; background: rgba(0,0,0,.18); color: var(--fb-fg); font-size: 13px; }
+.mock-fb-field.ph { color: var(--fb-dim); }
+.mock-fb-ctx { border: 1px dashed var(--fb-bd); border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; }
+.mock-fb-ctx-row { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; }
+.mock-fb-ctx-row span:first-child { color: var(--fb-dim); }
+.mock-fb-ctx-row em { font-style: normal; color: var(--fb-dim); margin-left: 6px; }
+.mock-fb-act { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.mock-fb-btn { padding: 8px 14px; border-radius: 999px; border: 1px solid var(--fb-bd); background: transparent; font-size: 12px; cursor: pointer; }
+.mock-fb-btn.pri { border-radius: 8px; background: var(--fb-acc); border-color: var(--fb-acc); color: #041016; font-weight: 700; flex: 1; text-align: center; }
+.mock-fb-btn.ok { border-color: var(--fb-ok); color: var(--fb-ok); }
+.mock-fb-btn.warn { border-color: var(--fb-warn); color: var(--fb-warn); }
+.mock-fb-btn.col { border-color: var(--fb-col); color: var(--fb-col); }
+.mock-fb-ic { width: 32px; height: 32px; border: 1px solid var(--fb-bd); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; color: var(--fb-dim); }
+.mock-fb-card { border: 1px solid var(--fb-bd); border-radius: 8px; background: rgba(0,0,0,.16); padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+.mock-fb-card.q { border-color: var(--fb-warn); }
+.mock-fb-card.r { border-color: var(--fb-acc); }
+.mock-fb-card.f { border-color: var(--fb-col); }
+.mock-fb-card h4 { margin: 0; font-size: 13px; font-weight: 600; }
+.mock-fb-card h4 i { font-style: normal; color: var(--fb-dim); font-weight: 500; margin-right: 6px; }
+.mock-fb-card p { margin: 0; font-size: 12px; color: var(--fb-dim); }
+.mock-fb-tag { align-self: flex-start; padding: 2px 8px; border-radius: 999px; font-size: 11px; border: 1px solid currentColor; }
+.mock-fb-tag.q { color: var(--fb-warn); } .mock-fb-tag.r { color: var(--fb-acc); } .mock-fb-tag.f { color: var(--fb-col); } .mock-fb-tag.ok { color: var(--fb-ok); }
+.mock-fb-ba { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.mock-fb-ba div { height: 58px; border-radius: 4px; border: 1px solid var(--fb-bd); background: repeating-linear-gradient(135deg, rgba(0,212,255,.06) 0 6px, transparent 6px 12px); font-size: 11px; color: var(--fb-dim); padding: 4px 6px; }
+.mock-fb-ba div:last-child { border-color: var(--fb-acc); }
+.mock-fb-fold { display: flex; justify-content: space-between; padding: 8px 10px; border-top: 1px solid var(--fb-bd); font-size: 12px; color: var(--fb-dim); }
+.mock-fb-fold b { color: var(--fb-fg); font-weight: 600; }
+.mock-fb-path { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.mock-fb-path span { padding: 6px 4px 4px; border-top: 3px solid var(--fb-bd); font-size: 11px; color: var(--fb-dim); text-align: center; }
+.mock-fb-path span.done { border-top-color: var(--fb-acc); color: var(--fb-fg); }
+.mock-fb-path span.now { border-top-color: var(--fb-warn); color: var(--fb-warn); font-weight: 600; }
+.mock-fb-note { font-size: 12px; color: var(--fb-dim); padding: 8px 10px; border-left: 3px solid var(--fb-bd); background: rgba(0,0,0,.14); border-radius: 4px; }
+.mock-fb-go { position: absolute; z-index: 6; left: 24px; bottom: 18px; padding: 7px 12px; border: 1px dashed var(--fb-acc); border-radius: 999px; background: rgba(6,20,32,.92); color: var(--fb-acc); font-size: 11px; cursor: pointer; }
+.mock-fb-go.b { left: 210px; }
+/* d2 · Am Ort */
+.mock-fb-bubble { position: absolute; z-index: 5; width: 330px; border: 1px solid var(--fb-acc); border-radius: 8px; background: var(--fb-bg2); box-shadow: 0 12px 32px rgba(0,0,0,.5); padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+.mock-fb-bubble::before { content: ''; position: absolute; left: 22px; top: -7px; width: 12px; height: 12px; background: var(--fb-bg2); border-left: 1px solid var(--fb-acc); border-top: 1px solid var(--fb-acc); transform: rotate(45deg); }
+.mock-fb-pin { position: absolute; z-index: 4; width: 26px; height: 26px; border-radius: 50% 50% 50% 4px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #041016; background: var(--fb-acc); box-shadow: 0 4px 12px rgba(0,0,0,.5); }
+.mock-fb-pin.q { background: var(--fb-warn); } .mock-fb-pin.ok { background: var(--fb-ok); } .mock-fb-pin.run { background: var(--fb-dim); }
+.mock-fb-dock { position: absolute; z-index: 5; right: 18px; bottom: 18px; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid var(--fb-bd); border-radius: 999px; background: var(--fb-bg2); font-size: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.45); }
+.mock-fb-dock b { color: var(--fb-acc); }
+.mock-fb-cross { position: absolute; z-index: 3; left: 0; right: 0; top: 0; padding: 6px 12px; text-align: center; font-size: 12px; background: rgba(0,212,255,.14); border-bottom: 1px solid var(--fb-acc); color: var(--fb-fg); }
+/* d3 · Gespräch */
+.mock-fb-chat { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+.mock-fb-msg { max-width: 92%; padding: 9px 11px; border-radius: 8px; font-size: 12.5px; line-height: 1.45; }
+.mock-fb-msg.me { align-self: flex-end; background: rgba(0,212,255,.14); border: 1px solid var(--fb-bd); }
+.mock-fb-msg.ai { align-self: flex-start; background: rgba(0,0,0,.2); border: 1px solid var(--fb-bd); }
+.mock-fb-msg.ai small { margin-bottom: 4px; }
+.mock-fb-msg ul { margin: 6px 0; padding-left: 18px; }
+.mock-fb-msg .mock-fb-act { margin-top: 8px; }
+.mock-fb-msg .mock-fb-card { margin-top: 8px; }
+.mock-fb-input { display: flex; gap: 8px; align-items: center; padding: 10px 14px; border-top: 1px solid var(--fb-bd); }
+.mock-fb-input div { flex: 1; padding: 9px 10px; border: 1px solid var(--fb-bd); border-radius: 8px; color: var(--fb-dim); font-size: 12px; }
+</style>
+<header class="iteration-intro">
+  <h2>{{iteration.tab}} 1 · Feedback als Auftrag an die Routine</h2>
+  <p>Heute schreibst fast nur du: 290 von 302 Themen kommen vom Admin-Konto, 14 von Mitwirkenden, keins von Nutzern, und 297 sind geshipped. Das Panel ist also weniger Kummerkasten als Auftragskonsole für die Routine. Drei Richtungen denken es von dort neu, jede in drei Zuständen: etwas melden, „Du bist dran“ und die Sicht eines Nutzers. Die gestrichelten Knöpfe springen zwischen den Zuständen. Unter „Analyse“ stehen der Befund und die Fragen, die sich nicht am Mock ansehen lassen.</p>
+</header>
+
+<section data-design="d1" data-nav-label="Auftragskonsole" data-design-active="true" data-design-motto="Jede Meldung ist ein Auftrag mit sichtbarem Kontext" data-design-traits="Seite, Ansicht, Gerät und Version hängen automatisch dran|Du bist dran zeigt nur Karten mit fertigen Knöpfen|Läuft und Geliefert sind eingeklappte Zeilen" data-design-icon="&lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot;&gt;&lt;rect x=&quot;4&quot; y=&quot;3&quot; width=&quot;16&quot; height=&quot;18&quot; rx=&quot;2&quot;/&gt;&lt;path d=&quot;M8 8h8M8 12h8M8 16h5&quot;/&gt;&lt;/svg&gt;">
+  <section id="r1-d1-s1" data-nav-label="Melden" data-screen data-screen-active="true" data-screen-fit="full"><div class="mock-fb">
+    <div class="mock-fb-page dim">
+      <div class="mock-fb-bar"><b>VERSE COMPANION</b> Codex › Schiffe › Liberator</div>
+      <div class="mock-fb-h1">LIBERATOR</div>
+      <div class="mock-fb-blocks"><div class="mock-fb-block"><strong>Holotisch</strong>Schiff, Callouts</div><div class="mock-fb-block mock-fb-hl"><strong>Loadout › Waffen</strong>Laserrepetierer S2 · Raketenwerfer S4</div><div class="mock-fb-block wide"><strong>Strip</strong>Offensive · Verteidigung · Bewegung · Signatur</div></div>
+    </div>
+    <aside class="mock-fb-panel">
+      <div class="mock-fb-ph">NEUER AUFTRAG <span>✕</span></div>
+      <div class="mock-fb-pb">
+        <div class="mock-fb-chips"><span class="mock-fb-chip on">Fehler</span><span class="mock-fb-chip">Wunsch</span><span class="mock-fb-chip">Frage</span></div>
+        <div class="mock-fb-field">Raketenwerfer S4 steht doppelt in der Liste, einmal ohne Größe.</div>
+        <div class="mock-fb-ctx">
+          <small>DAS BEKOMMT DIE ROUTINE MIT</small>
+          <div class="mock-fb-ctx-row"><span>Seite</span><span>/codex/ships/liberator?view=holo <em>✕</em></span></div>
+          <div class="mock-fb-ctx-row"><span>Stelle</span><span>Loadout › Waffen <em>✕</em></span></div>
+          <div class="mock-fb-ctx-row"><span>Gerät</span><span>Edge · 1440 × 900 <em>✕</em></span></div>
+          <div class="mock-fb-ctx-row"><span>Version</span><span>alpha v0.9.31 · 47ae59e <em>✕</em></span></div>
+          <div class="mock-fb-ctx-row"><span>Bild</span><span>Ausschnitt der Stelle ✓ <em>✕</em></span></div>
+        </div>
+        <div class="mock-fb-act"><span class="mock-fb-ic">＋</span><span class="mock-fb-ic">◉</span><span class="mock-fb-ic">🎙</span><span class="mock-fb-chip">Komplex</span></div>
+        <div class="mock-fb-act"><button type="button" class="mock-fb-btn pri">Auftrag senden</button></div>
+      </div>
+    </aside>
+    <button type="button" class="mock-fb-go" data-screen-link="r1-d1-s2">→ Du bist dran</button>
+    <button type="button" class="mock-fb-go b" data-screen-link="r1-d1-s3">→ Sicht eines Nutzers</button>
+    <div class="anno-layer" data-anno-layer>
+      <div class="anno" data-anno="r1-d1-s1-a1" data-anno-side="left" data-anno-target=".mock-fb-ctx" style="--anno-x:80%;--anno-y:44%">
+        <button class="anno-pin" type="button" data-anno-pin="r1-d1-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d1-s1-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-r1-d1-s1-a1" data-anno-bubble="r1-d1-s1-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r1-d1-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d1-s1-a1"><span class="anno-bubble-question">Der Kontext steht offen im Panel, jede Zeile lässt sich mit ✕ entfernen. Soll er sichtbar bleiben, oder reicht dir eine eingeklappte Zeile „5 Angaben hängen dran“?</span></button>
+          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d1-s1-a1" data-annotation="r1-d1-s1-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d1-s1-a1"></div></div>
+        </div>
+      </div>
+    </div>
+  </div></section>
+  <section id="r1-d1-s2" data-nav-label="Du bist dran" data-screen hidden data-screen-fit="full"><div class="mock-fb">
+    <div class="mock-fb-page dim">
+      <div class="mock-fb-bar"><b>VERSE COMPANION</b> Codex › Schiffe › Liberator</div>
+      <div class="mock-fb-h1">LIBERATOR</div>
+      <div class="mock-fb-blocks"><div class="mock-fb-block"><strong>Holotisch</strong></div><div class="mock-fb-block"><strong>Loadout</strong></div><div class="mock-fb-block wide"><strong>Strip</strong></div></div>
+    </div>
+    <aside class="mock-fb-panel">
+      <div class="mock-fb-ph">DU BIST DRAN · 3 <span>● Dev-PC arbeitet</span></div>
+      <div class="mock-fb-pb">
+        <div class="mock-fb-card q"><span class="mock-fb-tag q">Rückfrage</span><h4><i>#401</i>Waffen-Callouts zusammenfassen?</h4><p>Zwei Wege gehen, beide sind klein. Welcher?</p>
+          <div class="mock-fb-act"><button type="button" class="mock-fb-btn warn">A · Eine Zeile je Größe</button><button type="button" class="mock-fb-btn warn">B · Gruppe mit Zähler</button><button type="button" class="mock-fb-btn">Anders …</button></div></div>
+        <div class="mock-fb-card r"><span class="mock-fb-tag r">Abnahme</span><h4><i>#374</i>Klassische Ansicht: Pledge-Link nach oben</h4>
+          <div class="mock-fb-ba"><div>vorher</div><div>jetzt live</div></div>
+          <div class="mock-fb-act"><button type="button" class="mock-fb-btn ok">✓ Passt</button><button type="button" class="mock-fb-btn">↩ Nachbessern</button><button type="button" class="mock-fb-btn">Ansehen ↗</button></div></div>
+        <div class="mock-fb-card f"><span class="mock-fb-tag f">Freigabe</span><h4><i>#399</i>Von Mitwirkendem: Suche findet „Pisces“ nicht</h4><p>Routine-Einschätzung: klarer Fehler, klein, Bereich Suche.</p>
+          <div class="mock-fb-act"><button type="button" class="mock-fb-btn col">Freigeben</button><button type="button" class="mock-fb-btn">Nicht umsetzen …</button></div></div>
+        <div class="mock-fb-fold"><span>▸ Läuft</span><b>2</b></div>
+        <div class="mock-fb-fold"><span>▸ Geliefert diese Woche</span><b>14</b></div>
+      </div>
+    </aside>
+    <button type="button" class="mock-fb-go" data-screen-link="r1-d1-s1">← Melden</button>
+    <button type="button" class="mock-fb-go b" data-screen-link="r1-d1-s3">→ Sicht eines Nutzers</button>
+    <div class="anno-layer" data-anno-layer>
+      <div class="anno" data-anno="r1-d1-s2-a1" data-anno-side="left" data-anno-target=".mock-fb-card.r" style="--anno-x:76%;--anno-y:50%">
+        <button class="anno-pin" type="button" data-anno-pin="r1-d1-s2-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d1-s2-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-r1-d1-s2-a1" data-anno-bubble="r1-d1-s2-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r1-d1-s2-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d1-s2-a1"><span class="anno-bubble-question">Die Abnahme zeigt ein Vorher/Nachher-Bild, das die Routine nach dem Deploy selbst aufnimmt. Reicht dir das Bild meistens, um ohne Seitenwechsel „Passt“ zu klicken?</span></button>
+          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d1-s2-a1" data-annotation="r1-d1-s2-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d1-s2-a1"></div></div>
+        </div>
+      </div>
+    </div>
+  </div></section>
+  <section id="r1-d1-s3" data-nav-label="Sicht eines Nutzers" data-screen hidden data-screen-fit="full"><div class="mock-fb">
+    <div class="mock-fb-page">
+      <div class="mock-fb-bar"><b>VERSE COMPANION</b> Codex › Suche</div>
+      <div class="mock-fb-h1">SUCHE</div>
+      <div class="mock-fb-blocks"><div class="mock-fb-block wide"><strong>Treffer</strong>„Pisces“ · 0 Treffer</div></div>
+    </div>
+    <aside class="mock-fb-panel">
+      <div class="mock-fb-ph">MEIN FEEDBACK <span>2</span></div>
+      <div class="mock-fb-pb">
+        <div class="mock-fb-card q"><h4><i>#399</i>Suche findet „Pisces“ nicht</h4>
+          <div class="mock-fb-path"><span class="done">Eingegangen</span><span class="done">In Arbeit</span><span class="now">Wartet auf dich</span><span>Live</span></div>
+          <p>Team: Meinst du die C8 Pisces oder die C8X? Beide fehlen gerade.</p>
+          <div class="mock-fb-act"><button type="button" class="mock-fb-btn warn">C8 Pisces</button><button type="button" class="mock-fb-btn warn">C8X</button><button type="button" class="mock-fb-btn warn">Beide</button></div></div>
+        <div class="mock-fb-card"><h4><i>#388</i>Hangar-Filter merkt sich nichts</h4>
+          <div class="mock-fb-path"><span class="done">Eingegangen</span><span class="done">In Arbeit</span><span class="done">Wartet auf dich</span><span class="done">Live</span></div>
+          <div class="mock-fb-act"><button type="button" class="mock-fb-btn">Im Hangar ansehen ↗</button></div></div>
+        <div class="mock-fb-note">Das Team arbeitet in Schüben. Der nächste Schub läuft voraussichtlich heute Abend.</div>
+        <div class="mock-fb-act"><button type="button" class="mock-fb-btn pri">Neues Feedback</button></div>
+      </div>
+    </aside>
+    <button type="button" class="mock-fb-go" data-screen-link="r1-d1-s1">← Melden</button>
+  </div></section>
+</section>
+
+<section data-design="d2" data-nav-label="Am Ort" hidden data-design-motto="Feedback hängt an der Stelle, die es meint" data-design-traits="Melden heißt auf ein Element klicken, eine Blase öffnet sich dort|Offene Themen erscheinen als Nadeln auf ihrer Seite|Das Panel schrumpft zu einem Dock mit Zählern" data-design-icon="&lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot;&gt;&lt;path d=&quot;M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z&quot;/&gt;&lt;circle cx=&quot;12&quot; cy=&quot;10&quot; r=&quot;2.2&quot;/&gt;&lt;/svg&gt;">
+  <section id="r1-d2-s1" data-nav-label="Melden" data-screen data-screen-active="true" data-screen-fit="full"><div class="mock-fb solo">
+    <div class="mock-fb-page dim">
+      <div class="mock-fb-cross">Klick auf die Stelle, die du meinst · Esc bricht ab</div>
+      <div class="mock-fb-bar" style="margin-top:26px"><b>VERSE COMPANION</b> Codex › Schiffe › Liberator</div>
+      <div class="mock-fb-h1">LIBERATOR</div>
+      <div class="mock-fb-blocks"><div class="mock-fb-block"><strong>Holotisch</strong>Schiff, Callouts</div><div class="mock-fb-block mock-fb-hl"><strong>Loadout › Waffen</strong>Laserrepetierer S2 · Raketenwerfer S4</div><div class="mock-fb-block wide"><strong>Strip</strong>Offensive · Verteidigung · Bewegung · Signatur</div></div>
+      <div class="mock-fb-bubble" style="left:52%;top:330px">
+        <div class="mock-fb-chips"><span class="mock-fb-chip on">Fehler</span><span class="mock-fb-chip">Wunsch</span><span class="mock-fb-chip">Frage</span></div>
+        <div class="mock-fb-field">Raketenwerfer S4 steht doppelt, einmal ohne Größe.</div>
+        <small>Hängt an: Loadout › Waffen · Bild und Seite gehen automatisch mit</small>
+        <div class="mock-fb-act"><span class="mock-fb-ic">🎙</span><button type="button" class="mock-fb-btn pri">Anheften</button></div>
+      </div>
+      <div class="mock-fb-dock"><span>🗨</span><span><b>2</b> hier · 5 woanders</span></div>
+    </div>
+    <button type="button" class="mock-fb-go" data-screen-link="r1-d2-s2">→ Du bist dran</button>
+    <button type="button" class="mock-fb-go b" data-screen-link="r1-d2-s3">→ Sicht eines Nutzers</button>
+    <div class="anno-layer" data-anno-layer>
+      <div class="anno" data-anno="r1-d2-s1-a1" data-anno-side="top" data-anno-target=".mock-fb-bubble" style="--anno-x:90%;--anno-y:56%">
+        <button class="anno-pin" type="button" data-anno-pin="r1-d2-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d2-s1-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-r1-d2-s1-a1" data-anno-bubble="r1-d2-s1-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r1-d2-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d2-s1-a1"><span class="anno-bubble-question">Hier gibt es kein Panel mehr zum Schreiben, nur die Blase an der Stelle. Fehlt dir Platz für lange Meldungen mit mehreren Punkten?</span></button>
+          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d2-s1-a1" data-annotation="r1-d2-s1-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d2-s1-a1"></div></div>
+        </div>
+      </div>
+    </div>
+  </div></section>
+  <section id="r1-d2-s2" data-nav-label="Du bist dran" data-screen hidden data-screen-fit="full"><div class="mock-fb solo">
+    <div class="mock-fb-page">
+      <div class="mock-fb-bar"><b>VERSE COMPANION</b> Codex › Schiffe › Liberator</div>
+      <div class="mock-fb-h1">LIBERATOR</div>
+      <div class="mock-fb-blocks"><div class="mock-fb-block"><strong>Holotisch</strong></div><div class="mock-fb-block"><strong>Loadout › Waffen</strong></div><div class="mock-fb-block wide"><strong>Strip</strong></div></div>
+      <span class="mock-fb-pin q" style="left:46%;top:150px">1</span>
+      <span class="mock-fb-pin" style="left:30%;top:300px">2</span>
+      <span class="mock-fb-pin run" style="left:80%;top:300px">3</span>
+      <div class="mock-fb-bubble" style="left:26%;top:336px">
+        <span class="mock-fb-tag r">Abnahme · #374</span>
+        <div class="mock-fb-ba"><div>vorher</div><div>jetzt live</div></div>
+        <p style="margin:0;font-size:12px;color:var(--fb-dim)">Pledge-Link steht jetzt über dem Strip.</p>
+        <div class="mock-fb-act"><button type="button" class="mock-fb-btn ok">✓ Passt</button><button type="button" class="mock-fb-btn">↩ Nachbessern</button></div>
+      </div>
+      <div class="mock-fb-dock"><span>🗨</span><span><b>3</b> hier · Du bist dran: <b>2</b> · nächste ›</span></div>
+    </div>
+    <button type="button" class="mock-fb-go" data-screen-link="r1-d2-s1">← Melden</button>
+    <button type="button" class="mock-fb-go b" data-screen-link="r1-d2-s3">→ Sicht eines Nutzers</button>
+    <div class="anno-layer" data-anno-layer>
+      <div class="anno" data-anno="r1-d2-s2-a1" data-anno-side="top" data-anno-target=".mock-fb-dock" style="--anno-x:84%;--anno-y:88%">
+        <button class="anno-pin" type="button" data-anno-pin="r1-d2-s2-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d2-s2-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-r1-d2-s2-a1" data-anno-bubble="r1-d2-s2-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r1-d2-s2-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d2-s2-a1"><span class="anno-bubble-question">„nächste ›“ springt zur Seite des nächsten Themas, das auf dich wartet. Reicht das statt einer Liste, oder willst du die Liste trotzdem einen Klick entfernt?</span></button>
+          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d2-s2-a1" data-annotation="r1-d2-s2-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d2-s2-a1"></div></div>
+        </div>
+      </div>
+    </div>
+  </div></section>
+  <section id="r1-d2-s3" data-nav-label="Sicht eines Nutzers" data-screen hidden data-screen-fit="full"><div class="mock-fb solo">
+    <div class="mock-fb-page">
+      <div class="mock-fb-bar"><b>VERSE COMPANION</b> Codex › Suche</div>
+      <div class="mock-fb-h1">SUCHE</div>
+      <div class="mock-fb-blocks"><div class="mock-fb-block wide"><strong>Treffer</strong>„Pisces“ · 0 Treffer</div><div class="mock-fb-block wide"><strong>Filter</strong></div></div>
+      <span class="mock-fb-pin q" style="left:40%;top:128px">!</span>
+      <div class="mock-fb-bubble" style="left:36%;top:166px">
+        <div class="mock-fb-path"><span class="done">Eingegangen</span><span class="done">In Arbeit</span><span class="now">Wartet auf dich</span><span>Live</span></div>
+        <p style="margin:0;font-size:12px">Team: Meinst du die C8 Pisces oder die C8X?</p>
+        <div class="mock-fb-act"><button type="button" class="mock-fb-btn warn">C8 Pisces</button><button type="button" class="mock-fb-btn warn">C8X</button><button type="button" class="mock-fb-btn warn">Beide</button></div>
+      </div>
+      <div class="mock-fb-dock"><span>🗨</span><span>Mein Feedback · <b>1</b> wartet auf dich</span></div>
+    </div>
+    <button type="button" class="mock-fb-go" data-screen-link="r1-d2-s1">← Melden</button>
+  </div></section>
+</section>
+
+<section data-design="d3" data-nav-label="Gespräch" hidden data-design-motto="Du redest mit der Routine, sie macht daraus Themen" data-design-traits="Ein Chat statt Formular, Liste und Thread|Die Routine schneidet Meldungen selbst in Themen und fragt mit Knöpfen nach|Ergebnisse kommen als Karte mit Vorschau in denselben Verlauf" data-design-icon="&lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot;&gt;&lt;path d=&quot;M4 5h16v10H9l-5 4z&quot;/&gt;&lt;path d=&quot;M8 9h8M8 12h5&quot;/&gt;&lt;/svg&gt;">
+  <section id="r1-d3-s1" data-nav-label="Melden" data-screen data-screen-active="true" data-screen-fit="full"><div class="mock-fb">
+    <div class="mock-fb-page dim">
+      <div class="mock-fb-bar"><b>VERSE COMPANION</b> Codex › Schiffe › Liberator</div>
+      <div class="mock-fb-h1">LIBERATOR</div>
+      <div class="mock-fb-blocks"><div class="mock-fb-block"><strong>Holotisch</strong></div><div class="mock-fb-block mock-fb-hl"><strong>Loadout › Waffen</strong></div><div class="mock-fb-block wide"><strong>Strip</strong></div></div>
+    </div>
+    <aside class="mock-fb-panel">
+      <div class="mock-fb-ph">ROUTINE <span>● arbeitet</span></div>
+      <div class="mock-fb-pb">
+        <div class="mock-fb-chat">
+          <div class="mock-fb-msg me">Raketenwerfer steht doppelt im Loadout, und der Strip unten ist auf dem Laptop zu hoch. Außerdem hätte ich gern die Masse in Tonnen statt kg.</div>
+          <div class="mock-fb-msg ai"><small>ROUTINE</small>Daraus mache ich drei Themen:<ul><li>#402 Doppelter Raketenwerfer (Fehler, Loadout)</li><li>#403 Strip-Höhe am Laptop (Fehler, Holotisch)</li><li>#404 Masse in Tonnen (Wunsch, Strip)</li></ul>
+            <div class="mock-fb-act"><button type="button" class="mock-fb-btn ok">Passt, los</button><button type="button" class="mock-fb-btn">Als ein Thema</button><button type="button" class="mock-fb-btn">Ändern …</button></div></div>
+        </div>
+      </div>
+      <div class="mock-fb-input"><span class="mock-fb-ic">＋</span><div>Schreib der Routine …</div><span class="mock-fb-ic">🎙</span></div>
+    </aside>
+    <button type="button" class="mock-fb-go" data-screen-link="r1-d3-s2">→ Du bist dran</button>
+    <button type="button" class="mock-fb-go b" data-screen-link="r1-d3-s3">→ Sicht eines Nutzers</button>
+    <div class="anno-layer" data-anno-layer>
+      <div class="anno" data-anno="r1-d3-s1-a1" data-anno-side="left" data-anno-target=".mock-fb-msg.ai" style="--anno-x:78%;--anno-y:40%">
+        <button class="anno-pin" type="button" data-anno-pin="r1-d3-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d3-s1-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-r1-d3-s1-a1" data-anno-bubble="r1-d3-s1-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r1-d3-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d3-s1-a1"><span class="anno-bubble-question">Das Aufteilen braucht eine schnelle Antwort der Routine, also einen kleinen Dienst, der auch läuft, wenn der Dev-PC aus ist. Ist dir das den Aufwand wert, oder darf die Aufteilung bis zum nächsten Lauf warten?</span></button>
+          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d3-s1-a1" data-annotation="r1-d3-s1-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d3-s1-a1"></div></div>
+        </div>
+      </div>
+    </div>
+  </div></section>
+  <section id="r1-d3-s2" data-nav-label="Du bist dran" data-screen hidden data-screen-fit="full"><div class="mock-fb">
+    <div class="mock-fb-page dim">
+      <div class="mock-fb-bar"><b>VERSE COMPANION</b> Codex › Schiffe › Liberator</div>
+      <div class="mock-fb-h1">LIBERATOR</div>
+      <div class="mock-fb-blocks"><div class="mock-fb-block"><strong>Holotisch</strong></div><div class="mock-fb-block"><strong>Loadout</strong></div><div class="mock-fb-block wide"><strong>Strip</strong></div></div>
+    </div>
+    <aside class="mock-fb-panel">
+      <div class="mock-fb-ph">ROUTINE <span>2 warten auf dich</span></div>
+      <div class="mock-fb-pb">
+        <div class="mock-fb-chat">
+          <div class="mock-fb-msg ai"><small>ROUTINE · 14:43</small>#374 ist live.
+            <div class="mock-fb-card r"><div class="mock-fb-ba"><div>vorher</div><div>jetzt live</div></div><div class="mock-fb-act"><button type="button" class="mock-fb-btn ok">✓ Passt</button><button type="button" class="mock-fb-btn">↩ Nachbessern</button></div></div></div>
+          <div class="mock-fb-msg ai"><small>ROUTINE · 15:02</small>#403 Strip-Höhe: Ab welcher Breite soll er schrumpfen?
+            <div class="mock-fb-act"><button type="button" class="mock-fb-btn warn">unter 1440 px</button><button type="button" class="mock-fb-btn warn">unter 1280 px</button><button type="button" class="mock-fb-btn">Anders …</button></div></div>
+          <div class="mock-fb-msg ai"><small>ROUTINE · 15:10</small>#402 läuft, PR offen.</div>
+        </div>
+      </div>
+      <div class="mock-fb-input"><span class="mock-fb-ic">＋</span><div>Schreib der Routine …</div><span class="mock-fb-ic">🎙</span></div>
+    </aside>
+    <button type="button" class="mock-fb-go" data-screen-link="r1-d3-s1">← Melden</button>
+    <button type="button" class="mock-fb-go b" data-screen-link="r1-d3-s3">→ Sicht eines Nutzers</button>
+  </div></section>
+  <section id="r1-d3-s3" data-nav-label="Sicht eines Nutzers" data-screen hidden data-screen-fit="full"><div class="mock-fb">
+    <div class="mock-fb-page">
+      <div class="mock-fb-bar"><b>VERSE COMPANION</b> Codex › Suche</div>
+      <div class="mock-fb-h1">SUCHE</div>
+      <div class="mock-fb-blocks"><div class="mock-fb-block wide"><strong>Treffer</strong>„Pisces“ · 0 Treffer</div></div>
+    </div>
+    <aside class="mock-fb-panel">
+      <div class="mock-fb-ph">FEEDBACK <span>an das Team</span></div>
+      <div class="mock-fb-pb">
+        <div class="mock-fb-chat">
+          <div class="mock-fb-msg me">Die Suche findet „Pisces“ nicht.</div>
+          <div class="mock-fb-msg ai"><small>TEAM</small>Danke! Meinst du die C8 Pisces oder die C8X?
+            <div class="mock-fb-act"><button type="button" class="mock-fb-btn warn">C8 Pisces</button><button type="button" class="mock-fb-btn warn">C8X</button><button type="button" class="mock-fb-btn warn">Beide</button></div></div>
+          <div class="mock-fb-msg ai"><small>TEAM · gestern</small>Dein Hangar-Filter merkt sich jetzt die Auswahl. <u>Im Hangar ansehen ↗</u></div>
+        </div>
+      </div>
+      <div class="mock-fb-input"><span class="mock-fb-ic">＋</span><div>Schreib dem Team …</div><span class="mock-fb-ic">🎙</span></div>
+    </aside>
+    <button type="button" class="mock-fb-go" data-screen-link="r1-d3-s1">← Melden</button>
+    <div class="anno-layer" data-anno-layer>
+      <div class="anno" data-anno="r1-d3-s3-a1" data-anno-side="left" data-anno-target=".mock-fb-msg.ai" style="--anno-x:76%;--anno-y:30%">
+        <button class="anno-pin" type="button" data-anno-pin="r1-d3-s3-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d3-s3-a1" aria-label="{{anno.pin_label}}">1</button>
+        <div class="anno-bubble" id="anno-bubble-r1-d3-s3-a1" data-anno-bubble="r1-d3-s3-a1" data-open="false">
+          <button type="button" class="anno-bubble-summary" data-anno-summary="r1-d3-s3-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d3-s3-a1"><span class="anno-bubble-question">Für den Nutzer heißt der Absender „Team“, auch wenn die Frage von der Routine stammt. Passt das, oder soll offen „KI-Assistent“ dastehen?</span></button>
+          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d3-s3-a1" data-annotation="r1-d3-s3-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d3-s3-a1"></div></div>
+        </div>
+      </div>
+    </div>
+  </div></section>
+</section>
+
+<section data-view="r1-analyse" data-view-kind="analysis" data-analysis="full" data-nav-label="Analyse" hidden>
+  <section id="r1-briefing" data-analysis-briefing data-nav-label="Briefing">
+    <p data-briefing-what>Das Feedback-Panel steckt nur in der Web-App, die Desktop-App hat keins. Fast jede Meldung schreibst du selbst als Auftrag an die Routine.</p>
+    <p data-briefing-why>Die Routine shippt zuverlässig (297 von 302). Was bremst, liegt davor und danach: wenig Kontext beim Melden, ein langer Umweg bei Rückfragen an Nutzer und die Abnahme einzeln pro Thema.</p>
+    <div data-briefing-potential data-viz="kpi" data-viz-spec='{"value":"96","unit":"%","label":"der Themen kommen vom Admin-Konto"}'>96 %</div>
+    <a data-briefing-topic="r1-t-meta" data-share="50">Wer meldet was mit Kontext</a>
+    <a data-briefing-topic="r1-t-loop" data-share="50">Rückfragen, Freigabe, Abnahme</a>
+    <p data-briefing-duration>≈ 8 min</p>
+    <div data-alevel="1" data-title="Briefing">
+      <div data-slot="short"><p>Acht Fragen in zwei Themen, jede mit Empfehlung. Die Form des Panels entscheidest du an den drei Varianten.</p></div>
+      <div data-slot="long">
+        <div data-viz="bars" data-viz-spec='{"items":[{"label":"Admin (du)","value":275},{"label":"PostHog-Wächter","value":10},{"label":"Mitwirkende","value":14},{"label":"Nutzer","value":0},{"label":"Sonstige","value":3}],"unit":"Themen","hl":"Admin (du)"}'></div>
+        <div data-example><pre>Befund (Datenbank, 28.11.2026; der Bestand enthält 302 Themen)
+Absender      275 Admin · 14 Mitwirkende · 10 PostHog-Wächter · 3 Sonstige · 0 Nutzer
+Ergebnis      297 geshipped · 4 nicht umgesetzt · 1 in Arbeit
+Bereich       152 ohne Bereich · 73 Codex · 27 News · 25 Admin · Rest &lt; 10
+Länge         141 zwischen 300 und 1000 Zeichen · 62 mit Bild · 6 als „Komplex“
+
+Panels        Web: Admin-Board (Strom, Thread, Dashboard, Lebenszyklus) und das schlanke Nutzer-Panel
+              Desktop-App (Verse-Companion-App): kein Feedback-Weg
+Weiterverarbeitung
+              Wächter alle 3 min → headless claude -p auf dem Dev-PC → Worktree, PR, CI, ship_release
+              → „geshipped“ → deine Abnahme (reviewed_at). Nur solange der Dev-PC an ist.
+
+Reibung
+1 Kontext     Gespeichert werden Text, Bereich und Bilder. Route, Ansicht, Gerät, Version und Art
+              (Fehler/Wunsch) fehlen; die Routine rät sie aus dem Text.
+2 Nutzer      Jedes Nutzer-Thema wartet auf deine Freigabe. Eine Rückfrage geht Routine → du → Nutzer
+              → du (erneute Freigabe) → Routine. Der Nutzer sieht bis dahin nur „In Bearbeitung“.
+3 Abnahme     Jedes Thema einzeln öffnen, live ansehen, „Abgenommen“ klicken.
+4 Status      11 interne Stati; der Nutzer sieht 4, du siehst Spuren, Stationen und Lebenszyklus.</pre></div>
+        <p>Geprüft in <code>src/app/feedback/user-feedback-panel.component.ts</code>, <code>src/app/shell/user-feedback-fab.component.ts</code>, <code>src/app/admin/feedback/feedback-composer.component.ts</code>, <code>docs/feedback-routine/*.md</code> und per SQL auf <code>admin_feedback</code>.</p>
+        <p>Messbar machen (Projektregel): neue Events <code>feedback:context_remove</code>, <code>feedback:question_answer</code>, <code>feedback:review_accept</code>, <code>feedback:review_reopen</code>, <code>feedback:topic_release</code>; dazu eine Kachel „Feedback-Fluss“ im Produkt-Dashboard mit Zeit bis zur Antwort und Abnahmen pro Woche.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="r1-t-meta" data-topic data-nav-label="Wer meldet was">
+    <div data-alevel="2" data-title="Wer meldet was mit Kontext">
+      <div data-slot="short"><p>Heute bedient ein Panel zwei sehr verschiedene Leute: dich als Auftraggeber der Routine und Nutzer, die nur etwas loswerden wollen. Die Hälfte der Themen hat keinen Bereich, keins hat Seite, Gerät oder Version. Die Routine rät das aus dem Text.</p></div>
+      <div data-slot="long"><p>Das Admin-Board ist über 3.000 Zeilen groß und trägt Dashboard, Lebenszyklus, Herzschlag und Thread. Das Nutzer-Panel nutzt denselben Eingabekasten. Nutzer haben es bisher nie benutzt, Mitwirkende 14-mal.</p></div>
+    </div>
+
+    <section id="r1-audience" data-nav-label="Schwerpunkt" data-decision="r1-audience" data-ui-ok="Richtung der Arbeit, nicht die Form der Varianten" data-decision-mode="single" data-label="Schwerpunkt" data-rec="admin" data-rec-why="Fast jede Meldung und jeder Ship kommt aus deiner Hand, deshalb spart jeder Klick weniger bei dir am meisten Zeit." data-applies-to="Reihenfolge des Umbaus">
+      <p data-applies>Gilt für: Reihenfolge des Umbaus</p>
+      <p data-situation>96 % der Themen schreibst du; Nutzer-Feedback gibt es bisher nicht.</p>
+      <h3 data-question>Für wen wird das Panel zuerst neu gebaut?</h3>
+      <p data-stakes>Was die erste Umsetzung verbessert und was wartet.</p>
+      <div data-options>
+        <label data-opt="admin" data-recommended><input type="radio" name="dm-r1-audience" value="admin" checked><span data-opt-label>Erst deine Auftragsseite, Nutzer danach</span><span data-opt-consequence>Melden, „Du bist dran“ und Abnahme zuerst; das Nutzer-Panel bekommt danach dieselben Bausteine.</span></label><label data-opt="both"><input type="radio" name="dm-r1-audience" value="both"><span data-opt-label>Beide gleichzeitig</span><span data-opt-consequence>Ein Umbau, doppelt so groß, späteres Ergebnis.</span></label><label data-opt="user"><input type="radio" name="dm-r1-audience" value="user"><span data-opt-label>Erst Nutzer, um mehr Feedback zu bekommen</span><span data-opt-consequence>Lohnt sich erst, wenn Nutzer die App auch aktiv verwenden.</span></label>
+      </div>
+      <textarea data-comment="r1-audience-note" placeholder="Notiz (optional)"></textarea>
+    </section>
+
+    <section id="r1-desktop" data-nav-label="Desktop-App" data-decision="r1-desktop" data-ui-ok="Ein Einstieg in der Desktop-App, nicht das Panel der Varianten" data-decision-mode="yesnoalt" data-label="Desktop-App" data-rec="yes" data-rec-why="Ein eigenes Panel in der Desktop-App wäre eine zweite Baustelle; ein Link ins Web-Panel trägt die App-Version als Kontext mit und kostet wenig." data-applies-to="Verse-Companion-App">
+      <p data-applies>Gilt für: Verse-Companion-App</p>
+      <p data-situation>Die Desktop-App hat keinen Feedback-Weg; Desktop-Themen kommen nur über den Bereich „Desktop-Apps“ im Web.</p>
+      <h3 data-question>Bekommt die Desktop-App einen Knopf, der das Web-Panel mit App-Version und Fenster öffnet?</h3>
+      <p data-stakes>Ob Meldungen aus der Desktop-App mit Kontext ankommen.</p>
+      <div data-options>
+        <label data-opt="yes" data-recommended><input type="radio" name="dm-r1-desktop" value="yes" checked><span data-opt-label>Ja, Link ins Web-Panel mit vorausgefülltem Kontext</span><span data-opt-consequence>Ein Knopf in der App, kein zweites Panel.</span></label><label data-opt="no"><input type="radio" name="dm-r1-desktop" value="no"><span data-opt-label>Nein, Desktop bleibt ohne</span><span data-opt-consequence>Wie heute.</span></label><label data-opt="alt"><input type="radio" name="dm-r1-desktop" value="alt"><span data-opt-label>Anders …</span><input type="text" name="dm-r1-desktop-alt" placeholder="Wie stattdessen?" value=""></label>
+      </div>
+      <textarea data-comment="r1-desktop-note" placeholder="Notiz (optional)"></textarea>
+    </section>
+
+    <section id="r1-ctx" data-nav-label="Automatischer Kontext" data-decision="r1-ctx" data-decision-mode="multi" data-label="Automatischer Kontext" data-rec="route view device version spot" data-rec-why="Diese fünf Angaben kennt die Seite ohnehin, und genau sie fragt die Routine heute am häufigsten nach oder rät sie." data-applies-to="jede neue Meldung, Admin und Nutzer">
+      <p data-applies>Gilt für: jede neue Meldung, Admin und Nutzer</p>
+      <p data-situation>Nichts davon wird heute als eigenes Feld gespeichert.</p>
+      <h3 data-question>Welche Angaben hängen automatisch an jeder Meldung?</h3>
+      <p data-stakes>Wie oft die Routine raten oder nachfragen muss.</p>
+      <div data-options>
+        <label data-opt="route" data-recommended><input type="checkbox" name="dm-r1-ctx.route" checked><span data-opt-label>Seite mit Adresse und Filtern</span><span data-opt-consequence>Die Routine öffnet genau den Zustand, den du gesehen hast.</span></label><label data-opt="view" data-recommended><input type="checkbox" name="dm-r1-ctx.view" checked><span data-opt-label>Ansicht (Holotisch, Klassisch, Beta)</span><span data-opt-consequence>Ersetzt den heutigen Text-Marker im Body.</span></label><label data-opt="device" data-recommended><input type="checkbox" name="dm-r1-ctx.device" checked><span data-opt-label>Gerät: Browser, Fenstergröße, Telefon ja/nein</span><span data-opt-consequence>Mobile-Fehler werden ohne Rückfrage nachstellbar.</span></label><label data-opt="version" data-recommended><input type="checkbox" name="dm-r1-ctx.version" checked><span data-opt-label>App-Version und Commit</span><span data-opt-consequence>„Schon behoben“ lässt sich sicher erkennen.</span></label><label data-opt="spot" data-recommended><input type="checkbox" name="dm-r1-ctx.spot" checked><span data-opt-label>Angeklickte Stelle als eigenes Feld</span><span data-opt-consequence>Statt Text im Body; die Routine findet die Komponente direkt.</span></label><label data-opt="errors"><input type="checkbox" name="dm-r1-ctx.errors"><span data-opt-label>Letzte Fehlermeldungen der Seite</span><span data-opt-consequence>Hilft bei Abstürzen; kann persönliche Daten enthalten und braucht einen Filter.</span></label>
+      </div>
+      <textarea data-comment="r1-ctx-note" placeholder="Notiz (optional)"></textarea>
+    </section>
+
+    <section id="r1-kind" data-nav-label="Art der Meldung" data-decision="r1-kind" data-ui-ok="Ein Feld im Eingabekasten, das alle drei Varianten gleich zeigen" data-decision-mode="yesnoalt" data-label="Art der Meldung" data-rec="yes" data-rec-why="Bei einem Fehler darf die Routine sofort reparieren, bei einem Wunsch eher nachfragen; ein Klick erspart ihr das Raten." data-applies-to="Eingabekasten, alle Rollen">
+      <p data-applies>Gilt für: Eingabekasten, alle Rollen</p>
+      <p data-situation>Ob ein Thema ein Fehler oder ein Wunsch ist, steht heute nur im Text.</p>
+      <h3 data-question>Soll jede Meldung eine Art tragen: Fehler, Wunsch oder Frage?</h3>
+      <p data-stakes>Wie forsch die Routine handelt und wie sich der Strom filtern lässt.</p>
+      <div data-options>
+        <label data-opt="yes" data-recommended><input type="radio" name="dm-r1-kind" value="yes" checked><span data-opt-label>Ja, drei Chips, „Fehler“ vorgewählt, ein Klick zum Ändern</span><span data-opt-consequence>Kein Pflichtfeld; ohne Klick gilt die Vorwahl.</span></label><label data-opt="no"><input type="radio" name="dm-r1-kind" value="no"><span data-opt-label>Nein, die Routine erkennt es selbst</span><span data-opt-consequence>Kein neues Feld; die Routine schreibt die Art nur in ihre Zusammenfassung.</span></label><label data-opt="alt"><input type="radio" name="dm-r1-kind" value="alt"><span data-opt-label>Anders …</span><input type="text" name="dm-r1-kind-alt" placeholder="Wie stattdessen?" value=""></label>
+      </div>
+      <textarea data-comment="r1-kind-note" placeholder="Notiz (optional)"></textarea>
+    </section>
+  </section>
+
+  <section id="r1-t-loop" data-topic data-nav-label="Rückfrage, Freigabe, Abnahme">
+    <div data-alevel="2" data-title="Rückfragen, Freigabe, Abnahme">
+      <div data-slot="short"><p>Alles, was nach dem Absenden auf einen Menschen wartet, läuft heute über dich und über einzelne Klicks pro Thema.</p></div>
+      <div data-slot="long"><div data-example><pre>Rückfrage zu einem Nutzer-Thema heute
+Routine fragt (needs_input) → du liest → du schreibst dem Nutzer → Nutzer antwortet
+→ Thema wieder ungeprüft → du gibst frei → Routine arbeitet weiter
+Der Nutzer sieht die ganze Zeit „In Bearbeitung“.</pre></div></div>
+    </div>
+
+    <section id="r1-ask" data-nav-label="Rückfragen an Nutzer" data-decision="r1-ask" data-decision-mode="single" data-label="Rückfragen an Nutzer" data-rec="approve" data-rec-why="Du behältst die Kontrolle über alles, was ein Nutzer liest, sparst aber das Umformulieren und die zweite Freigabe." data-applies-to="Themen von Mitwirkenden und Nutzern">
+      <p data-applies>Gilt für: Themen von Mitwirkenden und Nutzern</p>
+      <p data-situation>Die Routine darf Nutzern nie direkt schreiben; jede Frage braucht dich zweimal.</p>
+      <h3 data-question>Wie erreicht eine Rückfrage der Routine den Nutzer?</h3>
+      <p data-stakes>Wie schnell Nutzer-Themen weiterkommen und wer liest, was die KI schreibt.</p>
+      <div data-options>
+        <label data-opt="approve" data-recommended><input type="radio" name="dm-r1-ask" value="approve" checked><span data-opt-label>Routine formuliert die Frage mit Antwortknöpfen, du gibst sie mit einem Klick frei</span><span data-opt-consequence>Die Antwort des Nutzers geht ohne zweite Freigabe zurück an die Routine.</span></label><label data-opt="direct"><input type="radio" name="dm-r1-ask" value="direct"><span data-opt-label>Routine fragt den Nutzer direkt, du siehst mit</span><span data-opt-consequence>Am schnellsten; KI-Text erreicht Nutzer ohne Prüfung.</span></label><label data-opt="relay"><input type="radio" name="dm-r1-ask" value="relay"><span data-opt-label>Wie heute: du schreibst die Frage selbst</span><span data-opt-consequence>Volle Kontrolle, längster Weg.</span></label>
+      </div>
+      <textarea data-comment="r1-ask-note" placeholder="Notiz (optional)"></textarea>
+    </section>
+
+    <section id="r1-release" data-nav-label="Freigabe" data-decision="r1-release" data-decision-mode="single" data-label="Freigabe" data-rec="collab" data-rec-why="Mitwirkende kennst du und sie sind wenige; Nutzer-Themen bleiben geprüft, bis klar ist, wie viel und was da kommt." data-applies-to="Eingang von Themen, die nicht von dir stammen">
+      <p data-applies>Gilt für: Eingang von Themen, die nicht von dir stammen</p>
+      <p data-situation>Jedes Thema, das nicht von dir kommt, wartet ungeprüft, bis du es für die Routine freigibst.</p>
+      <h3 data-question>Welche Themen gehen ohne deine Freigabe an die Routine?</h3>
+      <p data-stakes>Wie lange Themen anderer liegen und was die Routine ungeprüft anfasst.</p>
+      <div data-options>
+        <label data-opt="collab" data-recommended><input type="radio" name="dm-r1-release" value="collab" checked><span data-opt-label>Mitwirkende sofort, Nutzer nach Freigabe</span><span data-opt-consequence>Die Routine schätzt Nutzer-Themen vorab ein, damit die Freigabe ein Klick ist.</span></label><label data-opt="all"><input type="radio" name="dm-r1-release" value="all"><span data-opt-label>Alle sofort, mit Stundenlimit</span><span data-opt-consequence>Schnell; Spam und Wünsche gegen die Richtung landen direkt bei der Routine.</span></label><label data-opt="none"><input type="radio" name="dm-r1-release" value="none"><span data-opt-label>Wie heute: alles nach Freigabe</span><span data-opt-consequence>Volle Kontrolle.</span></label>
+      </div>
+      <textarea data-comment="r1-release-note" placeholder="Notiz (optional)"></textarea>
+    </section>
+
+    <section id="r1-review" data-nav-label="Abnahme" data-decision="r1-review" data-ui-ok="Regel, wann ein Thema als erledigt gilt; die Varianten zeigen nur den Knopf" data-decision-mode="single" data-label="Abnahme" data-rec="batch" data-rec-why="Ein Bild der live geänderten Stelle reicht meist zum Urteil, deshalb lassen sich mehrere Lieferungen in einem Durchgang abnehmen." data-applies-to="geshippte Themen">
+      <p data-applies>Gilt für: geshippte Themen</p>
+      <p data-situation>Ein Thema endet erst mit deinem Klick „Abgenommen“, einzeln pro Thema.</p>
+      <h3 data-question>Wie nimmst du Lieferungen ab?</h3>
+      <p data-stakes>Wie viele offene Abnahmen sich stapeln.</p>
+      <div data-options>
+        <label data-opt="batch" data-recommended><input type="radio" name="dm-r1-review" value="batch" checked><span data-opt-label>Vorher/Nachher-Bild je Lieferung, mehrere hintereinander abnehmen</span><span data-opt-consequence>Die Routine nimmt das Bild nach dem Deploy auf; „Passt“ und „Nachbessern“ direkt an der Karte.</span></label><label data-opt="auto"><input type="radio" name="dm-r1-review" value="auto"><span data-opt-label>Automatisch abgenommen nach 3 Tagen ohne Antwort</span><span data-opt-consequence>Nichts stapelt sich; ein übersehener Fehler gilt als erledigt.</span></label><label data-opt="single"><input type="radio" name="dm-r1-review" value="single"><span data-opt-label>Wie heute: einzeln öffnen und abnehmen</span><span data-opt-consequence>Kein Umbau.</span></label>
+      </div>
+      <textarea data-comment="r1-review-note" placeholder="Notiz (optional)"></textarea>
+    </section>
+
+    <section id="r1-status" data-nav-label="Status für Nutzer" data-decision="r1-status" data-ui-ok="Wortwahl der Stati, die alle Varianten gleich verwenden" data-decision-mode="yesnoalt" data-label="Status für Nutzer" data-rec="yes" data-rec-why="Nutzer sehen heute „In Bearbeitung“, auch wenn der Dev-PC aus ist oder ihre Antwort gebraucht wird; ein Pfad mit dem nächsten Schub macht das ehrlich." data-applies-to="Nutzer-Panel">
+      <p data-applies>Gilt für: Nutzer-Panel</p>
+      <p data-situation>Nutzer können nicht erkennen, ob ihr Thema ungeprüft liegt, der Dev-PC aus ist oder ihre Antwort fehlt: alles heißt „In Bearbeitung“.</p>
+      <h3 data-question>Soll der Nutzer einen Pfad mit vier Stufen und dem nächsten Schub sehen?</h3>
+      <p data-stakes>Ob Nutzer merken, dass sich etwas tut.</p>
+      <div data-options>
+        <label data-opt="yes" data-recommended><input type="radio" name="dm-r1-status" value="yes" checked><span data-opt-label>Ja: Eingegangen → In Arbeit → Wartet auf dich → Live, plus „Nächster Schub: heute Abend“</span><span data-opt-consequence>„Nicht umgesetzt“ bleibt als Endstation mit Begründung.</span></label><label data-opt="no"><input type="radio" name="dm-r1-status" value="no"><span data-opt-label>Nein, Stati wie heute</span><span data-opt-consequence>Kein Umbau.</span></label><label data-opt="alt"><input type="radio" name="dm-r1-status" value="alt"><span data-opt-label>Anders …</span><input type="text" name="dm-r1-status-alt" placeholder="Wie stattdessen?" value=""></label>
+      </div>
+      <textarea data-comment="r1-status-note" placeholder="Notiz (optional)"></textarea>
+    </section>
+  </section>
+</section>
+</section>
