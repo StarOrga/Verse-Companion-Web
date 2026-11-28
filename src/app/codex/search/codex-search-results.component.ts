@@ -11,6 +11,7 @@ import { CodexCategoryIconComponent } from '../codex-category-icon.component';
 import { ShipBlueprintIconComponent } from '../ship-blueprint/ship-blueprint-icon.component';
 import { FallbackImageComponent } from '../fallback-image.component';
 import { UpcomingShipsService, thumbnailCandidates } from '../upcoming-ships.service';
+import { ItemArtPrefsService } from '../item-art-prefs.service';
 import { hitThumbCandidates, type SearchHitArtSource } from './search-hit-thumbs';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import { PolySearchHit, isUpcomingHit, polyHitIconKind } from '../codex-poly-search';
@@ -457,6 +458,8 @@ import { SearchOption, SearchVariantLink, VARIANT_LINKS_SHOWN, hitManufacturer, 
 export class CodexSearchResultsComponent {
   readonly codex = inject(CodexService);
   private readonly rsi = inject(UpcomingShipsService);
+  /** Model renders vs icons for item rows (Settings, #402). */
+  private readonly itemArt = inject(ItemArtPrefsService);
 
   /** Intrinsic size of a row thumbnail (the dense overlay box; `.roomy` scales it in CSS). */
   protected readonly thumbW = 44;
@@ -472,6 +475,7 @@ export class CodexSearchResultsComponent {
       const ship = this.rsi.shipById(id);
       return ship ? thumbnailCandidates(ship) : [];
     },
+    itemRender: (name) => (this.itemArt.renders() ? this.codex.previewUrl(name) : null),
   };
 
   readonly engine = input.required<CodexSearchEngine>();

@@ -229,6 +229,11 @@ class PartStore:
         self.log = on_log
         self.simplify_error = simplify_error
         self.keep_work = keep_work
+        # Model renders (#402): with a dir set, every freshly built part also
+        # leaves a small colour still `<render_dir>/<sha>.webp`
+        # (`model_render`). A cache hit renders nothing — the next patch
+        # rebuilds the parts and fills it.
+        self.render_dir: Optional[Path] = None
         # Parallel workers share the store directory but each writes its OWN
         # index file (``index.w<N>.json``) — one shared file would lose rows to
         # concurrent read-modify-write. Every index file is read on start, so
@@ -508,6 +513,12 @@ class PartStore:
 
     def _publish(self, raw: Path, scratch: Path, geometry_path: str) -> PartRef:
         """Raw converter GLB -> geometry-only, optimized, content-addressed part."""
+        still = None
+        if self.render_dir is not None:
+            from .. import model_render
+            still = scratch / "render.webp"
+            if not model_render.render_glb(raw, still, self.log):
+                still = None
         glb_materials.strip_to_geometry(raw, self.log)
         out = scratch / "opt.glb"
         self.optimize(raw, out, 256, self.simplify_error)
@@ -517,6 +528,15 @@ class PartStore:
         sha = sha256_file(out)
         dest = self.path_of(sha)
         publish_blob(out, dest)
+        if still is not None and self.render_dir is not None:
+            from .. import model_render
+            target = model_render.render_path(self.render_dir, sha)
+            try:
+                if not target.exists():
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copyfile(still, target)
+            except OSError as exc:
+                self.log("warn", f"  render {geometry_path}: {exc}")
         return PartRef(sha256=sha, bytes=dest.stat().st_size, geometry_path=geometry_path,
                        bounds=glb_bounds(dest))
 
