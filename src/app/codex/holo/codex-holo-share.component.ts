@@ -194,7 +194,7 @@ export function reusableShareLink(
       font: inherit; font-size: max(0.78rem, var(--sc-fs-floor)); cursor: pointer; text-align: left;
     }
     .share-row:hover { border-color: var(--sc-accent); color: var(--sc-accent); }
-    .hk { padding: 0 4px; border: 1px solid var(--sc-border); border-radius: 2px; font-family: var(--font-monospace, monospace); font-size: 9px; color: var(--sc-fg-2); }
+    .hk { padding: 0 4px; border: 1px solid var(--sc-border); border-radius: 2px; font-family: var(--font-monospace, monospace); font-size: 13px; color: var(--sc-fg-2); }
     @media (hover: none), (pointer: coarse) { .hk { display: none; } }
 
     .follow-hint { padding: 8px 10px; border-radius: var(--holo-r); background: var(--sc-bg-0); border: 1px solid var(--sc-border); }

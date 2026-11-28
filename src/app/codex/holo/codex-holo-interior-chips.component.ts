@@ -36,9 +36,13 @@ import { GLYPH_PATHS, GROUP_GLYPH, INTERIOR_GROUPS } from './holo-interior';
   styles: [`
     :host { display: block; min-width: 0; container: ig / inline-size; }
   .ig { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1 1 auto; }
+  .ig-reset { position: relative; z-index: 1; margin-inline-start: 2px; }
   .ig-row { display: flex; gap: 5px; min-width: 0; flex: 0 1 auto; overflow-x: auto; overscroll-behavior-x: contain; padding: 2px 24px 4px 0;
   mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent); }
   .ig-tag, .ig-reset { flex: none; }
+  /* The row scrolls to a snap point instead of stopping mid-chip, and the reset sits outside its flow (T3). */
+  .ig-row { scroll-snap-type: x proximity; scroll-padding-inline: 4px; }
+  .ig-chip { scroll-snap-align: start; }
   .ig-ri { display: none; }
   /* Not room for every chip and the preset line (a 1440 px desktop): the preset folds into the reset icon (its name is the
      tooltip) instead of pushing the last chips under the fade. */
@@ -55,11 +59,13 @@ import { GLYPH_PATHS, GROUP_GLYPH, INTERIOR_GROUPS } from './holo-interior';
     .ig-reset { inline-size: 44px; min-inline-size: 44px; block-size: 44px; min-block-size: 44px; padding: 0; border-radius: 50%; justify-content: center; }
     .ig-ri { display: block; }
     .ig-rl { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    /* Its own slot before the scroll row, so it never lies over a chip (T3 round 2: the fade ended under it and cut "Weapons"). */
+    .ig-reset { order: -1; margin-inline-start: 0; }
   }
-  .ig-reset { min-height: 26px; padding-block: 0; font-size: max(11.5px, var(--f)); }
+  .ig-reset { min-height: 26px; padding-block: 0; font-size: max(13px, var(--f)); }
   @media (pointer: coarse) { .ig-reset { min-height: var(--sc-tap-min, 44px); min-inline-size: var(--sc-tap-min, 44px); } }
   .ig-chip { flex: none; display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 10px 0 4px; border: 1px solid var(--l1); border-radius: 13px;
-  background: none; color: var(--sc-fg-2); font: inherit; font-size: max(11.5px, var(--f)); white-space: nowrap; cursor: pointer;
+  background: none; color: var(--sc-fg-2); font: inherit; font-size: max(13px, var(--f)); white-space: nowrap; cursor: pointer;
   transition: color 160ms ease, border-color 160ms ease, background 160ms ease; --g: var(--sc-accent); }
   .ig-chip[data-g='cargo'] { --g: var(--sc-int-cargo); }
   .ig-chip[data-g='ways'] { --g: var(--sc-int-ways); }
@@ -78,7 +84,7 @@ import { GLYPH_PATHS, GROUP_GLYPH, INTERIOR_GROUPS } from './holo-interior';
   .ig-chip.on .ig-ic { opacity: 1; }
   .ig-chip:hover { color: var(--sc-fg-0); border-color: var(--l2); }
   .ig-chip:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
-  .ig-tag { font-size: max(11px, var(--f)); color: var(--sc-fg-2); white-space: nowrap; }
+  .ig-tag { font-size: max(13px, var(--f)); color: var(--sc-fg-2); white-space: nowrap; }
   .ig-tag b { color: var(--sc-fg-0); font-weight: 600; }
   @media (pointer: coarse) { .ig-chip { height: var(--sc-tap-min, 44px); } }
   /* A phone on its side: the chips row is exactly one tap high (44 px) with 3 px above and below, the hull gets the rest. */
@@ -86,6 +92,9 @@ import { GLYPH_PATHS, GROUP_GLYPH, INTERIOR_GROUPS } from './holo-interior';
   /* Narrow: the chips take their own line and scroll; the preset and its reset sit under them. */
   /* Narrow screens keep ONE line: the chips scroll sideways and the preset tag shortens with an ellipsis. A wrapped
      second line changed the row height with every view/deck switch and moved the stage (v0.282.0 report). */
+  @media (prefers-reduced-motion: reduce) {
+    .ig-chip { transition: none; }
+  }
   @media (max-width: 1000px) {
     .ig-row { flex: 1 1 auto; }
     .ig-tag { flex: 0 1 auto; min-width: 0; max-width: 34%; overflow: hidden; text-overflow: ellipsis; }

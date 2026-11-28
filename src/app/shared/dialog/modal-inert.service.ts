@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 
 const SKIP_TAGS = new Set(['SCRIPT', 'STYLE', 'LINK', 'TEMPLATE', 'NOSCRIPT', 'META']);
 
@@ -30,10 +30,14 @@ function isLiveRegion(el: Element): boolean {
 export class ModalInertService {
   private readonly stack: HTMLElement[] = [];
   private marked: Element[] = [];
+  private readonly openCountState = signal(0);
+  /** Number of open modal dialogs as a signal: a consumer that paused work under a modal resumes when it reads 0. */
+  readonly openCount = this.openCountState.asReadonly();
 
   register(host: HTMLElement): void {
     if (this.stack.includes(host)) return;
     this.stack.push(host);
+    this.openCountState.set(this.stack.length);
     this.apply();
   }
 
@@ -41,6 +45,7 @@ export class ModalInertService {
     const at = this.stack.indexOf(host);
     if (at < 0) return;
     this.stack.splice(at, 1);
+    this.openCountState.set(this.stack.length);
     this.apply();
   }
 

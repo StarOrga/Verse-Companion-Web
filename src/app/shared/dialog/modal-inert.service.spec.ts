@@ -74,8 +74,10 @@ describe('modal background inert', () => {
     expect(inert('.scrim')).toBe(false);
     expect(inert('.dlg-a')).toBe(false);
     expect(inert('.live')).toBe(false);
+    expect(TestBed.inject(ModalInertService).openCount()).toBe(1);
     host.a.set(false);
     await flush();
+    expect(TestBed.inject(ModalInertService).openCount()).toBe(0);
     expect(fixture.nativeElement.querySelectorAll('[inert]').length).toBe(0);
   });
 

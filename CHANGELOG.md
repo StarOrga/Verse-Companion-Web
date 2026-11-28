@@ -4,6 +4,18 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.302.3] - 2026-11-28
+
+### Changed
+- Beta Holotisch loads big ships faster: the Idris builds half the page elements up front, and the parts picker opens quicker.
+- Holotisch columns keep part names whole, fold to one open block per column on phones, and no longer slide under the floating buttons.
+- Smoother Holotisch motion that respects reduced-motion settings.
+
+### Fixed
+- The Gladius plan in "Einfach / Alle Räume" is centred instead of cut off in a corner.
+- The parts picker no longer lists Low Poly duplicates and sits below the top bar.
+- The page no longer jumps when the Holotisch replaces its loading view on large screens.
+
 ## [0.302.2] - 2026-11-28
 
 ### Fixed

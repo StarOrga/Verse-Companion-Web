@@ -579,6 +579,20 @@ const NOMAD_SIDED_RACKS_PAYLOAD: ShipPayload = {
 };
 
 describe('CodexDetailComponent — missile rack grouping (feedback #235)', () => {
+  // The Holotisch builds an open block's rows when it nears the viewport (@defer on viewport); the stub reports every block visible.
+  const RealIO = globalThis.IntersectionObserver;
+  beforeEach(() => {
+    globalThis.IntersectionObserver = class {
+      constructor(private readonly cb: IntersectionObserverCallback) {}
+      observe(target: Element): void {
+        setTimeout(() => this.cb([{ target, isIntersecting: true } as IntersectionObserverEntry], this as unknown as IntersectionObserver));
+      }
+      unobserve(): void {}
+      disconnect(): void {}
+      takeRecords(): IntersectionObserverEntry[] { return []; }
+    } as unknown as typeof IntersectionObserver;
+  });
+  afterEach(() => { globalThis.IntersectionObserver = RealIO; });
   it('groups two racks with per-side class names into one row, like the weapons', async () => {
     const fixture = await setup('ship', [], NOMAD_SIDED_RACKS_PAYLOAD);
     const missiles = fixture.componentInstance
@@ -590,8 +604,9 @@ describe('CodexDetailComponent — missile rack grouping (feedback #235)', () =>
     const keys = new Set(missiles?.slots.map((s) => s.groupKey));
     expect(keys.size).toBe(1);
     const el: HTMLElement = fixture.nativeElement;
-    const rows = el.querySelectorAll('sc-codex-hardpoint-layout .mod-sec[data-sec="missiles"] li.slot');
-    expect(rows.length).toBe(1);
+    // The Holotisch defers an open block's rows until it nears the viewport (@defer on viewport).
+    const rows = () => el.querySelectorAll('sc-codex-hardpoint-layout .mod-sec[data-sec="missiles"] li.slot');
+    await vi.waitFor(() => { fixture.detectChanges(); expect(rows().length).toBe(1); });
   });
 
   it('still keeps two DIFFERENT racks apart', async () => {
