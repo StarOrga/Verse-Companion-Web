@@ -373,7 +373,7 @@ function chipSize(pin: StagePin): number | null {
     .more:hover { border-bottom-color: var(--sc-accent); }
     @media (pointer: coarse) { .more { display: inline-flex; align-items: center; min-height: var(--sc-tap-min); } }
     .insp-head { display: flex; align-items: flex-start; gap: var(--sc-space-2); min-width: 0; }
-    .size-tag { font-family: var(--m); font-size: 10px; color: var(--sc-fg-2); border: 1px solid var(--hair); border-radius: 2px; padding: 1px 5px; flex: none; margin-top: 2px; }
+    .size-tag { font-family: var(--m); font-size: 13px; color: var(--sc-fg-2); border: 1px solid var(--hair); border-radius: 2px; padding: 1px 5px; flex: none; margin-top: 2px; }
     .insp-ident { display: grid; gap: var(--sc-space-1); min-width: 0; flex: 1; }
     .insp-ident b { font-weight: 500; color: var(--sc-fg-0); font-size: max(12.5px, var(--f)); overflow-wrap: anywhere; }
     .insp-ident small { font-size: max(10.5px, var(--f)); color: var(--sc-fg-2); overflow-wrap: anywhere; }
@@ -406,7 +406,7 @@ function chipSize(pin: StagePin): number | null {
     .pline { display: inline-flex; align-items: center; gap: 2px; max-width: 100%; min-width: 0; }
     .pline.off .part { opacity: 0.5; }
     .eye { flex: none; background: none; border: 0; border-radius: 3px; padding: 0; min-width: max(20px, var(--sc-tap-min, 0px)); min-height: max(20px, var(--sc-tap-min, 0px));
-      color: var(--sc-accent); cursor: pointer; font-size: 11px; }
+      color: var(--sc-accent); cursor: pointer; font-size: 13px; }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation: none !important; transition: none !important; }
     }

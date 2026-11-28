@@ -220,7 +220,7 @@ export type HoloPatchSide = CodexBuild | 'active';
     .cur { display: inline-flex; align-items: center; gap: 4px; font-family: var(--sc-font-body, inherit);
       font-size: max(0.66rem, var(--sc-fs-floor)); color: var(--sc-accent); }
     .cur::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--sc-accent); }
-    .car { font-size: 0.62rem; color: var(--sc-fg-2); }
+    .car { font-size: 0.8125rem; color: var(--sc-fg-2); }
     .bn { font-size: max(0.62rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
 
     .patch-pop {
@@ -278,7 +278,7 @@ export type HoloPatchSide = CodexBuild | 'active';
     .delta-state { margin: 6px 0 0; font-size: max(0.76rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
     /* Hotkey badge (#644): discreet, hidden on touch. */
     /* Out of the flow: the hidden hint never widens the picker. */
-    .hk { position: absolute; top: -9px; right: -4px; background: var(--sc-bg-0); padding: 0 4px; border: 1px solid var(--sc-border); border-radius: 2px; font-family: var(--font-monospace, monospace); font-size: 9px;
+    .hk { position: absolute; top: -9px; right: -4px; background: var(--sc-bg-0); padding: 0 4px; border: 1px solid var(--sc-border); border-radius: 2px; font-family: var(--font-monospace, monospace); font-size: 13px;
       color: var(--sc-fg-2); opacity: 0; transition: opacity 0.16s ease; }
     .pv:hover .hk, .pv:focus-visible .hk { opacity: 1; }
     @media (hover: none), (pointer: coarse) { .hk { display: none; } }

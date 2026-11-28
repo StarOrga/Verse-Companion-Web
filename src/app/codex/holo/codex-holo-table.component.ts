@@ -555,7 +555,7 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
     .viewer-hold.held > .mode-viewer { opacity: 0; pointer-events: none; }
     .mode-viewer { position: absolute; inset: 0; z-index: 1; animation: fade-in var(--holo-t-base) var(--holo-e-out) backwards; }
     .interior-3d { display: flex; flex-direction: column; }
-    .mode-viewer.is-placeholder { animation: none; }
+    .mode-viewer.is-placeholder { animation: none; container-type: size; }
     /* While the viewer chunk / the hull's asset row resolves, the projector already
        runs: a pulsing lock ring and a scan line rising through the air, so the stage
        is never an empty box (cx-polish: it stood empty for seconds on a cold load). */
@@ -570,10 +570,11 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
       left: 16%; right: 16%; bottom: 14%; height: 2px; border-radius: 2px;
       background: linear-gradient(90deg, transparent, var(--sc-accent), transparent);
       box-shadow: 0 0 14px var(--sc-accent);
-      animation: ph-scan 2.4s var(--holo-e-io) infinite;
+      will-change: transform, opacity; animation: ph-scan 2.4s var(--holo-e-io) infinite;
     }
     @keyframes ph-lock { 0%, 100% { transform: scale(0.82); opacity: 0.45; } 50% { transform: scale(1); opacity: 1; } }
-    @keyframes ph-scan { 0% { bottom: 14%; opacity: 0; } 15%, 85% { opacity: 1; } 100% { bottom: 86%; opacity: 0; } }
+    @keyframes ph-scan { 0% { transform: translateY(0); opacity: 0; } 15%, 85% { opacity: 1; } 100% { transform: translateY(-72cqh); opacity: 0; } }
+    @media (prefers-reduced-motion: reduce) { .mode-viewer.is-placeholder::before, .mode-viewer.is-placeholder::after { animation: none; } }
     :host(.still) .mode-viewer.is-placeholder::before, :host(.still) .mode-viewer.is-placeholder::after { animation: none; }
     /* #378: the 3D model is on its way — the table's hull steps back, a lock ring sits where the model lands. */
     .silhouette-frame.loading-3d .shipwrap { opacity: 0.35; transition: opacity var(--holo-t-base) var(--holo-e-out); }
