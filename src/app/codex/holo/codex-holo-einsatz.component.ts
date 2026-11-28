@@ -102,6 +102,12 @@ export interface StripMission {
       .mp.dis .mp-l svg { color: currentColor; }
       .mp .why { font-family: var(--sc-font-body, inherit); color: var(--sc-fg-2); }
       .mp:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
+      /* The mission name keeps its whole width; when the pill runs out of room the count (.sub) gives way first, to an ellipsis
+         and then to nothing (round-2 N1: "Co…" beside "2 × Frigate" on a phone). !important: the holo stage's ::ng-deep pill rules
+         (.val / .vt overflow hidden, .sub flex none) out-rank a component rule. ds-ok: layout priority, no new look. */
+      .val { flex: none !important; overflow: visible !important; }
+      .vt { overflow: visible !important; text-overflow: clip !important; }
+      .sub { flex: 0 1 auto !important; min-inline-size: 0; }
       @media (prefers-reduced-motion: reduce) { .einsatz, .val { transition: none; } }
       @media (max-width: 640px) {
         /* The word "Einsatz" stays for screen readers; the value gets the pill's width ("Frachter" not "Fracht…"). */

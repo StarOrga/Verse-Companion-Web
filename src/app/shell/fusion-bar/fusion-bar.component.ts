@@ -573,6 +573,11 @@ export class FusionBarComponent {
     // Coarse on purpose: every flip restyles the document, the hero's dock fade reads the
     // hero's own attributes (StageHeroDirective).
     effect(() => claimRootAttr('data-sc-bar', this, this.mode() === 'stage' ? 'stage' : 'bar'));
+    // One publish when the last modal closes (no polling timer while it is open).
+    effect(() => {
+      if (this.modalInert.openCount() > 0) return;
+      untracked(() => { if (this.publishWhenModalClosed) this.publishHeight(); });
+    });
 
     // The stage slot comes and goes with the page: track it and stand on it.
     effect(() => {
@@ -984,17 +989,19 @@ export class FusionBarComponent {
    * `--sc-topbar-h`: where a page's own sticky bar parks — the docked bar's
    * height at the top; 0 while staged, hidden or on a phone (bar at the bottom).
    */
+  private publishWhenModalClosed = false;
   private publishHeight(): void {
     if (typeof document === 'undefined') return;
     if (this.publishTimer) clearTimeout(this.publishTimer);
     this.publishTimer = null;
     // A modal holds the page inert: the bar cannot change under it, and the reads below force a
     // layout of the document the dialog just built (round-1 P1, ~450 ms at 4x on a big ship).
-    // Publish once it closes; the settle timer re-checks until then.
+    // Remember the request; the effect on ModalInertService.openCount publishes once, when the last modal closes.
     if (this.modalInert.depth > 0) {
-      this.publishHeightSettled();
+      this.publishWhenModalClosed = true;
       return;
     }
+    this.publishWhenModalClosed = false;
     const el = this.host.nativeElement as HTMLElement;
     const staged = this.mode() === 'stage';
     // The bar parks `--sc-chrome-top` (minus its 4px padding) below the viewport top: that lift counts.

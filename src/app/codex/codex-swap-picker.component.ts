@@ -220,7 +220,7 @@ export function isLowPolyProxy(it: Pick<CompatibleItem, 'classNameSlug' | 'subTy
   template: `
     @if (target(); as t) {
       <sc-popup class="pick-pop" kind="large" [title]="'codex.picker.title' | translate: { port: slotLabel(t), size: t.size ?? '' }"
-                [eyebrow]="eyebrow(t)" [initialFocus]="'first'" [bodyFill]="true" style="--sc-popup-body-gap: var(--sc-space-3)"
+                [eyebrow]="eyebrow(t)" [initialFocus]="'container'" [bodyFill]="true" style="--sc-popup-body-gap: var(--sc-space-3)"
                 scPopupMotion="large" scPopupMotionPlate=".scp-frame" scPopupMotionFoot=".scp-f"
                 (closed)="dismiss()">
           <!-- sc-popup: focus in, Tab trap, Escape, focus back to the opener
