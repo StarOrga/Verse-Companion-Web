@@ -120,7 +120,8 @@ export const SUBTHEMES: readonly Subtheme[] = [
     // so "Invictus Blue and Gold" no longer keeps the Grey icon and "Grey" its id.
     // 20: ship stats keep the weapon regen pool / capacitor-assignment structs
     // (energy pips → energy-weapon ammo on the classic ship page).
-    revision: 20,
+    // 21: ships carry `salvageScu` / `salvageStatus` and `providesMission` (extract schema 8).
+    revision: 21,
     phases: ['codex_ships'],
     sources: [
       ...CATALOG_SHARED,
@@ -138,11 +139,11 @@ export const SUBTHEMES: readonly Subtheme[] = [
   // resolve instead of showing the raw `@key`.
   // components 6 / weapons 6 / items 7: #402 — `renderImage`, the colour still
   // of the item's 3D model (model_render.py), plus its WebP in previews/.
-  { key: 'components', revision: 6, phases: ['codex_components'], sources: CATALOG_SHARED },
+  { key: 'components', revision: 7, phases: ['codex_components'], sources: CATALOG_SHARED },
   // weapons 4: #343 — weaponParams gains regen.* / heat.* (sustained DPS).
-  { key: 'weapons', revision: 6, phases: ['codex_weapons', 'codex_ammunition'], sources: CATALOG_SHARED },
+  { key: 'weapons', revision: 7, phases: ['codex_weapons', 'codex_ammunition'], sources: CATALOG_SHARED },
   // items 5: missiles carry stats.SCItemMissileParams (feedback e7b6a2a1).
-  { key: 'items', revision: 7, phases: ['codex_items'], sources: CATALOG_SHARED },
+  { key: 'items', revision: 8, phases: ['codex_items'], sources: CATALOG_SHARED },
   {
     key: 'codex_extra',
     // 2: #643 — codex_item_ports.helper_name / position / rotation resolve on
