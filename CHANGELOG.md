@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.300.6] - 2026-11-28
+
+### Added
+- Search and item detail pages show a small rendered image of each item (FPS weapons, armour, ship components) instead of the category icon; a new setting under Settings → Codex switches between rendered images and icons. The renders are untextured material-colour previews for now; they appear after Data Uploader 0.87.0 has rebuilt the parts (#402).
+
 ## [0.300.5] - 2026-11-27
 
 ### Changed
