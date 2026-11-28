@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.301.0",
+  "current": "0.301.1",
   "releases": [
+    {
+      "version": "0.301.1",
+      "date": "2026-11-28",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Holotable view: identical hardpoints are always grouped (no split toggle there; the classic view keeps it), and the fixed systems sit in the area columns they belong to — Bewegung, Offensive, Signatur & Kühlung, Verteidigung — open and clickable, without the \"nicht konfigurierbar\" tag (#411)."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.301.0",
       "date": "2026-11-28",
