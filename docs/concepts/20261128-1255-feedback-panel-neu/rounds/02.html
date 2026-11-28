@@ -1,4 +1,5 @@
-<section data-iteration="2" data-iteration-template="design" data-tab-label="Runde 2">
+<section data-iteration="2" data-iteration-template="design" data-tab-label="Runde 2" data-baked>
+  <script type="application/json" data-frozen-feedback>{"general":{"attachments":[],"text":""},"designs":{},"screens":{},"views":{},"fidelity":"off"}</script>
 <style>
 .mock-fb { --fb-acc: #00d4ff; --fb-col: #f06a6a; --fb-hot: #f06a6a; --fb-warn: #f2b84b; --fb-ok: #5fd39a; --fb-fg: #e3f2f8; --fb-dim: #8aa7b5; --fb-bd: rgba(0,212,255,.22); --fb-bg0: #07141f; --fb-bg1: #0c1f2e; --fb-bg2: #12293b;
   position: relative; box-sizing: border-box; min-height: 680px; height: 100%; display: grid; grid-template-columns: minmax(0,1fr) 380px; background: var(--fb-bg0); color: var(--fb-fg); font: 500 13px/1.45 Inter, system-ui, sans-serif; overflow: hidden; text-align: left; }
@@ -149,7 +150,7 @@
         <div class="anno-bubble" id="anno-bubble-r2-s1-a1" data-anno-bubble="r2-s1-a1" data-open="false">
           <p class="anno-bubble-improved"><strong>{{design.change_improved}}</strong> Art-Chips weg, mehrere Anhänge dazu</p>
           <button type="button" class="anno-bubble-summary" data-anno-summary="r2-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r2-s1-a1"><span class="anno-bubble-question">Das Bildschirmfoto der Seite kommt erst mit einem Klick auf „Seite“ dazu. Soll es bei jeder Meldung von selbst dranhängen?</span></button>
-          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r2-s1-a1" data-annotation="r2-s1-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r2-s1-a1"></div></div>
+          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r2-s1-a1" data-annotation="r2-s1-a1" data-attachable placeholder="{{anno.answer_placeholder}}">ja</textarea><div class="attach-slot" data-attach-slot="anno-r2-s1-a1"></div></div>
         </div>
       </div>
     </div>
@@ -408,8 +409,8 @@ Offen         sechs Regeln in zwei Themen</pre></div>
       </div>
       <textarea data-comment="r2-pins-note" placeholder="Notiz (optional)"></textarea>
       <input type="hidden" name="dm-r2-pins-none" value="">
-      <input type="hidden" name="dm-r2-pins-hes" value="">
-      <input type="hidden" name="dm-r2-pins-touched" value="">
+      <input type="hidden" name="dm-r2-pins-hes" value="{&quot;ms&quot;:14627,&quot;revisits&quot;:0,&quot;median&quot;:28779}">
+      <input type="hidden" name="dm-r2-pins-touched" value="1">
       <input type="hidden" name="dm-r2-pins-issue" value="">
       <input type="hidden" name="dm-r2-pins-epic" value="">
       <div data-alevel="3" data-title="Nadeln sichtbar">
@@ -437,8 +438,8 @@ Offen         sechs Regeln in zwei Themen</pre></div>
       </div>
       <textarea data-comment="r2-gone-note" placeholder="Notiz (optional)"></textarea>
       <input type="hidden" name="dm-r2-gone-none" value="">
-      <input type="hidden" name="dm-r2-gone-hes" value="">
-      <input type="hidden" name="dm-r2-gone-touched" value="">
+      <input type="hidden" name="dm-r2-gone-hes" value="{&quot;ms&quot;:44606,&quot;revisits&quot;:0,&quot;median&quot;:28779}">
+      <input type="hidden" name="dm-r2-gone-touched" value="1">
       <input type="hidden" name="dm-r2-gone-issue" value="">
       <input type="hidden" name="dm-r2-gone-epic" value="">
       <div data-alevel="3" data-title="Stelle verschwunden">
@@ -458,13 +459,13 @@ nachher  Abnahme #374 wartet, aber an der alten Stelle sitzt nichts</pre></div>
       <h3 data-question>Wo wird ein Entwurf gespeichert, bis du ihn sendest?</h3>
       <p data-stakes>Ob du am anderen Gerät weiterschreiben kannst.</p>
       <div data-options>
-        <label data-opt="device" data-recommended><input type="radio" name="dm-r2-drafts" value="device" checked><span data-opt-label>Nur auf diesem Gerät</span><span data-opt-consequence>Privat und ohne Datenbank; am anderen Gerät fehlt der Entwurf.</span></label>
-        <label data-opt="account"><input type="radio" name="dm-r2-drafts" value="account"><span data-opt-label>Im Konto, auf allen Geräten</span><span data-opt-consequence>Weiterschreiben überall; braucht eine Entwurfs-Tabelle und Speichern beim Tippen.</span></label>
+        <label data-opt="device" data-recommended><input type="radio" name="dm-r2-drafts" value="device"><span data-opt-label>Nur auf diesem Gerät</span><span data-opt-consequence>Privat und ohne Datenbank; am anderen Gerät fehlt der Entwurf.</span></label>
+        <label data-opt="account"><input type="radio" name="dm-r2-drafts" value="account" checked><span data-opt-label>Im Konto, auf allen Geräten</span><span data-opt-consequence>Weiterschreiben überall; braucht eine Entwurfs-Tabelle und Speichern beim Tippen.</span></label>
       </div>
       <textarea data-comment="r2-drafts-note" placeholder="Notiz (optional)"></textarea>
       <input type="hidden" name="dm-r2-drafts-none" value="">
-      <input type="hidden" name="dm-r2-drafts-hes" value="">
-      <input type="hidden" name="dm-r2-drafts-touched" value="">
+      <input type="hidden" name="dm-r2-drafts-hes" value="{&quot;ms&quot;:33466,&quot;revisits&quot;:0,&quot;median&quot;:28779}">
+      <input type="hidden" name="dm-r2-drafts-touched" value="1">
       <input type="hidden" name="dm-r2-drafts-issue" value="">
       <input type="hidden" name="dm-r2-drafts-epic" value="">
       <div data-alevel="3" data-title="Wo Entwürfe liegen">
@@ -500,8 +501,8 @@ Desktop-App, Hangar           keine Nadel</pre></div>
       </div>
       <textarea data-comment="r2-wait-note" placeholder="Notiz (optional)"></textarea>
       <input type="hidden" name="dm-r2-wait-none" value="">
-      <input type="hidden" name="dm-r2-wait-hes" value="">
-      <input type="hidden" name="dm-r2-wait-touched" value="">
+      <input type="hidden" name="dm-r2-wait-hes" value="{&quot;ms&quot;:111131,&quot;revisits&quot;:0,&quot;median&quot;:28779}">
+      <input type="hidden" name="dm-r2-wait-touched" value="1">
       <input type="hidden" name="dm-r2-wait-issue" value="">
       <input type="hidden" name="dm-r2-wait-epic" value="">
       <div data-alevel="3" data-title="Satz zur Wartezeit">
@@ -527,8 +528,8 @@ Deine Notiz  „nächsten sschub verstehe ich nicht, aber sonst gern“</pre></d
       </div>
       <textarea data-comment="r2-desktop-note" placeholder="Notiz (optional)"></textarea>
       <input type="hidden" name="dm-r2-desktop-none" value="">
-      <input type="hidden" name="dm-r2-desktop-hes" value="">
-      <input type="hidden" name="dm-r2-desktop-touched" value="">
+      <input type="hidden" name="dm-r2-desktop-hes" value="{&quot;ms&quot;:24092,&quot;revisits&quot;:0,&quot;median&quot;:28779}">
+      <input type="hidden" name="dm-r2-desktop-touched" value="1">
       <input type="hidden" name="dm-r2-desktop-issue" value="">
       <input type="hidden" name="dm-r2-desktop-epic" value="">
       <div data-alevel="3" data-title="Weg aus der Desktop-App">
@@ -554,8 +555,8 @@ Ziel     admin_feedback  source='desktop'  area='desktop'
       </div>
       <textarea data-comment="r2-notify-note" placeholder="Notiz (optional)"></textarea>
       <input type="hidden" name="dm-r2-notify-none" value="">
-      <input type="hidden" name="dm-r2-notify-hes" value="">
-      <input type="hidden" name="dm-r2-notify-touched" value="">
+      <input type="hidden" name="dm-r2-notify-hes" value="{&quot;ms&quot;:6014,&quot;revisits&quot;:0,&quot;median&quot;:28779}">
+      <input type="hidden" name="dm-r2-notify-touched" value="1">
       <input type="hidden" name="dm-r2-notify-issue" value="">
       <input type="hidden" name="dm-r2-notify-epic" value="">
       <div data-alevel="3" data-title="Rückfrage erreicht Nutzer">

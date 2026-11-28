@@ -1,0 +1,41 @@
+<section data-iteration="3" data-iteration-template="free" data-tab-label="Runde 3 · Gesamtbild">
+<style>.mock-r3t{width:100%;border-collapse:collapse;margin:4px 0 16px;font-size:14px}.mock-r3t th{text-align:left;vertical-align:top;white-space:nowrap;padding:6px 14px 6px 0;color:var(--text-2,#9fb3c0);font-weight:600}.mock-r3t td{padding:6px 0;border-top:1px solid rgba(127,160,180,.18)}.mock-r3t tr:first-child td{border-top:0}#r3-spec h4,#r3-plan h4{margin:18px 0 4px;font-size:15px}</style>
+<header class="iteration-intro">
+  <h2>{{iteration.tab}} 3 · Gesamtbild und Bauplan</h2>
+  <p>Runde 2 ist entschieden: Alle Empfehlungen gelten, nur Entwürfe liegen im Konto statt auf einem Gerät, und das Seiten-Bild hängt künftig von selbst an. Hier steht das ganze Panel als Spezifikation in einem Blick, dazu der Bauplan in drei Etappen. Offen sind nur noch zwei Fragen ganz unten. Passt alles, ist „Mit Feedback implementieren“ der nächste Schritt.</p>
+</header>
+
+<section id="r3-spec" data-nav-label="Spezifikation">
+  <h3>Was gebaut wird</h3>
+  <h4>Melden (Web, alle Rollen)</h4><table class="mock-r3t"><tbody><tr><th></th><td>Klick aufs Feedback-Dock → Fadenkreuz → Klick auf eine Stelle → Blase an der Stelle</td></tr><tr><th>Blase</th><td>Textfeld · Anhänge (mehrere Bilder, Einfügen, Ziehen; Admin auch Dateien) · Sprache · Seiten-Bild hängt automatisch an (abwählbar) · keine Auswahl Fehler/Wunsch/Frage</td></tr><tr><th>Kontext</th><td>Seite mit Adresse und Filtern, Ansicht, Gerät, Version, Stelle als eigene Felder · eingeklappt „Hängt an: Loadout › Waffen · Seite, Gerät, Version gehen mit“</td></tr><tr><th>Wegklicken</th><td>Blase wird zur Entwurfs-Nadel an der Stelle; Entwürfe liegen im Konto (alle Geräte)</td></tr></tbody></table><h4>Nadeln</h4><table class="mock-r3t"><tbody><tr><th>sichtbar</th><td>nur solange das Feedback-Dock offen ist</td></tr><tr><th>Farben</th><td>Rückfrage gelb · Abnahme cyan · Freigabe rot (nur Admin) · in Arbeit grau · Entwurf Sprechblase</td></tr><tr><th>Stelle weg</th><td>Nadel oben auf der Seite mit „Stelle nicht mehr da“</td></tr></tbody></table><h4>Alle Themen (Übersicht aus dem Dock)</h4><table class="mock-r3t"><tbody><tr><th></th><td>Schalter „Nadeln zeigen“ · Diese Seite | Überall · Filter nach Stand</td></tr><tr><th>Gruppen</th><td>Wartet auf dich · Eingegangen · In Arbeit · Live · Entwürfe</td></tr><tr><th>Aktionen</th><td>Zur Stelle ↗ (echter Link) · Zurückziehen (solange unberührt) · Verwerfen (Entwurf)</td></tr></tbody></table><h4>Du bist dran (nur Admin, nur Web)</h4><table class="mock-r3t"><tbody><tr><th>Rückfrage</th><td>Routine schreibt Frage mit Antwortknöpfen → ein Klick „An Nutzer senden“</td></tr><tr><th>Freigabe</th><td>Mitwirkende gehen direkt an die Routine; Nutzer-Themen mit Einschätzung der Routine</td></tr><tr><th>Abnahme</th><td>Vorher/Nachher-Bild aus dem Deploy · „✓ Passt“ / „↩ Nachbessern“ · „Nächste Abnahme ›“ (2 von 5)</td></tr></tbody></table><h4>Sicht eines Nutzers (Web und Desktop-App)</h4><table class="mock-r3t"><tbody><tr><th>Pfad</th><td>Eingegangen → In Arbeit → Wartet auf dich → Live (+ „Nicht umgesetzt“ mit Grund)</td></tr><tr><th>Wartezeit</th><td>„Wird meist innerhalb eines Tages bearbeitet“</td></tr><tr><th>Rückfrage</th><td>Zähler am Dock und gelbe Nadel beim nächsten Besuch; Antwort per Knopf geht ohne zweite Freigabe an die Routine</td></tr></tbody></table><h4>Desktop-App (Verse-Companion-App, Electron + Angular + StarUI)</h4><table class="mock-r3t"><tbody><tr><th></th><td>dieselbe Blase und dieselben Nadeln, eigener Weg: App-Login schreibt in dieselbe Tabelle</td></tr><tr><th>Kontext</th><td>App-Version, Windows, Fenster bzw. Ansicht, Bild des App-Fensters kein Admin: Freigabe, Abnahme und Routine-Status gibt es nur im Web</td></tr></tbody></table>
+</section>
+
+<section id="r3-plan" data-nav-label="Bauplan">
+  <h3>Bauplan in drei Etappen</h3>
+  <table class="mock-r3t"><tbody><tr><th>A</th><td>Web-Panel „Am Ort“        Blase, Entwurfs-Nadeln, Anhänge, Kontext-Felder (Migration: route, view, device, app_version, spot), Dock, Übersicht „Alle Themen“; Admin und Nutzer gemeinsam, ersetzt Composer und Nutzer-Panel</td></tr><tr><th>B</th><td>Routine und Rückweg        Rückfrage mit Freigabe-Klick, Mitwirkende ohne Freigabe, Vorher/Nachher- Bild nach dem Deploy, Abnahme am Stück, Status-Pfad für Nutzer; Änderungen an docs/feedback-routine und am Wächter</td></tr><tr><th>C</th><td>Desktop-App                Blase und Nadeln als gemeinsamer Baustein, Login-Weg in dieselbe Tabelle, Kontext der App; eigener PR im Repo Verse-Companion-App</td></tr><tr><th>Messung</th><td>Events feedback:pin_open, feedback:draft_restore, feedback:overview_open, feedback:question_answer, feedback:review_accept, feedback:review_reopen, feedback:item_submit {surface}; Kachel „Feedback-Fluss“ im Produkt-Dashboard</td></tr><tr><th>Risiko</th><td>Migration auf admin_feedback (neue Spalten, RLS unverändert) · Routine-Prompt ändert sich in Etappe B, deshalb dort ein Probelauf mit einem Test-Thema vor dem Merge</td></tr></tbody></table>
+</section>
+
+<section id="r3-open" data-analysis="lite" data-nav-label="Zwei offene Fragen">
+  <section id="r3-order" data-nav-label="Reihenfolge" data-decision="r3-order" data-decision-mode="single" data-label="Reihenfolge" data-rec="ab-c" data-rec-why="A und B berühren verschiedene Dateien und laufen parallel; die Desktop-App braucht den fertigen Baustein aus A, deshalb kommt sie danach." data-applies-to="Umsetzung">
+    <p data-applies>Gilt für: Umsetzung</p>
+    <p data-situation>Ein Umbau in einem Zug wäre ein sehr großer PR über zwei Repos, den du nur schwer abnehmen kannst.</p>
+    <h3 data-question>In welcher Reihenfolge wird gebaut?</h3>
+    <p data-stakes>Wann du das neue Panel siehst und wie groß jede Abnahme ist.</p>
+    <div data-options>
+      <label data-opt="ab-c" data-recommended><input type="radio" name="dm-r3-order" value="ab-c" checked><span data-opt-label>A und B parallel, danach C</span><span data-opt-consequence>Zwei PRs im Web, dann einer in der Desktop-App.</span></label><label data-opt="abc"><input type="radio" name="dm-r3-order" value="abc"><span data-opt-label>A, dann B, dann C nacheinander</span><span data-opt-consequence>Kleinste Abnahmen, späteres Ende.</span></label><label data-opt="all"><input type="radio" name="dm-r3-order" value="all"><span data-opt-label>Alles in einem Zug</span><span data-opt-consequence>Ein großer Stand am Ende, schwer abzunehmen.</span></label>
+    </div>
+    <textarea data-comment="r3-order-note" placeholder="Notiz (optional)"></textarea>
+  </section>
+
+  <section id="r3-board" data-nav-label="Altes Board" data-decision="r3-board" data-decision-mode="single" data-label="Altes Board" data-rec="page" data-rec-why="Dashboard und Lebenszyklus brauchst du selten und nicht beim Melden; als eigene Admin-Seite bleiben sie erreichbar, ohne das Dock zu füllen." data-applies-to="Dashboard, Lebenszyklus, Herzschlag des heutigen Admin-Boards">
+    <p data-applies>Gilt für: Dashboard, Lebenszyklus, Herzschlag des heutigen Admin-Boards</p>
+    <p data-situation>Ohne Plan für das alte Board gingen Durchsatz, Lebenszyklus und Herzschlag der Routine mit dem Umbau verloren.</p>
+    <h3 data-question>Was wird aus Dashboard, Lebenszyklus und Herzschlag?</h3>
+    <p data-stakes>Wo du den Gesamtzustand der Routine künftig siehst.</p>
+    <div data-options>
+      <label data-opt="page" data-recommended><input type="radio" name="dm-r3-board" value="page" checked><span data-opt-label>Eigene Admin-Seite „Feedback-Board“, im Dock nur der Herzschlag-Punkt</span><span data-opt-consequence>Das Dock bleibt schlank; Zahlen einen Klick entfernt.</span></label><label data-opt="overview"><input type="radio" name="dm-r3-board" value="overview"><span data-opt-label>Als Reiter in „Alle Themen“</span><span data-opt-consequence>Alles an einem Ort; die Übersicht wird für Admins schwerer.</span></label><label data-opt="drop"><input type="radio" name="dm-r3-board" value="drop"><span data-opt-label>Weglassen, PostHog-Kachel reicht</span><span data-opt-consequence>Weniger Code; Lebenszyklus und Herzschlag fehlen in der App.</span></label>
+    </div>
+    <textarea data-comment="r3-board-note" placeholder="Notiz (optional)"></textarea>
+  </section>
+</section>
+</section>

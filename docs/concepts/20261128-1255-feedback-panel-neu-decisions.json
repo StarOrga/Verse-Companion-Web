@@ -101,5 +101,53 @@
         "answer": "finde ich eigentlich recht raffiniert"
       }
     ]
+  },
+  {
+    "iteration": 2,
+    "action": "iterate",
+    "decisions": [
+      {
+        "id": "r2-pins",
+        "value": "dock",
+        "rec": "dock",
+        "note": ""
+      },
+      {
+        "id": "r2-gone",
+        "value": "top",
+        "rec": "top",
+        "note": ""
+      },
+      {
+        "id": "r2-drafts",
+        "value": "account",
+        "rec": "device",
+        "note": ""
+      },
+      {
+        "id": "r2-wait",
+        "value": "day",
+        "rec": "day",
+        "note": ""
+      },
+      {
+        "id": "r2-desktop",
+        "value": "native",
+        "rec": "native",
+        "note": ""
+      },
+      {
+        "id": "r2-notify",
+        "value": "dock",
+        "rec": "dock",
+        "note": ""
+      }
+    ],
+    "annotations": [
+      {
+        "id": "r2-s1-a1",
+        "answer": "ja"
+      }
+    ]
   }
 ]

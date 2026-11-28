@@ -2,7 +2,7 @@
      rewrites it on every tab switch. body overflow is set by that function,
      the inline style below is only the first-paint value. -->
 <!DOCTYPE html>
-<html lang="de" data-theme="dark" data-page-version="2026-11-28T11:50:07" data-template="design">
+<html lang="de" data-theme="dark" data-page-version="2026-11-28T11:50:07" data-template="free">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -5993,7 +5993,7 @@ html .feedback-dock .feedback-section textarea[data-attachable] { padding-right:
 }
 </style>
 </head>
-<body style="overflow: hidden">
+<body>
   <div class="concept-layout design fullscreen">
     <div class="concept-content">
       <header class="page-header" data-page-header>
@@ -6478,7 +6478,8 @@ Der Nutzer sieht die ganze Zeit „In Bearbeitung“.</pre></div></div>
 </section>
 </section>
 
-<section data-iteration="2" data-iteration-template="design" data-tab-label="Runde 2" id="iter-2" data-active>
+<section data-iteration="2" data-iteration-template="design" data-tab-label="Runde 2" data-baked id="iter-2" hidden>
+  <script type="application/json" data-frozen-feedback>{"general":{"attachments":[],"text":""},"designs":{},"screens":{},"views":{},"fidelity":"off"}</script>
 <style>
 .mock-fb { --fb-acc: #00d4ff; --fb-col: #f06a6a; --fb-hot: #f06a6a; --fb-warn: #f2b84b; --fb-ok: #5fd39a; --fb-fg: #e3f2f8; --fb-dim: #8aa7b5; --fb-bd: rgba(0,212,255,.22); --fb-bg0: #07141f; --fb-bg1: #0c1f2e; --fb-bg2: #12293b;
   position: relative; box-sizing: border-box; min-height: 680px; height: 100%; display: grid; grid-template-columns: minmax(0,1fr) 380px; background: var(--fb-bg0); color: var(--fb-fg); font: 500 13px/1.45 Inter, system-ui, sans-serif; overflow: hidden; text-align: left; }
@@ -6606,12 +6607,12 @@ Der Nutzer sieht die ganze Zeit „In Bearbeitung“.</pre></div></div>
         <div class="mock-fb-att">
           <span class="mock-fb-thumb">Bild 1<i>✕</i></span>
           <span class="mock-fb-thumb">Bild 2<i>✕</i></span>
-          <button type="button" class="mock-fb-tile" aria-label="Datei anhängen">＋<small>Datei</small></button>
-          <button type="button" class="mock-fb-tile" aria-label="Bildschirmfoto der Seite">◉<small>Seite</small></button>
-          <button type="button" class="mock-fb-tile" aria-label="Sprachnotiz">🎙<small>Sprache</small></button>
+          <button type="button" class="mock-fb-tile" aria-label="Datei anhängen" disabled>＋<small>Datei</small></button>
+          <button type="button" class="mock-fb-tile" aria-label="Bildschirmfoto der Seite" disabled>◉<small>Seite</small></button>
+          <button type="button" class="mock-fb-tile" aria-label="Sprachnotiz" disabled>🎙<small>Sprache</small></button>
         </div>
         <small>Bilder hierher ziehen oder mit Strg+V einfügen</small>
-        <button type="button" class="mock-fb-ctxline"><span>Hängt an: Loadout › Waffen · Seite, Gerät, Version gehen mit</span><b>▸</b></button>
+        <button type="button" class="mock-fb-ctxline" disabled><span>Hängt an: Loadout › Waffen · Seite, Gerät, Version gehen mit</span><b>▸</b></button>
         <div class="mock-fb-act"><button type="button" class="mock-fb-btn pri" data-screen-link="r2-s3">Senden</button></div>
       </div>
       <div class="mock-fb-dock"><span>💬</span><span><b>1</b> Entwurf · <b>3</b> Themen hier</span></div>
@@ -6629,7 +6630,7 @@ Der Nutzer sieht die ganze Zeit „In Bearbeitung“.</pre></div></div>
         <div class="anno-bubble" id="anno-bubble-r2-s1-a1" data-anno-bubble="r2-s1-a1" data-open="false">
           <p class="anno-bubble-improved"><strong>Verbessert</strong> Art-Chips weg, mehrere Anhänge dazu</p>
           <button type="button" class="anno-bubble-summary" data-anno-summary="r2-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r2-s1-a1"><span class="anno-bubble-question">Das Bildschirmfoto der Seite kommt erst mit einem Klick auf „Seite“ dazu. Soll es bei jeder Meldung von selbst dranhängen?</span></button>
-          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r2-s1-a1" data-annotation="r2-s1-a1" data-attachable placeholder="Deine Antwort…"></textarea><div class="attach-slot" data-attach-slot="anno-r2-s1-a1"></div></div>
+          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r2-s1-a1" data-annotation="r2-s1-a1" data-attachable placeholder="Deine Antwort…" readonly>ja</textarea><div class="attach-slot" data-attach-slot="anno-r2-s1-a1"></div></div>
         </div>
       </div>
     </div>
@@ -6659,7 +6660,7 @@ Der Nutzer sieht die ganze Zeit „In Bearbeitung“.</pre></div></div>
         <button class="anno-pin" type="button" data-anno-pin="r2-s2-a1" aria-expanded="false" aria-controls="anno-bubble-r2-s2-a1" aria-label="Frage {n}">1</button>
         <div class="anno-bubble" id="anno-bubble-r2-s2-a1" data-anno-bubble="r2-s2-a1" data-open="false">
           <button type="button" class="anno-bubble-summary" data-anno-summary="r2-s2-a1" aria-expanded="false" aria-controls="anno-bubble-r2-s2-a1"><span class="anno-bubble-question">Entwürfe bleiben als Nadel stehen, auch nach einem Neuladen. Passt dir, dass sie für niemanden sonst sichtbar sind?</span></button>
-          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r2-s2-a1" data-annotation="r2-s2-a1" data-attachable placeholder="Deine Antwort…"></textarea><div class="attach-slot" data-attach-slot="anno-r2-s2-a1"></div></div>
+          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r2-s2-a1" data-annotation="r2-s2-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea><div class="attach-slot" data-attach-slot="anno-r2-s2-a1"></div></div>
         </div>
       </div>
     </div>
@@ -6679,8 +6680,8 @@ Der Nutzer sieht die ganze Zeit „In Bearbeitung“.</pre></div></div>
         <div class="mock-fb-bh"><span class="mock-fb-tag r">Abnahme · #374</span><span class="mock-fb-count">2 von 5</span></div>
         <div class="mock-fb-ba"><div>vorher</div><div>jetzt live</div></div>
         <p style="color:var(--fb-dim)">Pledge-Link steht jetzt über dem Strip.</p>
-        <div class="mock-fb-act"><button type="button" class="mock-fb-btn ok">✓ Passt</button><button type="button" class="mock-fb-btn">↩ Nachbessern</button></div>
-        <button type="button" class="mock-fb-next"><span>Nächste Abnahme ›</span><span class="mock-fb-count">#381 · Hangar</span></button>
+        <div class="mock-fb-act"><button type="button" class="mock-fb-btn ok" disabled>✓ Passt</button><button type="button" class="mock-fb-btn" disabled>↩ Nachbessern</button></div>
+        <button type="button" class="mock-fb-next" disabled><span>Nächste Abnahme ›</span><span class="mock-fb-count">#381 · Hangar</span></button>
       </div>
       <div class="mock-fb-dock"><span>💬</span><span><b>3</b> hier · Du bist dran: <b>5</b></span><span class="mock-fb-live">Dev-PC arbeitet</span><button type="button" class="mock-fb-dlink" data-screen-link="r2-s4">Alle Themen ›</button></div>
     </div>
@@ -6695,7 +6696,7 @@ Der Nutzer sieht die ganze Zeit „In Bearbeitung“.</pre></div></div>
         <div class="anno-bubble" id="anno-bubble-r2-s3-a1" data-anno-bubble="r2-s3-a1" data-open="false">
           <p class="anno-bubble-improved"><strong>Verbessert</strong> Abnahmen in Folge, mit Zähler</p>
           <button type="button" class="anno-bubble-summary" data-anno-summary="r2-s3-a1" aria-expanded="false" aria-controls="anno-bubble-r2-s3-a1"><span class="anno-bubble-question">Die nächste Abnahme liegt hier im Hangar. Soll „Nächste Abnahme“ dorthin wechseln, oder alle fünf hier nacheinander als Bild zeigen?</span></button>
-          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r2-s3-a1" data-annotation="r2-s3-a1" data-attachable placeholder="Deine Antwort…"></textarea><div class="attach-slot" data-attach-slot="anno-r2-s3-a1"></div></div>
+          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r2-s3-a1" data-annotation="r2-s3-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea><div class="attach-slot" data-attach-slot="anno-r2-s3-a1"></div></div>
         </div>
       </div>
     </div>
@@ -6713,7 +6714,7 @@ Der Nutzer sieht die ganze Zeit „In Bearbeitung“.</pre></div></div>
     <aside class="mock-fb-sheet">
       <div class="mock-fb-sheet-h">ALLE THEMEN <span>14 · ✕</span></div>
       <div class="mock-fb-ctl">
-        <button type="button" class="mock-fb-tgl" aria-pressed="true"><span>👁</span>Nadeln zeigen<span class="mock-fb-sw"></span></button>
+        <button type="button" class="mock-fb-tgl" aria-pressed="true" disabled><span>👁</span>Nadeln zeigen<span class="mock-fb-sw"></span></button>
         <span class="mock-fb-seg"><span>Diese Seite</span><span class="on">Überall</span></span>
       </div>
       <div class="mock-fb-filt"><span class="mock-fb-chip on">Alle 14</span><span class="mock-fb-chip">Wartet 7</span><span class="mock-fb-chip">Eingegangen 1</span><span class="mock-fb-chip">In Arbeit 1</span><span class="mock-fb-chip">Live 3</span><span class="mock-fb-chip">Entwürfe 2</span></div>
@@ -6724,13 +6725,13 @@ Der Nutzer sieht die ganze Zeit „In Bearbeitung“.</pre></div></div>
         <div class="mock-fb-row"><b><i>#399</i>Suche findet „Pisces“ nicht</b><small>Suche · Rückfrage freigeben</small><span class="acts"><a class="mock-fb-lnk" role="link" data-screen-link="r2-s5">Zur Stelle ↗</a></span></div>
         <div class="mock-fb-more">▸ 4 weitere Abnahmen</div>
         <div class="mock-fb-grp"><span>Eingegangen</span><span>1</span></div>
-        <div class="mock-fb-row"><b><i>#405</i>Masse in Tonnen</b><small>Liberator › Strip · noch nicht begonnen</small><span class="acts"><a class="mock-fb-lnk" role="link" data-screen-link="r2-s2">Zur Stelle ↗</a><button type="button" class="mock-fb-dlink" style="color:var(--fb-dim)">Zurückziehen</button></span></div>
+        <div class="mock-fb-row"><b><i>#405</i>Masse in Tonnen</b><small>Liberator › Strip · noch nicht begonnen</small><span class="acts"><a class="mock-fb-lnk" role="link" data-screen-link="r2-s2">Zur Stelle ↗</a><button type="button" class="mock-fb-dlink" style="color:var(--fb-dim)" disabled>Zurückziehen</button></span></div>
         <div class="mock-fb-grp"><span>In Arbeit</span><span>1</span></div>
         <div class="mock-fb-row"><b><i>#402</i>Raketenwerfer doppelt</b><small>Liberator › Loadout · PR offen</small><span class="acts"><a class="mock-fb-lnk" role="link" data-screen-link="r2-s2">Zur Stelle ↗</a></span></div>
         <div class="mock-fb-grp"><span>Live diese Woche</span><span>3 ▸</span></div>
         <div class="mock-fb-grp"><span>Entwürfe</span><span>2</span></div>
-        <div class="mock-fb-row draft"><b>Raketenwerfer S4 steht doppelt …</b><small>Liberator › Loadout · nur bei dir</small><span class="acts"><a class="mock-fb-lnk" role="link" data-screen-link="r2-s1">Weiterschreiben ↗</a><button type="button" class="mock-fb-dlink" style="color:var(--fb-dim)">Verwerfen</button></span></div>
-        <div class="mock-fb-row draft"><b>Strip am Laptop zu hoch</b><small>Liberator › Strip · nur bei dir</small><span class="acts"><a class="mock-fb-lnk" role="link" data-screen-link="r2-s1">Weiterschreiben ↗</a><button type="button" class="mock-fb-dlink" style="color:var(--fb-dim)">Verwerfen</button></span></div>
+        <div class="mock-fb-row draft"><b>Raketenwerfer S4 steht doppelt …</b><small>Liberator › Loadout · nur bei dir</small><span class="acts"><a class="mock-fb-lnk" role="link" data-screen-link="r2-s1">Weiterschreiben ↗</a><button type="button" class="mock-fb-dlink" style="color:var(--fb-dim)" disabled>Verwerfen</button></span></div>
+        <div class="mock-fb-row draft"><b>Strip am Laptop zu hoch</b><small>Liberator › Strip · nur bei dir</small><span class="acts"><a class="mock-fb-lnk" role="link" data-screen-link="r2-s1">Weiterschreiben ↗</a><button type="button" class="mock-fb-dlink" style="color:var(--fb-dim)" disabled>Verwerfen</button></span></div>
       </div>
     </aside>
     <div class="mock-fb-gos">
@@ -6743,7 +6744,7 @@ Der Nutzer sieht die ganze Zeit „In Bearbeitung“.</pre></div></div>
         <button class="anno-pin" type="button" data-anno-pin="r2-s4-a1" aria-expanded="false" aria-controls="anno-bubble-r2-s4-a1" aria-label="Frage {n}">1</button>
         <div class="anno-bubble" id="anno-bubble-r2-s4-a1" data-anno-bubble="r2-s4-a1" data-open="false">
           <button type="button" class="anno-bubble-summary" data-anno-summary="r2-s4-a1" aria-expanded="false" aria-controls="anno-bubble-r2-s4-a1"><span class="anno-bubble-question">Die Übersicht öffnet sich über das Dock. Soll sie zusätzlich per Tastenkürzel aufgehen, etwa Umschalt+F, und das Kürzel auch die Nadeln ein- und ausblenden?</span></button>
-          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r2-s4-a1" data-annotation="r2-s4-a1" data-attachable placeholder="Deine Antwort…"></textarea><div class="attach-slot" data-attach-slot="anno-r2-s4-a1"></div></div>
+          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r2-s4-a1" data-annotation="r2-s4-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea><div class="attach-slot" data-attach-slot="anno-r2-s4-a1"></div></div>
         </div>
       </div>
     </div>
@@ -6760,10 +6761,10 @@ Der Nutzer sieht die ganze Zeit „In Bearbeitung“.</pre></div></div>
       <div class="mock-fb-bubble" style="left:36%;top:166px">
         <div class="mock-fb-path"><span class="done">Eingegangen</span><span class="done">In Arbeit</span><span class="now">Wartet auf dich</span><span>Live</span></div>
         <p>Team: Meinst du die C8 Pisces oder die C8X?</p>
-        <div class="mock-fb-act"><button type="button" class="mock-fb-btn warn">C8 Pisces</button><button type="button" class="mock-fb-btn warn">C8X</button><button type="button" class="mock-fb-btn warn">Beide</button></div>
+        <div class="mock-fb-act"><button type="button" class="mock-fb-btn warn" disabled>C8 Pisces</button><button type="button" class="mock-fb-btn warn" disabled>C8X</button><button type="button" class="mock-fb-btn warn" disabled>Beide</button></div>
         <div class="mock-fb-wait">Nach deiner Antwort geht es weiter. Wird meist innerhalb eines Tages bearbeitet.</div>
       </div>
-      <div class="mock-fb-dock"><button type="button" class="mock-fb-eye" aria-label="Nadeln ausblenden">👁</button><span>💬</span><span>Mein Feedback · <b>1</b> wartet auf dich</span><button type="button" class="mock-fb-dlink" data-screen-link="r2-s4">Alle Themen ›</button></div>
+      <div class="mock-fb-dock"><button type="button" class="mock-fb-eye" aria-label="Nadeln ausblenden" disabled>👁</button><span>💬</span><span>Mein Feedback · <b>1</b> wartet auf dich</span><button type="button" class="mock-fb-dlink" data-screen-link="r2-s4">Alle Themen ›</button></div>
     </div>
     <div class="mock-fb-gos">
       <button type="button" class="mock-fb-go" data-screen-link="r2-s1">← Melden</button>
@@ -6775,7 +6776,7 @@ Der Nutzer sieht die ganze Zeit „In Bearbeitung“.</pre></div></div>
         <div class="anno-bubble" id="anno-bubble-r2-s5-a1" data-anno-bubble="r2-s5-a1" data-open="false">
           <p class="anno-bubble-improved"><strong>Verbessert</strong> Wartezeit in Worten statt „Schub“</p>
           <button type="button" class="anno-bubble-summary" data-anno-summary="r2-s5-a1" aria-expanded="false" aria-controls="anno-bubble-r2-s5-a1" aria-label="Verbessert: Wartezeit in Worten statt „Schub“"></button>
-          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r2-s5-a1" data-annotation="r2-s5-a1" data-attachable placeholder="Deine Antwort…"></textarea><div class="attach-slot" data-attach-slot="anno-r2-s5-a1"></div></div>
+          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r2-s5-a1" data-annotation="r2-s5-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea><div class="attach-slot" data-attach-slot="anno-r2-s5-a1"></div></div>
         </div>
       </div>
     </div>
@@ -6795,12 +6796,12 @@ Der Nutzer sieht die ganze Zeit „In Bearbeitung“.</pre></div></div>
               <div class="mock-fb-field">Die C8X steht doppelt in meiner Schiffsliste, seit dem letzten Update.</div>
               <div class="mock-fb-att">
                 <span class="mock-fb-thumb">Fenster<i>✕</i></span>
-                <button type="button" class="mock-fb-tile" aria-label="Bild anhängen">＋<small>Bild</small></button>
-                <button type="button" class="mock-fb-tile" aria-label="Bildschirmfoto des Fensters">◉<small>Fenster</small></button>
-                <button type="button" class="mock-fb-tile" aria-label="Sprachnotiz">🎙<small>Sprache</small></button>
+                <button type="button" class="mock-fb-tile" aria-label="Bild anhängen" disabled>＋<small>Bild</small></button>
+                <button type="button" class="mock-fb-tile" aria-label="Bildschirmfoto des Fensters" disabled>◉<small>Fenster</small></button>
+                <button type="button" class="mock-fb-tile" aria-label="Sprachnotiz" disabled>🎙<small>Sprache</small></button>
               </div>
-              <button type="button" class="mock-fb-ctxline"><span>Hängt an: Meine Schiffe · Desktop-App 0.111 · Windows · Fenster Hangar</span><b>▸</b></button>
-              <div class="mock-fb-act"><button type="button" class="mock-fb-btn pri">Senden</button></div>
+              <button type="button" class="mock-fb-ctxline" disabled><span>Hängt an: Meine Schiffe · Desktop-App 0.111 · Windows · Fenster Hangar</span><b>▸</b></button>
+              <div class="mock-fb-act"><button type="button" class="mock-fb-btn pri" disabled>Senden</button></div>
             </div>
             <div class="mock-fb-ovl">
               <div class="mock-fb-ovl-game"><span>Strg+Umschalt+F</span><em>Blase wie im Fenster · Spielbild ✓</em></div>
@@ -6820,7 +6821,7 @@ Der Nutzer sieht die ganze Zeit „In Bearbeitung“.</pre></div></div>
         <button class="anno-pin" type="button" data-anno-pin="r2-s6-a1" aria-expanded="false" aria-controls="anno-bubble-r2-s6-a1" aria-label="Frage {n}">1</button>
         <div class="anno-bubble" id="anno-bubble-r2-s6-a1" data-anno-bubble="r2-s6-a1" data-open="false">
           <button type="button" class="anno-bubble-summary" data-anno-summary="r2-s6-a1" aria-expanded="false" aria-controls="anno-bubble-r2-s6-a1"><span class="anno-bubble-question">Im Spiel öffnet ein Kürzel im Overlay dieselbe Blase mit einem Bild aus dem Spiel. Willst du das, oder reicht Feedback aus dem App-Fenster?</span></button>
-          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r2-s6-a1" data-annotation="r2-s6-a1" data-attachable placeholder="Deine Antwort…"></textarea><div class="attach-slot" data-attach-slot="anno-r2-s6-a1"></div></div>
+          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r2-s6-a1" data-annotation="r2-s6-a1" data-attachable placeholder="Deine Antwort…" readonly></textarea><div class="attach-slot" data-attach-slot="anno-r2-s6-a1"></div></div>
         </div>
       </div>
     </div>
@@ -6882,16 +6883,16 @@ Offen         sechs Regeln in zwei Themen</pre></div>
       <h3 data-question>Wann zeigt eine Seite Nadeln, ohne dass jemand sie einblendet?</h3>
       <p data-stakes>Wie ruhig die Seite beim Lesen bleibt.</p>
       <div data-options>
-        <label data-opt="dock" data-recommended><input type="radio" name="dm-r2-pins" value="dock" checked><span data-opt-label>Nur solange das Feedback-Dock offen ist</span><span data-opt-consequence>Beim Lesen ist die Seite frei; ein Klick aufs Dock zeigt alle Nadeln.</span></label>
-        <label data-opt="own"><input type="radio" name="dm-r2-pins" value="own"><span data-opt-label>Eigene Nadeln immer</span><span data-opt-consequence>Du siehst sofort, wo etwas wartet; dichte Seiten wirken unruhiger.</span></label>
-        <label data-opt="never"><input type="radio" name="dm-r2-pins" value="never"><span data-opt-label>Nie von selbst, nur über die Übersicht</span><span data-opt-consequence>Ganz ruhig; ein Thema an der Stelle findest du nur über „Zur Stelle“.</span></label>
+        <label data-opt="dock" data-recommended><input type="radio" name="dm-r2-pins" value="dock" checked disabled><span data-opt-label>Nur solange das Feedback-Dock offen ist</span><span data-opt-consequence>Beim Lesen ist die Seite frei; ein Klick aufs Dock zeigt alle Nadeln.</span></label>
+        <label data-opt="own"><input type="radio" name="dm-r2-pins" value="own" disabled><span data-opt-label>Eigene Nadeln immer</span><span data-opt-consequence>Du siehst sofort, wo etwas wartet; dichte Seiten wirken unruhiger.</span></label>
+        <label data-opt="never"><input type="radio" name="dm-r2-pins" value="never" disabled><span data-opt-label>Nie von selbst, nur über die Übersicht</span><span data-opt-consequence>Ganz ruhig; ein Thema an der Stelle findest du nur über „Zur Stelle“.</span></label>
       </div>
-      <textarea data-comment="r2-pins-note" placeholder="Notiz (optional)"></textarea>
-      <input type="hidden" name="dm-r2-pins-none" value="">
-      <input type="hidden" name="dm-r2-pins-hes" value="">
-      <input type="hidden" name="dm-r2-pins-touched" value="">
-      <input type="hidden" name="dm-r2-pins-issue" value="">
-      <input type="hidden" name="dm-r2-pins-epic" value="">
+      <textarea data-comment="r2-pins-note" placeholder="Notiz (optional)" readonly></textarea>
+      <input type="hidden" name="dm-r2-pins-none" value="" disabled>
+      <input type="hidden" name="dm-r2-pins-hes" value="{&quot;ms&quot;:14627,&quot;revisits&quot;:0,&quot;median&quot;:28779}" disabled>
+      <input type="hidden" name="dm-r2-pins-touched" value="1" disabled>
+      <input type="hidden" name="dm-r2-pins-issue" value="" disabled>
+      <input type="hidden" name="dm-r2-pins-epic" value="" disabled>
       <div data-alevel="3" data-title="Nadeln sichtbar">
         <div data-slot="short"><p>Dichte Codex-Seiten tragen die meisten Nadeln.</p></div>
         <div data-slot="long">
@@ -6912,15 +6913,15 @@ Offen         sechs Regeln in zwei Themen</pre></div>
       <h3 data-question>Wo erscheint ein Thema, dessen Stelle es nicht mehr gibt?</h3>
       <p data-stakes>Ob Abnahmen und Rückfragen nach einem Umbau auffindbar bleiben.</p>
       <div data-options>
-        <label data-opt="top" data-recommended><input type="radio" name="dm-r2-gone" value="top" checked><span data-opt-label>Oben auf der Seite, mit „Stelle nicht mehr da“</span><span data-opt-consequence>Das Thema bleibt auf seiner Seite; du siehst, dass sich dort etwas verändert hat.</span></label>
-        <label data-opt="list"><input type="radio" name="dm-r2-gone" value="list"><span data-opt-label>Nur noch in der Übersicht</span><span data-opt-consequence>Die Seite bleibt frei; das Thema taucht nur in der Liste auf.</span></label>
+        <label data-opt="top" data-recommended><input type="radio" name="dm-r2-gone" value="top" checked disabled><span data-opt-label>Oben auf der Seite, mit „Stelle nicht mehr da“</span><span data-opt-consequence>Das Thema bleibt auf seiner Seite; du siehst, dass sich dort etwas verändert hat.</span></label>
+        <label data-opt="list"><input type="radio" name="dm-r2-gone" value="list" disabled><span data-opt-label>Nur noch in der Übersicht</span><span data-opt-consequence>Die Seite bleibt frei; das Thema taucht nur in der Liste auf.</span></label>
       </div>
-      <textarea data-comment="r2-gone-note" placeholder="Notiz (optional)"></textarea>
-      <input type="hidden" name="dm-r2-gone-none" value="">
-      <input type="hidden" name="dm-r2-gone-hes" value="">
-      <input type="hidden" name="dm-r2-gone-touched" value="">
-      <input type="hidden" name="dm-r2-gone-issue" value="">
-      <input type="hidden" name="dm-r2-gone-epic" value="">
+      <textarea data-comment="r2-gone-note" placeholder="Notiz (optional)" readonly></textarea>
+      <input type="hidden" name="dm-r2-gone-none" value="" disabled>
+      <input type="hidden" name="dm-r2-gone-hes" value="{&quot;ms&quot;:44606,&quot;revisits&quot;:0,&quot;median&quot;:28779}" disabled>
+      <input type="hidden" name="dm-r2-gone-touched" value="1" disabled>
+      <input type="hidden" name="dm-r2-gone-issue" value="" disabled>
+      <input type="hidden" name="dm-r2-gone-epic" value="" disabled>
       <div data-alevel="3" data-title="Stelle verschwunden">
         <div data-slot="short"><p>Fast jede Lieferung verändert die Stelle, an der ihre Nadel hängt.</p></div>
         <div data-slot="long">
@@ -6938,15 +6939,15 @@ nachher  Abnahme #374 wartet, aber an der alten Stelle sitzt nichts</pre></div>
       <h3 data-question>Wo wird ein Entwurf gespeichert, bis du ihn sendest?</h3>
       <p data-stakes>Ob du am anderen Gerät weiterschreiben kannst.</p>
       <div data-options>
-        <label data-opt="device" data-recommended><input type="radio" name="dm-r2-drafts" value="device" checked><span data-opt-label>Nur auf diesem Gerät</span><span data-opt-consequence>Privat und ohne Datenbank; am anderen Gerät fehlt der Entwurf.</span></label>
-        <label data-opt="account"><input type="radio" name="dm-r2-drafts" value="account"><span data-opt-label>Im Konto, auf allen Geräten</span><span data-opt-consequence>Weiterschreiben überall; braucht eine Entwurfs-Tabelle und Speichern beim Tippen.</span></label>
+        <label data-opt="device" data-recommended><input type="radio" name="dm-r2-drafts" value="device" disabled><span data-opt-label>Nur auf diesem Gerät</span><span data-opt-consequence>Privat und ohne Datenbank; am anderen Gerät fehlt der Entwurf.</span></label>
+        <label data-opt="account"><input type="radio" name="dm-r2-drafts" value="account" checked disabled><span data-opt-label>Im Konto, auf allen Geräten</span><span data-opt-consequence>Weiterschreiben überall; braucht eine Entwurfs-Tabelle und Speichern beim Tippen.</span></label>
       </div>
-      <textarea data-comment="r2-drafts-note" placeholder="Notiz (optional)"></textarea>
-      <input type="hidden" name="dm-r2-drafts-none" value="">
-      <input type="hidden" name="dm-r2-drafts-hes" value="">
-      <input type="hidden" name="dm-r2-drafts-touched" value="">
-      <input type="hidden" name="dm-r2-drafts-issue" value="">
-      <input type="hidden" name="dm-r2-drafts-epic" value="">
+      <textarea data-comment="r2-drafts-note" placeholder="Notiz (optional)" readonly></textarea>
+      <input type="hidden" name="dm-r2-drafts-none" value="" disabled>
+      <input type="hidden" name="dm-r2-drafts-hes" value="{&quot;ms&quot;:33466,&quot;revisits&quot;:0,&quot;median&quot;:28779}" disabled>
+      <input type="hidden" name="dm-r2-drafts-touched" value="1" disabled>
+      <input type="hidden" name="dm-r2-drafts-issue" value="" disabled>
+      <input type="hidden" name="dm-r2-drafts-epic" value="" disabled>
       <div data-alevel="3" data-title="Wo Entwürfe liegen">
         <div data-slot="short"><p>Ein Entwurf auf dem Gerät wandert nicht mit.</p></div>
         <div data-slot="long">
@@ -6974,16 +6975,16 @@ Desktop-App, Hangar           keine Nadel</pre></div>
       <h3 data-question>Welcher Satz steht unter dem Pfad, solange ein Thema wartet?</h3>
       <p data-stakes>Ob Nutzer der Zeitangabe trauen können.</p>
       <div data-options>
-        <label data-opt="day" data-recommended><input type="radio" name="dm-r2-wait" value="day" checked><span data-opt-label>„Wird meist innerhalb eines Tages bearbeitet“</span><span data-opt-consequence>Stimmt fast immer; braucht keine Daten von der Routine.</span></label>
-        <label data-opt="run"><input type="radio" name="dm-r2-wait" value="run"><span data-opt-label>„Nächster Arbeitslauf: heute Abend“</span><span data-opt-consequence>Genauer; braucht den Herzschlag der Routine und stimmt nur, wenn der Dev-PC planmäßig läuft.</span></label>
-        <label data-opt="none"><input type="radio" name="dm-r2-wait" value="none"><span data-opt-label>Kein Satz zur Zeit</span><span data-opt-consequence>Nur der Pfad; Nutzer raten, wie lange es dauert.</span></label>
+        <label data-opt="day" data-recommended><input type="radio" name="dm-r2-wait" value="day" checked disabled><span data-opt-label>„Wird meist innerhalb eines Tages bearbeitet“</span><span data-opt-consequence>Stimmt fast immer; braucht keine Daten von der Routine.</span></label>
+        <label data-opt="run"><input type="radio" name="dm-r2-wait" value="run" disabled><span data-opt-label>„Nächster Arbeitslauf: heute Abend“</span><span data-opt-consequence>Genauer; braucht den Herzschlag der Routine und stimmt nur, wenn der Dev-PC planmäßig läuft.</span></label>
+        <label data-opt="none"><input type="radio" name="dm-r2-wait" value="none" disabled><span data-opt-label>Kein Satz zur Zeit</span><span data-opt-consequence>Nur der Pfad; Nutzer raten, wie lange es dauert.</span></label>
       </div>
-      <textarea data-comment="r2-wait-note" placeholder="Notiz (optional)"></textarea>
-      <input type="hidden" name="dm-r2-wait-none" value="">
-      <input type="hidden" name="dm-r2-wait-hes" value="">
-      <input type="hidden" name="dm-r2-wait-touched" value="">
-      <input type="hidden" name="dm-r2-wait-issue" value="">
-      <input type="hidden" name="dm-r2-wait-epic" value="">
+      <textarea data-comment="r2-wait-note" placeholder="Notiz (optional)" readonly></textarea>
+      <input type="hidden" name="dm-r2-wait-none" value="" disabled>
+      <input type="hidden" name="dm-r2-wait-hes" value="{&quot;ms&quot;:111131,&quot;revisits&quot;:0,&quot;median&quot;:28779}" disabled>
+      <input type="hidden" name="dm-r2-wait-touched" value="1" disabled>
+      <input type="hidden" name="dm-r2-wait-issue" value="" disabled>
+      <input type="hidden" name="dm-r2-wait-epic" value="" disabled>
       <div data-alevel="3" data-title="Satz zur Wartezeit">
         <div data-slot="short"><p>„Schub“ sagt Nutzern nichts über die Wartezeit.</p></div>
         <div data-slot="long">
@@ -7001,16 +7002,16 @@ Deine Notiz  „nächsten sschub verstehe ich nicht, aber sonst gern“</pre></d
       <h3 data-question>Wie kommt eine Meldung aus der Desktop-App in die Themenliste?</h3>
       <p data-stakes>Ob Web und App gleich wirken und was die App dafür lernen muss.</p>
       <div data-options>
-        <label data-opt="native" data-recommended><input type="radio" name="dm-r2-desktop" value="native" checked><span data-opt-label>Eigene Blase in der App, schreibt mit dem App-Login in dieselbe Tabelle</span><span data-opt-consequence>Ein Bild in Web und App; die App braucht ihr eigenes Fenster- und Spielbild.</span></label>
-        <label data-opt="browser"><input type="radio" name="dm-r2-desktop" value="browser"><span data-opt-label>App öffnet die Web-Seite im Browser</span><span data-opt-consequence>Kein Umbau in der App; der Nutzer verlässt App und Spiel, Kontext reist als Link.</span></label>
-        <label data-opt="webview"><input type="radio" name="dm-r2-desktop" value="webview"><span data-opt-label>Web-Feedback eingebettet in der App</span><span data-opt-consequence>Ein Code für beide; Login und Bilder laufen über eine Brücke, das Feedback startet langsamer.</span></label>
+        <label data-opt="native" data-recommended><input type="radio" name="dm-r2-desktop" value="native" checked disabled><span data-opt-label>Eigene Blase in der App, schreibt mit dem App-Login in dieselbe Tabelle</span><span data-opt-consequence>Ein Bild in Web und App; die App braucht ihr eigenes Fenster- und Spielbild.</span></label>
+        <label data-opt="browser"><input type="radio" name="dm-r2-desktop" value="browser" disabled><span data-opt-label>App öffnet die Web-Seite im Browser</span><span data-opt-consequence>Kein Umbau in der App; der Nutzer verlässt App und Spiel, Kontext reist als Link.</span></label>
+        <label data-opt="webview"><input type="radio" name="dm-r2-desktop" value="webview" disabled><span data-opt-label>Web-Feedback eingebettet in der App</span><span data-opt-consequence>Ein Code für beide; Login und Bilder laufen über eine Brücke, das Feedback startet langsamer.</span></label>
       </div>
-      <textarea data-comment="r2-desktop-note" placeholder="Notiz (optional)"></textarea>
-      <input type="hidden" name="dm-r2-desktop-none" value="">
-      <input type="hidden" name="dm-r2-desktop-hes" value="">
-      <input type="hidden" name="dm-r2-desktop-touched" value="">
-      <input type="hidden" name="dm-r2-desktop-issue" value="">
-      <input type="hidden" name="dm-r2-desktop-epic" value="">
+      <textarea data-comment="r2-desktop-note" placeholder="Notiz (optional)" readonly></textarea>
+      <input type="hidden" name="dm-r2-desktop-none" value="" disabled>
+      <input type="hidden" name="dm-r2-desktop-hes" value="{&quot;ms&quot;:24092,&quot;revisits&quot;:0,&quot;median&quot;:28779}" disabled>
+      <input type="hidden" name="dm-r2-desktop-touched" value="1" disabled>
+      <input type="hidden" name="dm-r2-desktop-issue" value="" disabled>
+      <input type="hidden" name="dm-r2-desktop-epic" value="" disabled>
       <div data-alevel="3" data-title="Weg aus der Desktop-App">
         <div data-slot="short"><p>Aus der Desktop-App gibt es keinen direkten Feedback-Weg.</p></div>
         <div data-slot="long">
@@ -7028,16 +7029,16 @@ Ziel     admin_feedback  source='desktop'  area='desktop'
       <h3 data-question>Wie erfährt ein Nutzer, dass eine Rückfrage auf ihn wartet?</h3>
       <p data-stakes>Wie lange Nutzer-Themen stillstehen.</p>
       <div data-options>
-        <label data-opt="dock" data-recommended><input type="radio" name="dm-r2-notify" value="dock" checked><span data-opt-label>Zähler am Feedback-Dock und Nadel beim nächsten Besuch</span><span data-opt-consequence>Kein neuer Kanal; das Thema wartet, bis der Nutzer wiederkommt.</span></label>
-        <label data-opt="mail"><input type="radio" name="dm-r2-notify" value="mail"><span data-opt-label>Zusätzlich eine E-Mail mit Link zur Stelle</span><span data-opt-consequence>Schnellere Antworten; braucht Mail-Vorlage, Abmelde-Link und Einwilligung.</span></label>
-        <label data-opt="os"><input type="radio" name="dm-r2-notify" value="os"><span data-opt-label>Zusätzlich eine Windows-Mitteilung aus der Desktop-App</span><span data-opt-consequence>Erreicht Spieler am PC; nur wer die App installiert hat.</span></label>
+        <label data-opt="dock" data-recommended><input type="radio" name="dm-r2-notify" value="dock" checked disabled><span data-opt-label>Zähler am Feedback-Dock und Nadel beim nächsten Besuch</span><span data-opt-consequence>Kein neuer Kanal; das Thema wartet, bis der Nutzer wiederkommt.</span></label>
+        <label data-opt="mail"><input type="radio" name="dm-r2-notify" value="mail" disabled><span data-opt-label>Zusätzlich eine E-Mail mit Link zur Stelle</span><span data-opt-consequence>Schnellere Antworten; braucht Mail-Vorlage, Abmelde-Link und Einwilligung.</span></label>
+        <label data-opt="os"><input type="radio" name="dm-r2-notify" value="os" disabled><span data-opt-label>Zusätzlich eine Windows-Mitteilung aus der Desktop-App</span><span data-opt-consequence>Erreicht Spieler am PC; nur wer die App installiert hat.</span></label>
       </div>
-      <textarea data-comment="r2-notify-note" placeholder="Notiz (optional)"></textarea>
-      <input type="hidden" name="dm-r2-notify-none" value="">
-      <input type="hidden" name="dm-r2-notify-hes" value="">
-      <input type="hidden" name="dm-r2-notify-touched" value="">
-      <input type="hidden" name="dm-r2-notify-issue" value="">
-      <input type="hidden" name="dm-r2-notify-epic" value="">
+      <textarea data-comment="r2-notify-note" placeholder="Notiz (optional)" readonly></textarea>
+      <input type="hidden" name="dm-r2-notify-none" value="" disabled>
+      <input type="hidden" name="dm-r2-notify-hes" value="{&quot;ms&quot;:6014,&quot;revisits&quot;:0,&quot;median&quot;:28779}" disabled>
+      <input type="hidden" name="dm-r2-notify-touched" value="1" disabled>
+      <input type="hidden" name="dm-r2-notify-issue" value="" disabled>
+      <input type="hidden" name="dm-r2-notify-epic" value="" disabled>
       <div data-alevel="3" data-title="Rückfrage erreicht Nutzer">
         <div data-slot="short"><p>Eine unbemerkte Rückfrage hält das Thema an.</p></div>
         <div data-slot="long">
@@ -7048,6 +7049,48 @@ Nadel         (!) an „Treffer“: „Meinst du die C8 Pisces oder die C8X?“
 Sonst         keine Nachricht, bis der Nutzer die Seite wieder öffnet</pre></div>
       </div>
     </section>
+  </section>
+</section>
+</section>
+
+<section data-iteration="3" data-iteration-template="free" data-tab-label="Runde 3 · Gesamtbild" id="iter-3" data-active>
+<style>.mock-r3t{width:100%;border-collapse:collapse;margin:4px 0 16px;font-size:14px}.mock-r3t th{text-align:left;vertical-align:top;white-space:nowrap;padding:6px 14px 6px 0;color:var(--text-2,#9fb3c0);font-weight:600}.mock-r3t td{padding:6px 0;border-top:1px solid rgba(127,160,180,.18)}.mock-r3t tr:first-child td{border-top:0}#r3-spec h4,#r3-plan h4{margin:18px 0 4px;font-size:15px}</style>
+<header class="iteration-intro">
+  <h2>Runde 3 · Gesamtbild und Bauplan</h2>
+  <p>Runde 2 ist entschieden: Alle Empfehlungen gelten, nur Entwürfe liegen im Konto statt auf einem Gerät, und das Seiten-Bild hängt künftig von selbst an. Hier steht das ganze Panel als Spezifikation in einem Blick, dazu der Bauplan in drei Etappen. Offen sind nur noch zwei Fragen ganz unten. Passt alles, ist „Mit Feedback implementieren“ der nächste Schritt.</p>
+</header>
+
+<section id="r3-spec" data-nav-label="Spezifikation">
+  <h3>Was gebaut wird</h3>
+  <h4>Melden (Web, alle Rollen)</h4><table class="mock-r3t"><tbody><tr><th></th><td>Klick aufs Feedback-Dock → Fadenkreuz → Klick auf eine Stelle → Blase an der Stelle</td></tr><tr><th>Blase</th><td>Textfeld · Anhänge (mehrere Bilder, Einfügen, Ziehen; Admin auch Dateien) · Sprache · Seiten-Bild hängt automatisch an (abwählbar) · keine Auswahl Fehler/Wunsch/Frage</td></tr><tr><th>Kontext</th><td>Seite mit Adresse und Filtern, Ansicht, Gerät, Version, Stelle als eigene Felder · eingeklappt „Hängt an: Loadout › Waffen · Seite, Gerät, Version gehen mit“</td></tr><tr><th>Wegklicken</th><td>Blase wird zur Entwurfs-Nadel an der Stelle; Entwürfe liegen im Konto (alle Geräte)</td></tr></tbody></table><h4>Nadeln</h4><table class="mock-r3t"><tbody><tr><th>sichtbar</th><td>nur solange das Feedback-Dock offen ist</td></tr><tr><th>Farben</th><td>Rückfrage gelb · Abnahme cyan · Freigabe rot (nur Admin) · in Arbeit grau · Entwurf Sprechblase</td></tr><tr><th>Stelle weg</th><td>Nadel oben auf der Seite mit „Stelle nicht mehr da“</td></tr></tbody></table><h4>Alle Themen (Übersicht aus dem Dock)</h4><table class="mock-r3t"><tbody><tr><th></th><td>Schalter „Nadeln zeigen“ · Diese Seite | Überall · Filter nach Stand</td></tr><tr><th>Gruppen</th><td>Wartet auf dich · Eingegangen · In Arbeit · Live · Entwürfe</td></tr><tr><th>Aktionen</th><td>Zur Stelle ↗ (echter Link) · Zurückziehen (solange unberührt) · Verwerfen (Entwurf)</td></tr></tbody></table><h4>Du bist dran (nur Admin, nur Web)</h4><table class="mock-r3t"><tbody><tr><th>Rückfrage</th><td>Routine schreibt Frage mit Antwortknöpfen → ein Klick „An Nutzer senden“</td></tr><tr><th>Freigabe</th><td>Mitwirkende gehen direkt an die Routine; Nutzer-Themen mit Einschätzung der Routine</td></tr><tr><th>Abnahme</th><td>Vorher/Nachher-Bild aus dem Deploy · „✓ Passt“ / „↩ Nachbessern“ · „Nächste Abnahme ›“ (2 von 5)</td></tr></tbody></table><h4>Sicht eines Nutzers (Web und Desktop-App)</h4><table class="mock-r3t"><tbody><tr><th>Pfad</th><td>Eingegangen → In Arbeit → Wartet auf dich → Live (+ „Nicht umgesetzt“ mit Grund)</td></tr><tr><th>Wartezeit</th><td>„Wird meist innerhalb eines Tages bearbeitet“</td></tr><tr><th>Rückfrage</th><td>Zähler am Dock und gelbe Nadel beim nächsten Besuch; Antwort per Knopf geht ohne zweite Freigabe an die Routine</td></tr></tbody></table><h4>Desktop-App (Verse-Companion-App, Electron + Angular + StarUI)</h4><table class="mock-r3t"><tbody><tr><th></th><td>dieselbe Blase und dieselben Nadeln, eigener Weg: App-Login schreibt in dieselbe Tabelle</td></tr><tr><th>Kontext</th><td>App-Version, Windows, Fenster bzw. Ansicht, Bild des App-Fensters kein Admin: Freigabe, Abnahme und Routine-Status gibt es nur im Web</td></tr></tbody></table>
+</section>
+
+<section id="r3-plan" data-nav-label="Bauplan">
+  <h3>Bauplan in drei Etappen</h3>
+  <table class="mock-r3t"><tbody><tr><th>A</th><td>Web-Panel „Am Ort“        Blase, Entwurfs-Nadeln, Anhänge, Kontext-Felder (Migration: route, view, device, app_version, spot), Dock, Übersicht „Alle Themen“; Admin und Nutzer gemeinsam, ersetzt Composer und Nutzer-Panel</td></tr><tr><th>B</th><td>Routine und Rückweg        Rückfrage mit Freigabe-Klick, Mitwirkende ohne Freigabe, Vorher/Nachher- Bild nach dem Deploy, Abnahme am Stück, Status-Pfad für Nutzer; Änderungen an docs/feedback-routine und am Wächter</td></tr><tr><th>C</th><td>Desktop-App                Blase und Nadeln als gemeinsamer Baustein, Login-Weg in dieselbe Tabelle, Kontext der App; eigener PR im Repo Verse-Companion-App</td></tr><tr><th>Messung</th><td>Events feedback:pin_open, feedback:draft_restore, feedback:overview_open, feedback:question_answer, feedback:review_accept, feedback:review_reopen, feedback:item_submit {surface}; Kachel „Feedback-Fluss“ im Produkt-Dashboard</td></tr><tr><th>Risiko</th><td>Migration auf admin_feedback (neue Spalten, RLS unverändert) · Routine-Prompt ändert sich in Etappe B, deshalb dort ein Probelauf mit einem Test-Thema vor dem Merge</td></tr></tbody></table>
+</section>
+
+<section id="r3-open" data-analysis="lite" data-nav-label="Zwei offene Fragen">
+  <section id="r3-order" data-nav-label="Reihenfolge" data-decision="r3-order" data-decision-mode="single" data-label="Reihenfolge" data-rec="ab-c" data-rec-why="A und B berühren verschiedene Dateien und laufen parallel; die Desktop-App braucht den fertigen Baustein aus A, deshalb kommt sie danach." data-applies-to="Umsetzung">
+    <p data-applies>Gilt für: Umsetzung</p>
+    <p data-situation>Ein Umbau in einem Zug wäre ein sehr großer PR über zwei Repos, den du nur schwer abnehmen kannst.</p>
+    <h3 data-question>In welcher Reihenfolge wird gebaut?</h3>
+    <p data-stakes>Wann du das neue Panel siehst und wie groß jede Abnahme ist.</p>
+    <div data-options>
+      <label data-opt="ab-c" data-recommended><input type="radio" name="dm-r3-order" value="ab-c" checked><span data-opt-label>A und B parallel, danach C</span><span data-opt-consequence>Zwei PRs im Web, dann einer in der Desktop-App.</span></label><label data-opt="abc"><input type="radio" name="dm-r3-order" value="abc"><span data-opt-label>A, dann B, dann C nacheinander</span><span data-opt-consequence>Kleinste Abnahmen, späteres Ende.</span></label><label data-opt="all"><input type="radio" name="dm-r3-order" value="all"><span data-opt-label>Alles in einem Zug</span><span data-opt-consequence>Ein großer Stand am Ende, schwer abzunehmen.</span></label>
+    </div>
+    <textarea data-comment="r3-order-note" placeholder="Notiz (optional)"></textarea>
+  </section>
+
+  <section id="r3-board" data-nav-label="Altes Board" data-decision="r3-board" data-decision-mode="single" data-label="Altes Board" data-rec="page" data-rec-why="Dashboard und Lebenszyklus brauchst du selten und nicht beim Melden; als eigene Admin-Seite bleiben sie erreichbar, ohne das Dock zu füllen." data-applies-to="Dashboard, Lebenszyklus, Herzschlag des heutigen Admin-Boards">
+    <p data-applies>Gilt für: Dashboard, Lebenszyklus, Herzschlag des heutigen Admin-Boards</p>
+    <p data-situation>Ohne Plan für das alte Board gingen Durchsatz, Lebenszyklus und Herzschlag der Routine mit dem Umbau verloren.</p>
+    <h3 data-question>Was wird aus Dashboard, Lebenszyklus und Herzschlag?</h3>
+    <p data-stakes>Wo du den Gesamtzustand der Routine künftig siehst.</p>
+    <div data-options>
+      <label data-opt="page" data-recommended><input type="radio" name="dm-r3-board" value="page" checked><span data-opt-label>Eigene Admin-Seite „Feedback-Board“, im Dock nur der Herzschlag-Punkt</span><span data-opt-consequence>Das Dock bleibt schlank; Zahlen einen Klick entfernt.</span></label><label data-opt="overview"><input type="radio" name="dm-r3-board" value="overview"><span data-opt-label>Als Reiter in „Alle Themen“</span><span data-opt-consequence>Alles an einem Ort; die Übersicht wird für Admins schwerer.</span></label><label data-opt="drop"><input type="radio" name="dm-r3-board" value="drop"><span data-opt-label>Weglassen, PostHog-Kachel reicht</span><span data-opt-consequence>Weniger Code; Lebenszyklus und Herzschlag fehlen in der App.</span></label>
+    </div>
+    <textarea data-comment="r3-board-note" placeholder="Notiz (optional)"></textarea>
   </section>
 </section>
 </section>
@@ -7263,7 +7306,8 @@ Sonst         keine Nachricht, bis der Nutzer die Seite wieder öffnet</pre></di
       <div class="panel-nav-scroll">
       <nav class="iteration-tabs" role="tablist" aria-label="Runden">
 <button class="iteration-tab" role="tab" data-iteration="1" aria-selected="false" aria-controls="iter-1">Runde 1</button>
-<button class="iteration-tab" role="tab" data-iteration="2" aria-selected="true" aria-controls="iter-2">Runde 2</button>
+<button class="iteration-tab" role="tab" data-iteration="2" aria-selected="false" aria-controls="iter-2">Runde 2</button>
+<button class="iteration-tab" role="tab" data-iteration="3" aria-selected="true" aria-controls="iter-3">Runde 3 · Gesamtbild</button>
 </nav>
       <!-- #section-nav also lives on the design skeleton: a free/decision round
            on a design concept (the final report is always free) renders its TOC
