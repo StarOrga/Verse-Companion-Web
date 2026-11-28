@@ -817,7 +817,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
           </div>
           @if (detailsOpen()) {
             <div class="details-body" animate.leave="fold-leave">
-              <ng-content></ng-content>
+              <div class="details-in"><ng-content></ng-content></div>
             </div>
           }
         </section>
@@ -951,19 +951,19 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   @keyframes dk-push { from { transform: scale(0.965); } }
   .dock:not(.first) .holo-table { transform-origin: 35% 55%; animation: dk-holo 1000ms linear 260ms backwards; }
   @keyframes dk-holo {
-    0% { opacity: 0; transform: scale(1.03); filter: brightness(2) saturate(0.4); }
+    0% { opacity: 0; transform: scale(1.03); }
     10% { opacity: 0.6; }
     17% { opacity: 0.15; }
     28% { opacity: 0.9; }
     38% { opacity: 0.4; }
-    62%, 100% { opacity: 1; transform: none; filter: none; }
+    62%, 100% { opacity: 1; transform: none; }
   }
   .dock:is(:not(.first), .ph-reveal) .holo-panel { animation: dk-dock 900ms var(--dk-ease) 560ms backwards; }
   @keyframes dk-dock {
-    0% { opacity: 0; transform: translateX(46px); filter: brightness(1.7); }
-    52% { opacity: 1; transform: translateX(-6px); filter: brightness(1.4); }
+    0% { opacity: 0; transform: translateX(46px); }
+    52% { opacity: 1; transform: translateX(-6px); }
     76% { transform: translateX(1.5px); }
-    100% { transform: none; filter: none; }
+    100% { transform: none; }
   }
   .dock:is(:not(.first), .ph-reveal) .holo-panel::after { content: ''; position: absolute; z-index: 2; inset-block: 8% 8%; inset-inline-start: 0; width: 2px; pointer-events: none;
   background: linear-gradient(to bottom, transparent, var(--sc-accent), transparent); box-shadow: 0 0 12px var(--sc-accent); animation: dk-edge 1100ms ease-out 560ms both; }
@@ -974,9 +974,8 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .below-area[data-p="movement"] { --dk-i: 2; }
   .below-area[data-p="signature"] { --dk-i: 3; }
   @keyframes dk-ignite {
-    0% { opacity: 0; transform: translateY(6px) scale(0.985); filter: brightness(2.4); }
-    40% { opacity: 1; transform: none; filter: brightness(1.7); }
-    100% { opacity: 1; transform: none; filter: none; }
+    0% { opacity: 0; transform: translateY(6px) scale(0.985); }
+    100% { opacity: 1; transform: none; }
   }
   .pdetails { flex: none; display: block; width: 100%; min-height: max(30px, var(--sc-tap-min, 0px)); background: none; border: 0; border-block-start: 1px solid var(--hair); color: var(--sc-fg-2); cursor: pointer;
   font: inherit; font-size: max(11px, var(--f)); transition: color 160ms ease; }
@@ -989,13 +988,14 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .rh strong { display: inline-block; font-size: 22px; font-weight: 500; letter-spacing: 0.02em; color: var(--sc-fg-0); line-height: 1.15; }
   .rh strong::first-letter { text-transform: uppercase; }
   .rh span { font-family: var(--m); font-size: 14px; color: var(--sc-fg-1); }
-  .statics { display: flex; gap: 18px; min-width: 0; }
+  /* Reserved height (two lines of 13px): the chips fill in after the data arrives without moving the card (CLS, P3). */
+  .statics { display: flex; gap: 18px; min-width: 0; min-block-size: 40px; }
   .statics div { display: grid; gap: 1px; min-width: 0; }
-  .statics .k { font-family: inherit; text-transform: none; font-size: max(9.5px, var(--f)); color: var(--sc-fg-2); white-space: nowrap; }
-  .statics .v { font-family: var(--m); font-size: 12.5px; color: var(--sc-fg-0); white-space: nowrap; }
+  .statics .k { font-family: inherit; text-transform: none; font-size: max(13px, var(--f)); color: var(--sc-fg-2); white-space: nowrap; }
+  .statics .v { font-family: var(--m); font-size: 13px; color: var(--sc-fg-0); white-space: nowrap; }
   /* Touch: the focusable chips carry the tooltip, so they are tap targets. */
   @media (pointer: coarse) { .statics div { min-width: var(--sc-tap-min); min-height: var(--sc-tap-min); align-content: center; } }
-  .cohort-link { font-size: max(10.5px, var(--f)); color: var(--sc-fg-2); text-decoration: none; text-align: center; transition: color 160ms ease; }
+  .cohort-link { display: block; min-block-size: 20px; font-size: max(13px, var(--f)); color: var(--sc-fg-2); text-decoration: none; text-align: center; transition: color 160ms ease; }
   .cohort-link:hover { color: var(--sc-accent); }
   /* The patch Δ fits the fixed card: no column wider than the card, the card scrolls inside (C18). */
   .patchdiff { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; min-width: 0; overflow-x: auto; }
@@ -1105,7 +1105,9 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .area-empty { margin: 4px 0; font-size: max(11.5px, var(--f)); color: var(--sc-fg-2); }
   .holo-below .holo-details { grid-column: 1 / 5; grid-row: 4; min-width: 0; }
   /* The strip ends before the launcher lane (it measures --holo-fab-clear): what stands on its columns ends there too, or the four columns drift apart. */
-  @media (min-width: 641px) { .holo-below { margin-inline-end: var(--holo-fab-clear, 0px); } }
+  @media (min-width: 641px) { .holo-below { margin-inline-end: max(var(--holo-fab-clear, 0px), var(--sc-fab-clear-inline)); } }
+  /* The views / deck bar stops before the launcher lane too (U2): the floating buttons covered its last tiles and chips. */
+  @media (min-width: 641px) { .holo-views { margin-inline-end: max(var(--holo-fab-clear, 0px), var(--sc-fab-clear-inline)); } }
   .holo-scope.first:is(.ph-wait, .ph-hero) .holo-below { opacity: 0; }
   .first.ph-reveal .holo-below { animation: rise 600ms var(--e-out) 440ms backwards; }
   .holo-below { transition: opacity var(--holo-t-fast) var(--e-io); }
@@ -1119,11 +1121,14 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
      glides instead of jumping. Clipped only while it moves: at rest a select
      menu inside must still overflow it. Without interpolate-size support the
      height step is skipped and only the fade remains. */
-  .details-body { margin-top: 12px; display: flex; flex-direction: column; gap: 12px; interpolate-size: allow-keywords;
+  .details-body { margin-top: 12px; display: grid; grid-template-rows: 1fr;
   animation: unfold var(--holo-t-base) var(--e-out) backwards; }
+  .details-in { min-height: 0; display: flex; flex-direction: column; gap: 12px; animation: clip-moving var(--holo-t-base) var(--e-out) backwards; }
   .fold-leave { animation: fold var(--holo-t-fast) var(--e-io) forwards; }
-  @keyframes unfold { from { height: 0; margin-top: 0; opacity: 0; overflow: clip; } to { overflow: clip; } }
-  @keyframes fold { from { overflow: clip; } to { height: 0; margin-top: 0; opacity: 0; overflow: clip; } }
+  .fold-leave .details-in { animation: clip-moving var(--holo-t-fast) var(--e-io) forwards; }
+  @keyframes unfold { from { grid-template-rows: 0fr; opacity: 0; } }
+  @keyframes fold { to { grid-template-rows: 0fr; opacity: 0; } }
+  @keyframes clip-moving { from, to { overflow: clip; } }
   .switch { display: inline-flex; align-items: center; gap: 8px; font-size: max(8.5px, var(--f)); letter-spacing: 0.14em; color: var(--sc-fg-2); cursor: pointer; min-height: var(--sc-tap-min, 24px); white-space: nowrap; }
   .switch.mobile-only { display: none; }
   .switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
@@ -1200,7 +1205,16 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .vw-grp { gap: 0; }
   .vw, .vf-row { scroll-snap-type: x proximity; }
   .vw-thumb, .vf-chip { scroll-snap-align: start; }
-  .vf-row { mask-image: linear-gradient(90deg, transparent 0, #000 10px, #000 calc(100% - 18px), transparent 100%); padding-inline: 6px 18px; }
+  /* Rows scroll sideways with a fade at both ends; the end padding keeps the last tile/chip clear of the FAB dial (U2, T3). */
+  .vf-row { mask-image: linear-gradient(90deg, transparent 0, #000 10px, #000 calc(100% - 18px), transparent 100%); padding-inline: 6px max(18px, var(--sc-fab-clear-inline)); scroll-padding-inline: 6px; }
+  .vw { padding-inline-end: var(--sc-fab-clear-inline); mask-image: linear-gradient(90deg, #000 calc(100% - 18px), transparent 100%); }
+  .ig-host { padding-inline-end: 0; }
+  /* The mission pill shows its count (T2): the label word gives way, the name shortens with an ellipsis, the count and caret stay. */
+  .holo-topbar:not(.slim) ::ng-deep sc-codex-holo-einsatz .lab { display: none; }
+  .holo-topbar:not(.slim) ::ng-deep sc-codex-holo-einsatz .einsatz { gap: 6px; padding-inline: 10px; overflow: hidden; }
+  .holo-topbar:not(.slim) ::ng-deep sc-codex-holo-einsatz .val { min-inline-size: 0; flex: 0 1 auto; overflow: hidden; }
+  .holo-topbar:not(.slim) ::ng-deep sc-codex-holo-einsatz .vt { min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; }
+  .holo-topbar:not(.slim) ::ng-deep sc-codex-holo-einsatz :is(.sub, .caret) { flex: none; }
   .switch.mobile-only { display: inline-flex; }
   .holo-body { gap: 10px; }
   .table-head { flex-wrap: wrap; gap: 6px; padding: 0; }

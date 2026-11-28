@@ -36,9 +36,13 @@ import { GLYPH_PATHS, GROUP_GLYPH, INTERIOR_GROUPS } from './holo-interior';
   styles: [`
     :host { display: block; min-width: 0; container: ig / inline-size; }
   .ig { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1 1 auto; }
+  .ig-reset { position: relative; z-index: 1; margin-inline-start: 2px; }
   .ig-row { display: flex; gap: 5px; min-width: 0; flex: 0 1 auto; overflow-x: auto; overscroll-behavior-x: contain; padding: 2px 24px 4px 0;
   mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent); }
   .ig-tag, .ig-reset { flex: none; }
+  /* The row scrolls to a snap point instead of stopping mid-chip, and the reset sits outside its flow (T3). */
+  .ig-row { scroll-snap-type: x proximity; scroll-padding-inline: 4px; }
+  .ig-chip { scroll-snap-align: start; }
   .ig-ri { display: none; }
   /* Not room for every chip and the preset line (a 1440 px desktop): the preset folds into the reset icon (its name is the
      tooltip) instead of pushing the last chips under the fade. */
@@ -86,6 +90,9 @@ import { GLYPH_PATHS, GROUP_GLYPH, INTERIOR_GROUPS } from './holo-interior';
   /* Narrow: the chips take their own line and scroll; the preset and its reset sit under them. */
   /* Narrow screens keep ONE line: the chips scroll sideways and the preset tag shortens with an ellipsis. A wrapped
      second line changed the row height with every view/deck switch and moved the stage (v0.282.0 report). */
+  @media (prefers-reduced-motion: reduce) {
+    .ig-chip { transition: none; }
+  }
   @media (max-width: 1000px) {
     .ig-row { flex: 1 1 auto; }
     .ig-tag { flex: 0 1 auto; min-width: 0; max-width: 34%; overflow: hidden; text-overflow: ellipsis; }

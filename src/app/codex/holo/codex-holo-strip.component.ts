@@ -471,7 +471,7 @@ let uidSeq = 0;
       .m { display: flex; align-items: center; justify-content: space-between; gap: 8px; border: 1px solid var(--sc-border); border-radius: 3px;
         background: transparent; color: var(--sc-fg-1); padding: 5px 10px; min-block-size: var(--sc-tap-min, 30px); cursor: pointer;
         font-family: var(--sc-font-display); font-size: max(9.5px, var(--sc-fs-floor)); letter-spacing: 0.14em; text-transform: uppercase; text-align: start; }
-      .m small { font-family: var(--hs-mono); letter-spacing: 0; text-transform: none; font-size: 9px; color: var(--sc-fg-2); }
+      .m small { font-family: var(--hs-mono); letter-spacing: 0; text-transform: none; font-size: 13px; color: var(--sc-fg-2); }
       .m.on { color: var(--sc-accent); border-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 12%, transparent); }
       .m.preset { border-style: dashed; border-color: rgba(var(--accent-gold-rgb, 200, 168, 75), 0.5); color: var(--p-signature); }
       .m.preset.on { background: rgba(var(--accent-gold-rgb, 200, 168, 75), 0.12); border-style: solid; border-color: var(--p-signature); }
@@ -517,7 +517,7 @@ let uidSeq = 0;
       .hp-cool-txt .k { font-family: var(--sc-font-display); font-size: max(8px, var(--sc-fs-floor)); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-fg-2); }
       .hp-summary { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-variant-numeric: tabular-nums; color: var(--sc-fg-1); }
       .hp-summary .v { font-family: var(--hs-mono); font-size: 13px; color: var(--sc-fg-0); }
-      .hp-summary .v small { font-size: 10px; color: var(--sc-fg-2); }
+      .hp-summary .v small { font-size: 13px; color: var(--sc-fg-2); }
       .hp-summary .mode { font-family: var(--sc-font-display); text-transform: uppercase; letter-spacing: 0.14em; font-size: max(8.5px, var(--sc-fs-floor)); color: var(--sc-fg-2); }
       .hp-summary .ok { font-size: max(10px, var(--sc-fs-floor)); color: var(--sc-success); }
       .hp-summary .ok.no { color: var(--sc-danger); }
@@ -560,7 +560,7 @@ let uidSeq = 0;
         @media (max-width: 430px) { .sig { display: none; } }
         .seg { padding: 5px 7px; flex: 1 1 0; }
         .tile-vals { min-inline-size: 0; }
-        .tv .v, .fact .v { font-size: 12.5px; }
+        .tv .v, .fact .v { font-size: 13px; }
         .seg .lab .lt { display: none; }
         .seg .lab { gap: 0; }
         .tile-vals .tv .k { display: none; }
