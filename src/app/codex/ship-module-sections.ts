@@ -108,8 +108,9 @@ export function isConfigurableSection(section: ShipModuleSection): boolean {
  * Every block stacks identical occupants (feedback #348: "alles was mehr als 1
  * ist könnte ja gestackt werden"). Shields and countermeasures used to list
  * every bay on its own row (1add86a4); since #348 they fold like weapons —
- * "3× S1 WEB". Since #411 the rows stay grouped — the per-block "Einzeln"
- * toggle is gone (*"immer zusammengefasst"*). A passive generator never
+ * "3× S1 WEB" — and the classic view's per-block "Einzeln" toggle lists the
+ * bays one by one when a pilot wants to swap a single generator; the
+ * Holotable always groups (#411). A passive generator never
  * folds into active ones: the ship page puts the stock role into the
  * grouping key, so "2× … Aktiv" and "1× … Passiv" stay two rows.
  */
@@ -126,7 +127,7 @@ export function isConfigurableSection(section: ShipModuleSection): boolean {
 // `coolers`, `radar` and `lifeSupport` are one block, "Antrieb & Systeme", with
 // the five sections kept as SUBGROUPS inside it — nothing is merged away, the
 // nesting is purely presentational and every section keeps its own census,
-// notes and fold preview. Countermeasures and the airframe keep
+// notes, split toggle and fold preview. Countermeasures and the airframe keep
 // their own block, exactly as before.
 //
 // This is a mapping, not a second taxonomy: `shipModuleGroupOf` is total over

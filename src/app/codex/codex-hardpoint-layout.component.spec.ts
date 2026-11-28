@@ -159,6 +159,26 @@ describe('CodexHardpointLayoutComponent', () => {
     expect(perItem.slice(1, 3)).toEqual(['1,480 m/s', '1,924 m']);
   });
 
+  it('drops "Gesamt" and the "3×" prefix once the block is split into single rows', () => {
+    const el = render([
+      {
+        section: 'weapons',
+        slots: [PANTHER, { ...PANTHER, port: 'Hardpoint Weapon Top Right' }, { ...PANTHER, port: 'Hardpoint Weapon Nose' }],
+      },
+    ]);
+    (el.querySelector('.mod-sec[data-sec="weapons"] .sec-btn') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(el.querySelectorAll('li.slot').length).toBe(3);
+    // Each row is one gun: its figure is its own value, unlabelled, and no
+    // stat pretends to stand for more than one unit.
+    expect(el.querySelector('.fig.total')).toBeNull();
+    expect(el.querySelector('.fig-l')).toBeNull();
+    expect(el.querySelector('.slot-stats .mult')).toBeNull();
+    expect(
+      Array.from(el.querySelectorAll('.fig .n')).map((n) => n.textContent?.trim()),
+    ).toEqual(['43.65', '43.65', '43.65']);
+  });
+
   // Feedback #233: "Info in Traktor Beam. Welche Reichweite und welche Masse
   // kann das tragen." — the beam's reach leads its row, the pull carries the
   // force-not-mass hint, and a collapsed run never sums a reach.
@@ -725,8 +745,11 @@ describe('CodexHardpointLayoutComponent', () => {
     // Empty bay + "2× S1" — the empty one never hides inside the stack.
     expect(el.querySelectorAll('.slot').length).toBe(2);
     expect(el.querySelector('.slot:not(.empty) .size-tag')?.textContent?.trim()).toBe('2× S1');
-    // Always grouped (#411): no "Einzeln" toggle on the block.
-    expect(el.querySelector('.mod-sec[data-sec="shields"] .sec-btn')).toBeNull();
+    // "Einzeln" lists the three bays again, one row each.
+    (el.querySelector('.mod-sec[data-sec="shields"] .sec-btn') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(el.querySelectorAll('.slot').length).toBe(3);
+    expect(el.querySelectorAll('.tag.role').length).toBe(3);
   });
 
   it('greys the passive shield generator and never stacks it with the active ones (4263fed1, #348)', () => {
@@ -758,6 +781,14 @@ describe('CodexHardpointLayoutComponent', () => {
     expect(rows.map((r) => r.classList.contains('inactive'))).toEqual([false, true]);
     expect(rows.map((r) => r.querySelector('.size-tag')?.textContent?.trim())).toEqual(['2× S1', 'S1']);
     expect(rows[1].querySelector('.tag.role')?.textContent?.trim()).toBe('codex.module.badge.passive');
+    // Split: three single generators, no "Gesamt", no multiplier.
+    (el.querySelector('.mod-sec[data-sec="shields"] .sec-btn') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    const single = Array.from(el.querySelectorAll('li.slot'));
+    expect(single.length).toBe(3);
+    expect(single.map((r) => r.classList.contains('inactive'))).toEqual([false, false, true]);
+    expect(el.querySelector('.fig.total')).toBeNull();
+    expect(el.querySelector('.slot-stats .mult')).toBeNull();
   });
 
   it('stacks identical countermeasure launchers too (#348)', () => {
@@ -812,8 +843,8 @@ describe('CodexHardpointLayoutComponent', () => {
     expect(
       Array.from(el.querySelectorAll('.slot-stats dd')).map((d) => d.textContent?.trim()),
     ).toEqual(['34', '3']);
-    // Always grouped (#411): no toggle lists them one by one.
-    expect(el.querySelector('.mod-sec[data-sec="coolers"] .sec-btn')).toBeNull();
+    // The block still offers to list them one by one.
+    expect(el.querySelector('.mod-sec[data-sec="coolers"] .sec-btn')).toBeTruthy();
   });
 
   it('tells the shield CONTROL module apart from a generator bay', () => {
@@ -930,15 +961,55 @@ describe('CodexHardpointLayoutComponent', () => {
     },
   ];
 
-  it('always keeps identical hardpoints in one row, with no split toggle (#411)', () => {
+  it('offers to split a collapsed block into one row per hardpoint', () => {
+    const el = render(THREE_MOUNTS);
+    expect(el.querySelectorAll('.slot').length).toBe(1);
+
+    const toggle = el.querySelector(
+      '.mod-sec[data-sec="weapons"] .sec-btn',
+    ) as HTMLButtonElement;
+    expect(toggle).toBeTruthy();
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+
+    toggle.click();
+    fixture.detectChanges();
+    // Every mount is now its own decision, each naming its own position.
+    expect(el.querySelectorAll('.slot').length).toBe(3);
+    expect(
+      Array.from(el.querySelectorAll('.duo > .main > .slot-btn > .slot-port')).map((p) =>
+        p.textContent?.trim(),
+      ),
+    ).toEqual([
+      'Hardpoint Weapon Wing Left',
+      'Hardpoint Weapon Wing Right',
+      'Hardpoint Weapon Nose',
+    ]);
+    expect(el.querySelector('.size-tag')?.textContent?.trim()).toBe('S3');
+    expect(
+      (el.querySelector('.mod-sec[data-sec="weapons"] .sec-btn') as HTMLElement).getAttribute(
+        'aria-expanded',
+      ),
+    ).toBe('true');
+  });
+
+  it('swaps a single hardpoint once the block is split, not all three at once', () => {
     const swaps: LayoutTarget[] = [];
     fixture.componentInstance.swapRequested.subscribe((v) => swaps.push(v));
     const el = render(THREE_MOUNTS);
-    expect(el.querySelectorAll('.slot').length).toBe(1);
-    expect(el.querySelector('.size-tag')?.textContent?.trim()).toBe('3× S3');
-    expect(el.querySelector('.sec-btn')).toBeNull();
+
     (el.querySelector('button.slot-btn') as HTMLButtonElement).click();
-    expect(swaps[0].count).toBe(3);
+    expect(swaps[0].count).toBe(3); // collapsed: the row stands for all three
+
+    (el.querySelector('.mod-sec[data-sec="weapons"] .sec-btn') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    (el.querySelectorAll('button.slot-btn')[1] as HTMLButtonElement).click();
+    expect(swaps[1].count).toBe(1);
+    expect(swaps[1].slot.port).toBe('Hardpoint Weapon Wing Right');
+  });
+
+  it('offers the split only where collapsing actually hides a hardpoint', () => {
+    const el = render([{ section: 'weapons', slots: [PANTHER] }]);
+    expect(el.querySelector('.sec-btn')).toBeNull();
   });
 
   it('folds the airframe away until it is asked for', () => {
@@ -1165,6 +1236,18 @@ describe('CodexHardpointLayoutComponent', () => {
     it('carries the row\'s share of the category total as a bar', () => {
       const el = renderCalm();
       expect(el.querySelector('[data-testid="part-share"] .hx-share-b i')?.getAttribute('style')).toContain('12%');
+    });
+
+    it('always groups identical hardpoints and offers no split toggle (#411)', () => {
+      fixture.componentRef.setInput('calm', true);
+      const el = render([
+        {
+          section: 'weapons',
+          slots: [PANTHER, { ...PANTHER, port: 'Hardpoint Weapon Top Right' }, { ...PANTHER, port: 'Hardpoint Weapon Nose' }],
+        },
+      ]);
+      expect(el.querySelectorAll('li.slot').length).toBe(1);
+      expect(el.querySelector('.mod-sec[data-sec="weapons"] .sec-btn:not(.detail-btn)')).toBeNull();
     });
 
     it('lists the fixed systems open and clickable, without the "nicht konfigurierbar" tag (#411)', () => {
