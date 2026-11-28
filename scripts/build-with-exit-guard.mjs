@@ -25,6 +25,7 @@
 import { spawn } from 'node:child_process';
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
+import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -163,13 +164,24 @@ export function runGuarded(command, args, opts = {}) {
   });
 }
 
+function resolveNgBin() {
+  try {
+    return createRequire(path.join(repoRoot, 'package.json')).resolve('@angular/cli/bin/ng.js');
+  } catch {
+    return path.join(repoRoot, 'node_modules/@angular/cli/bin/ng.js');
+  }
+}
+
 async function main() {
   // Resolve the Angular CLI entry point directly rather than through `ng`
   // or `npx ng` — on Windows those resolve to a .cmd/.ps1 shim, which
   // forces a shell wrapper (`shell: true`) just to spawn it. Running
   // node_modules/@angular/cli/bin/ng.js with the current `node` binary
   // works identically on Windows/Linux/macOS with a plain, unshelled spawn.
-  const ngBin = path.join(repoRoot, 'node_modules/@angular/cli/bin/ng.js');
+  // A git worktree under .claude/worktrees/ has no node_modules of its own and
+  // resolves packages from the main checkout above it, so ask Node's resolver
+  // (it walks up like require does) before falling back to the path in this repo.
+  const ngBin = resolveNgBin();
   const ngArgs = ['build', '--configuration', 'production'];
   const command = existsSync(ngBin) ? process.execPath : 'npx';
   const args = existsSync(ngBin) ? [ngBin, ...ngArgs] : ['ng', ...ngArgs];
