@@ -51,4 +51,10 @@ describe('CodexHoloCategoryHeadComponent', () => {
     f.detectChanges();
     expect((f.nativeElement as HTMLElement).querySelector('.hx-head.is-dim')).toBeTruthy();
   });
+
+  it('says "no class rank" for an empty cohort, never "only 0 ships"', () => {
+    const { el } = render('movement', false);
+    expect(el.querySelector('.say')!.textContent).not.toMatch(/0/);
+    expect(el.querySelector('.say')!.textContent!.trim().length).toBeGreaterThan(0);
+  });
 });

@@ -1233,6 +1233,15 @@ describe('CodexHardpointLayoutComponent', () => {
       expect(el.querySelector('.meta-txt')?.textContent?.trim()).toBe('KLA');
     });
 
+    it('a sliver reads 1 %, and a share without a total uses the bare phrase (no dangling "of")', () => {
+      fixture.componentRef.setInput('calm', true);
+      fixture.componentRef.setInput('partShares', new Map([['KLWE_LaserRepeater_S3', 0.002]]));
+      fixture.componentRef.setInput('partShareOf', null);
+      const el = render([{ section: 'weapons', slots: [calmSlot] }]);
+      expect(el.querySelector('[data-testid="part-share"]')!.textContent).toContain('codex.holo.part.shareOnly');
+      expect(el.querySelector('[data-testid="part-share"] .hx-share-b i')!.getAttribute('style')).toContain('1%');
+    });
+
     it('carries the row\'s share of the category total as a bar', () => {
       const el = renderCalm();
       expect(el.querySelector('[data-testid="part-share"] .hx-share-b i')?.getAttribute('style')).toContain('12%');

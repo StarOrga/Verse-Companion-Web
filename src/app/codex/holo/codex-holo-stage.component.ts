@@ -1349,6 +1349,7 @@ export class CodexHoloStageComponent implements DetailSlotSource {
   });
   /** What each column's bars refer to, in words ("211.200 Schild-HP"); several kinds in one column are joined. */
   protected readonly areaShareOf = computed<Record<HoloCategoryId, string | null>>(() => {
+    this.deckLang(); // the sentence is built with `instant`: re-run when the language changes
     const out: Record<HoloCategoryId, string[]> = { offensive: [], defensive: [], movement: [], signature: [] };
     const off = this.offensiveShareOf();
     if (off) out.offensive.push(off);

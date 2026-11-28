@@ -29,7 +29,7 @@ const CIRC = 2 * Math.PI * R;
     <p class="say">
       @if (rank() !== null) {
         {{ phraseKey() | translate: { n: rank() } }}
-      } @else if (thin()) {
+      } @else if (thin() && cohortSize() > 0) {
         {{ 'codex.holo.head.thin' | translate: { n: cohortSize() } }}
       } @else {
         {{ 'codex.holo.head.rankNone' | translate }}
