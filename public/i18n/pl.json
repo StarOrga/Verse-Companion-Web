@@ -2428,10 +2428,6 @@
       "shieldsNote": "Każde miejsce w tym bloku to wymienialny generator tarcz, także te puste fabrycznie. Moduł sterowania tarczą należy do systemów stałych: nie jest osobną tarczą i nie można go wymienić w grze.",
       "countermeasuresNote": "Wyrzutni nie można zmienić w grze, więc ten blok służy tylko jako odniesienie. Wabiki (decoy) odciągają rakiety naprowadzane na ciepło, zakłócenia (noise/chaff) oślepiają rakiety naprowadzane radarem. Ile potrzebujesz, pokazuje karta informacyjna wyrzutni (ⓘ): zestawia sygnaturę na wystrzał z sygnaturą samego statku.",
       "infoLabel": "O tym bloku",
-      "splitRows": "Osobno",
-      "groupRows": "Grupuj",
-      "splitRowsHint": "Wyświetl każdy hardpoint w osobnym wierszu, aby zmieniać je pojedynczo",
-      "groupRowsHint": "Złóż identyczne hardpointy z powrotem w jeden wiersz",
       "unfold": "Pokaż",
       "foldAway": "Ukryj"
     },
@@ -2449,7 +2445,6 @@
         "passive": "Pasywne · poza siecią",
         "pool": "Pula"
       },
-      "shieldNote": "Wszystkie ({{count}}) to generatory tarcz i każdy można wymienić osobno — identyczne są tu zgrupowane, „Osobno” wyświetla je miejsce po miejscu.",
       "shieldPassiveNote": "Pasywny nie pobiera mocy, a mimo to w pełni liczy się do puli — ale jest zależny od aktywnych: jeśli one zawiodą, znika też zapas.",
       "peek": {
         "sustainedDpsTotal": "Całkowity ciągły DPS",

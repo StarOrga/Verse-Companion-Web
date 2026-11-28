@@ -2428,10 +2428,6 @@
       "shieldsNote": "Todo compartimento deste bloco é um gerador de escudo substituível, inclusive os que vêm vazios. O módulo de controle de escudo fica com os sistemas fixos: ele não é um escudo por si só e não pode ser trocado no jogo.",
       "countermeasuresNote": "Os lançadores não podem ser trocados no jogo, então este bloco serve só para consulta. Iscas (decoys) desviam mísseis termoguiados, e o ruído (chaff) cega os guiados por radar. Quantos você precisa aparece na ficha de informações (ⓘ) do lançador: ela compara a assinatura por lançamento com a da própria nave.",
       "infoLabel": "Sobre este bloco",
-      "splitRows": "Individual",
-      "groupRows": "Agrupar",
-      "splitRowsHint": "Listar cada hardpoint em sua própria linha para alterá-los um a um",
-      "groupRowsHint": "Reunir hardpoints idênticos novamente em uma única linha",
       "unfold": "Mostrar",
       "foldAway": "Ocultar"
     },
@@ -2449,7 +2445,6 @@
         "passive": "Passivo · fora da rede",
         "pool": "Pool"
       },
-      "shieldNote": "Todos os {{count}} são geradores de escudo e cada um pode ser trocado separadamente — os idênticos aparecem agrupados aqui, e \"Individual\" lista compartimento por compartimento.",
       "shieldPassiveNote": "O passivo não consome energia e conta integralmente para o pool — mas depende dos ativos: se eles falharem, o backup vai junto.",
       "peek": {
         "sustainedDpsTotal": "DPS sustentado total",

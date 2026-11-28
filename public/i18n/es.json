@@ -2428,10 +2428,6 @@
       "shieldsNote": "Cada hueco de este bloque es un generador de escudo intercambiable, incluidos los que vienen vacíos de serie. El módulo de control de escudo está con los sistemas fijos: no es un escudo en sí y no se puede cambiar en el juego.",
       "countermeasuresNote": "Los lanzadores no se pueden cambiar en el juego, así que este bloque es solo de consulta. Los señuelos (decoy) desvían misiles termodirigidos; el ruido (chaff) ciega a los guiados por radar. Cuántos necesitas aparece en la ficha de información (ⓘ) de un lanzador: compara la firma por lanzamiento con la de la propia nave.",
       "infoLabel": "Sobre este bloque",
-      "splitRows": "Individual",
-      "groupRows": "Agrupar",
-      "splitRowsHint": "Mostrar cada hardpoint en su propia fila para cambiarlos uno a uno",
-      "groupRowsHint": "Volver a agrupar los hardpoints idénticos en una sola fila",
       "unfold": "Mostrar",
       "foldAway": "Ocultar"
     },
@@ -2449,7 +2445,6 @@
         "passive": "Pasivo · fuera de la red",
         "pool": "Reserva"
       },
-      "shieldNote": "Los {{count}} son generadores de escudo y cada uno se puede cambiar por separado: aquí aparecen agrupados los idénticos; «Individual» los lista hueco a hueco.",
       "shieldPassiveNote": "El pasivo no consume energía y aun así cuenta por completo en la reserva, pero depende de los activos: si estos fallan, la compensación también desaparece.",
       "peek": {
         "sustainedDpsTotal": "DPS sostenido total",

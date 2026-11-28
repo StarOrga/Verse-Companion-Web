@@ -240,7 +240,7 @@ interface RenderSection {
   rows: GroupedSlot<LayoutSlot>[];
   configurable: boolean;
   notes: SectionNote[];
-  /** Collapsing this block actually hides hardpoints → offer the split toggle. */
+  /** Collapsing this block actually hides hardpoints → offer the split toggle (classic view only). */
   splittable: boolean;
   /** Currently listing every hardpoint on its own row. */
   split: boolean;
@@ -381,7 +381,7 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
     <!-- One block heading, used at both nesting levels. -->
     <ng-template #secSummary let-sec>
             <sc-area-symbol class="sec-glyph" [area]="sec.section" />
-            {{ ('codex.moduleSection.' + sec.section) | translate }}
+            {{ sectionLabelKey(sec) | translate }}
             <span class="sec-ct">{{ censusKey(sec) | translate: censusParams(sec) }}</span>
             <!-- What this block can and cannot tell you sits behind an info
                  icon at its heading, not as running text in the block (#349). -->
@@ -390,12 +390,15 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                       [attr.aria-label]="'codex.moduleSection.infoLabel' | translate"
                       [scTooltip]="noteText(sec.notes)"><span aria-hidden="true">i</span></button>
             }
-            @if (!sec.configurable) {
+            <!-- The Holotable drops the "nicht konfigurierbar" tag (#411): a fixed
+                 part opens its stat sheet on click like every other row. -->
+            @if (!sec.configurable && !calm()) {
               <span class="sec-tag">{{ 'codex.moduleSection.fixedTag' | translate }}</span>
             }
-            <!-- "Alle oder einzeln" (32659942): a block that folds identical
+            <!-- "Alle oder einzeln" (32659942): a classic block that folds identical
                  mounts into one row says so, and hands over the choice. Only
-                 shown when collapsing actually hides a hardpoint. -->
+                 shown when collapsing actually hides a hardpoint; the Holotable
+                 always groups (#411: *"immer zusammengefasst"*). -->
             @if (sec.splittable) {
               <button type="button" class="sec-btn" (click)="$event.stopPropagation(); toggleSplit(sec.section)"
                       [attr.aria-expanded]="sec.split"
@@ -929,8 +932,8 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
       background: color-mix(in srgb, var(--sc-fg-2) 18%, transparent); color: var(--sc-fg-2); }
     .sec-tag { font-size: max(0.56rem, var(--sc-fs-floor)); letter-spacing: 0.06em; color: var(--sc-fg-2);
       font-weight: 400; border: 1px solid var(--sc-border); border-radius: 2px; padding: 0 5px; }
-    /* "Einzeln / zusammen" and the airframe fold. Quiet by default — the block
-       heading must stay a heading — but a real 32px-tall target. */
+    /* "Einzeln / zusammen" (classic) and the Holotable's "Detail" switch. Quiet
+       by default — the block heading must stay a heading — but a real 32px-tall target. */
     .sec-btn { margin-left: auto; display: inline-flex; align-items: center; gap: 5px;
       min-height: 32px; padding: 2px 8px; border-radius: 6px; cursor: pointer;
       background: transparent; border: 1px solid var(--sc-border); color: var(--sc-fg-2);
@@ -1146,7 +1149,7 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
 
     /* ── Holotable "calm" variant (concept round 5, hv5-s3): keine Boxen, keine
        Rahmen — Gruppenlinien, gedämpfte Namen, Werte im Mono ohne Glow. Only
-       the hovered/located row lights up. Every control stays (split, caret,
+       the hovered/located row lights up. Every control stays (caret,
        ⓘ, ⇄, revert); the per-row stats fold behind the group's "Detail ▾". ── */
     :host(.calm) .layout { gap: 8px; }
     :host(.calm) .mod-sec, :host(.calm) .mod-sub { background: transparent; border: 0; border-radius: 0; padding: 0 0 6px; box-shadow: none; }
@@ -1376,12 +1379,13 @@ export class CodexHardpointLayoutComponent {
           // Everything open except the airframe: "Zelle & feste Systeme" is a
           // hull inventory, not a decision, and starts folded even under
           // "Alles" (#333: *"Standardgemäß eingeklappt!"*). A click opens it.
-          const open = present.filter((sec) => !FOLDABLE_SECTIONS.has(sec));
+          const always = this.alwaysFolded();
+          const open = present.filter((sec) => !always.has(sec));
           this.openGroups.set(new Set(open.map((sec) => shipModuleGroupOf(sec))));
           this.openSections.set(new Set(open));
           return;
         }
-        const closedDefault = new Set<ShipModuleSection>([...FOLDABLE_SECTIONS, ...folded]);
+        const closedDefault = new Set<ShipModuleSection>([...this.alwaysFolded(), ...folded]);
         // Sections that end up NESTED inside a merged block start closed: the
         // block is the decision, a reactor is one level below it. Their fold
         // preview still names what is installed, so nothing is hidden.
@@ -1408,6 +1412,21 @@ export class CodexHardpointLayoutComponent {
         );
       });
     });
+  }
+
+  /**
+   * Blocks that start folded whatever the lens says. The Holotable spreads the
+   * fixed systems over its four area columns (#411) and lists them open and
+   * clickable — no "Anzeigen" step first; the classic loadout keeps its folded
+   * airframe block.
+   */
+  private alwaysFolded(): ReadonlySet<ShipModuleSection> {
+    return this.calm() ? new Set<ShipModuleSection>() : FOLDABLE_SECTIONS;
+  }
+
+  /** Block heading. On the Holotable a fixed-systems block sits inside an area column, so "Zelle &" would mislead. */
+  sectionLabelKey(sec: RenderSection): string {
+    return this.calm() && sec.section === 'structure' ? 'codex.moduleSection.fixedSystems' : `codex.moduleSection.${sec.section}`;
   }
 
   /** Folded-preview chips + aggregate + census for this block's `<summary>`. */
@@ -1559,12 +1578,12 @@ export class CodexHardpointLayoutComponent {
   }
 
   /**
-   * Blocks the pilot asked to see hardpoint-by-hardpoint. Identical mounts are
-   * folded into one "3× S3 VariPuck" row by default — right when all three
-   * carry the same gun, wrong the moment one of them should not (32659942:
-   * *"da die Waffen aufhängungen einzeln sind müsste es möglich sein, dass man
-   * alle Gimbal Mounts manuell entscheiden kann"*). The toggle is per block and
-   * per visit; nothing about the ship changes, only how many rows it takes.
+   * Classic blocks the pilot asked to see hardpoint-by-hardpoint. Identical
+   * mounts are folded into one "3× S3 VariPuck" row by default — right when all
+   * three carry the same gun, wrong the moment one of them should not
+   * (32659942: *"da die Waffen aufhängungen einzeln sind müsste es möglich
+   * sein, dass man alle Gimbal Mounts manuell entscheiden kann"*). The toggle
+   * is per block and per visit. The Holotable always groups (#411).
    */
   private readonly splitSections = signal<ReadonlySet<ShipModuleSection>>(new Set());
   /** Foldable blocks currently open (the airframe starts folded). */
@@ -1613,7 +1632,8 @@ export class CodexHardpointLayoutComponent {
   }
 
   private ordered = computed<RenderSection[]>(() => {
-    const split = this.splitSections();
+    const calm = this.calm();
+    const split = calm ? new Set<ShipModuleSection>() : this.splitSections();
     const open = this.openSections();
     const lens = this.sectionOrder() ?? SHIP_MODULE_SECTION_ORDER;
     // Concept §7: the lens REORDERS and may FOLD — it never removes a module.
@@ -1624,7 +1644,7 @@ export class CodexHardpointLayoutComponent {
       ...lens,
       ...SHIP_MODULE_SECTION_ORDER.filter((s) => !lens.includes(s)),
     ];
-    const foldable = new Set<ShipModuleSection>([...FOLDABLE_SECTIONS, ...this.foldedSections()]);
+    const foldable = new Set<ShipModuleSection>([...this.alwaysFolded(), ...this.foldedSections()]);
     return order
       .map((s) => this.sections().find((g) => g.section === s))
       .filter((g): g is LayoutSection => !!g && g.slots.length > 0)
@@ -1635,11 +1655,11 @@ export class CodexHardpointLayoutComponent {
           section: g.section,
           count: g.slots.length,
           // Splitting is just "don't group": every hardpoint gets its own row,
-          // each standing for exactly itself.
+          // each standing for exactly itself. The Holotable never splits (#411).
           rows: isSplit ? g.slots.map((slot) => ({ slot, count: 1, ports: [slot] })) : grouped,
           configurable: isConfigurableSection(g.section),
           notes: g.notes ?? [],
-          splittable: grouped.length < g.slots.length,
+          splittable: !calm && grouped.length < g.slots.length,
           split: isSplit,
           foldable: foldable.has(g.section),
           open: open.has(g.section),

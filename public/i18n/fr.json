@@ -2428,10 +2428,6 @@
       "shieldsNote": "Chaque emplacement de ce bloc est un générateur de bouclier interchangeable, y compris ceux livrés vides. Le module de contrôle des boucliers fait partie des systèmes fixes : ce n'est pas un bouclier à part entière et il ne peut pas être échangé en jeu.",
       "countermeasuresNote": "Les lanceurs ne peuvent pas être changés en jeu, ce bloc sert donc uniquement de référence. Les leurres attirent les missiles à guidage thermique, le brouillage (chaff) aveugle ceux guidés par radar. Le nombre nécessaire figure sur la fiche d'infos (ⓘ) d'un lanceur : elle compare la signature par lancement à celle du vaisseau.",
       "infoLabel": "À propos de ce bloc",
-      "splitRows": "Individuel",
-      "groupRows": "Grouper",
-      "splitRowsHint": "Lister chaque hardpoint sur sa propre ligne pour les modifier un par un",
-      "groupRowsHint": "Regrouper les hardpoints identiques en une seule ligne",
       "unfold": "Afficher",
       "foldAway": "Masquer"
     },
@@ -2449,7 +2445,6 @@
         "passive": "Passif · hors réseau",
         "pool": "Pool"
       },
-      "shieldNote": "Les {{count}} sont des générateurs de bouclier, chacun échangeable séparément — les identiques sont regroupés ici, « Individuel » les liste emplacement par emplacement.",
       "shieldPassiveNote": "Le passif ne consomme aucune énergie et compte pourtant pleinement dans le pool — mais il dépend des actifs : s'ils tombent, la compensation disparaît avec eux.",
       "peek": {
         "sustainedDpsTotal": "DPS soutenu total",

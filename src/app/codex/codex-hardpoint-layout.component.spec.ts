@@ -1247,6 +1247,32 @@ describe('CodexHardpointLayoutComponent', () => {
       expect(el.querySelector('[data-testid="part-share"] .hx-share-b i')?.getAttribute('style')).toContain('12%');
     });
 
+    it('always groups identical hardpoints and offers no split toggle (#411)', () => {
+      fixture.componentRef.setInput('calm', true);
+      const el = render([
+        {
+          section: 'weapons',
+          slots: [PANTHER, { ...PANTHER, port: 'Hardpoint Weapon Top Right' }, { ...PANTHER, port: 'Hardpoint Weapon Nose' }],
+        },
+      ]);
+      expect(el.querySelectorAll('li.slot').length).toBe(1);
+      expect(el.querySelector('.mod-sec[data-sec="weapons"] .sec-btn:not(.detail-btn)')).toBeNull();
+    });
+
+    it('lists the fixed systems open and clickable, without the "nicht konfigurierbar" tag (#411)', () => {
+      const inspects: LayoutTarget[] = [];
+      fixture.componentInstance.inspected.subscribe((v) => inspects.push(v));
+      fixture.componentRef.setInput('calm', true);
+      const thruster = slot({ port: 'Hardpoint Thruster Main', className: 'THR_Main', kind: 'component', name: 'Main Thruster' });
+      const el = render([{ section: 'structure', slots: [thruster] }]);
+      const fixed = el.querySelector('.mod-sec[data-sec="structure"]') as HTMLDetailsElement;
+      expect(fixed.open).toBe(true);
+      expect(fixed.querySelector('.sec-tag')).toBeNull();
+      expect(fixed.querySelector('.sec-head')?.textContent).toContain('codex.moduleSection.fixedSystems');
+      (fixed.querySelector('button.slot-btn') as HTMLButtonElement).click();
+      expect(inspects.length).toBe(1);
+    });
+
     it('draws bars in the other columns\' sections too, and none on a row without a share', () => {
       fixture.componentRef.setInput('calm', true);
       fixture.componentRef.setInput('partShares', new Map([['SHLD_A', 0.6], ['COOL_A', 0.25]]));

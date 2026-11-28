@@ -2428,10 +2428,6 @@
       "shieldsNote": "Ogni alloggiamento di questo blocco è un generatore di scudi sostituibile, compresi quelli forniti vuoti. Il modulo di controllo scudi è tra i sistemi fissi: non è uno scudo a sé e non si può sostituire nel gioco.",
       "countermeasuresNote": "I lanciatori non si possono cambiare nel gioco, quindi questo blocco è solo di consultazione. Le esche (decoy) allontanano i missili a ricerca di calore, il disturbo (chaff) acceca quelli a guida radar. Quanti te ne servono lo trovi nella scheda info (ⓘ) del lanciatore: confronta la firma per lancio con quella della nave.",
       "infoLabel": "Informazioni su questo blocco",
-      "splitRows": "Singoli",
-      "groupRows": "Raggruppa",
-      "splitRowsHint": "Elenca ogni hardpoint su una riga a sé, così puoi modificarli uno per uno",
-      "groupRowsHint": "Riunisci gli hardpoint identici in un'unica riga",
       "unfold": "Mostra",
       "foldAway": "Nascondi"
     },
@@ -2449,7 +2445,6 @@
         "passive": "Passivo · fuori rete",
         "pool": "Pool"
       },
-      "shieldNote": "Tutti i {{count}} sono generatori di scudi e ognuno si può sostituire singolarmente: quelli identici sono raggruppati qui, «Singoli» li elenca alloggiamento per alloggiamento.",
       "shieldPassiveNote": "Quello passivo non consuma energia e conta comunque per intero nel pool, ma dipende dagli attivi: se questi si guastano, salta anche il backup.",
       "peek": {
         "sustainedDpsTotal": "DPS sostenuto totale",

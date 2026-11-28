@@ -2588,6 +2588,7 @@
       "coolers": "Coolers",
       "lifeSupport": "Life support",
       "structure": "Airframe & fixed systems",
+      "fixedSystems": "Fixed systems",
       "systems": "Propulsion & systems",
       "fixedTag": "not configurable",
       "countermeasures": "Countermeasures",
@@ -2615,7 +2616,7 @@
         "passive": "Passive · off the grid",
         "pool": "Pool"
       },
-      "shieldNote": "All {{count}} are shield generators and each can be swapped on its own — identical ones are stacked here, “Individually” lists them bay by bay.",
+      "shieldNote": "All {{count}} are shield generators and each can be swapped on its own — identical ones are stacked here in one row.",
       "shieldPassiveNote": "The passive one costs no power and still counts fully towards the pool — but it hangs off the active ones: if they fail, the backup goes with them.",
       "peek": {
         "sustainedDpsTotal": "Total sustained DPS",
