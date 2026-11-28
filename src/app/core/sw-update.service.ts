@@ -1,8 +1,8 @@
 import { logWarn } from './log';
 import { DOCUMENT } from '@angular/common';
 import { Injectable, NgZone, inject, signal } from '@angular/core';
-import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
-import { filter } from 'rxjs/operators';
+import { SwUpdate, VersionEvent } from '@angular/service-worker';
+import { clearBootSplashResume, holdBootSplash, markBootSplashResume } from './boot-splash';
 
 /**
  * Surfaces ngsw "new version ready" events to the UI and performs the
@@ -43,6 +43,13 @@ export class SwUpdateService {
    */
   private static readonly AUTO_RELOAD_FLAG = 'sc.sw.autoReloaded';
 
+  /**
+   * Longest the boot splash waits for the worker's answer to "is there a newer build?" once
+   * the page is ready. The answer usually arrives while the page still loads, so this costs
+   * nothing; without it a build found a moment later reloads a page that just appeared.
+   */
+  private static readonly CHECK_HOLD_MS = 1500;
+
   /** Guards against double-wiring (subscription + timer) if init() re-runs. */
   private initialized = false;
   /** Guards against concurrent activate-and-reload from double clicks. */
@@ -51,6 +58,10 @@ export class SwUpdateService {
   private startedAt = 0;
   /** The user clicked, typed or scrolled since opening: no silent reload any more. */
   private interacted = false;
+  /** Releases the boot splash held for the startup check (see {@link holdSplashForCheck}); null = not held. */
+  private releaseSplash: (() => void) | null = null;
+  /** Ends the splash hold when the worker stays silent or the download outlasts the grace window. */
+  private splashTimer: ReturnType<typeof setTimeout> | null = null;
 
   /**
    * Subscribe to version events and start polling. No-op when the service
@@ -63,12 +74,11 @@ export class SwUpdateService {
     this.initialized = true;
     this.startedAt = Date.now();
     this.watchForInteraction();
+    this.holdSplashForCheck();
 
-    this.swUpdate.versionUpdates
-      .pipe(filter((event): event is VersionReadyEvent => event.type === 'VERSION_READY'))
-      // versionUpdates can emit outside the Angular zone; re-enter so the
-      // signal write reliably schedules CD for the OnPush banner.
-      .subscribe(() => this.zone.run(() => this.onVersionReady()));
+    // versionUpdates can emit outside the Angular zone; re-enter so the
+    // signal write reliably schedules CD for the OnPush banner.
+    this.swUpdate.versionUpdates.subscribe((event) => this.zone.run(() => this.onVersionEvent(event)));
 
     // A cached asset whose hash no longer exists on the server leaves the
     // shell broken until a full reload; the SW reports it once and never
@@ -78,6 +88,7 @@ export class SwUpdateService {
       this.zone.run(() => {
         if (this.autoReloadedThisSession()) return;
         this.markAutoReloaded();
+        markBootSplashResume(this.document);
         this.document.location.reload();
       }),
     );
@@ -85,7 +96,16 @@ export class SwUpdateService {
     // A long-open tab would otherwise only check on reload. Poll outside the
     // Angular zone so the timer never keeps the zone unstable (which would
     // delay `registerWhenStable` and CD).
-    this.swUpdate.checkForUpdate().catch((e) => logWarn('sw', 'checkForUpdate failed', e));
+    this.swUpdate
+      .checkForUpdate()
+      // false = no newer build: the splash may go. true = one is ready, VERSION_READY decides.
+      .then((found) => {
+        if (!found) this.endSplashHold();
+      })
+      .catch((e) => {
+        this.endSplashHold();
+        logWarn('sw', 'checkForUpdate failed', e);
+      });
     this.zone.runOutsideAngular(() => {
       setInterval(
         () => this.swUpdate.checkForUpdate().catch((e) => logWarn('sw', 'checkForUpdate failed', e)),
@@ -106,13 +126,72 @@ export class SwUpdateService {
    * persistent "ready" state from looping the page.
    */
   private onVersionReady(): void {
-    const withinStartup = Date.now() - this.startedAt < SwUpdateService.STARTUP_GRACE_MS;
-    if (withinStartup && !this.interacted && !this.autoReloadedThisSession()) {
+    if (this.silentReloadAllowed()) {
       this.markAutoReloaded();
-      void this.applyUpdate();
+      // The splash is still up (held since the build was found): the next document carries its animation on.
+      markBootSplashResume(this.document);
+      void this.applyUpdate().then(() => {
+        // Still here and no longer applying = the activation failed: no reload comes, the page may show.
+        if (this.applying) return;
+        clearBootSplashResume(this.document);
+        this.endSplashHold();
+      });
       return;
     }
+    this.endSplashHold();
     this.updateReady.set(true);
+  }
+
+  /** A fresh open nobody has touched yet, with this session's one silent reload unspent. */
+  private silentReloadAllowed(): boolean {
+    const withinStartup = Date.now() - this.startedAt < SwUpdateService.STARTUP_GRACE_MS;
+    return withinStartup && !this.interacted && !this.autoReloadedThisSession();
+  }
+
+  private onVersionEvent(event: VersionEvent): void {
+    switch (event.type) {
+      case 'VERSION_READY':
+        this.onVersionReady();
+        break;
+      case 'VERSION_DETECTED':
+        // A build is downloading. If it will load silently, the splash stays until the reload
+        // (one loading sequence instead of page, reload, splash again) — at most until the
+        // grace window ends, after which the build only raises the prompt anyway.
+        if (this.releaseSplash && this.silentReloadAllowed()) {
+          this.armSplashTimer(SwUpdateService.STARTUP_GRACE_MS - (Date.now() - this.startedAt));
+        } else {
+          this.endSplashHold();
+        }
+        break;
+      default:
+        // NO_NEW_VERSION_DETECTED, VERSION_INSTALLATION_FAILED: nothing to wait for.
+        this.endSplashHold();
+    }
+  }
+
+  /**
+   * A page this worker already controls may be about to reload into a newer build. Hold the
+   * boot splash until the worker has answered the startup check, so the reload never hits a
+   * page that just appeared. A first visit (no controller yet) has nothing to update.
+   */
+  private holdSplashForCheck(): void {
+    if (!this.window()?.navigator?.serviceWorker?.controller) return;
+    this.releaseSplash = holdBootSplash();
+    this.armSplashTimer(SwUpdateService.CHECK_HOLD_MS);
+  }
+
+  private armSplashTimer(ms: number): void {
+    if (this.splashTimer !== null) clearTimeout(this.splashTimer);
+    this.zone.runOutsideAngular(() => {
+      this.splashTimer = setTimeout(() => this.endSplashHold(), Math.max(0, ms));
+    });
+  }
+
+  private endSplashHold(): void {
+    if (this.splashTimer !== null) clearTimeout(this.splashTimer);
+    this.splashTimer = null;
+    this.releaseSplash?.();
+    this.releaseSplash = null;
   }
 
   /** Flags the first input. Outside the zone: it only sets a field, no CD needed. */

@@ -103,13 +103,19 @@
       }
       /* Splash-only elements (logo, streaks, word) stay hidden until the load has lasted
          --scb-reveal (SPLASH_REVEAL_MS in core/boot-splash.ts), then fade in; a fast reload only
-         ever shows the dark backdrop. Leaving (scb-leave, set by dismissBootSplash) is a fade
-         plus a quick push-in toward the logo - only applied when the stage was visible. */
-      .scb { --scb-reveal: 600ms; transition: opacity 350ms ease-out; pointer-events: auto; }
-      .scb-stage { position: absolute; inset: 0; opacity: 0; transform-origin: 50% 46%; animation: scb-reveal 250ms ease-out var(--scb-reveal) forwards; transition: transform 350ms cubic-bezier(0.4, 0, 0.9, 0.6); }
+         ever shows the dark backdrop. Leaving (set by dismissBootSplash, lengths mirrored there) is
+         never a cut: scb-leave fades the splash out while the stage pushes in slowly toward the
+         logo; scb-quick is the short fade of a backdrop whose stage never showed. Both run on
+         opacity / transform only, so the compositor keeps them smooth while the page renders.
+         scb-resume (public/boot-splash.js) = this document continues a splash that was showing
+         before a reload: the stage is there at once, without the reveal delay. */
+      .scb { --scb-reveal: 600ms; transition: opacity 700ms cubic-bezier(0.4, 0, 0.6, 1); pointer-events: auto; will-change: opacity; }
+      .scb-stage { position: absolute; inset: 0; opacity: 0; transform-origin: 50% 46%; animation: scb-reveal 250ms ease-out var(--scb-reveal) forwards; transition: transform 700ms cubic-bezier(0.3, 0, 0.7, 1); will-change: transform, opacity; }
       @keyframes scb-reveal { to { opacity: 1; } }
+      .scb.scb-resume .scb-stage { animation: none; opacity: 1; }
       .scb.scb-leave { opacity: 0; pointer-events: none; }
-      .scb.scb-leave .scb-stage { transform: scale(1.45); }
+      .scb.scb-leave .scb-stage { transform: scale(1.22); }
+      .scb.scb-quick { transition-duration: 220ms; }
       .scb-sky { position: absolute; inset: 0; pointer-events: none; opacity: 0.7; background-image: radial-gradient(1.2px 1.2px at 8% 22%, rgba(223, 246, 255, 0.8), transparent 60%), radial-gradient(1px 1px at 17% 64%, rgba(223, 246, 255, 0.55), transparent 60%), radial-gradient(1.4px 1.4px at 26% 38%, rgba(143, 227, 255, 0.7), transparent 60%), radial-gradient(1px 1px at 33% 86%, rgba(223, 246, 255, 0.5), transparent 60%), radial-gradient(1px 1px at 41% 12%, rgba(223, 246, 255, 0.6), transparent 60%), radial-gradient(1.3px 1.3px at 52% 72%, rgba(223, 246, 255, 0.55), transparent 60%), radial-gradient(1px 1px at 58% 30%, rgba(143, 227, 255, 0.6), transparent 60%), radial-gradient(1.2px 1.2px at 66% 54%, rgba(223, 246, 255, 0.5), transparent 60%), radial-gradient(1px 1px at 72% 16%, rgba(223, 246, 255, 0.7), transparent 60%), radial-gradient(1.5px 1.5px at 79% 82%, rgba(143, 227, 255, 0.6), transparent 60%), radial-gradient(1px 1px at 86% 42%, rgba(223, 246, 255, 0.55), transparent 60%), radial-gradient(1.2px 1.2px at 93% 66%, rgba(223, 246, 255, 0.6), transparent 60%), radial-gradient(1px 1px at 4% 92%, rgba(223, 246, 255, 0.45), transparent 60%), radial-gradient(1px 1px at 97% 8%, rgba(223, 246, 255, 0.5), transparent 60%), radial-gradient(1px 1px at 47% 50%, rgba(223, 246, 255, 0.35), transparent 60%), radial-gradient(1px 1px at 63% 94%, rgba(223, 246, 255, 0.4), transparent 60%); }
       /* star streaks, same field as the mock; travel distance scales with the window so it reaches every corner */
       .scb-warp { position: absolute; left: 50%; top: 46%; width: 0; height: 0; pointer-events: none; }
@@ -304,5 +310,9 @@
         <div class="scb-word">Verse Companion</div>
       </div>
     </div>
+    <!-- Right behind the splash and not deferred: after a reload during boot it carries the
+         running animation on before the first frame (core/boot-splash.ts). External because the
+         CSP forbids inline scripts. -->
+    <script src="boot-splash.js"></script>
   </body>
 </html>
