@@ -3,8 +3,6 @@ import { AccountPrefsService } from '../../core/account-prefs.service';
 
 /** `profiles.ui_prefs` key; `true` = the two-colour liveness tint. */
 export const ROUTINE_TINT_BINARY_KEY = 'feedback.routineTintBinary';
-/** `profiles.ui_prefs` key; `true` = the steady green "PC on" light (feedback #405). */
-export const ROUTINE_PC_LIGHT_KEY = 'feedback.routinePcLight';
 
 /**
  * Which palette the feedback title's liveness tint (`scRoutineStatus`) uses.
@@ -26,19 +24,6 @@ export class RoutineTintPrefsService {
 
   /** `true` → the title is only ever green, red or (unknown) grey. */
   readonly binary = computed(() => this.account.prefs()?.[ROUTINE_TINT_BINARY_KEY] === true);
-
-  /**
-   * `true` → the title glows green, steadily, for as long as the watcher on
-   * the dev PC keeps ticking — idle, working or paused alike — and turns red
-   * shortly after the ticks stop (feedback #405: "dauerhaftes Grün, damit ich
-   * weiß, ob hier dran gearbeitet wird"). It replaces the cyan a working run
-   * showed in the four-state palette. Outranks `binary` when both are on.
-   */
-  readonly pcLight = computed(() => this.account.prefs()?.[ROUTINE_PC_LIGHT_KEY] === true);
-
-  setPcLight(on: boolean): void {
-    this.account.set(ROUTINE_PC_LIGHT_KEY, on ? true : null);
-  }
 
   setBinary(on: boolean): void {
     // `null` removes the key: the default stays the absence of a value.

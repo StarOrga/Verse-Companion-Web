@@ -118,7 +118,9 @@ export const SUBTHEMES: readonly Subtheme[] = [
     // lends itself to one DataCore paint only (Retaliator, Avenger, Constellation, Syulen).
     // 19: the id match claims a shared heuristic icon row before the name match,
     // so "Invictus Blue and Gold" no longer keeps the Grey icon and "Grey" its id.
-    revision: 19,
+    // 20: ship stats keep the weapon regen pool / capacitor-assignment structs
+    // (energy pips → energy-weapon ammo on the classic ship page).
+    revision: 20,
     phases: ['codex_ships'],
     sources: [
       ...CATALOG_SHARED,

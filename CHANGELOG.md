@@ -4,6 +4,62 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.300.5] - 2026-11-27
+
+### Changed
+- Classic ship view: the analysis cards follow their loadout sections while scrolling — Offensive stays pinned until the missiles end, Verteidigung starts at the shield generators, and the ship card is pulled up smoothly to Antrieb & Systeme (#409).
+
+### Fixed
+- Classic ship view: a leftover 16px gap no longer pushes the Offensive card below Bewaffnung (#408).
+
+## [0.300.4] - 2026-11-27
+
+### Fixed
+- Classic ship view: the Analyse column's first card (Offensive) starts at the same height as Bewaffnung in the Loadout column, and every Loadout box shares the analysis cards' rounder 8px corner (#408).
+
+## [0.300.3] - 2026-11-27
+
+### Changed
+- Classic ship view: career, crew and cargo sit as a short list on the right under the 3D switch; mass, systems and countermeasure counts are gone, the remaining counts ("3 Waffen", "8 Raketen", tractor beam, shield generators) are smaller chips on the picture's bottom edge (#407).
+
+### Fixed
+- Ships whose cargo bed the extract lists without SCU (Nomad, Mustang, Reliant …) no longer claim "Kein Laderaum"; they show "Laderaum · ?" with an explanation (#407).
+
+## [0.300.2] - 2026-11-27
+
+### Changed
+- Info windows (component window, craft dialog, weapon detail, compare tray, news detail, patch dossier, HQ log/stats) close on a click beside them, past a 20px safety margin around the frame; windows with input still close only via X, Cancel or Escape (#406).
+
+## [0.300.1] - 2026-11-27
+
+### Removed
+- Feedback board: the opt-in "green light while the PC is on" setting is gone again; the routine title tint works as before (#405).
+
+## [0.300.0] - 2026-11-27
+
+### Added
+- Classic Codex ship page: energy pips now act on shields, energy weapons, radar and coolers; cards, KPI band and analysis read the powered loadout.
+- Crafting quality on the classic ship page: quality chip per blueprint part, slider dialog per recipe slot with presets, crafted stats in every number.
+- Damage-by-source table (pilot, remote turrets, manned turrets, missiles) and real item names in the offensive table.
+- Data uploader 0.86.0 keeps the ship-level weapon regen pool and capacitor-assignment data.
+
+### Fixed
+- Sustained DPS no longer mixes shot and energy units (Nomad now 837 sustained, matching erkul).
+- Reserve shield generators count as HP pool only, without power or regen.
+- Quantum speed in the ship facts was shown 1000x too high.
+- Quantum drive is all-or-nothing in NAV; pip clicks and module swaps keep the scroll position; the KPI delta chip no longer shifts the band.
+- The factory baseline is compared under the same power deal, so no phantom regen delta shows on open.
+
+## [0.299.0] - 2026-11-26
+
+### Added
+- Ship page, Holotisch view: an energy zone like the game's power screen. Each consumer has a column of segments you can set; the effect on firepower, signature and cooling shows as chips.
+- Ship page, Holotisch view: each part column opens with its key number, the rank in the class and the class median; part cards show the grade as "Güte C" on an A–D scale, the state as a dot and the part's share.
+- Ship page, Holotisch view: the bottom strip appears once you scroll past the columns, and each category opens a panel (at most a third of the screen) with its graphics, e.g. "How long can I fire flat out, and what stops me?".
+
+### Changed
+- Ship page, Holotisch view: the perspective tiles at the page end are gone; their figures live in the strip panels.
+
 ## [0.298.15] - 2026-11-26
 
 ### Added

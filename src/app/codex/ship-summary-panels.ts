@@ -52,6 +52,12 @@ export interface SummaryOccupant {
    * resource-draw rule; undefined/false = decide from the item data alone.
    */
   passive?: boolean;
+  /**
+   * The hardpoint this occupant sits on, as the crafting store keys it: the
+   * top-level port, or `port>Class` for an item a mount carries. Absent where
+   * the caller does not track hardpoints (aggregates of a fixed loadout).
+   */
+  slotKey?: string;
 }
 
 /** A headline panel: a few aggregate stats plus the gaps it had to admit. */

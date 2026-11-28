@@ -123,7 +123,7 @@ export interface HqTile {
     }
 
     @if (detail(); as d) {
-      <sc-popup kind="dialog" [eyebrow]="'hq.title' | translate" [title]="'hq.stats.tile.' + d.id + '.name' | translate" (closed)="close()">
+      <sc-popup [closeBeside]="true" kind="dialog" [eyebrow]="'hq.title' | translate" [title]="'hq.stats.tile.' + d.id + '.name' | translate" (closed)="close()">
       <div class="d-body">
         <p class="d-sum">{{ d.value }} · {{ d.sub }}</p>
         <sc-hq-spark class="d-spark" [values]="d.series" [values2]="d.series2" [kind]="d.kind" />

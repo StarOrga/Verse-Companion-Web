@@ -121,7 +121,7 @@ function scrollBehavior(): ScrollBehavior {
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <sc-popup kind="large" [title]="title()" [eyebrow]="'news.patch.dossier.eyebrow' | translate" [backClose]="false" (closed)="onEscape()">
+    <sc-popup [closeBeside]="true" kind="large" [title]="title()" [eyebrow]="'news.patch.dossier.eyebrow' | translate" [backClose]="false" (closed)="onEscape()">
       <div class="panel">
         @if (card(); as c) {
           <header class="hero" [attr.data-status]="c.status">

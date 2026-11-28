@@ -378,32 +378,6 @@ const DELETE_ACCOUNT_ERROR_KEYS: Readonly<Record<string, string>> = {
                         : 'settings.feedbackFab.routineTint.descOff') | translate
                     }}
                   </p>
-                  <!-- The steady green "PC on" light (feedback #405): green with a
-                       halo for as long as the watcher on the dev PC ticks, in
-                       place of the cyan a working run shows. Per account. -->
-                  <div class="row">
-                    <span class="label elevated-hot">
-                      {{ 'settings.feedbackFab.routinePcLight.label' | translate }}
-                      <span class="sc-sr-only">{{ 'settings.feedbackFab.routineTint.audience' | translate }}</span>
-                    </span>
-                    <span class="value">
-                      <label class="consent-toggle">
-                        <input
-                          type="checkbox"
-                          data-testid="routine-pc-light-toggle"
-                          [checked]="routineTintPrefs.pcLight()"
-                          (change)="onRoutinePcLightToggle($event)" />
-                        {{ (routineTintPrefs.pcLight() ? 'consent.settings.on' : 'consent.settings.off') | translate }}
-                      </label>
-                    </span>
-                  </div>
-                  <p class="consent-desc">
-                    {{
-                      (routineTintPrefs.pcLight()
-                        ? 'settings.feedbackFab.routinePcLight.descOn'
-                        : 'settings.feedbackFab.routinePcLight.descOff') | translate
-                    }}
-                  </p>
                 }
               </div>
 
@@ -1270,12 +1244,6 @@ export class SettingsComponent implements OnInit, AfterViewInit, OnDestroy {
     const on = (e.target as HTMLInputElement).checked;
     this.routineTintPrefs.setBinary(on);
     this.analytics.track('settings:routine_tint_toggle', { on });
-  }
-
-  onRoutinePcLightToggle(e: Event) {
-    const on = (e.target as HTMLInputElement).checked;
-    this.routineTintPrefs.setPcLight(on);
-    this.analytics.track('settings:routine_pc_light_toggle', { on });
   }
 
   onShowNonUsableToggle(e: Event) {

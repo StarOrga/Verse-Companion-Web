@@ -1,7 +1,121 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.298.10",
+  "current": "0.299.0",
   "releases": [
+    {
+      "version": "0.299.0",
+      "date": "2026-11-26",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Ship page, Holotisch view: an energy zone like the game's power screen. Each consumer has a column of segments you can set; the effect on firepower, signature and cooling shows as chips."
+            },
+            {
+              "title": "",
+              "text": "Ship page, Holotisch view: each part column opens with its key number, the rank in the class and the class median; part cards show the grade as \"Güte C\" on an A–D scale, the state as a dot and the part's share."
+            },
+            {
+              "title": "",
+              "text": "Ship page, Holotisch view: the bottom strip appears once you scroll past the columns, and each category opens a panel (at most a third of the screen) with its graphics, e.g. \"How long can I fire flat out, and what stops me?\"."
+            }
+          ]
+        },
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Ship page, Holotisch view: the perspective tiles at the page end are gone; their figures live in the strip panels."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.298.15",
+      "date": "2026-11-26",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Settings (admins): \"Green light while the PC is on\" makes the feedback title glow steadily green while the feedback routine's PC is alive."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.298.14",
+      "date": "2026-11-26",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Ship page: the ship's 3D model now downloads quietly in idle time on desktop connections, so pressing \"3D\" opens straight into the model; the prefetch steps aside for anything the user opens."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.298.13",
+      "date": "2026-11-26",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Search: ship rows in the quick search and the Codex search show a small colour picture of the ship."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.298.12",
+      "date": "2026-11-26",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Ship loadout: closing the swap picker or another large popup no longer jumps the page back to the top; it stays where you were."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.298.11",
+      "date": "2026-11-25",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Verse hub: scrolling down to the footer no longer snaps the page back up; the footer is now reachable below the events teaser."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.298.10",
       "date": "2026-11-24",

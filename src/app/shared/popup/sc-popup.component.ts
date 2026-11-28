@@ -17,6 +17,7 @@ import { ModalInertService } from '../dialog/modal-inert.service';
 import { ScActionDirective } from '../action/sc-action.directive';
 import { ScTooltipDirective } from '../tooltip/sc-tooltip.directive';
 import { logWarn } from '../../core/log';
+import { isPlainLeftClick } from '../../core/modified-click.util';
 import { pushPopupEntry, releasePopupEntry } from './popup-history';
 
 /** The five popup kinds (concept 20261115-0216-popup-aufbau, r1-types). */
@@ -25,8 +26,24 @@ export type ScPopupKind = 'menu' | 'panel' | 'dialog' | 'large' | 'notice';
 export type ScPopupSize = 'menu' | 's' | 'm' | 'area' | 'fill';
 /** Who can reach the popup: the top edge takes the role colour (r1-role). */
 export type ScPopupAccess = 'admin' | 'collab' | null;
-/** Why the popup asks to close: its ✕, Escape, or the browser / phone back gesture. */
-export type ScPopupCloseReason = 'close' | 'escape' | 'back';
+/** Why the popup asks to close: its ✕, Escape, the browser / phone back gesture, or a click beside it (`closeBeside`). */
+export type ScPopupCloseReason = 'close' | 'escape' | 'back' | 'beside';
+
+/**
+ * The safety margin around the frame for `closeBeside` (admin feedback #406, "einen halben Zentimeter"):
+ * a click on the scrim within this many px of the frame's edge is a near miss and keeps the window open.
+ */
+export const SC_POPUP_BESIDE_MARGIN = 20;
+
+/** A point (client px) beside the frame rect, past the safety margin on every side? */
+export function isBesideFrame(
+  rect: Pick<DOMRect, 'left' | 'top' | 'right' | 'bottom'>,
+  x: number,
+  y: number,
+  margin = SC_POPUP_BESIDE_MARGIN,
+): boolean {
+  return x < rect.left - margin || x > rect.right + margin || y < rect.top - margin || y > rect.bottom + margin;
+}
 
 /** The one overlay breakpoint of styles.scss: below it dialog / panel / large are full screen. */
 export const SC_POPUP_PHONE_QUERY = '(max-width: 720px)';
@@ -107,9 +124,17 @@ let uid = 0;
  *               Pass `false` for a popup that already owns a URL (wish cart `?cart=1`,
  *               overlay-frame child routes) so it gets no second entry.
  *
+ * - `closeBeside` an info window without input the user could lose (a component window, a detail,
+ *               a log): a plain left click on the scrim beside the frame closes it with reason
+ *               'beside', but not within `SC_POPUP_BESIDE_MARGIN` (20 px) of the frame, so a near
+ *               miss keeps it open; press and release must both land out there (a drag that starts
+ *               in the window never closes it). Only with a scrim of its own (`backdrop`). Default
+ *               false: a window with a form, a prompt or a confirm closes only via ✕ / Abbrechen / Escape.
+ *
  * Output
- * - `closed` ('close' | 'escape' | 'back'): the ✕, Escape or the back gesture. A scrim click
- *   NEVER closes a modal, and a press on the scrim keeps focus in the frame (Escape stays alive).
+ * - `closed` ('close' | 'escape' | 'back' | 'beside'): the ✕, Escape, the back gesture or a click
+ *   beside a `closeBeside` window. Otherwise a scrim click NEVER closes a modal, and a press on
+ *   the scrim keeps focus in the frame (Escape stays alive).
  *   The host decides what closing means (remove the `@if`, resolve a promise, play
  *   `[scPopupMotion]`'s exit first).
  *
@@ -142,6 +167,8 @@ let uid = 0;
     '[class.sc-popup--staged]': 'hasBackdrop()',
     '[attr.data-layer]': 'hasBackdrop() ? layer : null',
     '(mousedown)': 'onHostMouseDown($event)',
+    '(pointerdown)': 'onHostPointerDown($event)',
+    '(click)': 'onHostClick($event)',
   },
   template: `
     @if (hasBackdrop()) {
@@ -244,6 +271,8 @@ export class ScPopupComponent implements OnInit, OnDestroy {
   readonly describedBy = input<string | null>(null);
   /** null = auto (large always, dialog/panel at phone width); false for a popup that owns a URL. */
   readonly backClose = input<boolean | null>(null);
+  /** A click beside the frame (past the safety margin) closes it: info windows without input only. */
+  readonly closeBeside = input(false);
 
   readonly closed = output<ScPopupCloseReason>();
 
@@ -318,6 +347,29 @@ export class ScPopupComponent implements OnInit, OnDestroy {
     ev.preventDefault();
     const active = document.activeElement;
     if (!active || active === document.body) (frame as HTMLElement).focus({ preventScroll: true });
+  }
+
+  /** The press of the current click landed beside the frame (past the margin): only then may its click close. */
+  private pressedBeside = false;
+
+  onHostPointerDown(ev: PointerEvent): void {
+    this.pressedBeside = this.isBesideClick(ev);
+  }
+
+  onHostClick(ev: MouseEvent): void {
+    const pressed = this.pressedBeside;
+    this.pressedBeside = false;
+    if (pressed && this.isBesideClick(ev)) this.closed.emit('beside');
+  }
+
+  private isBesideClick(ev: MouseEvent): boolean {
+    if (!this.closeBeside() || !this.hasBackdrop() || !isPlainLeftClick(ev)) return false;
+    const host = ev.currentTarget as HTMLElement | null;
+    const frame = host?.querySelector<HTMLElement>(':scope > .scp-frame');
+    if (!frame || frame.contains(ev.target as Node)) return false;
+    // Only a press on this popup's own scrim / stage: never one inside a nested overlay it hosts.
+    if (ev.target !== host && !(ev.target as Element).classList?.contains('scp-scrim')) return false;
+    return isBesideFrame(frame.getBoundingClientRect(), ev.clientX, ev.clientY);
   }
 
   private wantsHistoryEntry(): boolean {

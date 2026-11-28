@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideTranslateService } from '@ngx-translate/core';
 import de from '../../../../public/i18n/de.json';
 import en from '../../../../public/i18n/en.json';
-import { ScPopupComponent, type ScPopupAccess, type ScPopupKind, type ScPopupSize } from './sc-popup.component';
+import { ScPopupComponent, SC_POPUP_BESIDE_MARGIN, isBesideFrame, type ScPopupAccess, type ScPopupKind, type ScPopupSize } from './sc-popup.component';
 import { ModalInertService } from '../dialog/modal-inert.service';
 import { popupEntryDepth } from './popup-history';
 import { useViewport } from '../../testing/viewport';
@@ -21,6 +21,7 @@ import { useViewport } from '../../testing/viewport';
         [size]="size()"
         [access]="access()"
         [backClose]="backClose()"
+        [closeBeside]="closeBeside()"
         (closed)="onClosed($event)"
       >
         @if (icon()) {
@@ -50,6 +51,7 @@ class HostComponent {
   readonly contentH = signal(40);
   readonly icon = signal(false);
   readonly backClose = signal<boolean | null>(null);
+  readonly closeBeside = signal(false);
   readonly secondBack = signal<boolean | null>(null);
   readonly secondReasons: string[] = [];
   readonly reasons: string[] = [];
@@ -180,6 +182,74 @@ describe('ScPopupComponent', () => {
     expect(f.componentInstance.reasons).toEqual([]);
     expect(f.nativeElement.querySelector('sc-popup')).not.toBeNull();
     f.destroy();
+  });
+
+  describe('closeBeside (#406)', () => {
+    const rect = { left: 100, top: 100, right: 300, bottom: 200 };
+    it('isBesideFrame: inside the frame and within the margin is not beside, past it is', () => {
+      expect(SC_POPUP_BESIDE_MARGIN).toBe(20);
+      expect(isBesideFrame(rect, 150, 150)).toBe(false);
+      expect(isBesideFrame(rect, 100 - 20, 150)).toBe(false);
+      expect(isBesideFrame(rect, 300 + 12, 150)).toBe(false);
+      expect(isBesideFrame(rect, 150, 200 + 20)).toBe(false);
+      expect(isBesideFrame(rect, 100 - 21, 150)).toBe(true);
+      expect(isBesideFrame(rect, 300 + 21, 150)).toBe(true);
+      expect(isBesideFrame(rect, 150, 100 - 21)).toBe(true);
+      expect(isBesideFrame(rect, 150, 200 + 21)).toBe(true);
+    });
+
+    const press = (target: Element, x: number, y: number, init: MouseEventInit = {}) =>
+      target.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, clientX: x, clientY: y, button: 0, ...init }));
+    const release = (target: Element, x: number, y: number, init: MouseEventInit = {}) =>
+      target.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, clientX: x, clientY: y, button: 0, ...init }));
+
+    it('a click on the scrim past the safety margin closes with reason "beside"', async () => {
+      const f = mount((h) => h.closeBeside.set(true));
+      await settle();
+      const r = frame(f.nativeElement).getBoundingClientRect();
+      const scrim = f.nativeElement.querySelector('.scp-scrim') as HTMLElement;
+      const y = (r.top + r.bottom) / 2;
+      // a near miss inside the margin keeps the window open
+      press(scrim, r.left - 10, y);
+      release(scrim, r.left - 10, y);
+      f.detectChanges();
+      expect(f.componentInstance.reasons).toEqual([]);
+      press(scrim, r.left - 40, y);
+      release(scrim, r.left - 40, y);
+      f.detectChanges();
+      expect(f.componentInstance.reasons).toEqual(['beside']);
+      f.destroy();
+    });
+
+    it('a drag out of the window, a modified or a right click never closes', async () => {
+      const f = mount((h) => h.closeBeside.set(true));
+      await settle();
+      const fr = frame(f.nativeElement);
+      const r = fr.getBoundingClientRect();
+      const scrim = f.nativeElement.querySelector('.scp-scrim') as HTMLElement;
+      const y = (r.top + r.bottom) / 2;
+      press(fr.querySelector('.content')!, r.left + 10, y);
+      release(scrim, r.left - 40, y);
+      press(scrim, r.left - 40, y, { button: 2 });
+      release(scrim, r.left - 40, y, { button: 2 });
+      press(scrim, r.left - 40, y, { ctrlKey: true });
+      release(scrim, r.left - 40, y, { ctrlKey: true });
+      f.detectChanges();
+      expect(f.componentInstance.reasons).toEqual([]);
+      f.destroy();
+    });
+
+    it('without closeBeside a click beside the window keeps it open', async () => {
+      const f = mount();
+      await settle();
+      const r = frame(f.nativeElement).getBoundingClientRect();
+      const scrim = f.nativeElement.querySelector('.scp-scrim') as HTMLElement;
+      press(scrim, r.left - 40, r.top + 10);
+      release(scrim, r.left - 40, r.top + 10);
+      f.detectChanges();
+      expect(f.componentInstance.reasons).toEqual([]);
+      f.destroy();
+    });
   });
 
   it('Escape closes with reason "escape"', async () => {

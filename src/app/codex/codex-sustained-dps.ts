@@ -72,7 +72,35 @@ interface Cycle {
   downtime: number;
 }
 
+/**
+ * The weapon regen struct carries TWO consistent pairs, in different units
+ * (LIVE 4.10.3, KLWE_LaserRepeater_S3):
+ *   * `maxAmmoLoad` 75 / `maxRegenPerSec` 15 — SHOTS (the capacitor the pilot
+ *     sees; star-citizen.wiki prints exactly these as "max ammo / regen");
+ *   * `requestedAmmoLoad` 18187 / `requestedRegenPerSec` 3031 — ENERGY units,
+ *     drained at `regenerationCostPerBullet` 48.5 per shot.
+ * Mixing them (75 shots ÷ 48.5 per shot) collapsed the fire time to 1.5 shots
+ * and the sustained DPS to a seventh of the burst. A complete pair always wins;
+ * only a payload with neither pair falls back to the loose candidate lists.
+ */
+function energyPair(p: Params): { pool: number; regen: number; cost: number } | null {
+  const shots = positive(pick(p, ['regen.maxAmmoLoad']));
+  const shotsRegen = positive(pick(p, ['regen.maxRegenPerSec']));
+  if (shots !== null && shotsRegen !== null) return { pool: shots, regen: shotsRegen, cost: 1 };
+  const energy = positive(pick(p, ['regen.requestedAmmoLoad']));
+  const energyRegen = positive(pick(p, ['regen.requestedRegenPerSec']));
+  if (energy !== null && energyRegen !== null) {
+    return { pool: energy, regen: energyRegen, cost: positive(pick(p, COST_PER_SHOT)) ?? 1 };
+  }
+  return null;
+}
+
 function energyCycle(p: Params, sps: number): Cycle | null {
+  const pair = energyPair(p);
+  if (pair) {
+    const cooldown = Math.max(0, pick(p, REGEN_COOLDOWN) ?? 0);
+    return { limit: 'energyPool', fireTime: pair.pool / pair.cost / sps, downtime: cooldown + pair.pool / pair.regen };
+  }
   const pool = positive(pick(p, POOL));
   const regen = positive(pick(p, REGEN_PER_SEC));
   if (pool === null || regen === null) return null;
@@ -125,6 +153,45 @@ export function sustainedDps(
     fireTime: best.cycle.fireTime,
     downtime: best.cycle.downtime,
   };
+}
+
+/** One limit's cycle of a weapon, with the DPS that limit alone would give. */
+export interface SustainedCycleInfo {
+  limit: SustainedLimit;
+  /** Seconds of uninterrupted fire before this limit stops the gun. */
+  fireTime: number;
+  /** Seconds the gun is down afterwards. */
+  downtime: number;
+  /** Cycle-averaged DPS if only this limit applied. */
+  value: number;
+}
+
+/**
+ * EVERY limit cycle a weapon carries, shortest burst first — the data the
+ * fire timeline draws ("until 3,4 s (heat), until 12 s (magazine)").
+ * {@link sustainedDps} stays the one source for the sustained number; the
+ * binding cycle there is the one with the lowest `value` here.
+ */
+export function sustainedCycles(
+  burstDps: number | null,
+  fireRateRpm: number | null,
+  weaponParams: Params,
+): SustainedCycleInfo[] {
+  if (burstDps === null || !(burstDps > 0)) return [];
+  const rpm = positive(fireRateRpm);
+  if (rpm === null) return [];
+  const sps = rpm / 60;
+  const out: SustainedCycleInfo[] = [];
+  for (const c of [energyCycle(weaponParams, sps), magazineCycle(weaponParams, sps), heatCycle(weaponParams, sps)]) {
+    if (!c) continue;
+    out.push({
+      limit: c.limit,
+      fireTime: c.fireTime,
+      downtime: c.downtime,
+      value: Math.round(((burstDps * c.fireTime) / (c.fireTime + c.downtime)) * 100) / 100,
+    });
+  }
+  return out.sort((a, b) => a.fireTime - b.fireTime);
 }
 
 /** `weaponParams` of a weapon payload, or undefined. */

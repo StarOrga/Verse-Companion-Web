@@ -49,6 +49,20 @@ describe('keepsScroll', () => {
     expect(keepsScroll(st(true), st(false, '{}', { path: 'other' }))).toBe(false);
     expect(keepsScroll(st(false, '{"id":"1"}'), st(true, '{"id":"2"}'))).toBe(false);
   });
+
+  it('keeps the scroll when only the query of the same page changes (energy pips, module swap)', () => {
+    const q = (query: string, params = '{}', route: unknown = board): OverlayScrollState => ({
+      base: [{ route, params }],
+      overlay: false,
+      query,
+    });
+    expect(keepsScroll(q('{"pw":"a"}'), q('{"pw":"b"}'))).toBe(true);
+    expect(keepsScroll(q('{}'), q('{"loadout":"x"}'))).toBe(true);
+    // same URL again, another page, or other path params still land at the top
+    expect(keepsScroll(q('{"pw":"a"}'), q('{"pw":"a"}'))).toBe(false);
+    expect(keepsScroll(q('{}'), q('{"pw":"a"}', '{}', { path: 'other' }))).toBe(false);
+    expect(keepsScroll(q('{}', '{"id":"1"}'), q('{"pw":"a"}', '{"id":"2"}'))).toBe(false);
+  });
 });
 
 describe('OverlayRouteScrollService (feedback #245)', () => {

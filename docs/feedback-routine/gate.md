@@ -141,16 +141,6 @@ The tooltip (native `title`, so no markup) is also the honest availability
 sentence: it names the last check-in, the last run's note (translated from the
 gate's keys) and says that the routine only runs while the dev PC is up.
 
-**Two per-account palettes** (Settings → Feedback button, admins only, stored
-in `profiles.ui_prefs` via `RoutineTintPrefsService`, default off):
-`feedback.routineTintBinary` collapses the four tints to green (online,
-running) / red (paused, offline) (#338); `feedback.routinePcLight` (#405, wins
-when both are on) is the "PC on" light — online, running and paused all glow
-steady green (full `--sc-success` plus a halo, `is-glow`), and the verdict uses
-a 2-minute grace instead of 15 (`HEARTBEAT_PC_GRACE_MS`), so the title stays
-green from one 3-minute tick to the next and turns red about five minutes after
-the last one.
-
 **Grey is a real third state, not an error bucket.** A missing row, an expired
 session, or a failed request says nothing whatsoever about the dev PC, and
 painting that red would be a claim the admin then has to go and disprove.

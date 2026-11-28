@@ -76,6 +76,10 @@ import type { SummaryOccupant } from '../ship-summary-panels';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import { AreaSymbolComponent } from '../../shared/area-symbol/area-symbol.component';
 import { CountUp } from './count-up';
+import { CodexHoloCategoryPanelComponent } from './codex-holo-category-panel.component';
+import { HoloCategoryId, HoloCategoryModel } from './holo-category-model';
+import { ScActionDirective } from '../../shared/action/sc-action.directive';
+import { logWarn } from '../../core/log';
 import { AnalyticsService } from '../../core/analytics.service';
 import { claimRootAttr } from '../../core/root-var';
 import { SheetSnap, SnapHeights, cycleSnap, dragVisible, releaseVelocity, settleSnap } from './holo-sheet-snap';
@@ -115,10 +119,10 @@ let uidSeq = 0;
 @Component({
   selector: 'sc-codex-holo-strip',
   standalone: true,
-  imports: [TranslatePipe, ScTooltipDirective, AreaSymbolComponent],
+  imports: [TranslatePipe, ScTooltipDirective, ScActionDirective, AreaSymbolComponent, CodexHoloCategoryPanelComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="holo-strip" [class.open]="expanded()" [class.sheet]="phone" [class.dragging]="dragging()" [attr.data-snap]="phone ? snap() : null"
+    <div class="holo-strip" [class.away]="!stripShown()" [class.open]="expanded()" [class.sheet]="phone" [class.dragging]="dragging()" [attr.data-snap]="phone ? snap() : null"
          (keydown.escape)="phone && snap() !== 'peek' && setSnap('peek', true)">
       @if (phone) {
         <!-- Half / full: the page behind is dimmed; a tap on it folds the sheet back to peek. -->
@@ -232,9 +236,24 @@ let uidSeq = 0;
           <ng-content select="[hsDock]" />
         </div>
       }
+      @if (openArea(); as area) {
+        @if (models(); as m) {
+          <div class="cat-panel" [id]="catPanelId" role="region" [attr.data-p]="area"
+               [attr.aria-label]="'codex.holo.panel.aria' | translate: { area: areaLabel(area) | translate }"
+               animate.enter="cp-enter" animate.leave="cp-leave">
+            <button type="button" scAction tier="tertiary" class="cp-close" [attr.aria-label]="'codex.holo.panel.close' | translate"
+                    [scTooltip]="'codex.holo.panel.close' | translate" scTooltipTier="label" (click)="closeArea(true)">
+              <svg class="sc-action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+            </button>
+            <sc-codex-holo-category-panel [area]="area" [models]="m" />
+          </div>
+        }
+      }
       <div class="hs-row">
         @for (tile of perspectiveTiles(); track tile.perspective) {
-          <div class="seg tile" [attr.data-p]="tile.perspective">
+          <button type="button" class="seg tile" [attr.data-p]="tile.perspective" [class.sel]="openArea() === tile.perspective"
+                  [attr.aria-expanded]="openArea() === tile.perspective" [attr.aria-controls]="catPanelId"
+                  (click)="toggleArea(tile.perspective, $event)">
             <span class="lab"><sc-area-symbol class="area-sym" [area]="tile.perspective" /><span class="lt">{{ tile.labelKey | translate }}</span></span>
             <div class="tile-vals">
               @for (c of tile.cells; track c.key) {
@@ -250,24 +269,26 @@ let uidSeq = 0;
               } @empty {
                 <!-- Nothing in this perspective has a value for this hull — say
                      so instead of leaving a label over an empty cell. -->
-                <span class="tv none" tabindex="0" role="img" [scTooltip]="'codex.kpi.gap' | translate" scTooltipTier="label" [attr.aria-label]="'codex.kpi.gap' | translate"><span class="k">&nbsp;</span><span class="v">—</span></span>
+                <span class="tv none" [scTooltip]="'codex.kpi.gap' | translate" scTooltipTier="label"><span class="k">&nbsp;</span><span class="v">—</span></span>
               }
             </div>
-          </div>
+          </button>
         }
 
-        <div class="seg tile sig" data-p="signature">
+        <button type="button" class="seg tile sig" data-p="signature" [class.sel]="openArea() === 'signature'"
+                [attr.aria-expanded]="openArea() === 'signature'" [attr.aria-controls]="catPanelId"
+                (click)="toggleArea('signature', $event)">
           <span class="lab"><sc-area-symbol class="area-sym" area="signature" /><span class="lt">{{ 'codex.holo.strip.signature' | translate }}</span></span>
           <div class="tile-vals">
-          <span class="fact" tabindex="0" [scTooltip]="fmtM($safeNavigationMigration(irFact()?.value)) + '\u00a0m'" scTooltipTier="label">
+          <span class="fact" [scTooltip]="fmtM($safeNavigationMigration(irFact()?.value)) + '\u00a0m'" scTooltipTier="label">
             <span class="tip-trigger">{{ 'codex.energy.fact.ir' | translate }}</span>
             <span class="v pulse">{{ fmtKm(up('ir', irFact()?.value)) }}<small>km</small></span>
           </span>
-          <span class="fact" tabindex="0" [scTooltip]="fmtM($safeNavigationMigration(emFact()?.value)) + '\u00a0m'" scTooltipTier="label">
+          <span class="fact" [scTooltip]="fmtM($safeNavigationMigration(emFact()?.value)) + '\u00a0m'" scTooltipTier="label">
             <span class="tip-trigger">{{ 'codex.energy.fact.em' | translate }}</span>
             <span class="v pulse">{{ fmtKm(up('em', emFact()?.value)) }}<small>km</small></span>
           </span>
-          <span class="fact" tabindex="0" [scTooltip]="fmtM($safeNavigationMigration(csFact()?.value)) + '\u00a0m'" scTooltipTier="label">
+          <span class="fact" [scTooltip]="fmtM($safeNavigationMigration(csFact()?.value)) + '\u00a0m'" scTooltipTier="label">
             <span class="tip-trigger">{{ 'codex.energy.fact.crossSection' | translate }}</span>
             <span class="v pulse">{{ fmtKm(up('cs', csFact()?.value)) }}<small>km</small></span>
           </span>
@@ -280,7 +301,7 @@ let uidSeq = 0;
             }}</span>
           </span>
           </div>
-        </div>
+        </button>
 
       </div>
       <!-- The dock's handle: a thin bar under the capsule (concept holotisch-feinschliff C8), it takes no width from the four topics. -->
@@ -343,6 +364,13 @@ let uidSeq = 0;
       .hs-row { display: flex; align-items: stretch; gap: 0; padding: 0; padding-inline-end: var(--fab-clear, 0px); overflow-x: auto;
         scrollbar-width: none; min-block-size: 64px; }
       .hs-row::-webkit-scrollbar { display: none; }
+      /* The cells are buttons: they keep the strip's own look, only the browser's button skin goes. */
+      button.seg { appearance: none; border: 0; background: transparent; color: inherit; font: inherit; text-align: start; cursor: pointer;
+        transition: background var(--holo-t-fast) ease; }
+      button.seg:hover { background: color-mix(in srgb, var(--p, var(--sc-accent)) 7%, transparent); }
+      button.seg:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
+      /* The open cell lights up in its area's colour. */
+      button.seg.sel { background: color-mix(in srgb, var(--p) 14%, transparent); box-shadow: inset 0 -2px 0 var(--p); }
       .seg { display: flex; flex-direction: column; justify-content: center; gap: 2px; padding: 6px clamp(7px, 0.6vw, 11px); min-width: 0; flex: 1 1 auto; }
       .seg .lab { display: inline-flex; align-items: baseline; gap: 8px; font-family: var(--sc-font-display); font-size: max(9px, var(--sc-fs-floor));
         letter-spacing: 0.1em; text-transform: uppercase; color: var(--sc-accent); white-space: nowrap; }
@@ -413,6 +441,22 @@ let uidSeq = 0;
         background: color-mix(in srgb, var(--sc-accent) 6%, var(--sc-bg-0));
         border: 1px solid color-mix(in srgb, var(--holo-e, var(--sc-accent)) 28%, transparent); border-block-end: 0;
         border-radius: 16px 16px 0 0; box-shadow: 0 -12px 34px rgb(0 0 0 / 0.55); }
+      /* The strip shows only once the category heads have scrolled out above (they carry the same numbers). */
+      .holo-strip { transition: transform var(--holo-t-base) var(--e-out), opacity var(--holo-t-base) ease, border-color var(--holo-t-base) ease; }
+      .holo-strip.away { transform: translateY(100%); opacity: 0; visibility: hidden; pointer-events: none; }
+      /* ds-ok: the fold-out is its own surface — the strip's capsule skin, as wide as the strip, a third of the screen at most (vh = fallback). */
+      .cat-panel { position: absolute; inset-inline: -1px; inset-block-end: 100%; z-index: 4;
+        max-block-size: 33vh; max-block-size: 33dvh; overflow-y: auto; overscroll-behavior: contain;
+        padding: 12px 48px 12px 16px;
+        background: color-mix(in srgb, var(--sc-accent) 6%, var(--sc-bg-0));
+        border: 1px solid color-mix(in srgb, var(--p, var(--sc-accent)) 40%, transparent); border-block-end: 0;
+        border-radius: 16px 16px 0 0; box-shadow: 0 -12px 34px rgb(0 0 0 / 0.55); --p: var(--p-offensive); }
+      .cat-panel[data-p='defensive'] { --p: var(--p-defensive); }
+      .cat-panel[data-p='movement'] { --p: var(--p-movement); }
+      .cat-panel[data-p='signature'] { --p: var(--p-signature); }
+      .cp-close { position: absolute; inset-block-start: 8px; inset-inline-end: 8px; }
+      .cp-enter { animation: hp-in 260ms var(--e-out); }
+      .cp-leave { animation: hp-out 180ms ease-in forwards; }
       .holo-strip.open { border-start-start-radius: 0; border-start-end-radius: 0; }
       /* Energy row: modes | pips | cooling (concept round 6 "Energie-Zeile"). */
       .hp-energy { padding: 10px 14px; display: grid; grid-template-columns: 170px 1fr 240px; gap: 18px; align-items: center;
@@ -526,6 +570,7 @@ let uidSeq = 0;
         /* Phone: the dock rides on the fixed bar, which already ends before
            the feedback launcher's lane — nothing of it sits under the FAB. */
         .hs-panel { border-radius: 16px 16px 0 0; }
+        .cat-panel { padding-inline-end: 48px; }
       }
       /* A phone on its side (two-pane page): the bar rides in the flow at the page's end instead of eating a third of the screen. */
       @media (orientation: landscape) and (max-height: 500px) {
@@ -554,6 +599,8 @@ export class CodexHoloStripComponent {
 
   // The Einsatz picker lives in the head now (sc-codex-holo-einsatz, concept holotisch-feinschliff C4).
   readonly capabilities = input<ShipCapabilities | null>(null);
+  /** The category models the fold-out panels draw from (the stage's `categoryModels()`). */
+  readonly models = input<HoloCategoryModel | null>(null);
 
   private readonly route = inject(ActivatedRoute, { optional: true });
   private readonly router = inject(Router, { optional: true });
@@ -564,6 +611,11 @@ export class CodexHoloStripComponent {
 
   private readonly uid = `holo-strip-${++uidSeq}`;
   protected readonly panelId = `${this.uid}-panel`;
+  protected readonly catPanelId = `${this.uid}-cat`;
+  /** The strip appears once the category heads have scrolled out above (true until they are found: never lost). */
+  protected readonly stripShown = signal(false);
+  protected readonly openArea = signal<HoloCategoryId | null>(null);
+  private openedFrom: HTMLElement | null = null;
 
   private readonly cutGroups = signal<ReadonlySet<PowerColumnKey>>(new Set());
   private readonly levels = signal<PowerLevels>({});
@@ -761,6 +813,14 @@ export class CodexHoloStripComponent {
         cancelAnimationFrame(raf);
       });
     });
+    afterNextRender(() => this.watchHeads());
+    afterNextRender(() => {
+      const onKey = (ev: KeyboardEvent) => {
+        if (ev.key === 'Escape' && this.openArea() !== null) this.closeArea(true);
+      };
+      document.addEventListener('keydown', onKey);
+      this.destroyRef.onDestroy(() => document.removeEventListener('keydown', onKey));
+    });
     afterNextRender(() => {
       if (!this.phone) return;
       this.paint(0);
@@ -785,6 +845,60 @@ export class CodexHoloStripComponent {
       if (this.flashTimer) clearTimeout(this.flashTimer);
       this.counter.dispose();
     });
+  }
+
+  /** Show the strip only while no category head is on screen below the top edge: it takes over once they scrolled out above. */
+  private watchHeads(): void {
+    if (typeof IntersectionObserver !== 'function') { this.stripShown.set(true); return; }
+    let io: IntersectionObserver | null = null;
+    let timer: ReturnType<typeof setInterval> | null = null;
+    let tries = 0;
+    const state = new Map<Element, boolean>();
+    const apply = () => this.stripShown.set(state.size > 0 && [...state.values()].every(Boolean));
+    const attach = (): boolean => {
+      const heads = Array.from(document.querySelectorAll('sc-codex-holo-category-head'));
+      if (heads.length === 0) return false;
+      io = new IntersectionObserver((entries) => {
+        for (const en of entries) {
+          const r = en.boundingClientRect;
+          // Out of sight above the viewport (or not laid out at all) = passed; below = still ahead.
+          state.set(en.target, !en.isIntersecting && (r.bottom < 0 || (r.width === 0 && r.height === 0)));
+        }
+        apply();
+      });
+      heads.forEach((h) => io!.observe(h));
+      return true;
+    };
+    if (!attach()) {
+      // The parts area renders after the arrival; look again a few times, then give up and show the strip.
+      timer = setInterval(() => {
+        tries++;
+        if (attach() || tries >= 20) {
+          if (timer) clearInterval(timer);
+          timer = null;
+          if (!io) { logWarn('holo-strip', 'no category heads found, strip stays visible'); this.stripShown.set(true); }
+        }
+      }, 300);
+    }
+    this.destroyRef.onDestroy(() => { if (timer) clearInterval(timer); io?.disconnect(); });
+  }
+
+  protected areaLabel(area: HoloCategoryId): string {
+    return `codex.holo.strip.${area}`;
+  }
+
+  protected toggleArea(area: HoloCategoryId, ev: Event): void {
+    if (this.openArea() === area) { this.closeArea(false); return; }
+    this.openedFrom = ev.currentTarget as HTMLElement | null;
+    this.openArea.set(area);
+    // One surface at a time over the parts: the energy dock gives way.
+    if (this.expanded()) { if (this.phone) this.setSnap('peek'); else this.expanded.set(false); }
+    this.analytics.track('codex:stats_panel_open', { area });
+  }
+
+  protected closeArea(refocus: boolean): void {
+    this.openArea.set(null);
+    if (refocus) this.openedFrom?.focus({ preventScroll: true });
   }
 
   private storageGet(key: string): string | null {
@@ -998,6 +1112,7 @@ export class CodexHoloStripComponent {
   }
 
   protected toggleExpanded(): void {
+    if (!this.expanded()) this.openArea.set(null);
     this.expanded.set(!this.expanded());
   }
 
@@ -1024,6 +1139,7 @@ export class CodexHoloStripComponent {
   protected setSnap(next: SheetSnap, focusHandle = false): void {
     const prev = this.snap();
     this.snap.set(next);
+    if (next !== 'peek') this.openArea.set(null);
     this.expanded.set(next !== 'peek');
     this.paint(this.snapHeights()[next]);
     this.publishSheet();

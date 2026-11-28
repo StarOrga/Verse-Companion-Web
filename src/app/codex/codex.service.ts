@@ -1593,6 +1593,59 @@ export class CodexService {
    * three tiny columns for ~1.3k rows. Cached per build id, because the build
    * only changes when a new catalog is ingested.
    */
+  /**
+   * Output class name → blueprint class name for every ship blueprint of the
+   * current build (`Vehicle*` categories, ~500 rows): which loadout cards get a
+   * quality control. One paged read of two small fields, cached per build.
+   */
+  async craftableOutputs(): Promise<ReadonlyMap<string, string>> {
+    const build = await this.loadCurrentBuild();
+    if (!build) return new Map();
+    if (this.craftableCache?.buildId === build.id) return this.craftableCache.map;
+    const map = new Map<string, string>();
+    const page = 1000;
+    for (let offset = 0; offset < 10_000; offset += page) {
+      const { data, error } = await this.sb.client
+        .from(CODEX_ENTITY_TABLES['blueprint'])
+        .select('class_name, output:payload->outputs->0->>className')
+        .eq('build_id', build.id)
+        .like('category', 'Vehicle%')
+        .order('class_name', { ascending: true })
+        .range(offset, offset + page - 1);
+      if (error) throw error;
+      const rows = (data ?? []) as unknown as { class_name: string; output: string | null }[];
+      for (const r of rows) if (r.output && !map.has(r.output)) map.set(r.output, r.class_name);
+      if (rows.length < page) break;
+    }
+    this.craftableCache = { buildId: build.id, map };
+    return map;
+  }
+
+  /** The full blueprint payload (raw recipe included) of one blueprint class. */
+  async blueprintPayload(blueprintClassName: string): Promise<unknown | null> {
+    const build = await this.loadCurrentBuild();
+    if (!build) return null;
+    const key = `${build.id}:${blueprintClassName}`;
+    const hit = this.blueprintPayloadCache.get(key);
+    if (hit) return hit;
+    const p = (async () => {
+      const { data, error } = await this.sb.client
+        .from(CODEX_ENTITY_TABLES['blueprint'])
+        .select('payload')
+        .eq('build_id', build.id)
+        .eq('class_name', blueprintClassName)
+        .maybeSingle();
+      if (error) throw error;
+      return (data as { payload?: unknown } | null)?.payload ?? null;
+    })();
+    this.blueprintPayloadCache.set(key, p);
+    p.catch(() => this.blueprintPayloadCache.delete(key));
+    return p;
+  }
+
+  private craftableCache: { buildId: string; map: Map<string, string> } | null = null;
+  private readonly blueprintPayloadCache = new Map<string, Promise<unknown | null>>();
+
   async weaponFacets(): Promise<WeaponFacetRow[]> {
     const build = await this.loadCurrentBuild();
     if (!build) return [];

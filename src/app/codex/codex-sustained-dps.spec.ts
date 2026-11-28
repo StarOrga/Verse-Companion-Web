@@ -16,6 +16,21 @@ describe('codex-sustained-dps — sustainedDps (#343)', () => {
     expect(r.value).toBe(335.77); // 545.63 × 4 / 6.5
   });
 
+  it('never mixes the shot pair with the energy-unit pair (live 4.10.3 repeater)', () => {
+    const r = sustainedDps(1000, 750, {
+      'regen.maxAmmoLoad': 75,
+      'regen.maxRegenPerSec': 15,
+      'regen.requestedAmmoLoad': 18187,
+      'regen.requestedRegenPerSec': 3031,
+      'regen.regenerationCooldown': 0.74,
+      'regen.regenerationCostPerBullet': 48.5,
+    });
+    expect(r.limit).toBe('energyPool');
+    expect(r.fireTime).toBeCloseTo(6, 6); // 75 shots at 12.5/s
+    expect(r.downtime).toBeCloseTo(5.74, 6); // 0.74 s + 75 / 15
+    expect(r.value).toBe(511.07); // 1000 × 6 / 11.74
+  });
+
   it('ballistic weapon with a reload: magazine time over magazine time + reload', () => {
     // 200 rpm = 3.33 shots/s, 100-round magazine → 30 s firing, 5 s reload.
     const r = sustainedDps(455.4, 200, { ammoCapacity: 100, reloadTime: 5 });

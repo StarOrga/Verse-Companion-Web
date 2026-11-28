@@ -1212,4 +1212,37 @@ describe('CodexHardpointLayoutComponent', () => {
     const swapped = infoLeft(true);
     expect(Math.abs(swapped - stock)).toBeLessThan(1);
   });
+
+  describe('calm cards (Holotable)', () => {
+    const calmSlot = { ...PANTHER, grade: 'C', roleKey: 'codex.module.badge.active' };
+    function renderCalm(): HTMLElement {
+      fixture.componentRef.setInput('calm', true);
+      fixture.componentRef.setInput('partShares', new Map([['KLWE_LaserRepeater_S3', 0.12]]));
+      fixture.componentRef.setInput('partShareOf', '506/s');
+      return render([{ section: 'weapons', slots: [calmSlot] }]);
+    }
+
+    it('shows the grade as a word with a four-step scale, a quiet status dot and no English type label', () => {
+      const el = renderCalm();
+      expect(el.querySelector('.hx-grade b')?.textContent).toContain('codex.holo.part.grade');
+      const steps = el.querySelectorAll('.hx-gbar i');
+      expect(steps.length).toBe(4);
+      expect([...steps].map((i) => i.classList.contains('on'))).toEqual([false, false, true, false]);
+      expect(el.querySelector('.hx-state i')).toBeTruthy();
+      expect(el.querySelector('.slot-meta .tag.role')).toBeNull();
+      expect(el.querySelector('.meta-txt')?.textContent?.trim()).toBe('KLA');
+    });
+
+    it('carries the row\'s share of the category total as a bar', () => {
+      const el = renderCalm();
+      expect(el.querySelector('[data-testid="part-share"] .hx-share-b i')?.getAttribute('style')).toContain('12%');
+    });
+
+    it('leaves the classic row as it was', () => {
+      const el = render([{ section: 'weapons', slots: [calmSlot] }]);
+      expect(el.querySelector('.hx-grade')).toBeNull();
+      expect(el.querySelector('.slot-meta .tag.role')).toBeTruthy();
+      expect(el.querySelector('.meta-txt')?.textContent).toContain('Gun');
+    });
+  });
 });

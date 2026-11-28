@@ -1292,7 +1292,9 @@ describe('CodexDetailComponent — Holotable (Nomad fixture)', () => {
     const fixture = renderOnFakeClock();
     arrive(fixture);
     const el: HTMLElement = fixture.nativeElement;
-    // Every perspective tile unfolded — the ship panel is one of them.
+    // The tiles live in the strip's dock: open it, then unfold every perspective tile — the ship panel is one of them.
+    el.querySelector<HTMLButtonElement>('.hs-toggle')?.click();
+    fixture.detectChanges();
     el.querySelectorAll<HTMLButtonElement>('.tile-expand').forEach((b) => b.click());
     fixture.detectChanges();
     const massRows = Array.from(el.querySelectorAll('dt')).filter((dt) =>
