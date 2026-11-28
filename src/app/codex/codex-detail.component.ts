@@ -1786,6 +1786,11 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
        leaves (the stage enters in its place) and fades out under the stage's own view-in (D11). */
     .skel-stage.skel-leave { margin-bottom: -520px; pointer-events: none; animation: skel-out 420ms var(--holo-e-out, ease-out) forwards; }
     @media (max-width: 720px) { .skel-stage.skel-leave { margin-bottom: -360px; } }
+    /* β shell: the skeleton reserves the stage's own height (holo-body: viewport minus head and strip, 460px floor), so the hand-over does not shift the page (QA round 2, N5). */
+    @media (min-width: 721px) {
+      .skel-stage.bare { min-height: max(460px, calc(100dvh - 260px)); }
+      .skel-stage.bare.skel-leave { margin-bottom: calc(-1 * max(460px, calc(100dvh - 260px))); }
+    }
     @keyframes skel-out { to { opacity: 0; } }
     @media (prefers-reduced-motion: reduce) { .skel-ring, .skel-scan { animation: none; } .skel-ring { transition: none; } .skel-stage.skel-leave { animation-duration: 160ms; } }
     /* No own padding: .sc-card's density scale (--sc-pad-1) tightens it on phones. */

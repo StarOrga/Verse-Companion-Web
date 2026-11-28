@@ -357,7 +357,9 @@ export class ShipDeckPlanComponent {
     const pad = Math.max(w0, h0) * 0.06;
     const w = w0 + 2 * pad, h = h0 + 2 * pad;
     const r2 = (n: number) => Math.round(n * 100) / 100;
-    return { viewBox: `${r2(minX - pad)} ${r2(minY - pad)} ${r2(w)} ${r2(h)}`, w, h };
+    // Centre on the content: the 4 m floor pads a tiny deck (Gladius, one 1.3 x 2.6 m room) on both sides, not only to the right and bottom.
+    const x0 = (minX + maxX) / 2 - w / 2, y0 = (minY + maxY) / 2 - h / 2;
+    return { viewBox: `${r2(x0)} ${r2(y0)} ${r2(w)} ${r2(h)}`, w, h };
   });
 
   /** The interior of the deck on the plan, in viewBox space; null without an interior. */

@@ -1215,12 +1215,10 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .ig-host { padding-inline-end: 0; }
   /* The whole views / deck box ends before the FAB dial's lane (U2 round 2): end padding only helped after scrolling to the end, the dial still lay over the Side tile and the chips. */
   .holo-views { margin-inline-end: var(--sc-fab-clear-inline); }
-  /* The mission pill shows its count (T2): the label word gives way, the name shortens with an ellipsis, the count and caret stay. */
+  /* The mission pill on a phone (T2, N1): the label word gives way; the einsatz component keeps the name whole and lets the count shorten first. */
   .holo-topbar:not(.slim) ::ng-deep sc-codex-holo-einsatz .lab { display: none; }
   .holo-topbar:not(.slim) ::ng-deep sc-codex-holo-einsatz .einsatz { gap: 6px; padding-inline: 10px; overflow: hidden; }
-  .holo-topbar:not(.slim) ::ng-deep sc-codex-holo-einsatz .val { min-inline-size: 0; flex: 0 1 auto; overflow: hidden; }
-  .holo-topbar:not(.slim) ::ng-deep sc-codex-holo-einsatz .vt { min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; }
-  .holo-topbar:not(.slim) ::ng-deep sc-codex-holo-einsatz :is(.sub, .caret) { flex: none; }
+  .holo-topbar:not(.slim) ::ng-deep sc-codex-holo-einsatz .caret { flex: none; }
   .switch.mobile-only { display: inline-flex; }
   .holo-body { gap: 10px; }
   .table-head { flex-wrap: wrap; gap: 6px; padding: 0; }
