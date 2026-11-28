@@ -295,6 +295,8 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
             <i class="ml-ring" aria-hidden="true"></i>
             <span class="ml-text">{{ 'codex.assetPackage.loading' | translate }}</span>
           </div>
+          <!-- The same scan line as the stage skeleton and the placeholder, for the whole wait (not only while the chunk loads). -->
+          <i class="ml-scan" aria-hidden="true"></i>
         }
       }
       @if (viewMode() === 'schema' && schemaBlueprint(); as bp) {
@@ -580,12 +582,20 @@ function hullSpanOf(s: HoloSilhouette): { x0: number; x1: number } | undefined {
     .silhouette-frame.loading-3d .shipwrap { opacity: 0.35; transition: opacity var(--holo-t-base) var(--holo-e-out); }
     .model-loading { position: absolute; left: 50%; top: 50%; z-index: 2; translate: -50% -50%; display: flex; flex-direction: column;
       align-items: center; gap: var(--sc-space-3); pointer-events: none; animation: fade-in var(--holo-t-base) var(--holo-e-out) 150ms backwards; }
+    /* One loader for the whole wait: the lock ring and scan line of the page skeleton (codex-detail .skel-ring / .skel-scan)
+       and of the placeholder above, without a second, spinning arc. While it shows, the placeholder's own pair steps
+       back, so the ring never doubles and never restarts when the viewer chunk lands. */
     .ml-ring { position: relative; width: 76px; height: 76px; border-radius: 50%;
-      border: 1px solid color-mix(in srgb, var(--sc-accent) 35%, transparent);
-      box-shadow: 0 0 22px color-mix(in srgb, var(--sc-accent) 25%, transparent), inset 0 0 14px color-mix(in srgb, var(--sc-accent) 18%, transparent);
+      border: 1px solid color-mix(in srgb, var(--sc-accent) 60%, transparent);
+      box-shadow: 0 0 22px color-mix(in srgb, var(--sc-accent) 30%, transparent), inset 0 0 14px color-mix(in srgb, var(--sc-accent) 20%, transparent);
       animation: ph-lock 1.6s var(--holo-e-io) infinite; }
-    .ml-ring::after { content: ''; position: absolute; inset: -1px; border-radius: 50%; border: 2px solid transparent;
-      border-top-color: var(--sc-accent); animation: holo-sweep 1.1s linear infinite; }
+    .ml-scan { position: absolute; z-index: 2; left: 16%; right: 16%; bottom: 14%; height: 2px; border-radius: 2px; pointer-events: none;
+      background: linear-gradient(90deg, transparent, var(--sc-accent), transparent); box-shadow: 0 0 14px var(--sc-accent);
+      will-change: transform, opacity; animation: ml-scan 2.4s var(--holo-e-io) infinite; }
+    /* The frame is the size container: the line rises through 72 % of it on transform alone (compositor only). */
+    @keyframes ml-scan { 0% { transform: translateY(0); opacity: 0; } 15%, 85% { opacity: 1; } 100% { transform: translateY(-72cqh); opacity: 0; } }
+    .silhouette-frame.loading-3d .mode-viewer.is-placeholder::before, .silhouette-frame.loading-3d .mode-viewer.is-placeholder::after { display: none; }
+    :host(.still) .ml-ring, :host(.still) .ml-scan { animation: none; }
     .ml-text { font-size: max(0.78rem, var(--sc-fs-floor)); letter-spacing: 0.06em; color: var(--sc-fg-1);
       text-shadow: 0 0 8px var(--sc-bg-0); }
     .mode-viewer.schema-sheet { padding: 14px 16px; overflow: auto; }

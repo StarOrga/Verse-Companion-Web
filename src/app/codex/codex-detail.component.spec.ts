@@ -333,7 +333,7 @@ describe('CodexDetailComponent — ship load skeleton', () => {
     expect(c.holoStageOn()).toBe(true);
   });
 
-  it('draws only the real silhouette (no backdrop) while a ship with a silhouette loads', async () => {
+  it('draws the real silhouette inside the stage skeleton (no backdrop) while a ship with a silhouette loads', async () => {
     configureSetup('ship', [], NOMAD_PAYLOAD, { getDetail: () => new Promise(() => undefined) });
     TestBed.overrideProvider(SilThumbsService, {
       useValue: {
@@ -348,8 +348,9 @@ describe('CodexDetailComponent — ship load skeleton', () => {
     expect(stage).not.toBeNull();
     expect(stage.getAttribute('role')).toBe('status');
     expect(stage.querySelector('sc-ship-arrival svg path.outline')).not.toBeNull();
-    expect(stage.querySelector('.skel-ring, .skel-scan, .sun, .star, .streak, canvas, img')).toBeNull();
-    expect(Array.from(stage.querySelectorAll('i')).map((i) => i.className)).toEqual(['flash']);
+    expect(stage.querySelector('.sun, .star, .streak, .flash, canvas, img')).toBeNull();
+    // The same skeleton box as before the silhouette was known: its ring and scan line stay, the hull joins them.
+    expect(Array.from(stage.querySelectorAll('i')).map((i) => i.className)).toEqual(['skel-ring', 'skel-scan']);
   });
 
   it('keeps the stage skeleton when the ship has no silhouette', async () => {
