@@ -54,8 +54,6 @@ describe('modal background inert', () => {
   async function flush(): Promise<void> {
     fixture.detectChanges();
     await fixture.whenStable();
-    // [scDialog] marks the page inert one frame after the dialog opens (round-2 N3).
-    await new Promise<void>((r) => requestAnimationFrame(() => setTimeout(r)));
   }
 
   beforeEach(async () => {
