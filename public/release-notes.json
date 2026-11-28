@@ -1,7 +1,177 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.299.0",
+  "current": "0.300.6",
   "releases": [
+    {
+      "version": "0.300.6",
+      "date": "2026-11-28",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Search and item detail pages show a small rendered image of each item (FPS weapons, armour, ship components) instead of the category icon; a new setting under Settings → Codex switches between rendered images and icons. The renders are untextured material-colour previews for now; they appear after Data Uploader 0.87.0 has rebuilt the parts (#402)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.300.5",
+      "date": "2026-11-27",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Classic ship view: the analysis cards follow their loadout sections while scrolling — Offensive stays pinned until the missiles end, Verteidigung starts at the shield generators, and the ship card is pulled up smoothly to Antrieb & Systeme (#409)."
+            }
+          ]
+        },
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Classic ship view: a leftover 16px gap no longer pushes the Offensive card below Bewaffnung (#408)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.300.4",
+      "date": "2026-11-27",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Classic ship view: the Analyse column's first card (Offensive) starts at the same height as Bewaffnung in the Loadout column, and every Loadout box shares the analysis cards' rounder 8px corner (#408)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.300.3",
+      "date": "2026-11-27",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Classic ship view: career, crew and cargo sit as a short list on the right under the 3D switch; mass, systems and countermeasure counts are gone, the remaining counts (\"3 Waffen\", \"8 Raketen\", tractor beam, shield generators) are smaller chips on the picture's bottom edge (#407)."
+            }
+          ]
+        },
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Ships whose cargo bed the extract lists without SCU (Nomad, Mustang, Reliant …) no longer claim \"Kein Laderaum\"; they show \"Laderaum · ?\" with an explanation (#407)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.300.2",
+      "date": "2026-11-27",
+      "sections": [
+        {
+          "category": "Changed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Info windows (component window, craft dialog, weapon detail, compare tray, news detail, patch dossier, HQ log/stats) close on a click beside them, past a 20px safety margin around the frame; windows with input still close only via X, Cancel or Escape (#406)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.300.1",
+      "date": "2026-11-27",
+      "sections": [
+        {
+          "category": "Removed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Feedback board: the opt-in \"green light while the PC is on\" setting is gone again; the routine title tint works as before (#405)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "0.300.0",
+      "date": "2026-11-27",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Classic Codex ship page: energy pips now act on shields, energy weapons, radar and coolers; cards, KPI band and analysis read the powered loadout."
+            },
+            {
+              "title": "",
+              "text": "Crafting quality on the classic ship page: quality chip per blueprint part, slider dialog per recipe slot with presets, crafted stats in every number."
+            },
+            {
+              "title": "",
+              "text": "Damage-by-source table (pilot, remote turrets, manned turrets, missiles) and real item names in the offensive table."
+            },
+            {
+              "title": "",
+              "text": "Data uploader 0.86.0 keeps the ship-level weapon regen pool and capacitor-assignment data."
+            }
+          ]
+        },
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Sustained DPS no longer mixes shot and energy units (Nomad now 837 sustained, matching erkul)."
+            },
+            {
+              "title": "",
+              "text": "Reserve shield generators count as HP pool only, without power or regen."
+            },
+            {
+              "title": "",
+              "text": "Quantum speed in the ship facts was shown 1000x too high."
+            },
+            {
+              "title": "",
+              "text": "Quantum drive is all-or-nothing in NAV; pip clicks and module swaps keep the scroll position; the KPI delta chip no longer shifts the band."
+            },
+            {
+              "title": "",
+              "text": "The factory baseline is compared under the same power deal, so no phantom regen delta shows on open."
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.299.0",
       "date": "2026-11-26",
