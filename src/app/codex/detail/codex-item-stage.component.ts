@@ -60,6 +60,13 @@ export type ItemStageView = 'silhouette' | '3d';
           } @error {
             <sc-defer-error class="pkg" source="codex.itemStage" />
           }
+        } @else if (render(); as r) {
+          <!-- ds-new: the colour still of the item's 3D model (#402) leads over the outline; a failed load shows the icon. -->
+          <div class="art render">
+            <sc-fallback-image [candidates]="[r]" [alt]="displayName()" [width]="224" [height]="224" [eager]="true">
+              <span class="art-fallback"><sc-codex-icon class="ico" [kind]="kind()" [sub]="heroSub()" [attachType]="heroAttachType()" /></span>
+            </sc-fallback-image>
+          </div>
         } @else if (silhouette(); as s) {
           <svg class="sil ce-draw" [attr.viewBox]="s.viewBox" preserveAspectRatio="xMidYMid meet" role="img" [attr.aria-label]="displayName()">
             <defs>
@@ -132,6 +139,8 @@ export class CodexItemStageComponent {
   /** The 3D asset package of the item, when the build carries one. */
   readonly package = input<AssetPackageRow | null>(null);
   readonly still = input(false);
+  /** URL of the item's model render (#402) — shown before the outline; null = none or icons chosen. */
+  readonly render = input<string | null>(null);
 
   private readonly codex = inject(CodexService);
   protected readonly gradId = `ist-${Math.random().toString(36).slice(2, 8)}`;

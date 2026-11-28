@@ -68,7 +68,9 @@ describe('list snapshot builders', () => {
   it('lists the columns of LIST_SELECT in order, ships with the extra payload keys', () => {
     assert.deepEqual(LIST_COLUMNS.ship, ['class_name', 'guid', 'name_localized', 'manufacturer_code', 'role', 'crew_size', 'is_variant']);
     assert.deepEqual(LIST_COLUMNS.blueprint, ['class_name', 'name_localized', 'category', 'tier', 'craft_time_seconds', 'dismantle_time_seconds']);
-    assert.deepEqual(PAYLOAD_KEYS.item, ['name', 'previewImage', 'manufacturer']);
+    // #402: the item-like files carry the model render as an optional card key at the end.
+    for (const k of ['item', 'weapon', 'component']) assert.deepEqual(PAYLOAD_KEYS[k], ['name', 'previewImage', 'manufacturer', 'renderImage']);
+    assert.deepEqual(PAYLOAD_KEYS.ammunition, ['name', 'previewImage', 'manufacturer']);
     assert.deepEqual(SHIP_PAYLOAD_KEYS, ['name', 'previewImage', 'manufacturer', 'sizeClass', 'career', 'dimensions']);
   });
 

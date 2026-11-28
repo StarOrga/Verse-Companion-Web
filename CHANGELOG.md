@@ -16,6 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Ship page, Holotisch view: a class without ships reads "Kein Klassenrang" instead of "only 0 ships"; missing missiles and tiny shares no longer show as "0"; long German labels in the energy columns no longer break mid-word; screen readers hear energy changes.
 
+## [0.300.6] - 2026-11-28
+
+### Added
+- Search and item detail pages show a small rendered image of each item (FPS weapons, armour, ship components) instead of the category icon; a new setting under Settings → Codex switches between rendered images and icons. The renders are untextured material-colour previews for now; they appear after Data Uploader 0.87.0 has rebuilt the parts (#402).
+
 ## [0.300.5] - 2026-11-27
 
 ### Changed
