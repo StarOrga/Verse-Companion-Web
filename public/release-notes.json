@@ -1,7 +1,23 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.302.0",
+  "current": "0.302.1",
   "releases": [
+    {
+      "version": "0.302.1",
+      "date": "2026-11-28",
+      "sections": [
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "The Codex „neu in diesem Patch“ navigation shows recognisable category icons (ship, pistol, helmet, component, tool)"
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.302.0",
       "date": "2026-11-28",

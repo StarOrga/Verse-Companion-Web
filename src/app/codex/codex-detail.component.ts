@@ -1,7 +1,7 @@
 import { ShipArrivalComponent } from './ship-arrival/ship-arrival.component';
 import { PATH_ICONS } from '../shared/item-path/path-icons';
 import { SilThumbsService } from '../shared/sil-thumb/sil-thumbs.service';
-import { SILHOUETTE_HOLD_MS, arrivalThumbOf } from './ship-arrival/arrival-thumb';
+import { SILHOUETTE_HOLD_MS, arrivalThumbOf, uprightThumb } from './ship-arrival/arrival-thumb';
 import { StarTriggerService } from '../verse/starmap/star-trigger.service';
 import { PageCornerService, type PageShare, type PageViewToggle } from '../shell/corners/page-corner.service';
 import { CodexOwnStationsComponent } from './detail/codex-own-stations.component';
@@ -358,18 +358,17 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
         <sc-codex-personal-uses class="personal-uses" [ownership]="myOwnership()" [personal]="personalMode()" />
       }
 
-      @if (loading() && !holdStage() && skeletonStage() && arrivalThumb(); as arrival) {
-        <!-- The loading ship's real silhouette (silhouette only, no backdrop) when the build has it. -->
-        <div class="sc-card skel-stage arrival" [class.bare]="shellBeta()" animate.leave="skel-leave" role="status" [attr.aria-label]="'codex.detail.loadingStage' | translate">
-          <sc-ship-arrival [thumb]="arrival" />
-        </div>
-      } @else if (loading() && !holdStage() && skeletonStage()) {
-        <!-- Holodeck skeleton: the page frame + header are already up; the
-             stage's own lock ring and scan line run until the ship arrives and
-             the real stage replaces this box in place (same min-height). -->
-        <div class="sc-card skel-stage" [class.bare]="shellBeta()" animate.leave="skel-leave" role="status" [attr.aria-label]="'codex.detail.loadingStage' | translate">
+      @if (loading() && !holdStage() && skeletonStage()) {
+        <!-- Holodeck skeleton: the page frame + header are already up; the stage's own lock ring and scan line
+             run until the ship arrives and the real stage replaces this box in place (same min-height). One box
+             for the whole wait: once the build's silhouette is known the ring widens around it and the hull's
+             real outline materialises inside, so the loader grows into the hologram instead of being swapped. -->
+        <div class="sc-card skel-stage" [class.arrival]="!!arrivalThumb()" [class.bare]="shellBeta()" animate.leave="skel-leave" role="status" [attr.aria-label]="'codex.detail.loadingStage' | translate">
           <i class="skel-ring" aria-hidden="true"></i>
           <i class="skel-scan" aria-hidden="true"></i>
+          @if (arrivalThumb(); as arrival) {
+            <sc-ship-arrival [thumb]="arrival" />
+          }
         </div>
       } @else if (loading() && requestKind() !== 'ship') {
         <!-- Item page: reserved boxes of the final panel heights, so the late shell does not push what follows. -->
@@ -1770,10 +1769,13 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
     .skel-stage > i { position: absolute; pointer-events: none; }
     /* β shell: the scene behind is the stage while the ship loads - no card slab before the hologram (QA D11). */
     .skel-stage.bare { background: transparent; border-color: transparent; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
-    .skel-ring { left: 50%; top: 50%; width: 76px; height: 76px; margin: -38px 0 0 -38px; border-radius: 50%;
+    .skel-ring { left: 50%; top: 50%; width: 76px; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%;
       border: 1px solid color-mix(in srgb, var(--sc-accent) 60%, transparent);
       box-shadow: 0 0 22px color-mix(in srgb, var(--sc-accent) 30%, transparent), inset 0 0 14px color-mix(in srgb, var(--sc-accent) 20%, transparent);
-      animation: skel-lock 1.6s ease-in-out infinite; }
+      animation: skel-lock 1.6s ease-in-out infinite;
+      transition: width 700ms var(--holo-e-out, ease-out), border-color 700ms ease; }
+    /* The hull is known: the lock ring opens around it (the table's own ring, quieter) and keeps breathing. */
+    .skel-stage.arrival .skel-ring { width: min(430px, 68%); border-color: color-mix(in srgb, var(--sc-accent) 26%, transparent); }
     .skel-scan { left: 16%; right: 16%; bottom: 14%; height: 2px; border-radius: 2px;
       background: linear-gradient(90deg, transparent, var(--sc-accent), transparent); box-shadow: 0 0 14px var(--sc-accent);
       animation: skel-scan 2.4s ease-in-out infinite; }
@@ -1785,7 +1787,7 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
     .skel-stage.skel-leave { margin-bottom: -520px; pointer-events: none; animation: skel-out 420ms var(--holo-e-out, ease-out) forwards; }
     @media (max-width: 720px) { .skel-stage.skel-leave { margin-bottom: -360px; } }
     @keyframes skel-out { to { opacity: 0; } }
-    @media (prefers-reduced-motion: reduce) { .skel-ring, .skel-scan { animation: none; } .skel-stage.skel-leave { animation-duration: 160ms; } }
+    @media (prefers-reduced-motion: reduce) { .skel-ring, .skel-scan { animation: none; } .skel-ring { transition: none; } .skel-stage.skel-leave { animation-duration: 160ms; } }
     /* No own padding: .sc-card's density scale (--sc-pad-1) tightens it on phones. */
     .err { color: var(--sc-danger); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .err .retry { margin-left: auto; padding: 6px 14px; border-radius: 6px; background: transparent; border: 1px solid var(--sc-danger); color: var(--sc-danger); cursor: pointer; font-family: inherit; }
@@ -2125,7 +2127,7 @@ export class CodexDetailComponent implements OnInit {
   readonly arrivalThumb = computed(() => {
     const cls = this.requestClass();
     if (!cls || this.requestKind() !== 'ship') return null;
-    return this.silThumbs.thumbOf('ship', cls) ?? arrivalThumbOf(this.shipSilhouette());
+    return uprightThumb(this.silThumbs.thumbOf('ship', cls)) ?? arrivalThumbOf(this.shipSilhouette());
   });
   readonly skeletonStage = computed(() => this.requestKind() === 'ship' && this.holoView());
   private static readonly HOLO_VIEW_STORAGE_KEY = 'sc.codex.holoView';

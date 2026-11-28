@@ -2,8 +2,10 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import type { SilThumb } from '../../shared/sil-thumb/sil-thumbs.service';
 
 /**
- * The real silhouette of the ship that is loading, arriving from the jump point: a short flash, the hull stretching
- * to its length and the outline drawing itself. Nothing else (no sun, stars or streaks); the parent owns the box.
+ * The real silhouette of the ship that is loading, as the Holotable will show it a moment later: the outline
+ * materialises behind a scan front, top to bottom, in the box the table's hull takes (the same move as the
+ * table's own `sil-scan`), so the skeleton reads as the first pass of the hologram and not as a scene of its own.
+ * Nothing else is drawn here; the lock ring and the scan line around it belong to the parent's skeleton.
  * Reduced motion: the outline is simply there.
  */
 @Component({
@@ -11,9 +13,8 @@ import type { SilThumb } from '../../shared/sil-thumb/sil-thumbs.service';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <i class="flash" aria-hidden="true"></i>
     <svg class="hull" [attr.viewBox]="thumb().viewBox" preserveAspectRatio="xMidYMid meet" fill="none" stroke="currentColor"
-         stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+         stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
       <path class="outline" [attr.d]="thumb().path" [attr.transform]="thumb().transform || null" vector-effect="non-scaling-stroke" />
       @if (thumb().edges) {
         <path class="edges" [attr.d]="thumb().edges" vector-effect="non-scaling-stroke" stroke-width="0.8" />
@@ -23,21 +24,16 @@ import type { SilThumb } from '../../shared/sil-thumb/sil-thumbs.service';
   styles: [
     `
       :host { position: absolute; inset: 0; display: grid; place-items: center; color: var(--sc-accent); pointer-events: none; }
-      .flash { position: absolute; left: 50%; top: 50%; width: 14%; aspect-ratio: 1; margin: -7% 0 0 -7%; border-radius: 50%;
-        background: radial-gradient(circle, color-mix(in srgb, var(--sc-accent) 85%, white) 0%, transparent 70%);
-        opacity: 0; animation: arr-flash 0.7s ease-out both; }
-      .hull { width: 76%; height: 62%; overflow: visible; filter: drop-shadow(0 0 8px color-mix(in srgb, var(--sc-accent) 55%, transparent));
-        transform-origin: 50% 50%; animation: arr-stretch 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
-      .outline { stroke-dasharray: 20000; stroke-dashoffset: 20000; animation: arr-draw 1.6s 0.15s ease-out forwards; }
-      .edges { opacity: 0; animation: arr-edges 0.8s 1s ease-out forwards; }
-      @keyframes arr-flash { 0% { opacity: 0; transform: scale(0.3); } 25% { opacity: 1; } 100% { opacity: 0; transform: scale(5); } }
-      @keyframes arr-stretch { 0% { transform: scaleX(0.04); opacity: 0; } 30% { opacity: 1; } 100% { transform: scaleX(1); opacity: 1; } }
-      @keyframes arr-draw { to { stroke-dashoffset: 0; } }
+      /* ds-ok: the box of the Holotable's hull (.shipwrap in codex-holo-table), so the outline stands where the hologram lands. */
+      .hull { width: min(560px, 76%); height: min(560px, 82%); overflow: visible;
+        filter: drop-shadow(0 0 8px color-mix(in srgb, var(--sc-accent) 55%, transparent));
+        animation: arr-scan 0.9s cubic-bezier(0.4, 0, 0.2, 1) both; }
+      .edges { opacity: 0; animation: arr-edges 0.6s 0.7s ease-out forwards; }
+      /* The whole outline, never a partly drawn stroke: a dash pattern has to know the path's length and cut long hulls in half. */
+      @keyframes arr-scan { from { clip-path: inset(0 0 100% 0); opacity: 0.4; } to { clip-path: inset(-12% -12% -12% -12%); opacity: 1; } }
       @keyframes arr-edges { to { opacity: 0.5; } }
       @media (prefers-reduced-motion: reduce) {
-        .flash { display: none; }
-        .hull, .outline, .edges { animation: none; }
-        .outline { stroke-dasharray: none; stroke-dashoffset: 0; }
+        .hull, .edges { animation: none; }
         .edges { opacity: 0.5; }
       }
     `,

@@ -16,10 +16,11 @@ import { TranslatePipe } from '@ngx-translate/core';
   template: `
     @if (loading()) {
       <div class="rank-state loading" role="status" aria-live="polite">
+        <!-- The chart's own hexagon as a lock ring, with the scan line of the table's loaders rising through it. -->
         <svg class="rs-radar" viewBox="0 0 100 100" aria-hidden="true">
-          <polygon points="50,6 92,36 76,88 24,88 8,36" />
-          <polygon points="50,28 71,43 63,69 37,69 29,43" />
-          <line class="sweep" x1="50" y1="50" x2="50" y2="6" />
+          <polygon class="lock" points="50,6 88.1,28 88.1,72 50,94 11.9,72 11.9,28" />
+          <polygon points="50,28 69.1,39 69.1,61 50,72 30.9,61 30.9,39" />
+          <line class="scan" x1="12" y1="0" x2="88" y2="0" />
         </svg>
         <p>{{ 'codex.holo.stage.rankLoading' | translate }}</p>
       </div>
@@ -39,9 +40,12 @@ import { TranslatePipe } from '@ngx-translate/core';
     .rank-state p { margin: 0; line-height: 1.4; }
     .rs-radar { width: 96px; height: 96px; }
     .rs-radar polygon { fill: none; stroke: color-mix(in srgb, var(--sc-accent) 22%, transparent); stroke-width: 1; }
-    .rs-radar .sweep { stroke: var(--sc-accent); stroke-width: 1.5; stroke-linecap: round; transform-origin: 50px 50px; animation: rs-sweep 1.8s linear infinite; }
-    @keyframes rs-sweep { to { transform: rotate(360deg); } }
-    @media (prefers-reduced-motion: reduce) { .rs-radar .sweep { animation: none; } }
+    /* Same timing and motion as the stage's lock ring and scan line (codex-detail .skel-ring / .skel-scan). */
+    .rs-radar .lock { stroke: color-mix(in srgb, var(--sc-accent) 60%, transparent); transform-origin: 50px 50px; animation: rs-lock 1.6s ease-in-out infinite; }
+    .rs-radar .scan { stroke: var(--sc-accent); stroke-width: 1.5; stroke-linecap: round; animation: rs-scan 2.4s ease-in-out infinite; }
+    @keyframes rs-lock { 0%, 100% { transform: scale(0.9); opacity: 0.45; } 50% { transform: scale(1); opacity: 1; } }
+    @keyframes rs-scan { 0% { transform: translateY(84px); opacity: 0; } 15%, 85% { opacity: 1; } 100% { transform: translateY(16px); opacity: 0; } }
+    @media (prefers-reduced-motion: reduce) { .rs-radar .lock { animation: none; } .rs-radar .scan { animation: none; transform: translateY(50px); } }
     .rank-retry { min-height: max(32px, var(--sc-tap-min, 0px)); padding: 5px 12px; border-radius: 3px; border: 1px solid var(--sc-border); background: none;
       color: var(--sc-fg-1); cursor: pointer; font-family: var(--sc-font-display); text-transform: uppercase; font-size: max(11px, var(--sc-fs-floor));
       letter-spacing: 0.08em; transition: border-color 160ms ease, color 160ms ease; }
