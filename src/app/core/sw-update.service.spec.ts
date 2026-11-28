@@ -1,9 +1,10 @@
 import type { Mock } from 'vitest';
 import { DOCUMENT } from '@angular/common';
 import { TestBed } from '@angular/core/testing';
-import { SwUpdate, UnrecoverableStateEvent, VersionReadyEvent } from '@angular/service-worker';
+import { SwUpdate, UnrecoverableStateEvent, VersionEvent, VersionReadyEvent } from '@angular/service-worker';
 import { Subject } from 'rxjs';
 
+import { dismissBootSplash, resetBootSplashHolds } from './boot-splash';
 import { SwUpdateService } from './sw-update.service';
 
 /**
@@ -12,11 +13,11 @@ import { SwUpdateService } from './sw-update.service';
  * the user is already on the page — only offers the deliberate reload prompt.
  */
 describe('SwUpdateService', () => {
-  let versionUpdates: Subject<VersionReadyEvent>;
+  let versionUpdates: Subject<VersionEvent>;
   let unrecoverable: Subject<UnrecoverableStateEvent>;
   let swUpdate: {
     isEnabled: boolean;
-    versionUpdates: Subject<VersionReadyEvent>;
+    versionUpdates: Subject<VersionEvent>;
     unrecoverable: Subject<UnrecoverableStateEvent>;
     checkForUpdate: Mock;
     activateUpdate: Mock;
@@ -25,6 +26,8 @@ describe('SwUpdateService', () => {
   let sessionStore: Map<string, string>;
   let service: SwUpdateService;
   let fireInput: (type: string) => void;
+  /** Set `serviceWorker.controller` before init() to act as a page the worker already controls. */
+  let fakeNavigator: { serviceWorker?: { controller: object | null } };
 
   const versionReady = (): VersionReadyEvent =>
     ({
@@ -39,7 +42,8 @@ describe('SwUpdateService', () => {
   };
 
   beforeEach(() => {
-    versionUpdates = new Subject<VersionReadyEvent>();
+    resetBootSplashHolds();
+    versionUpdates = new Subject<VersionEvent>();
     unrecoverable = new Subject<UnrecoverableStateEvent>();
     swUpdate = {
       isEnabled: true,
@@ -52,7 +56,9 @@ describe('SwUpdateService', () => {
     sessionStore = new Map<string, string>();
     const inputListeners = new Map<string, () => void>();
     fireInput = (type) => inputListeners.get(type)?.();
+    fakeNavigator = {};
     const fakeWindow = {
+      navigator: fakeNavigator,
       addEventListener: (type: string, listener: () => void) => void inputListeners.set(type, listener),
       sessionStorage: {
         getItem: (k: string) => (sessionStore.has(k) ? sessionStore.get(k)! : null),
@@ -141,5 +147,76 @@ describe('SwUpdateService', () => {
 
     expect(swUpdate.checkForUpdate).not.toHaveBeenCalled();
     expect(service.updateReady()).toBe(false);
+  });
+  describe('boot splash during the startup check', () => {
+    let splash: HTMLElement;
+    const leaving = (): boolean => splash.classList.contains('scb-leave');
+
+    beforeEach(() => {
+      splash = document.createElement('div');
+      splash.className = 'scb';
+      document.body.appendChild(splash);
+    });
+    afterEach(() => {
+      splash.remove();
+      resetBootSplashHolds();
+    });
+
+    it('a first visit (no controlling worker) hands the splash over at once', () => {
+      service.init();
+      dismissBootSplash();
+      expect(leaving()).toBe(true);
+    });
+
+    it('holds the splash until the worker reports no newer build', () => {
+      fakeNavigator.serviceWorker = { controller: {} };
+      service.init();
+      dismissBootSplash();
+      expect(leaving()).toBe(false);
+      versionUpdates.next({ type: 'NO_NEW_VERSION_DETECTED', version: { hash: 'old' } });
+      expect(leaving()).toBe(true);
+    });
+
+    it('releases the splash when the check answers "nothing new" without an event', async () => {
+      fakeNavigator.serviceWorker = { controller: {} };
+      swUpdate.checkForUpdate.mockResolvedValue(false);
+      service.init();
+      dismissBootSplash();
+      await flush();
+      expect(leaving()).toBe(true);
+    });
+
+    it('keeps the splash up from the found build to the silent reload', async () => {
+      fakeNavigator.serviceWorker = { controller: {} };
+      service.init();
+      versionUpdates.next({ type: 'VERSION_DETECTED', version: { hash: 'new' } });
+      dismissBootSplash();
+      expect(leaving()).toBe(false);
+      versionUpdates.next(versionReady());
+      await flush();
+      expect(reload).toHaveBeenCalledTimes(1);
+      // The reload takes the splash with it: it never left on this page.
+      expect(leaving()).toBe(false);
+    });
+
+    it('lets the page show when the found build will only raise the prompt', () => {
+      fakeNavigator.serviceWorker = { controller: {} };
+      service.init();
+      fireInput('pointerdown');
+      versionUpdates.next({ type: 'VERSION_DETECTED', version: { hash: 'new' } });
+      dismissBootSplash();
+      expect(leaving()).toBe(true);
+    });
+
+    it('lets the page show when the activation fails', async () => {
+      fakeNavigator.serviceWorker = { controller: {} };
+      swUpdate.activateUpdate.mockRejectedValue(new Error('gone'));
+      service.init();
+      dismissBootSplash();
+      versionUpdates.next(versionReady());
+      await flush();
+      expect(reload).not.toHaveBeenCalled();
+      expect(leaving()).toBe(true);
+    });
   });
 });
