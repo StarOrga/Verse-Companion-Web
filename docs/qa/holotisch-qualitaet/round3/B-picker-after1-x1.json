@@ -1,0 +1,46 @@
+{
+ "w": 1280,
+ "thr": 1,
+ "tag": "after1",
+ "runs": [
+  {
+   "sync": 1,
+   "toFrame": 204,
+   "lt": 2,
+   "max": 130,
+   "sum": 200,
+   "act": {
+    "tag": "INPUT",
+    "cls": "",
+    "dlg": true
+   }
+  },
+  {
+   "sync": 1,
+   "toFrame": 122,
+   "lt": 1,
+   "max": 84,
+   "sum": 84,
+   "act": {
+    "tag": "INPUT",
+    "cls": "",
+    "dlg": true
+   }
+  },
+  {
+   "sync": 1,
+   "toFrame": 92,
+   "lt": 1,
+   "max": 64,
+   "sum": 64,
+   "act": {
+    "tag": "INPUT",
+    "cls": "",
+    "dlg": true
+   }
+  }
+ ],
+ "msgs": [
+  "warning: Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information."
+ ]
+}

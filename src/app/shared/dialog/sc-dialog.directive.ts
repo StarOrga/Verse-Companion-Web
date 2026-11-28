@@ -102,15 +102,22 @@ export class ScDialogDirective implements OnDestroy {
       if (this.destroyed) return;
       this.trap = this.trapFactory.create(this.host);
       this.trap.enabled = this.scDialogModal();
-      // Focus first, the page goes inert after: marking the rest of the document inert dirties its
-      // style, and a focus scan behind it paid for that in one forced layout (round-1 P1).
+      // The dialog host takes focus right away, the page goes inert one frame later: marking the rest
+      // of the document inert dirties its style, and any layout read in the opening frame (focus, a
+      // motion directive's rect) paid for that on a 15k-node page (round-2 N3). A focus scan ('first')
+      // runs in the same render, before the inert pass, as before.
       if (this.scDialogInitialFocus() === 'container' || !this.focusFirst()) {
         this.host.focus({ preventScroll: true });
       }
       const inert = this.scDialogInert() ?? this.host.getAttribute('aria-modal') === 'true';
       if (inert && this.scDialogModal()) {
-        this.inertService.register(this.host);
-        this.inertRegistered = true;
+        const register = () => {
+          if (this.destroyed || this.inertRegistered) return;
+          this.inertService.register(this.host);
+          this.inertRegistered = true;
+        };
+        if (typeof requestAnimationFrame === 'undefined') register();
+        else requestAnimationFrame(() => setTimeout(register));
       }
     });
   }

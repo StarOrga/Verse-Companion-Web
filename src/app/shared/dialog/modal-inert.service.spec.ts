@@ -54,6 +54,8 @@ describe('modal background inert', () => {
   async function flush(): Promise<void> {
     fixture.detectChanges();
     await fixture.whenStable();
+    // [scDialog] marks the page inert one frame after the dialog opens (round-2 N3).
+    await new Promise<void>((r) => requestAnimationFrame(() => setTimeout(r)));
   }
 
   beforeEach(async () => {
@@ -74,8 +76,10 @@ describe('modal background inert', () => {
     expect(inert('.scrim')).toBe(false);
     expect(inert('.dlg-a')).toBe(false);
     expect(inert('.live')).toBe(false);
+    expect(TestBed.inject(ModalInertService).openCount()).toBe(1);
     host.a.set(false);
     await flush();
+    expect(TestBed.inject(ModalInertService).openCount()).toBe(0);
     expect(fixture.nativeElement.querySelectorAll('[inert]').length).toBe(0);
   });
 

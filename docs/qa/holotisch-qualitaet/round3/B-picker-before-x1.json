@@ -1,0 +1,47 @@
+{
+ "w": 1280,
+ "thr": 1,
+ "tag": "before",
+ "runs": [
+  {
+   "sync": 1,
+   "toFrame": 153,
+   "lt": 2,
+   "max": 88,
+   "sum": 148,
+   "act": {
+    "tag": "INPUT",
+    "cls": "",
+    "dlg": true
+   }
+  },
+  {
+   "sync": 1,
+   "toFrame": 82,
+   "lt": 1,
+   "max": 81,
+   "sum": 81,
+   "act": {
+    "tag": "INPUT",
+    "cls": "",
+    "dlg": true
+   }
+  },
+  {
+   "sync": 0,
+   "toFrame": 61,
+   "lt": 0,
+   "max": 0,
+   "sum": 0,
+   "act": {
+    "tag": "INPUT",
+    "cls": "",
+    "dlg": true
+   }
+  }
+ ],
+ "msgs": [
+  "error: Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+  "warning: Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information."
+ ]
+}

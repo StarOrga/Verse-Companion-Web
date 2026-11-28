@@ -1,0 +1,13 @@
+const {open}=require('../round1/lib.cjs');
+(async()=>{const {b,page}=await open({w:1280,h:800});
+await page.goto('http://127.0.0.1:4340/codex/ship/AEGS_Gladius?view=holo',{waitUntil:'commit'});
+await page.waitForSelector('sc-codex-holo-table',{timeout:120000});await page.waitForTimeout(5000);
+const v=()=>page.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--sc-topbar-h').trim());
+console.log('before',await v());
+await page.evaluate(()=>{window.__t=0;const st=window.setTimeout;window.setTimeout=function(f,ms,...a){if(ms===140)window.__t++;return st.call(window,f,ms,...a)}});
+await page.locator('button[aria-label*="wap" i]').first().click();await page.waitForTimeout(1500);
+await page.setViewportSize({width:700,height:800});await page.waitForTimeout(1500);
+console.log('during modal',await v(),'140ms timers armed:',await page.evaluate(()=>window.__t));
+await page.keyboard.press('Escape');await page.waitForTimeout(600);
+console.log('after close',await v(),'timers',await page.evaluate(()=>window.__t));
+await b.close()})().catch(e=>{console.error('ERR',e.message.slice(0,300))});
