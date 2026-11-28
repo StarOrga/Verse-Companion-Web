@@ -202,6 +202,7 @@ const EDGE = 8;
       border: 1px solid var(--hb-pill-bd, color-mix(in srgb, var(--sc-accent) 30%, transparent)); border-radius: 17px;
       background: var(--hb-pill-bg, color-mix(in srgb, var(--sc-bg-0) 52%, transparent)); transition: border-color 160ms ease, background 160ms ease;
       color: var(--sc-fg-1); font: inherit; font-size: max(12.5px, var(--sc-fs-floor)); text-align: start; cursor: pointer; }
+    @media (prefers-reduced-motion: reduce) { .hb { transition: none; } }
     .hb .ic { flex: none; width: 24px; height: 24px; padding: 5px; box-sizing: border-box; border-radius: 50%; color: var(--sc-accent);
       background: color-mix(in srgb, var(--sc-accent) 12%, transparent); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
     .ic-w { position: relative; flex: none; display: inline-flex; margin-inline-end: 3px; }

@@ -194,6 +194,12 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
   }
 }
 
+/** The Low Poly stand-in of a part (subType "Low Poly" or a `_LowPoly` class). Exported for the spec. */
+export function isLowPolyProxy(it: Pick<CompatibleItem, 'classNameSlug' | 'subType'>): boolean {
+  const re = /low[\s_-]?poly/i;
+  return re.test(it.subType ?? '') || re.test(it.classNameSlug);
+}
+
 /**
  * The swap picker (admin request 461288f9, redesigned per MASTER §9 / iteration
  * 7 `#g3` + iteration 8 `#h3` values): a centred window over a dimmed, blurred
@@ -213,7 +219,7 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (target(); as t) {
-      <sc-popup kind="large" [title]="'codex.picker.title' | translate: { port: slotLabel(t), size: t.size ?? '' }"
+      <sc-popup class="pick-pop" kind="large" [title]="'codex.picker.title' | translate: { port: slotLabel(t), size: t.size ?? '' }"
                 [eyebrow]="eyebrow(t)" [initialFocus]="'first'" [bodyFill]="true" style="--sc-popup-body-gap: var(--sc-space-3)"
                 scPopupMotion="large" scPopupMotionPlate=".scp-frame" scPopupMotionFoot=".scp-f"
                 (closed)="dismiss()">
@@ -488,6 +494,16 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
   `,
   styles: [`
     :host { display: contents; }
+
+    /* The window stands below the docked fusion bar, not under it (round-1 U3): the staged
+       stage pads by the bar's published height (--sc-topbar-h, 0 while staged / compact), the frame
+       gives up the same room. Phone keeps its own full-screen rules. */
+    @media (min-width: 721px) {
+      sc-popup.pick-pop {
+        padding-block-start: max(var(--sc-rand, 16px), calc(var(--sc-topbar-h, 0px) + var(--sc-space-2)));
+        --sc-popup-max-h: calc(100dvh - max(var(--sc-rand, 16px), calc(var(--sc-topbar-h, 0px) + var(--sc-space-2))) - var(--sc-rand, 16px));
+      }
+    }
 
     .pick-hint.inferred { text-align: left; margin: 0; font-size: max(0.75rem, var(--sc-fs-floor)); color: var(--sc-fg-2);
       border-left: 2px solid color-mix(in srgb, var(--sc-warn) 55%, transparent); padding-left: 8px; }
@@ -948,7 +964,10 @@ export class CodexSwapPickerComponent {
       ammo = new Map([...ammo, ...extraAmmo]);
     }
 
-    const items = data.items;
+    // The game ships a Low Poly proxy next to a real part; same name, same stats, no purpose here (U4).
+    const items = data.items.filter(
+      (it) => it.classNameSlug === installedName || it.classNameSlug === factory || !isLowPolyProxy(it),
+    );
     const seedNames = [installedName, factory].filter((n): n is string => !!n);
     const rows = items.map((it) =>
       this.toCandidate(it, payloads, ammo, it.classNameSlug === installedName),

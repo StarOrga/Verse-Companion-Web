@@ -36,7 +36,7 @@ export interface StripMission {
   template: `
     <button type="button" class="einsatz" #btn aria-haspopup="true" [attr.aria-expanded]="open()"
             [attr.aria-label]="('codex.holo.strip.einsatzPick' | translate) + ': ' + (activeLabel() | translate)"
-            [scTooltip]="'codex.holo.strip.einsatzPick' | translate" scTooltipTier="label"
+            [scTooltip]="open() ? null : ('codex.holo.strip.einsatzPick' | translate)" scTooltipTier="label"
             (click)="toggle($event)" (keydown.escape)="open() && close($event)">
       <small class="lab">{{ 'codex.holo.strip.einsatz' | translate }}</small>
       <span class="val"><svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="activeIcon()" /></svg><span class="vt">{{ activeLabel() | translate }}</span></span>
@@ -102,6 +102,7 @@ export interface StripMission {
       .mp.dis .mp-l svg { color: currentColor; }
       .mp .why { font-family: var(--sc-font-body, inherit); color: var(--sc-fg-2); }
       .mp:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring-inset); }
+      @media (prefers-reduced-motion: reduce) { .einsatz, .val { transition: none; } }
       @media (max-width: 640px) {
         /* The word "Einsatz" stays for screen readers; the value gets the pill's width ("Frachter" not "Fracht…"). */
         .lab { position: absolute; inline-size: 1px; block-size: 1px; padding: 0; border: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }

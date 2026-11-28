@@ -214,6 +214,25 @@ describe('CodexSwapPickerComponent', () => {
     );
   });
 
+  it('drops the Low Poly proxy of a part from the list', async () => {
+    COMPATIBLE.push({
+      kind: 'weapon',
+      classNameSlug: 'GATS_BallisticGatling_S3_LowPoly',
+      nameLocalized: 'Mantis GT-220 Gatling',
+      manufacturerCode: 'GAT',
+      size: 3,
+      subType: 'Low Poly',
+      grade: 'A',
+    });
+    try {
+      const el = await open();
+      widenToAllSize(el);
+      expect(rowNames(el).filter((n) => n === 'Mantis GT-220 Gatling')).toHaveLength(1);
+    } finally {
+      COMPATIBLE.pop();
+    }
+  });
+
   it('badges the installed item EQUIPPED', async () => {
     const el = await open();
     const rows = Array.from(el.querySelectorAll('.pick-row'));
