@@ -1,7 +1,45 @@
 {
   "generatedFrom": "CHANGELOG.md",
-  "current": "0.301.1",
+  "current": "0.302.0",
   "releases": [
+    {
+      "version": "0.302.0",
+      "date": "2026-11-28",
+      "sections": [
+        {
+          "category": "Added",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Holotisch columns follow the chosen Einsatz and compare every value against the factory loadout, with saved configurations marked on the same bar"
+            },
+            {
+              "title": "",
+              "text": "Einsätze a ship is not equipped for are disabled with their reason"
+            },
+            {
+              "title": "",
+              "text": "Data Uploader extracts mining laser, salvage head and salvage hold figures (extract schema 8)"
+            },
+            {
+              "title": "",
+              "text": "Usage dashboard tiles for the Einsatz choice and „Alle Werte“"
+            }
+          ]
+        },
+        {
+          "category": "Fixed",
+          "label": "",
+          "items": [
+            {
+              "title": "",
+              "text": "Hull HP, armour, cargo and the quantum range now appear on the ship page"
+            }
+          ]
+        }
+      ]
+    },
     {
       "version": "0.301.1",
       "date": "2026-11-28",
