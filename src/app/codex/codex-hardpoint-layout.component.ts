@@ -271,6 +271,10 @@ interface RenderGroup {
   open: boolean;
 }
 
+/** Placeholder height of a not yet built slot row / of each sub-slot under it, measured on the Idris at 1280 (P2). */
+const PH_ROW_PX = 112;
+const PH_KID_PX = 112;
+
 /**
  * Blocks that start folded away. The airframe block is a hull inventory — a
  * capital ship puts hundreds of thrusters, seats and doors in it and none of
@@ -354,7 +358,7 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                       <ng-container *ngTemplateOutlet="secSummary; context: { $implicit: sec }"></ng-container>
                     </summary>
                     @if (sec.open) {
-                      <ng-container *ngTemplateOutlet="secBody; context: { $implicit: sec }"></ng-container>
+                      <ng-container *ngTemplateOutlet="secBodyHost; context: { $implicit: sec }"></ng-container>
                     }
                   </details>
                 }
@@ -370,7 +374,7 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                 <ng-container *ngTemplateOutlet="secSummary; context: { $implicit: sec }"></ng-container>
               </summary>
               @if (sec.open) {
-                <ng-container *ngTemplateOutlet="secBody; context: { $implicit: sec }"></ng-container>
+                <ng-container *ngTemplateOutlet="secBodyHost; context: { $implicit: sec }"></ng-container>
               }
             </details>
           }
@@ -435,6 +439,21 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                 <span class="fp-lock">{{ preview(sec).lockKey | translate }}</span>
               </span>
             }
+    </ng-template>
+
+    <!-- P2 (Holotisch only): a ship like the Idris lists ~80 slot rows with ~40 elements each, and the table sits
+         below the stage, off screen on load. The rows are built when their block nears the viewport; until then a
+         placeholder of about the right height holds the place (the classic page renders its rows at once). -->
+    <ng-template #secBodyHost let-sec>
+      @if (calm()) {
+        @defer (on viewport({ rootMargin: '900px 0px' })) {
+          <ng-container *ngTemplateOutlet="secBody; context: { $implicit: sec }"></ng-container>
+        } @placeholder {
+          <div class="sec-ph" aria-hidden="true" [style.min-height.px]="placeholderHeight(sec)"></div>
+        }
+      } @else {
+        <ng-container *ngTemplateOutlet="secBody; context: { $implicit: sec }"></ng-container>
+      }
     </ng-template>
 
     <!-- One block body, used at both nesting levels. -->
@@ -1214,6 +1233,14 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
     :host(.calm) .slot-stats { border-top: 0; padding-top: 2px; gap: 2px 18px; }
     :host(.calm) .slot-stats dd { font-family: var(--font-monospace, monospace); color: var(--sc-fg-0); }
     :host(.calm) .kids { border-left-color: color-mix(in srgb, var(--sc-accent) 30%, transparent); }
+    /* U7: every text in the Holotisch columns reads at 13px or more (the classic page keeps its denser 9-11.5px scale). */
+    :host(.calm) .sec-head { font-size: max(13px, var(--sc-fs-floor)); letter-spacing: 0.1em; }
+    :host(.calm) .sec-ct, :host(.calm) .sec-tag, :host(.calm) .sec-btn, :host(.calm) .sec-info, :host(.calm) .caret,
+    :host(.calm) .size-tag, :host(.calm) .tag, :host(.calm) .meta-txt, :host(.calm) .slot-port, :host(.calm) .slot-note,
+    :host(.calm) .slot-stats dt, :host(.calm) .slot-stats dd, :host(.calm) .slot-craft, :host(.calm) .fp-chip,
+    :host(.calm) .fp-lock, :host(.calm) .fold-preview, :host(.calm) .fig .dl, :host(.calm) .mult, :host(.calm) .derived,
+    :host(.calm) .slot-stats .derived.hint {
+      font-size: max(13px, var(--sc-fs-floor)); }
   `],
 })
 export class CodexHardpointLayoutComponent {
@@ -1441,6 +1468,13 @@ export class CodexHardpointLayoutComponent {
 
   private alwaysFolded(): ReadonlySet<ShipModuleSection> {
     return this.calm() ? new Set<ShipModuleSection>() : FOLDABLE_SECTIONS;
+  }
+
+  /** Height reserved for a block body that is not built yet: a row's own lines plus one per sub-slot. */
+  placeholderHeight(sec: RenderSection): number {
+    let h = 0;
+    for (const row of sec.rows) h += PH_ROW_PX + (row.slot.children?.length ?? 0) * PH_KID_PX;
+    return h;
   }
 
   /** Block heading. On the Holotable a fixed-systems block sits inside an area column, so "Zelle &" would mislead. */

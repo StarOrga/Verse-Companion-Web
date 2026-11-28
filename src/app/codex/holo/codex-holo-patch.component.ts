@@ -207,7 +207,7 @@ export type HoloPatchSide = CodexBuild | 'active';
       min-height: max(30px, var(--sc-tap-min, 0px)); padding: 2px 7px;
       border: 1px solid color-mix(in srgb, var(--sc-accent) 30%, var(--sc-border)); border-radius: 4px;
       background: var(--sc-bg-0); color: var(--sc-fg-0);
-      font-size: max(0.74rem, var(--sc-fs-floor)); cursor: pointer;
+      font-size: max(0.8125rem, var(--sc-fs-floor)); cursor: pointer;
       transition: border-color 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
     }
     .pv:hover, .pv.on { border-color: color-mix(in srgb, var(--sc-accent) 60%, var(--sc-border)); }
@@ -215,13 +215,13 @@ export type HoloPatchSide = CodexBuild | 'active';
     .pv:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--sc-accent); }
     .ph { font-family: var(--sc-font-body, inherit); color: var(--sc-fg-2); }
     /* The channel as a small tag, never "-LIVE" glued to the number. */
-    .ch { font-style: normal; font-family: var(--sc-font-body, inherit); font-size: max(0.64rem, var(--sc-fs-floor));
+    .ch { font-style: normal; font-family: var(--sc-font-body, inherit); font-size: max(0.8125rem, var(--sc-fs-floor));
       padding: 1px 5px; border-radius: 3px; border: 1px solid var(--sc-border); color: var(--sc-fg-1); letter-spacing: 0.04em; }
     .cur { display: inline-flex; align-items: center; gap: 4px; font-family: var(--sc-font-body, inherit);
-      font-size: max(0.66rem, var(--sc-fs-floor)); color: var(--sc-accent); }
+      font-size: max(0.8125rem, var(--sc-fs-floor)); color: var(--sc-accent); }
     .cur::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--sc-accent); }
     .car { font-size: 0.8125rem; color: var(--sc-fg-2); }
-    .bn { font-size: max(0.62rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
+    .bn { font-size: max(0.8125rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
 
     .patch-pop {
       position: absolute; top: calc(100% + 6px); left: 0; z-index: 80;
@@ -239,12 +239,12 @@ export type HoloPatchSide = CodexBuild | 'active';
     @keyframes pp-in { from { opacity: 0; transform: translateY(calc(-1 * var(--holo-rise))) scale(0.97); } }
     @keyframes pp-out { to { opacity: 0; transform: translateY(-4px) scale(0.98); } }
     .patch-pop:focus { outline: none; }
-    .pop-label { font-family: var(--sc-font-display); font-size: max(0.66rem, var(--sc-fs-floor));
+    .pop-label { font-family: var(--sc-font-display); font-size: max(0.8125rem, var(--sc-fs-floor));
       letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-accent); }
-    .pop-state { margin: 0; font-size: max(0.74rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
+    .pop-state { margin: 0; font-size: max(0.8125rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
     .pop-state.err, .delta-state.err { color: var(--sc-danger); }
     .pop-err { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
-    .pop-why { margin: 2px 4px 0; font-size: max(0.68rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
+    .pop-why { margin: 2px 4px 0; font-size: max(0.8125rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
 
     .build-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; max-height: 260px; overflow-y: auto; }
     .row-wrap { display: block; }
@@ -252,7 +252,7 @@ export type HoloPatchSide = CodexBuild | 'active';
       width: 100%; display: flex; align-items: center; gap: 8px;
       min-height: max(36px, var(--sc-tap-min, 0px)); padding: 6px 9px; border-radius: 4px;
       border: 1px solid transparent; background: transparent; color: var(--sc-fg-1);
-      font: inherit; font-size: max(0.78rem, var(--sc-fs-floor)); cursor: pointer; text-align: left;
+      font: inherit; font-size: max(0.8125rem, var(--sc-fs-floor)); cursor: pointer; text-align: left;
       transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
       animation: row-in 260ms var(--holo-e-out) backwards; animation-delay: calc(min(var(--r, 0), 10) * 22ms);
     }
@@ -263,19 +263,19 @@ export type HoloPatchSide = CodexBuild | 'active';
       color: var(--sc-fg-0);
     }
     .build-row:disabled { opacity: 0.5; cursor: not-allowed; }
-    .row-build { font-size: max(0.7rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
+    .row-build { font-size: max(0.8125rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
     /* The reason wraps inside the row (360 px card): a cut "steht schon auf der a…" told nothing. */
     .build-row { flex-wrap: wrap; row-gap: 2px; }
-    .row-flag { margin-left: auto; min-width: 0; max-width: 100%; font-size: max(0.66rem, var(--sc-fs-floor)); color: var(--sc-fg-2);
+    .row-flag { margin-left: auto; min-width: 0; max-width: 100%; font-size: max(0.8125rem, var(--sc-fs-floor)); color: var(--sc-fg-2);
       white-space: normal; overflow-wrap: anywhere; text-align: right; line-height: 1.25; }
 
     .patch-clear { align-self: flex-start; min-height: 32px; padding: 4px 10px;
       border-radius: var(--holo-r); border: 1px solid var(--sc-border); background: var(--sc-bg-0);
-      color: var(--sc-fg-2); font: inherit; font-size: max(0.72rem, var(--sc-fs-floor)); cursor: pointer; }
+      color: var(--sc-fg-2); font: inherit; font-size: max(0.8125rem, var(--sc-fs-floor)); cursor: pointer; }
     /* Clearing a comparison is not destructive — accent, never danger. */
     .patch-clear:hover { border-color: var(--sc-accent); color: var(--sc-accent); }
 
-    .delta-state { margin: 6px 0 0; font-size: max(0.76rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
+    .delta-state { margin: 6px 0 0; font-size: max(0.8125rem, var(--sc-fs-floor)); color: var(--sc-fg-2); }
     /* Hotkey badge (#644): discreet, hidden on touch. */
     /* Out of the flow: the hidden hint never widens the picker. */
     .hk { position: absolute; top: -9px; right: -4px; background: var(--sc-bg-0); padding: 0 4px; border: 1px solid var(--sc-border); border-radius: 2px; font-family: var(--font-monospace, monospace); font-size: 13px;
@@ -294,8 +294,8 @@ export type HoloPatchSide = CodexBuild | 'active';
       background: color-mix(in srgb, var(--sc-accent-collab) 8%, transparent);
     }
     .admin-schema-row dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; }
-    .admin-schema-row dt { color: var(--sc-fg-2); font-size: max(0.72rem, var(--sc-fs-floor)); }
-    .admin-schema-row dd { margin: 0; color: var(--sc-fg-0); font-size: max(0.72rem, var(--sc-fs-floor)); }
+    .admin-schema-row dt { color: var(--sc-fg-2); font-size: max(0.8125rem, var(--sc-fs-floor)); }
+    .admin-schema-row dd { margin: 0; color: var(--sc-fg-0); font-size: max(0.8125rem, var(--sc-fs-floor)); }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
   `],
 })

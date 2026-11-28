@@ -1,0 +1,16 @@
+0 weapons open=true y=1620 h=318 rows=1 els=77
+0 remoteTurrets open=true y=1946 h=773 rows=3 els=197
+0 mannedTurrets open=true y=2727 h=1334 rows=3 els=311
+0 missiles open=true y=4069 h=186 rows=1 els=102
+0 pod open=true y=4263 h=186 rows=1 els=43
+0 structure open=true y=4457 h=186 rows=6 els=209
+1 shields open=true y=1619 h=303 rows=1 els=75
+1 countermeasures open=true y=1931 h=407 rows=2 els=124
+1 structure open=true y=2346 h=5206 rows=46 els=1513
+2 powerPlants open=false y=1620 h=115 rows=0 els=11
+2 quantum open=false y=1743 h=93 rows=0 els=11
+2 structure open=true y=1844 h=1947 rows=14 els=534
+3 radar open=false y=1698 h=93 rows=0 els=11
+3 coolers open=false y=1799 h=115 rows=0 els=12
+3 lifeSupport open=false y=1922 h=93 rows=0 els=10
+3 structure open=true y=2023 h=502 rows=4 els=143

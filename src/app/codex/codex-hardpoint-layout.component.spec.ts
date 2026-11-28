@@ -1215,15 +1215,39 @@ describe('CodexHardpointLayoutComponent', () => {
 
   describe('calm cards (Holotable)', () => {
     const calmSlot = { ...PANTHER, grade: 'C', roleKey: 'codex.module.badge.active' };
-    function renderCalm(): HTMLElement {
+    // P2: the Holotisch builds a block's rows when the block nears the viewport (@defer on viewport). The stub
+    // reports every observed block as visible, so a test only has to wait for the deferred part to arrive.
+    const RealIO = globalThis.IntersectionObserver;
+    beforeEach(() => {
+      globalThis.IntersectionObserver = class {
+        constructor(private readonly cb: IntersectionObserverCallback) {}
+        observe(target: Element): void {
+          setTimeout(() => this.cb([{ target, isIntersecting: true } as IntersectionObserverEntry], this as unknown as IntersectionObserver));
+        }
+        unobserve(): void {}
+        disconnect(): void {}
+        takeRecords(): IntersectionObserverEntry[] { return []; }
+      } as unknown as typeof IntersectionObserver;
+    });
+    afterEach(() => {
+      globalThis.IntersectionObserver = RealIO;
+    });
+    async function renderDeferred(sections: LayoutSection[]): Promise<HTMLElement> {
+      const el = render(sections);
+      await new Promise((r) => setTimeout(r, 30));
+      await fixture.whenStable();
+      fixture.detectChanges();
+      return el;
+    }
+    async function renderCalm(): Promise<HTMLElement> {
       fixture.componentRef.setInput('calm', true);
       fixture.componentRef.setInput('partShares', new Map([['KLWE_LaserRepeater_S3', 0.12]]));
       fixture.componentRef.setInput('partShareOf', '506/s');
-      return render([{ section: 'weapons', slots: [calmSlot] }]);
+      return renderDeferred([{ section: 'weapons', slots: [calmSlot] }]);
     }
 
-    it('shows the grade as a word with a four-step scale, a quiet status dot and no English type label', () => {
-      const el = renderCalm();
+    it('shows the grade as a word with a four-step scale, a quiet status dot and no English type label', async () => {
+      const el = await renderCalm();
       expect(el.querySelector('.hx-grade b')?.textContent).toContain('codex.holo.part.grade');
       const steps = el.querySelectorAll('.hx-gbar i');
       expect(steps.length).toBe(4);
@@ -1233,23 +1257,23 @@ describe('CodexHardpointLayoutComponent', () => {
       expect(el.querySelector('.meta-txt')?.textContent?.trim()).toBe('KLA');
     });
 
-    it('a sliver reads 1 %, and a share without a total uses the bare phrase (no dangling "of")', () => {
+    it('a sliver reads 1 %, and a share without a total uses the bare phrase (no dangling "of")', async () => {
       fixture.componentRef.setInput('calm', true);
       fixture.componentRef.setInput('partShares', new Map([['KLWE_LaserRepeater_S3', 0.002]]));
       fixture.componentRef.setInput('partShareOf', null);
-      const el = render([{ section: 'weapons', slots: [calmSlot] }]);
+      const el = await renderDeferred([{ section: 'weapons', slots: [calmSlot] }]);
       expect(el.querySelector('[data-testid="part-share"]')!.textContent).toContain('codex.holo.part.shareOnly');
       expect(el.querySelector('[data-testid="part-share"] .hx-share-b i')!.getAttribute('style')).toContain('1%');
     });
 
-    it('carries the row\'s share of the category total as a bar', () => {
-      const el = renderCalm();
+    it('carries the row\'s share of the category total as a bar', async () => {
+      const el = await renderCalm();
       expect(el.querySelector('[data-testid="part-share"] .hx-share-b i')?.getAttribute('style')).toContain('12%');
     });
 
-    it('always groups identical hardpoints and offers no split toggle (#411)', () => {
+    it('always groups identical hardpoints and offers no split toggle (#411)', async () => {
       fixture.componentRef.setInput('calm', true);
-      const el = render([
+      const el = await renderDeferred([
         {
           section: 'weapons',
           slots: [PANTHER, { ...PANTHER, port: 'Hardpoint Weapon Top Right' }, { ...PANTHER, port: 'Hardpoint Weapon Nose' }],
@@ -1259,12 +1283,12 @@ describe('CodexHardpointLayoutComponent', () => {
       expect(el.querySelector('.mod-sec[data-sec="weapons"] .sec-btn:not(.detail-btn)')).toBeNull();
     });
 
-    it('lists the fixed systems open and clickable, without the "nicht konfigurierbar" tag (#411)', () => {
+    it('lists the fixed systems open and clickable, without the "nicht konfigurierbar" tag (#411)', async () => {
       const inspects: LayoutTarget[] = [];
       fixture.componentInstance.inspected.subscribe((v) => inspects.push(v));
       fixture.componentRef.setInput('calm', true);
       const thruster = slot({ port: 'Hardpoint Thruster Main', className: 'THR_Main', kind: 'component', name: 'Main Thruster' });
-      const el = render([{ section: 'structure', slots: [thruster] }]);
+      const el = await renderDeferred([{ section: 'structure', slots: [thruster] }]);
       const fixed = el.querySelector('.mod-sec[data-sec="structure"]') as HTMLDetailsElement;
       expect(fixed.open).toBe(true);
       expect(fixed.querySelector('.sec-tag')).toBeNull();
@@ -1273,12 +1297,12 @@ describe('CodexHardpointLayoutComponent', () => {
       expect(inspects.length).toBe(1);
     });
 
-    it('draws bars in the other columns\' sections too, and none on a row without a share', () => {
+    it('draws bars in the other columns\' sections too, and none on a row without a share', async () => {
       fixture.componentRef.setInput('calm', true);
       fixture.componentRef.setInput('partShares', new Map([['SHLD_A', 0.6], ['COOL_A', 0.25]]));
       fixture.componentRef.setInput('partShareOf', '211.200 Schild-HP');
       const mk = (className: string, port: string) => ({ ...calmSlot, className, rawPort: port, portName: port });
-      const el = render([
+      const el = await renderDeferred([
         { section: 'shields', slots: [mk('SHLD_A', 'hardpoint_shield_a'), mk('SHLD_B', 'hardpoint_shield_b')] },
         { section: 'coolers', slots: [mk('COOL_A', 'hardpoint_cooler_a')] },
       ]);
@@ -1288,8 +1312,8 @@ describe('CodexHardpointLayoutComponent', () => {
       expect(bars[1]).toContain('25%');
     });
 
-    it('leaves the classic row as it was', () => {
-      const el = render([{ section: 'weapons', slots: [calmSlot] }]);
+    it('leaves the classic row as it was', async () => {
+      const el = await renderDeferred([{ section: 'weapons', slots: [calmSlot] }]);
       expect(el.querySelector('.hx-grade')).toBeNull();
       expect(el.querySelector('.slot-meta .tag.role')).toBeTruthy();
       expect(el.querySelector('.meta-txt')?.textContent).toContain('Gun');
