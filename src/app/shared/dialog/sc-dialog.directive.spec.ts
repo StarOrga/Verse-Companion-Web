@@ -19,7 +19,7 @@ import { ScDialogDirective } from './sc-dialog.directive';
         (scDialogEscape)="escapes = escapes + 1"
       >
         <p>Text</p>
-        <button type="button" class="first">First</button>
+        <button type="button" class="first" [style.display]="hideFirst() ? 'none' : null">First</button>
         @if (withInitial()) {
           <button type="button" class="initial" cdkFocusInitial>Initial</button>
         }
@@ -33,6 +33,7 @@ class HostComponent {
   readonly modal = signal(true);
   readonly initialFocus = signal<'first' | 'container'>('first');
   readonly withInitial = signal(false);
+  readonly hideFirst = signal(false);
   readonly returnTo = signal<HTMLElement | null>(null);
   escapes = 0;
 }
@@ -69,6 +70,20 @@ describe('ScDialogDirective', () => {
   }
 
   it('focuses the first tabbable element on open', async () => {
+    await openFrom();
+    expect(document.activeElement).toBe(el('.first'));
+  });
+
+  it('skips a first control that cannot take focus (display:none) and focuses the next', async () => {
+    host.hideFirst.set(true);
+    await openFrom();
+    expect(document.activeElement).toBe(el('.last'));
+  });
+
+  it('never looks outside its own subtree for the initial focus', async () => {
+    const outside = document.createElement('button');
+    outside.className = 'outside';
+    fixture.nativeElement.prepend(outside);
     await openFrom();
     expect(document.activeElement).toBe(el('.first'));
   });

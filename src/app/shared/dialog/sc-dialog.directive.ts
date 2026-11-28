@@ -10,6 +10,13 @@ import {
 import { FocusTrap, FocusTrapFactory } from '@angular/cdk/a11y';
 import { ModalInertService } from './modal-inert.service';
 
+/** What can take focus; geometry is never read here (the CDK scan did, per node, over the whole subtree). */
+const TABBABLE =
+  'a[href],button:not([disabled]),input:not([disabled]):not([type="hidden"]),select:not([disabled]),' +
+  'textarea:not([disabled]),[tabindex]:not([tabindex^="-"]),[contenteditable="true"]';
+/** How many candidates are tried before the dialog itself takes focus (a failed focus() costs no layout pass beyond its own). */
+const MAX_FOCUS_TRIES = 12;
+
 /** Open dialogs, oldest first; only the last one reacts to a document-level Escape. */
 const openDialogs: ScDialogDirective[] = [];
 
@@ -95,19 +102,37 @@ export class ScDialogDirective implements OnDestroy {
       if (this.destroyed) return;
       this.trap = this.trapFactory.create(this.host);
       this.trap.enabled = this.scDialogModal();
+      // Focus first, the page goes inert after: marking the rest of the document inert dirties its
+      // style, and a focus scan behind it paid for that in one forced layout (round-1 P1).
+      if (this.scDialogInitialFocus() === 'container' || !this.focusFirst()) {
+        this.host.focus({ preventScroll: true });
+      }
       const inert = this.scDialogInert() ?? this.host.getAttribute('aria-modal') === 'true';
       if (inert && this.scDialogModal()) {
         this.inertService.register(this.host);
         this.inertRegistered = true;
       }
-      if (this.scDialogInitialFocus() === 'container') {
-        this.host.focus({ preventScroll: true });
-        return;
-      }
-      if (!this.trap.focusInitialElement({ preventScroll: true })) {
-        this.host.focus({ preventScroll: true });
-      }
     });
+  }
+
+  /**
+   * The `cdkFocusInitial` element, else the first tabbable one — found inside the dialog only, by
+   * selector, never by geometry. focus() itself is the visibility test: an element that cannot take
+   * focus (display:none) leaves `activeElement` unchanged and the next candidate is tried.
+   */
+  private focusFirst(): boolean {
+    const candidates = [
+      ...this.host.querySelectorAll<HTMLElement>('[cdkFocusInitial], [cdkfocusinitial]'),
+      ...this.host.querySelectorAll<HTMLElement>(TABBABLE),
+    ];
+    let tries = 0;
+    for (const el of candidates) {
+      if (el.hasAttribute('hidden') || el.closest('[inert], [hidden]')) continue;
+      el.focus({ preventScroll: true });
+      if (document.activeElement === el) return true;
+      if (++tries >= MAX_FOCUS_TRIES) break;
+    }
+    return false;
   }
 
   onKeydown(ev: KeyboardEvent): void {

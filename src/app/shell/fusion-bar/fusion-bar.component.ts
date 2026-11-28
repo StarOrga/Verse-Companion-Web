@@ -1,3 +1,4 @@
+import { ModalInertService } from '../../shared/dialog/modal-inert.service';
 import {
   ApplicationRef,
   ChangeDetectionStrategy,
@@ -334,6 +335,7 @@ const MAX_TOKENS = 3;
 })
 export class FusionBarComponent {
   private readonly router = inject(Router);
+  private readonly modalInert = inject(ModalInertService);
   private readonly layout = inject(LayoutService);
   readonly chrome = inject(ShellChromeService);
   private readonly appRef = inject(ApplicationRef);
@@ -986,6 +988,13 @@ export class FusionBarComponent {
     if (typeof document === 'undefined') return;
     if (this.publishTimer) clearTimeout(this.publishTimer);
     this.publishTimer = null;
+    // A modal holds the page inert: the bar cannot change under it, and the reads below force a
+    // layout of the document the dialog just built (round-1 P1, ~450 ms at 4x on a big ship).
+    // Publish once it closes; the settle timer re-checks until then.
+    if (this.modalInert.depth > 0) {
+      this.publishHeightSettled();
+      return;
+    }
     const el = this.host.nativeElement as HTMLElement;
     const staged = this.mode() === 'stage';
     // The bar parks `--sc-chrome-top` (minus its 4px padding) below the viewport top: that lift counts.
