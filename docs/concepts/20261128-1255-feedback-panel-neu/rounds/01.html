@@ -1,4 +1,5 @@
-<section data-iteration="1" data-iteration-template="design" data-tab-label="Runde 1" data-design-set="alternatives">
+<section data-iteration="1" data-iteration-template="design" data-tab-label="Runde 1" data-design-set="alternatives" data-baked>
+  <script type="application/json" data-frozen-feedback>{"general":{"attachments":[],"text":""},"designs":{},"screens":{},"views":{},"favorite":"d2","userPins":[{"attachments":[],"design":"d2","id":"up-mx0cxywga21a","screen":"r1-d2-s1","target":"span.mock-fb-chip \"Wunsch\"","text":"braucht man duie auswahl hier? denn das kann claude doch selbst sich überlegen !?","x":57.7,"y":41.4},{"attachments":[],"design":"d2","id":"up-mx0cydy0cux5","screen":"r1-d2-s1","target":"button.mock-fb-btn.pri \"Anheften\"","text":"Kann ich nicht nooch weitere atafchements hinzufügen?","x":60.2,"y":58.2},{"attachments":[],"design":"d2","id":"up-mx0cyknsofci","screen":"r1-d2-s1","target":"small \"Hängt an: Loadout › Waffen · Bild und Se\"","text":"Was ist wenn ich woander shinklicke / absende. Ich will das ja nicht alles verlorgen sehen, aber auch auf dem screen, vllt. wie bei devops concept als feedback speech bubble?!","x":56.2,"y":55.7},{"attachments":[],"design":"d2","id":"up-mx0cztolscrr","screen":"r1-d2-s2","target":"div \"vorher\"","text":"Raffiniert!","x":31,"y":48.6},{"attachments":[],"design":"d2","id":"up-mx0d0gl3g51o","screen":"r1-d2-s3","target":"div.mock-fb-act \"C8 PiscesC8XBeide\"","text":"Wie blendet man feedbacks aus und ein, bzw. wo kann man alle einsehen und verwalten ?!","x":50.9,"y":33.1}],"fidelity":"off"}</script>
 <style>
 .mock-fb { --fb-acc: #00d4ff; --fb-col: #c27a5a; --fb-hot: #f06a6a; --fb-warn: #f2b84b; --fb-ok: #5fd39a; --fb-fg: #e3f2f8; --fb-dim: #8aa7b5; --fb-bd: rgba(0,212,255,.22); --fb-bg0: #07141f; --fb-bg1: #0c1f2e; --fb-bg2: #12293b;
   position: relative; box-sizing: border-box; min-height: 680px; height: 100%; display: grid; grid-template-columns: minmax(0,1fr) 380px; background: var(--fb-bg0); color: var(--fb-fg); font: 500 13px/1.45 Inter, system-ui, sans-serif; overflow: hidden; text-align: left; }
@@ -196,7 +197,7 @@
         <button class="anno-pin" type="button" data-anno-pin="r1-d2-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d2-s1-a1" aria-label="{{anno.pin_label}}">1</button>
         <div class="anno-bubble" id="anno-bubble-r1-d2-s1-a1" data-anno-bubble="r1-d2-s1-a1" data-open="false">
           <button type="button" class="anno-bubble-summary" data-anno-summary="r1-d2-s1-a1" aria-expanded="false" aria-controls="anno-bubble-r1-d2-s1-a1"><span class="anno-bubble-question">Hier gibt es kein Panel mehr zum Schreiben, nur die Blase an der Stelle. Fehlt dir Platz für lange Meldungen mit mehreren Punkten?</span></button>
-          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d2-s1-a1" data-annotation="r1-d2-s1-a1" data-attachable placeholder="{{anno.answer_placeholder}}"></textarea><div class="attach-slot" data-attach-slot="anno-r1-d2-s1-a1"></div></div>
+          <div class="anno-bubble-body"><textarea class="anno-answer" data-comment="anno-r1-d2-s1-a1" data-annotation="r1-d2-s1-a1" data-attachable placeholder="{{anno.answer_placeholder}}">finde ich eigentlich recht raffiniert </textarea><div class="attach-slot" data-attach-slot="anno-r1-d2-s1-a1"></div></div>
         </div>
       </div>
     </div>
@@ -372,29 +373,29 @@ Reibung
       <div data-slot="long"><p>Das Admin-Board ist über 3.000 Zeilen groß und trägt Dashboard, Lebenszyklus, Herzschlag und Thread. Das Nutzer-Panel nutzt denselben Eingabekasten. Nutzer haben es bisher nie benutzt, Mitwirkende 14-mal.</p></div>
     </div>
 
-    <section id="r1-audience" data-nav-label="Schwerpunkt" data-decision="r1-audience" data-ui-ok="Richtung der Arbeit, nicht die Form der Varianten" data-decision-mode="single" data-label="Schwerpunkt" data-rec="admin" data-rec-why="Fast jede Meldung und jeder Ship kommt aus deiner Hand, deshalb spart jeder Klick weniger bei dir am meisten Zeit." data-applies-to="Reihenfolge des Umbaus">
+    <section id="r1-audience" data-nav-label="Schwerpunkt" data-decision="r1-audience" data-ui-ok="Richtung der Arbeit, nicht die Form der Varianten" data-decision-mode="single" data-label="Schwerpunkt" data-rec="admin" data-rec-why="Fast jede Meldung und jeder Ship kommt aus deiner Hand, deshalb spart jeder Klick weniger bei dir am meisten Zeit." data-applies-to="Reihenfolge des Umbaus"><input type="hidden" name="dm-r1-audience-hes" value="{&quot;ms&quot;:15136,&quot;revisits&quot;:0,&quot;median&quot;:12390}">
       <p data-applies>Gilt für: Reihenfolge des Umbaus</p>
       <p data-situation>96 % der Themen schreibst du; Nutzer-Feedback gibt es bisher nicht.</p>
       <h3 data-question>Für wen wird das Panel zuerst neu gebaut?</h3>
       <p data-stakes>Was die erste Umsetzung verbessert und was wartet.</p>
       <div data-options>
-        <label data-opt="admin" data-recommended><input type="radio" name="dm-r1-audience" value="admin" checked><span data-opt-label>Erst deine Auftragsseite, Nutzer danach</span><span data-opt-consequence>Melden, „Du bist dran“ und Abnahme zuerst; das Nutzer-Panel bekommt danach dieselben Bausteine.</span></label><label data-opt="both"><input type="radio" name="dm-r1-audience" value="both"><span data-opt-label>Beide gleichzeitig</span><span data-opt-consequence>Ein Umbau, doppelt so groß, späteres Ergebnis.</span></label><label data-opt="user"><input type="radio" name="dm-r1-audience" value="user"><span data-opt-label>Erst Nutzer, um mehr Feedback zu bekommen</span><span data-opt-consequence>Lohnt sich erst, wenn Nutzer die App auch aktiv verwenden.</span></label>
+        <label data-opt="admin" data-recommended><input type="radio" name="dm-r1-audience" value="admin"><span data-opt-label>Erst deine Auftragsseite, Nutzer danach</span><span data-opt-consequence>Melden, „Du bist dran“ und Abnahme zuerst; das Nutzer-Panel bekommt danach dieselben Bausteine.</span></label><label data-opt="both"><input type="radio" name="dm-r1-audience" value="both" checked><span data-opt-label>Beide gleichzeitig</span><span data-opt-consequence>Ein Umbau, doppelt so groß, späteres Ergebnis.</span></label><label data-opt="user"><input type="radio" name="dm-r1-audience" value="user"><span data-opt-label>Erst Nutzer, um mehr Feedback zu bekommen</span><span data-opt-consequence>Lohnt sich erst, wenn Nutzer die App auch aktiv verwenden.</span></label>
       </div>
       <textarea data-comment="r1-audience-note" placeholder="Notiz (optional)"></textarea>
     </section>
 
-    <section id="r1-desktop" data-nav-label="Desktop-App" data-decision="r1-desktop" data-ui-ok="Ein Einstieg in der Desktop-App, nicht das Panel der Varianten" data-decision-mode="yesnoalt" data-label="Desktop-App" data-rec="yes" data-rec-why="Ein eigenes Panel in der Desktop-App wäre eine zweite Baustelle; ein Link ins Web-Panel trägt die App-Version als Kontext mit und kostet wenig." data-applies-to="Verse-Companion-App">
+    <section id="r1-desktop" data-nav-label="Desktop-App" data-decision="r1-desktop" data-ui-ok="Ein Einstieg in der Desktop-App, nicht das Panel der Varianten" data-decision-mode="yesnoalt" data-label="Desktop-App" data-rec="yes" data-rec-why="Ein eigenes Panel in der Desktop-App wäre eine zweite Baustelle; ein Link ins Web-Panel trägt die App-Version als Kontext mit und kostet wenig." data-applies-to="Verse-Companion-App"><input type="hidden" name="dm-r1-desktop-hes" value="{&quot;ms&quot;:90625,&quot;revisits&quot;:1,&quot;median&quot;:12390}">
       <p data-applies>Gilt für: Verse-Companion-App</p>
       <p data-situation>Die Desktop-App hat keinen Feedback-Weg; Desktop-Themen kommen nur über den Bereich „Desktop-Apps“ im Web.</p>
       <h3 data-question>Bekommt die Desktop-App einen Knopf, der das Web-Panel mit App-Version und Fenster öffnet?</h3>
       <p data-stakes>Ob Meldungen aus der Desktop-App mit Kontext ankommen.</p>
       <div data-options>
-        <label data-opt="yes" data-recommended><input type="radio" name="dm-r1-desktop" value="yes" checked><span data-opt-label>Ja, Link ins Web-Panel mit vorausgefülltem Kontext</span><span data-opt-consequence>Ein Knopf in der App, kein zweites Panel.</span></label><label data-opt="no"><input type="radio" name="dm-r1-desktop" value="no"><span data-opt-label>Nein, Desktop bleibt ohne</span><span data-opt-consequence>Wie heute.</span></label><label data-opt="alt"><input type="radio" name="dm-r1-desktop" value="alt"><span data-opt-label>Anders …</span><input type="text" name="dm-r1-desktop-alt" placeholder="Wie stattdessen?" value=""></label>
+        <label data-opt="yes" data-recommended><input type="radio" name="dm-r1-desktop" value="yes"><span data-opt-label>Ja, Link ins Web-Panel mit vorausgefülltem Kontext</span><span data-opt-consequence>Ein Knopf in der App, kein zweites Panel.</span></label><label data-opt="no"><input type="radio" name="dm-r1-desktop" value="no"><span data-opt-label>Nein, Desktop bleibt ohne</span><span data-opt-consequence>Wie heute.</span></label><label data-opt="alt"><input type="radio" name="dm-r1-desktop" value="alt" checked><span data-opt-label>Anders …</span><input type="text" name="dm-r1-desktop-alt" placeholder="Wie stattdessen?" value="überlege dir mal wie man sinnvoll wie man in der desktop app als nutzer feedback geben kann und ees gleichförmig aussieht wie in web, aber als admin will ich in der desktop app nicht aktiv entwickeln wie in web, das ist einfahc unpraktikabel (also der teil is tweb only) "></label>
       </div>
       <textarea data-comment="r1-desktop-note" placeholder="Notiz (optional)"></textarea>
     </section>
 
-    <section id="r1-ctx" data-nav-label="Automatischer Kontext" data-decision="r1-ctx" data-decision-mode="multi" data-label="Automatischer Kontext" data-rec="route view device version spot" data-rec-why="Diese fünf Angaben kennt die Seite ohnehin, und genau sie fragt die Routine heute am häufigsten nach oder rät sie." data-applies-to="jede neue Meldung, Admin und Nutzer">
+    <section id="r1-ctx" data-nav-label="Automatischer Kontext" data-decision="r1-ctx" data-decision-mode="multi" data-label="Automatischer Kontext" data-rec="route view device version spot" data-rec-why="Diese fünf Angaben kennt die Seite ohnehin, und genau sie fragt die Routine heute am häufigsten nach oder rät sie." data-applies-to="jede neue Meldung, Admin und Nutzer"><input type="hidden" name="dm-r1-ctx-hes" value="{&quot;ms&quot;:28963,&quot;revisits&quot;:0,&quot;median&quot;:12390}">
       <p data-applies>Gilt für: jede neue Meldung, Admin und Nutzer</p>
       <p data-situation>Nichts davon wird heute als eigenes Feld gespeichert.</p>
       <h3 data-question>Welche Angaben hängen automatisch an jeder Meldung?</h3>
@@ -405,13 +406,13 @@ Reibung
       <textarea data-comment="r1-ctx-note" placeholder="Notiz (optional)"></textarea>
     </section>
 
-    <section id="r1-kind" data-nav-label="Art der Meldung" data-decision="r1-kind" data-ui-ok="Ein Feld im Eingabekasten, das alle drei Varianten gleich zeigen" data-decision-mode="yesnoalt" data-label="Art der Meldung" data-rec="yes" data-rec-why="Bei einem Fehler darf die Routine sofort reparieren, bei einem Wunsch eher nachfragen; ein Klick erspart ihr das Raten." data-applies-to="Eingabekasten, alle Rollen">
+    <section id="r1-kind" data-nav-label="Art der Meldung" data-decision="r1-kind" data-ui-ok="Ein Feld im Eingabekasten, das alle drei Varianten gleich zeigen" data-decision-mode="yesnoalt" data-label="Art der Meldung" data-rec="yes" data-rec-why="Bei einem Fehler darf die Routine sofort reparieren, bei einem Wunsch eher nachfragen; ein Klick erspart ihr das Raten." data-applies-to="Eingabekasten, alle Rollen"><input type="hidden" name="dm-r1-kind-hes" value="{&quot;ms&quot;:7358,&quot;revisits&quot;:0,&quot;median&quot;:12390}">
       <p data-applies>Gilt für: Eingabekasten, alle Rollen</p>
       <p data-situation>Ob ein Thema ein Fehler oder ein Wunsch ist, steht heute nur im Text.</p>
       <h3 data-question>Soll jede Meldung eine Art tragen: Fehler, Wunsch oder Frage?</h3>
       <p data-stakes>Wie forsch die Routine handelt und wie sich der Strom filtern lässt.</p>
       <div data-options>
-        <label data-opt="yes" data-recommended><input type="radio" name="dm-r1-kind" value="yes" checked><span data-opt-label>Ja, drei Chips, „Fehler“ vorgewählt, ein Klick zum Ändern</span><span data-opt-consequence>Kein Pflichtfeld; ohne Klick gilt die Vorwahl.</span></label><label data-opt="no"><input type="radio" name="dm-r1-kind" value="no"><span data-opt-label>Nein, die Routine erkennt es selbst</span><span data-opt-consequence>Kein neues Feld; die Routine schreibt die Art nur in ihre Zusammenfassung.</span></label><label data-opt="alt"><input type="radio" name="dm-r1-kind" value="alt"><span data-opt-label>Anders …</span><input type="text" name="dm-r1-kind-alt" placeholder="Wie stattdessen?" value=""></label>
+        <label data-opt="yes" data-recommended><input type="radio" name="dm-r1-kind" value="yes"><span data-opt-label>Ja, drei Chips, „Fehler“ vorgewählt, ein Klick zum Ändern</span><span data-opt-consequence>Kein Pflichtfeld; ohne Klick gilt die Vorwahl.</span></label><label data-opt="no"><input type="radio" name="dm-r1-kind" value="no" checked><span data-opt-label>Nein, die Routine erkennt es selbst</span><span data-opt-consequence>Kein neues Feld; die Routine schreibt die Art nur in ihre Zusammenfassung.</span></label><label data-opt="alt"><input type="radio" name="dm-r1-kind" value="alt"><span data-opt-label>Anders …</span><input type="text" name="dm-r1-kind-alt" placeholder="Wie stattdessen?" value=""></label>
       </div>
       <textarea data-comment="r1-kind-note" placeholder="Notiz (optional)"></textarea>
     </section>
@@ -426,7 +427,7 @@ Routine fragt (needs_input) → du liest → du schreibst dem Nutzer → Nutzer 
 Der Nutzer sieht die ganze Zeit „In Bearbeitung“.</pre></div></div>
     </div>
 
-    <section id="r1-ask" data-nav-label="Rückfragen an Nutzer" data-decision="r1-ask" data-decision-mode="single" data-label="Rückfragen an Nutzer" data-rec="approve" data-rec-why="Du behältst die Kontrolle über alles, was ein Nutzer liest, sparst aber das Umformulieren und die zweite Freigabe." data-applies-to="Themen von Mitwirkenden und Nutzern">
+    <section id="r1-ask" data-nav-label="Rückfragen an Nutzer" data-decision="r1-ask" data-decision-mode="single" data-label="Rückfragen an Nutzer" data-rec="approve" data-rec-why="Du behältst die Kontrolle über alles, was ein Nutzer liest, sparst aber das Umformulieren und die zweite Freigabe." data-applies-to="Themen von Mitwirkenden und Nutzern"><input type="hidden" name="dm-r1-ask-hes" value="{&quot;ms&quot;:9644,&quot;revisits&quot;:0,&quot;median&quot;:12390}">
       <p data-applies>Gilt für: Themen von Mitwirkenden und Nutzern</p>
       <p data-situation>Die Routine darf Nutzern nie direkt schreiben; jede Frage braucht dich zweimal.</p>
       <h3 data-question>Wie erreicht eine Rückfrage der Routine den Nutzer?</h3>
@@ -437,7 +438,7 @@ Der Nutzer sieht die ganze Zeit „In Bearbeitung“.</pre></div></div>
       <textarea data-comment="r1-ask-note" placeholder="Notiz (optional)"></textarea>
     </section>
 
-    <section id="r1-release" data-nav-label="Freigabe" data-decision="r1-release" data-decision-mode="single" data-label="Freigabe" data-rec="collab" data-rec-why="Mitwirkende kennst du und sie sind wenige; Nutzer-Themen bleiben geprüft, bis klar ist, wie viel und was da kommt." data-applies-to="Eingang von Themen, die nicht von dir stammen">
+    <section id="r1-release" data-nav-label="Freigabe" data-decision="r1-release" data-decision-mode="single" data-label="Freigabe" data-rec="collab" data-rec-why="Mitwirkende kennst du und sie sind wenige; Nutzer-Themen bleiben geprüft, bis klar ist, wie viel und was da kommt." data-applies-to="Eingang von Themen, die nicht von dir stammen"><input type="hidden" name="dm-r1-release-hes" value="{&quot;ms&quot;:9327,&quot;revisits&quot;:0,&quot;median&quot;:12390}">
       <p data-applies>Gilt für: Eingang von Themen, die nicht von dir stammen</p>
       <p data-situation>Jedes Thema, das nicht von dir kommt, wartet ungeprüft, bis du es für die Routine freigibst.</p>
       <h3 data-question>Welche Themen gehen ohne deine Freigabe an die Routine?</h3>
@@ -448,7 +449,7 @@ Der Nutzer sieht die ganze Zeit „In Bearbeitung“.</pre></div></div>
       <textarea data-comment="r1-release-note" placeholder="Notiz (optional)"></textarea>
     </section>
 
-    <section id="r1-review" data-nav-label="Abnahme" data-decision="r1-review" data-ui-ok="Regel, wann ein Thema als erledigt gilt; die Varianten zeigen nur den Knopf" data-decision-mode="single" data-label="Abnahme" data-rec="batch" data-rec-why="Ein Bild der live geänderten Stelle reicht meist zum Urteil, deshalb lassen sich mehrere Lieferungen in einem Durchgang abnehmen." data-applies-to="geshippte Themen">
+    <section id="r1-review" data-nav-label="Abnahme" data-decision="r1-review" data-ui-ok="Regel, wann ein Thema als erledigt gilt; die Varianten zeigen nur den Knopf" data-decision-mode="single" data-label="Abnahme" data-rec="batch" data-rec-why="Ein Bild der live geänderten Stelle reicht meist zum Urteil, deshalb lassen sich mehrere Lieferungen in einem Durchgang abnehmen." data-applies-to="geshippte Themen"><input type="hidden" name="dm-r1-review-hes" value="{&quot;ms&quot;:8595,&quot;revisits&quot;:0,&quot;median&quot;:12390}">
       <p data-applies>Gilt für: geshippte Themen</p>
       <p data-situation>Ein Thema endet erst mit deinem Klick „Abgenommen“, einzeln pro Thema.</p>
       <h3 data-question>Wie nimmst du Lieferungen ab?</h3>
@@ -459,7 +460,7 @@ Der Nutzer sieht die ganze Zeit „In Bearbeitung“.</pre></div></div>
       <textarea data-comment="r1-review-note" placeholder="Notiz (optional)"></textarea>
     </section>
 
-    <section id="r1-status" data-nav-label="Status für Nutzer" data-decision="r1-status" data-ui-ok="Wortwahl der Stati, die alle Varianten gleich verwenden" data-decision-mode="yesnoalt" data-label="Status für Nutzer" data-rec="yes" data-rec-why="Nutzer sehen heute „In Bearbeitung“, auch wenn der Dev-PC aus ist oder ihre Antwort gebraucht wird; ein Pfad mit dem nächsten Schub macht das ehrlich." data-applies-to="Nutzer-Panel">
+    <section id="r1-status" data-nav-label="Status für Nutzer" data-decision="r1-status" data-ui-ok="Wortwahl der Stati, die alle Varianten gleich verwenden" data-decision-mode="yesnoalt" data-label="Status für Nutzer" data-rec="yes" data-rec-why="Nutzer sehen heute „In Bearbeitung“, auch wenn der Dev-PC aus ist oder ihre Antwort gebraucht wird; ein Pfad mit dem nächsten Schub macht das ehrlich." data-applies-to="Nutzer-Panel"><input type="hidden" name="dm-r1-status-hes" value="{&quot;ms&quot;:25779,&quot;revisits&quot;:0,&quot;median&quot;:12390}">
       <p data-applies>Gilt für: Nutzer-Panel</p>
       <p data-situation>Nutzer können nicht erkennen, ob ihr Thema ungeprüft liegt, der Dev-PC aus ist oder ihre Antwort fehlt: alles heißt „In Bearbeitung“.</p>
       <h3 data-question>Soll der Nutzer einen Pfad mit vier Stufen und dem nächsten Schub sehen?</h3>
@@ -467,7 +468,7 @@ Der Nutzer sieht die ganze Zeit „In Bearbeitung“.</pre></div></div>
       <div data-options>
         <label data-opt="yes" data-recommended><input type="radio" name="dm-r1-status" value="yes" checked><span data-opt-label>Ja: Eingegangen → In Arbeit → Wartet auf dich → Live, plus „Nächster Schub: heute Abend“</span><span data-opt-consequence>„Nicht umgesetzt“ bleibt als Endstation mit Begründung.</span></label><label data-opt="no"><input type="radio" name="dm-r1-status" value="no"><span data-opt-label>Nein, Stati wie heute</span><span data-opt-consequence>Kein Umbau.</span></label><label data-opt="alt"><input type="radio" name="dm-r1-status" value="alt"><span data-opt-label>Anders …</span><input type="text" name="dm-r1-status-alt" placeholder="Wie stattdessen?" value=""></label>
       </div>
-      <textarea data-comment="r1-status-note" placeholder="Notiz (optional)"></textarea>
+      <textarea data-comment="r1-status-note" placeholder="Notiz (optional)">nächsten sschub verstehe ich nicht, aber sonst gern</textarea>
     </section>
   </section>
 </section>

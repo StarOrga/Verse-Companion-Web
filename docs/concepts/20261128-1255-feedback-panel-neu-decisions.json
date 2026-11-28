@@ -1,0 +1,105 @@
+[
+  {
+    "iteration": 1,
+    "action": "iterate",
+    "favorite": "d2",
+    "decisions": [
+      {
+        "id": "r1-audience",
+        "value": "both",
+        "rec": "admin",
+        "note": ""
+      },
+      {
+        "id": "r1-desktop",
+        "value": {
+          "alt": "überlege dir mal wie man sinnvoll wie man in der desktop app als nutzer feedback geben kann und ees gleichförmig aussieht wie in web, aber als admin will ich in der desktop app nicht aktiv entwickeln wie in web, das ist einfahc unpraktikabel (also der teil is tweb only)",
+          "answer": "alt"
+        },
+        "rec": "yes",
+        "note": ""
+      },
+      {
+        "id": "r1-ctx",
+        "value": [
+          "route",
+          "view",
+          "device",
+          "version",
+          "spot"
+        ],
+        "rec": "route view device version spot",
+        "note": ""
+      },
+      {
+        "id": "r1-kind",
+        "value": {
+          "alt": "",
+          "answer": "no"
+        },
+        "rec": "yes",
+        "note": ""
+      },
+      {
+        "id": "r1-ask",
+        "value": "approve",
+        "rec": "approve",
+        "note": ""
+      },
+      {
+        "id": "r1-release",
+        "value": "collab",
+        "rec": "collab",
+        "note": ""
+      },
+      {
+        "id": "r1-review",
+        "value": "batch",
+        "rec": "batch",
+        "note": ""
+      },
+      {
+        "id": "r1-status",
+        "value": {
+          "alt": "",
+          "answer": "yes"
+        },
+        "rec": "yes",
+        "note": "nächsten sschub verstehe ich nicht, aber sonst gern"
+      }
+    ],
+    "userPins": [
+      {
+        "screen": "r1-d2-s1",
+        "target": "span.mock-fb-chip \"Wunsch\"",
+        "text": "braucht man duie auswahl hier? denn das kann claude doch selbst sich überlegen !?"
+      },
+      {
+        "screen": "r1-d2-s1",
+        "target": "button.mock-fb-btn.pri \"Anheften\"",
+        "text": "Kann ich nicht nooch weitere atafchements hinzufügen?"
+      },
+      {
+        "screen": "r1-d2-s1",
+        "target": "small \"Hängt an: Loadout › Waffen · Bild und Se\"",
+        "text": "Was ist wenn ich woander shinklicke / absende. Ich will das ja nicht alles verlorgen sehen, aber auch auf dem screen, vllt. wie bei devops concept als feedback speech bubble?!"
+      },
+      {
+        "screen": "r1-d2-s2",
+        "target": "div \"vorher\"",
+        "text": "Raffiniert!"
+      },
+      {
+        "screen": "r1-d2-s3",
+        "target": "div.mock-fb-act \"C8 PiscesC8XBeide\"",
+        "text": "Wie blendet man feedbacks aus und ein, bzw. wo kann man alle einsehen und verwalten ?!"
+      }
+    ],
+    "annotations": [
+      {
+        "id": "r1-d2-s1-a1",
+        "answer": "finde ich eigentlich recht raffiniert"
+      }
+    ]
+  }
+]
