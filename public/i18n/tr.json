@@ -2428,10 +2428,6 @@
       "shieldsNote": "Bu bloktaki her yuva, fabrikadan boş gelenler dahil değiştirilebilir bir kalkan jeneratörüdür. Kalkan kontrol modülü sabit sistemlerin yanında durur: kendi başına bir kalkan değildir ve oyunda değiştirilemez.",
       "countermeasuresNote": "Fırlatıcılar oyunda değiştirilemez, bu yüzden bu blok yalnızca bilgi içindir. Yemler (decoy) ısı güdümlü füzeleri saptırır, parazit (noise/chaff) radar güdümlü olanları kör eder. Kaç tanesine ihtiyacın olduğunu fırlatıcının bilgi sayfasında (ⓘ) görürsün: atım başına imzayı geminin kendi imzasıyla karşılaştırır.",
       "infoLabel": "Bu blok hakkında",
-      "splitRows": "Tek tek",
-      "groupRows": "Grupla",
-      "splitRowsHint": "Her hardpoint'i ayrı satırda listele, böylece tek tek değiştirebilirsin",
-      "groupRowsHint": "Aynı hardpoint'leri tek satırda birleştir",
       "unfold": "Göster",
       "foldAway": "Gizle"
     },
@@ -2449,7 +2445,6 @@
         "passive": "Pasif · şebekede değil",
         "pool": "Havuz"
       },
-      "shieldNote": "{{count}} adedin hepsi kalkan jeneratörüdür ve her biri ayrı değiştirilebilir — aynı olanlar burada üst üste gösterilir, „Tek tek“ yuva yuva listeler.",
       "shieldPassiveNote": "Pasif olan güç harcamaz ve yine de havuza tam sayılır — ama aktif olanlara bağlıdır: onlar devre dışı kalırsa yedek de gider.",
       "peek": {
         "sustainedDpsTotal": "Toplam sürekli DPS",

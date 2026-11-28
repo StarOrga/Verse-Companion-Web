@@ -4,6 +4,11 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.301.1] - 2026-11-28
+
+### Changed
+- Holotable view: identical hardpoints are always grouped (no split toggle there; the classic view keeps it), and the fixed systems sit in the area columns they belong to — Bewegung, Offensive, Signatur & Kühlung, Verteidigung — open and clickable, without the "nicht konfigurierbar" tag (#411).
+
 ## [0.301.0] - 2026-11-28
 
 ### Added

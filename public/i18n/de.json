@@ -2547,6 +2547,7 @@
       "coolers": "Kühler",
       "lifeSupport": "Lebenserhaltung",
       "structure": "Zelle & feste Systeme",
+      "fixedSystems": "Feste Systeme",
       "systems": "Antrieb & Systeme",
       "fixedTag": "nicht konfigurierbar",
       "countermeasures": "Gegenmaßnahmen",
@@ -2574,7 +2575,7 @@
         "passive": "Passiv · nicht am Netz",
         "pool": "Pool"
       },
-      "shieldNote": "Alle {{count}} sind Schild-Generatoren und jeder einzeln tauschbar — gleiche stehen hier zusammengefasst, „Einzeln“ listet sie Platz für Platz.",
+      "shieldNote": "Alle {{count}} sind Schild-Generatoren und jeder einzeln tauschbar — gleiche stehen hier in einer Zeile zusammengefasst.",
       "shieldPassiveNote": "Der passive kostet keine Energie und zählt trotzdem voll in den Pool — er hängt aber an den aktiven: fallen die aus, ist auch der Ausgleich weg.",
       "peek": {
         "sustainedDpsTotal": "Dauer-DPS gesamt",
