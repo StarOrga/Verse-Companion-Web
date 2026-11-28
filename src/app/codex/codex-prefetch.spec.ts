@@ -21,11 +21,12 @@ describe('codex prefetch warmers', () => {
     expect(CODEX_DETAIL_WARMER.key?.('/codex/ship/x')).toBe('ship:x');
   });
 
-  it('turns the detail silhouette into a nose-up arrival thumb', () => {
+  it('turns the detail silhouette into an arrival thumb on the axis of the table (nose up, no turn)', () => {
     expect(arrivalThumbOf(null)).toBeNull();
     expect(arrivalThumbOf({ viewBox: '', path: 'M0 0' })).toBeNull();
     const t = arrivalThumbOf({ viewBox: '0 0 100 40', path: 'M0 0L1 1' });
     expect(t?.path).toBe('M0 0L1 1');
-    expect(t?.transform).toContain('rotate(90');
+    expect(t?.viewBox).toBe('0 0 100 40');
+    expect(t?.transform).toBe('');
   });
 });
