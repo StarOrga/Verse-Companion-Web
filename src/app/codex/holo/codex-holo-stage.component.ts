@@ -716,7 +716,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
                  located SCU on its chip, and an open cargo gap said aloud (r1-gaps = show). -->
             <div class="vf vd" role="group" [attr.aria-label]="'codex.holo.interior.deckFilterAria' | translate">
               <span class="vw-gl">{{ 'codex.holo.interior.deckFilter' | translate }}</span>
-              <div class="vf-row vd-row">
+              <div class="vf-row vd-row" (wheel)="wheelSideways($event)">
                 @for (c of deckFilterChips(); track c.id) {
                   <button type="button" class="vf-chip vd-chip" [attr.data-deck]="c.id"
                           [class.on]="c.key === deckFilter()" [attr.aria-pressed]="c.key === deckFilter()"
@@ -1041,7 +1041,7 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   border-radius: 12px 12px 0 0; background: color-mix(in srgb, var(--sc-bg-0) 88%, var(--sc-accent) 4%); }
   .vw { display: flex; align-items: flex-end; gap: 6px; min-width: 0; flex: none; }
   .vw-grp { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-  .vw-gl { font-family: var(--d); font-size: max(13px, var(--f)); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-fg-2); padding-inline-start: 2px; min-height: 1.2em; white-space: nowrap; }
+  .vw-gl { font-family: var(--d); font-size: max(13px, var(--f)); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-fg-2); padding-inline-start: 2px; min-height: 1.2em; line-height: 1.2; white-space: nowrap; }
   .vw-row { display: flex; gap: 5px; }
   .vw-div { width: 1px; align-self: stretch; background: var(--l1); margin: 0 3px; }
   .vw-thumb { flex: none; width: 62px; display: flex; flex-direction: column; align-items: stretch; gap: 3px; padding: 0; background: none; border: 0; cursor: pointer; color: var(--sc-fg-2); font: inherit; }
@@ -1083,8 +1083,10 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
   .vd-gap { flex: none; white-space: nowrap; font-size: max(13px, var(--f)); color: var(--sc-warning); padding: 0 8px; line-height: 24px;
   border: 1px dashed color-mix(in srgb, var(--sc-warning) 55%, transparent); border-radius: 13px; }
   .vd-gap:focus-visible { outline: 1px solid transparent; box-shadow: var(--sc-focus-ring); }
-  /* From the tablet up the chips wrap onto a second line instead of hiding behind a fade: every chip is in reach (N6). */
-  @media (min-width: 641px) { .vd-row { flex-wrap: wrap; row-gap: 6px; overflow: visible; mask-image: none; padding-inline-end: 0; } }
+  /* Every chip in reach (N6): a tall desktop wraps the chips onto a second line; a short one (1280 x 800) keeps one row, because a
+     second line takes its height from the fixed card and clipped the Standing radar (QA round 3, R1). There the fade marks the
+     overflow and the mouse wheel scrolls the row sideways (wheelSideways). */
+  @media (min-width: 641px) and (min-height: 901px) { .vd-row { flex-wrap: wrap; row-gap: 6px; overflow: visible; mask-image: none; padding-inline-end: 0; } }
   /* The fixed card's patch slot (C18): only on the Änderungen tab. */
   .patch-slot { margin-bottom: 10px; }
   .chg-sw { display: block; margin-bottom: 10px; }
@@ -1753,6 +1755,16 @@ export class CodexHoloStageComponent implements DetailSlotSource {
   });
 
   /** A deck filter chip; on Oben/Seite/Front or the Akte it brings Einfach back, where a deck shows. */
+  /** A plain mouse wheel over the one-row deck chips scrolls them sideways while they can still move; at either end the page scrolls. */
+  wheelSideways(e: WheelEvent): void {
+    const row = e.currentTarget as HTMLElement;
+    if (e.shiftKey || e.ctrlKey || Math.abs(e.deltaX) >= Math.abs(e.deltaY) || row.scrollWidth <= row.clientWidth) return;
+    const max = row.scrollWidth - row.clientWidth;
+    if ((e.deltaY < 0 && row.scrollLeft <= 0) || (e.deltaY > 0 && row.scrollLeft >= max - 1)) return;
+    e.preventDefault();
+    row.scrollLeft += e.deltaY;
+  }
+
   pickDeckChip(c: DeckFilterChip): void {
     if (c.disabledKey || this.activeView() === 'akte') return;
     if (c.key !== null && this.surface() !== '3d' && this.surface() !== 'simple') this.pickSurface('simple');

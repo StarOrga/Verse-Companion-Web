@@ -209,7 +209,7 @@ function readShapePref(): 'hex' | 'bars' {
       <!-- Below three axes there is no shape to draw: the bars say it all. -->
       @if (ready() && result()!.axes.length >= 3 && (!holo() || shape() === 'hex')) {
         <div class="rank-col-radar">
-          <svg class="radar" [style.max-width.px]="holo() ? 270 : null" [attr.viewBox]="holo() ? '-34 -6 268 212' : '0 0 200 200'" [attr.aria-label]="copy().radarAria | translate: { name: shipName(), n: result()!.cohortSize }" role="img">
+          <svg class="radar" [attr.viewBox]="holo() ? '-34 -6 268 212' : '0 0 200 200'" [attr.aria-label]="copy().radarAria | translate: { name: shipName(), n: result()!.cohortSize }" role="img">
             <g class="rings" aria-hidden="true">
               @for (ring of rings; track ring) {
                 <polygon [attr.points]="ringPoints(ring, result()!.axes.length)" />
@@ -548,7 +548,10 @@ function readShapePref(): 'hex' | 'bars' {
     /* The axis captions sit on the rim and run past the 200-unit box on the
        flanks ("WENDIGKEIT" lost its W); the Holotable centres the radar in a
        wide column, so they may use the margin. */
-    :host(.holo) .radar { max-width: 260px; overflow: visible; }
+    :host(.holo) .radar { max-width: 270px; overflow: visible; }
+    /* The Holotisch card is as tall as the first screen leaves it: on a short desktop (1280 x 800) the radar shrinks with the
+       viewport instead of running under the card's lower edge (QA round 3, R1); 1.264 is the holo viewBox's width / height. */
+    @media (min-width: 721px) and (pointer: fine) { :host(.holo) .radar { max-width: clamp(220px, (100dvh - 610px) * 1.264, 270px); } }
     :host(.holo) .radar .ship { fill: color-mix(in srgb, var(--holo-e, var(--sc-accent)) 20%, transparent); stroke: var(--holo-e, var(--sc-accent)); }
     :host(.holo) .radar text { font-size: 7px; }
     /* Touch: the holo radar renders at about 1:1 (260px for a 268-unit viewBox),
