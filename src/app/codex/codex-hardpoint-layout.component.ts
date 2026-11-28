@@ -1177,6 +1177,17 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
     :host(.calm) button.slot-btn:hover, :host(.calm) button.kid-btn:hover { background: color-mix(in srgb, var(--sc-accent) 6%, transparent); border: 0; }
     :host(.calm) .slot.located .slot-btn { border-left: 2px solid transparent; }
     :host(.calm) .slot.located.on .slot-btn { border-left-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 8%, transparent); }
+    /* U1: the column is a size container; below ~300px the headline figure drops under the name instead of
+       squeezing it (names never break mid-word). P2: off-screen blocks skip layout and paint until near. */
+    :host(.calm) { container-type: inline-size; container-name: hxcol; }
+    :host(.calm) .mod-sec { content-visibility: auto; contain-intrinsic-size: auto 180px; }
+    :host(.calm) .slot-item { overflow-wrap: break-word; hyphens: none; word-break: normal; }
+    @container hxcol (max-width: 300px) {
+      :host(.calm) .slot-top { flex-wrap: wrap; row-gap: 4px; }
+      :host(.calm) .slot-top > .slot-head { flex: 1 1 100%; }
+      :host(.calm) .fig { flex: 1 1 100%; margin-left: 0; padding-left: 0; text-align: left; flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; }
+      :host(.calm) .fig .u { text-align: left; display: inline; }
+    }
     :host(.calm) .slot-item { color: var(--sc-fg-0); font-weight: 500; }
     :host(.calm) .slot.on .slot-item { color: var(--sc-accent); }
     :host(.calm) .fig .n { font-family: var(--font-monospace, monospace); font-size: 14px; color: var(--sc-accent); }
@@ -1404,12 +1415,16 @@ export class CodexHardpointLayoutComponent {
           }
           if (members.some((sec) => !closedDefault.has(sec))) openGroups.add(group);
         }
+        let openNow = present.filter((sec) => !closedDefault.has(sec) && !nested.has(sec));
+        // T1 (Holotisch only): on a phone the stacked columns would be one 18,000 px page. Only the first
+        // block of each column starts open; the rest sit folded behind their summary and open with a tap.
+        if (this.calm() && this.isPhoneWidth() && openNow.length > 1) {
+          openNow = openNow.slice(0, 1);
+          openGroups.clear();
+          openGroups.add(shipModuleGroupOf(openNow[0]));
+        }
         this.openGroups.set(openGroups);
-        this.openSections.set(
-          new Set<ShipModuleSection>(
-            present.filter((sec) => !closedDefault.has(sec) && !nested.has(sec)),
-          ),
-        );
+        this.openSections.set(new Set<ShipModuleSection>(openNow));
       });
     });
   }
@@ -1420,6 +1435,10 @@ export class CodexHardpointLayoutComponent {
    * clickable — no "Anzeigen" step first; the classic loadout keeps its folded
    * airframe block.
    */
+  private isPhoneWidth(): boolean {
+    return typeof matchMedia === 'function' && matchMedia('(max-width: 720px)').matches;
+  }
+
   private alwaysFolded(): ReadonlySet<ShipModuleSection> {
     return this.calm() ? new Set<ShipModuleSection>() : FOLDABLE_SECTIONS;
   }
