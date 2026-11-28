@@ -38,10 +38,6 @@ const I18N_DE = {
       structure: 'Zelle & feste Systeme',
       remoteTurrets: 'Ferngesteuerte Türme',
       fixedTag: 'nicht konfigurierbar',
-      splitRows: 'Einzeln',
-      groupRows: 'Zusammenfassen',
-      splitRowsHint: 'Jeden Platz einzeln auflisten',
-      groupRowsHint: 'Gleiche Plätze wieder zusammenfassen',
       unfold: 'Anzeigen',
       foldAway: 'Einklappen',
     },
@@ -147,13 +143,12 @@ describe('Codex detail blocks at a 375px viewport', () => {
 
   afterEach(() => TestBed.resetTestingModule());
 
-  it('keeps a hardpoint section head with the split toggle and the fold caret inside the phone width', () => {
+  it('keeps a hardpoint section head with the fold caret inside the phone width', () => {
     // The worst case on a real hull: a long section label, a count, the
-    // "nicht konfigurierbar" tag, the splittable toggle AND the fold caret on
-    // one line (MASTER §6: every block is now a native <details>/<summary>, so
-    // folding itself is the built-in caret, not a second `.sec-btn`). Three
-    // identical slots make the block splittable; `structure`
-    // is the foldable block.
+    // "nicht konfigurierbar" tag AND the fold caret on one line (MASTER §6:
+    // every block is a native <details>/<summary>, so folding itself is the
+    // built-in caret). Rows are always grouped (#411), so there is no split
+    // toggle any more; `structure` is the foldable block.
     const mount = slot({
       port: 'Hardpoint Turret Remote',
       className: 'BEHR_BallisticGatling_S4',
@@ -175,7 +170,7 @@ describe('Codex detail blocks at a 375px viewport', () => {
 
     const head = frame.querySelector('.sec-head') as HTMLElement;
     expect(head, 'the section head renders').not.toBeNull();
-    expect(head.querySelectorAll('.sec-btn').length, 'the split toggle is on this head').toBe(1);
+    expect(head.querySelectorAll('.sec-btn').length, 'no split toggle on this head (#411)').toBe(0);
     expect(head.querySelector('.caret'), 'the fold caret is on this head').not.toBeNull();
     expect(frame.scrollWidth).toBeLessThanOrEqual(PHONE_PX);
   });
