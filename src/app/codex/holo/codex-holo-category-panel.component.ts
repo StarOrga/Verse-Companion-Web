@@ -86,13 +86,13 @@ function pctOf(v: number | null, max: number): number | null {
           @for (b of offBars(); track b.labelKey) {
             <div class="bar" [class.is-gap]="b.pct === null">
               <span class="k">{{ b.labelKey | translate }}</span>
-              <span class="track"><span class="fill" [style.inline-size.%]="b.pct ?? 0"></span></span>
+              <span class="track" aria-hidden="true"><span class="fill" [style.inline-size.%]="b.pct ?? 0"></span></span>
               <span class="v">{{ b.text }}</span>
             </div>
           }
           <div class="bar sep" [class.is-gap]="missileBar().pct === null">
             <span class="k">{{ missileBar().labelKey | translate }}</span>
-            <span class="track"><span class="fill" [style.inline-size.%]="missileBar().pct ?? 0"></span></span>
+            <span class="track" aria-hidden="true"><span class="fill" [style.inline-size.%]="missileBar().pct ?? 0"></span></span>
             <span class="v">{{ missileBar().text }}</span>
           </div>
         </div>
@@ -104,7 +104,7 @@ function pctOf(v: number | null, max: number): number | null {
           @for (b of ehpBars(); track b.labelKey) {
             <div class="bar" [class.is-gap]="b.pct === null">
               <span class="k">{{ b.labelKey | translate }}</span>
-              <span class="track"><span class="fill" [style.inline-size.%]="b.pct ?? 0"></span></span>
+              <span class="track" aria-hidden="true"><span class="fill" [style.inline-size.%]="b.pct ?? 0"></span></span>
               <span class="v">{{ b.text }}</span>
             </div>
           }
@@ -126,7 +126,7 @@ function pctOf(v: number | null, max: number): number | null {
           @for (b of speedBars(); track b.labelKey) {
             <div class="bar" [class.is-gap]="b.pct === null">
               <span class="k">{{ b.labelKey | translate }}</span>
-              <span class="track"><span class="fill" [style.inline-size.%]="b.pct ?? 0"></span></span>
+              <span class="track" aria-hidden="true"><span class="fill" [style.inline-size.%]="b.pct ?? 0"></span></span>
               <span class="v">{{ b.text }}</span>
             </div>
           }
@@ -145,7 +145,7 @@ function pctOf(v: number | null, max: number): number | null {
           @for (b of sigBars(); track b.labelKey) {
             <div class="bar" [class.is-gap]="b.pct === null">
               <span class="k">{{ b.labelKey | translate }}</span>
-              <span class="track"><span class="fill" [style.inline-size.%]="b.pct ?? 0"></span></span>
+              <span class="track" aria-hidden="true"><span class="fill" [style.inline-size.%]="b.pct ?? 0"></span></span>
               <span class="v">{{ b.text }}</span>
             </div>
           }
@@ -157,7 +157,7 @@ function pctOf(v: number | null, max: number): number | null {
             @for (b of emSourceBars(); track b.labelKey) {
               <div class="bar">
                 <span class="k">{{ b.labelKey | translate }}</span>
-                <span class="track"><span class="fill" [style.inline-size.%]="b.pct ?? 0"></span></span>
+                <span class="track" aria-hidden="true"><span class="fill" [style.inline-size.%]="b.pct ?? 0"></span></span>
                 <span class="v">{{ b.text }}</span>
               </div>
             }
@@ -168,7 +168,7 @@ function pctOf(v: number | null, max: number): number | null {
         <div class="bars">
           <div class="bar" [class.is-gap]="coolBar().pct === null">
             <span class="k">{{ coolBar().labelKey | translate }}</span>
-            <span class="track"><span class="fill" [class.over]="coolOver()" [style.inline-size.%]="coolBar().pct ?? 0"></span></span>
+            <span class="track" aria-hidden="true"><span class="fill" [class.over]="coolOver()" [style.inline-size.%]="coolBar().pct ?? 0"></span></span>
             <span class="v">{{ coolBar().text }}</span>
           </div>
         </div>
@@ -205,7 +205,7 @@ function pctOf(v: number | null, max: number): number | null {
       .bars { display: grid; gap: 4px; margin-block-start: 12px; }
       .bar { display: grid; grid-template-columns: minmax(80px, 140px) minmax(40px, 1fr) minmax(64px, auto); align-items: center; gap: 12px; }
       .bar.sep { margin-block-start: 8px; padding-block-start: 8px; border-block-start: 1px dashed var(--sc-border); }
-      .bar .k { color: var(--sc-fg-2); }
+      .bar .k { min-inline-size: 0; color: var(--sc-fg-2); overflow-wrap: anywhere; hyphens: auto; }
       .bar .v { text-align: end; font-family: var(--font-monospace, monospace); font-variant-numeric: tabular-nums; color: var(--sc-fg-0); white-space: nowrap; }
       .bar.is-gap .v { color: var(--sc-fg-2); }
       .track { display: block; block-size: 8px; border-radius: 2px; background: color-mix(in srgb, var(--sc-fg-2) 18%, transparent); overflow: hidden; }
@@ -306,7 +306,7 @@ export class CodexHoloCategoryPanelComponent {
   /** Missiles stand apart: one hit's worth of damage, not part of any gun DPS. */
   protected readonly missileBar = computed<Bar>(() => {
     const v = this.models().offensive.detail.missileDamage;
-    return this.bar('codex.holo.panel.offensive.missiles', v, v ?? 0, 'int');
+    return this.bar('codex.holo.panel.offensive.missiles', v !== null && v > 0 ? v : null, v ?? 0, 'int');
   });
 
   protected readonly gunnerPct = computed(() => {

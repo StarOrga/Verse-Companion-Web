@@ -176,27 +176,21 @@ const round1 = (v: number): number => Math.round(v * 10) / 10;
           </div>
 
           <div class="en-side">
-            @if (chips().length > 0) {
-              <div class="deltas" data-testid="en-chips" aria-live="polite">
-                <span class="k">{{ 'codex.holo.energy.changes' | translate }}</span>
-                @for (c of chips(); track c.key) {
-                  <span class="dl">{{ c.labelKey | translate }}<span class="chip" [class.is-better]="c.tone === 'better'" [class.is-worse]="c.tone === 'worse'">{{ c.text }}</span></span>
-                }
-              </div>
-            } @else {
-              <div class="cool">
-                <span class="k">{{ 'codex.energy.fact.coolingLoad' | translate }}</span>
-                <span class="v">{{ coolingText() }}</span>
-                <span class="cool-b" aria-hidden="true"><i [style.width.%]="coolingBar()"></i></span>
-              </div>
-            }
-            @if (chips().length > 0) {
-              <div class="cool">
-                <span class="k">{{ 'codex.energy.fact.coolingLoad' | translate }}</span>
-                <span class="v">{{ coolingText() }}</span>
-                <span class="cool-b" aria-hidden="true"><i [style.width.%]="coolingBar()"></i></span>
-              </div>
-            }
+            <div class="live" aria-live="polite">
+              @if (chips().length > 0) {
+                <div class="deltas" data-testid="en-chips">
+                  <span class="k">{{ 'codex.holo.energy.changes' | translate }}</span>
+                  @for (c of chips(); track c.key) {
+                    <span class="dl">{{ c.labelKey | translate }}<span class="chip" [class.is-better]="c.tone === 'better'" [class.is-worse]="c.tone === 'worse'">{{ c.text }}</span></span>
+                  }
+                </div>
+              }
+            </div>
+            <div class="cool">
+              <span class="k">{{ 'codex.energy.fact.coolingLoad' | translate }}</span>
+              <span class="v">{{ coolingText() }}</span>
+              <span class="cool-b" aria-hidden="true"><i [style.width.%]="coolingBar()"></i></span>
+            </div>
             @if (coolingNote(); as note) {
               <p class="note">{{ note.key | translate: note.params }}</p>
             }
@@ -239,7 +233,7 @@ const round1 = (v: number): number => Math.round(v * 10) / 10;
       .grp[data-p='signature'] { --p: var(--sc-area-signature); }
       .grp-cols { display: flex; gap: 4px; justify-content: center; align-items: flex-end; flex: 1 1 auto; }
       .grp-l { margin-top: 8px; padding-top: 4px; border-top: 2px solid var(--p); font-family: var(--disp); font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--p); text-align: center; white-space: nowrap; }
-      .col { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; inline-size: 76px; }
+      .col { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; min-inline-size: 76px; max-inline-size: 112px; inline-size: max-content; }
       .cnt { font-family: var(--mono); font-size: 14px; color: var(--sc-fg-0); font-variant-numeric: tabular-nums; }
       .cnt.is-zero { color: var(--sc-fg-2); }
       .stack { display: flex; flex-direction: column-reverse; justify-content: flex-start; gap: 4px; block-size: calc(var(--n, 1) * 16px - 4px); }
@@ -252,7 +246,7 @@ const round1 = (v: number): number => Math.round(v * 10) / 10;
       @media (hover: hover) { .gbtn:hover { border-color: var(--p); background: color-mix(in srgb, var(--p) 10%, transparent); } }
       .gbtn.is-off { color: var(--sc-fg-2); border-style: dashed; }
       .gbtn:focus-visible, .stp:focus-visible, .reset:focus-visible { outline: 1px solid transparent; box-shadow: var(--sc-focus-ring); }
-      .cl { max-inline-size: 100%; min-block-size: 2.5em; font-size: 13px; line-height: 1.25; color: var(--sc-fg-1); text-align: center; hyphens: auto; overflow-wrap: break-word; }
+      .cl { max-inline-size: 100%; min-block-size: 2.5em; font-size: 13px; line-height: 1.25; color: var(--sc-fg-1); text-align: center; hyphens: auto; overflow-wrap: break-word; text-wrap: balance; }
       .step { display: inline-flex; gap: 4px; }
       .stp { display: grid; place-items: center; inline-size: 28px; block-size: 28px; padding: 0; border: 1px solid var(--sc-border); border-radius: 4px; background: none; color: var(--sc-fg-1); cursor: pointer; }
       .stp svg { inline-size: 14px; block-size: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
@@ -274,7 +268,7 @@ const round1 = (v: number): number => Math.round(v * 10) / 10;
       .reset { align-self: flex-start; margin-top: auto; }
       /* Touch: the steppers and segments reach the 44 px floor; the row scrolls sideways instead of squeezing. */
       @media (pointer: coarse) {
-        .col { inline-size: 104px; }
+        .col { min-inline-size: 104px; max-inline-size: 120px; }
         .stp { inline-size: 44px; block-size: 44px; }
         .gbtn { inline-size: 44px; block-size: 44px; }
         .seg { block-size: 16px; inline-size: 44px; }

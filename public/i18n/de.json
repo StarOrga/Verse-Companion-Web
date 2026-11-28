@@ -1508,16 +1508,24 @@
         "thin": "Nur {{n}} Schiffe in dieser Klasse – zu wenige für einen Rang",
         "betterThan": "besser als {{n}} % der Klasse",
         "quieterThan": "leiser als {{n}} % der Klasse",
-        "median": "Mitte",
+        "median": "Klassenmitte",
         "firstReveals": "zuerst verrät dich",
         "emKm": "EM entdeckt ab",
         "irKm": "IR entdeckt ab",
         "csKm": "Querschnitt",
-        "maxSpeed": "Maximal"
+        "maxSpeed": "Maximalgeschwindigkeit"
       },
       "part": {
         "grade": "Güte {{grade}}",
-        "share": "{{pct}} % von {{total}}"
+        "share": "{{pct}} % von {{total}}",
+        "shareOnly": "{{pct}} %",
+        "of": {
+          "shieldHp": "{{n}} Schild-HP",
+          "driveSpeed": "{{n}} km/s Quantum-Geschwindigkeit",
+          "plantEm": "{{n}} EM (Kraftwerk)",
+          "coolerRate": "{{n}} Kühlleistung",
+          "radarEm": "{{n}} EM (Radar)"
+        }
       },
       "panel": {
         "close": "Übersicht schließen",
@@ -1574,11 +1582,11 @@
           "title": "Tempo und Wendigkeit",
           "scm": "SCM",
           "boost": "Boost",
-          "max": "Höchstgeschwindigkeit",
+          "max": "Maximalgeschwindigkeit",
           "pitch": "Nicken",
           "yaw": "Gieren",
           "roll": "Rollen",
-          "quantumSpeed": "Quantum-Tempo",
+          "quantumSpeed": "Quantum-Geschwindigkeit",
           "quantumRange": "Quantum-Reichweite",
           "acceleration": "Beschleunigung"
         },
@@ -1589,7 +1597,7 @@
           "crossSection": "Querschnitt",
           "lowerBetter": "Kürzere Distanz ist besser.",
           "emSources": "Woher kommt das EM-Signal",
-          "cooling": "Kühlauslastung",
+          "cooling": "Kühllast",
           "decoys": "Täuschkörper, um dich zu überstrahlen: IR {{ir}}, EM {{em}}, Querschnitt {{cs}}",
           "decoysNone": "Keine Angabe zu Täuschkörpern."
         }

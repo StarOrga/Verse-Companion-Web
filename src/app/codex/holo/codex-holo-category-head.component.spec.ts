@@ -51,4 +51,29 @@ describe('CodexHoloCategoryHeadComponent', () => {
     f.detectChanges();
     expect((f.nativeElement as HTMLElement).querySelector('.hx-head.is-dim')).toBeTruthy();
   });
+
+  it('follows the scaled lead while the weapons column is only reduced', () => {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({ imports: [CodexHoloCategoryHeadComponent], providers: [provideTranslateService({ fallbackLang: 'en' })] });
+    const base = buildHoloCategoryModels({ occupants: nomadOccupants(), ship, schemaVersion: 3 });
+    const models = { ...base, offensive: { ...base.offensive, lead: { ...base.offensive.lead, value: 506 } } };
+    const f = TestBed.createComponent(CodexHoloCategoryHeadComponent);
+    f.componentRef.setInput('area', 'offensive');
+    f.componentRef.setInput('models', models);
+    f.detectChanges();
+    const num = () => (f.nativeElement as HTMLElement).querySelector('.num')!.textContent!;
+    expect(num()).toContain('506');
+    f.componentRef.setInput('editedLead', 300);
+    f.detectChanges();
+    expect(num()).toContain('300');
+    f.componentRef.setInput('editedLead', null);
+    f.detectChanges();
+    expect(num()).toContain('506');
+  });
+
+  it('says "no class rank" for an empty cohort, never "only 0 ships"', () => {
+    const { el } = render('movement', false);
+    expect(el.querySelector('.say')!.textContent).not.toMatch(/0/);
+    expect(el.querySelector('.say')!.textContent!.trim().length).toBeGreaterThan(0);
+  });
 });
