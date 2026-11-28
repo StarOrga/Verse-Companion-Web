@@ -89,6 +89,8 @@ export class CodexHoloCategoryHeadComponent {
   readonly models = input.required<HoloCategoryModel>();
   /** The area's power is cut in the energy zone: the lead reads 0 and the ring dims. */
   readonly off = input(false);
+  /** The lead as the energy what-if computes it (e.g. a reduced weapons column); null = no edit. */
+  readonly editedLead = input<number | null>(null);
 
   protected readonly model = computed(() => this.models()[this.area()]);
 
@@ -109,7 +111,9 @@ export class CodexHoloCategoryHeadComponent {
 
   protected readonly fig = computed<Fig | null>(() => {
     const l = this.model().lead;
-    return this.figOf(this.off() && this.area() === 'offensive' && l.value !== null ? 0 : l.value);
+    if (l.value === null) return this.figOf(null);
+    if (this.off() && this.area() === 'offensive') return this.figOf(0);
+    return this.figOf(this.editedLead() ?? l.value);
   });
 
   protected readonly median = computed<{ text: string; delta: { text: string; better: boolean } | null } | null>(() => {

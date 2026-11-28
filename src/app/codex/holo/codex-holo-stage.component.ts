@@ -706,7 +706,8 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
           <section class="below-area" [attr.data-p]="a.id" [attr.aria-label]="a.labelKey | translate">
             <h3 class="area-h"><sc-area-symbol [area]="a.id" />{{ a.labelKey | translate }}</h3>
             <sc-codex-holo-category-head [area]="a.id" [models]="categoryModels()"
-              [off]="a.id === 'offensive' && weaponsOff()" />
+              [off]="a.id === 'offensive' && weaponsOff()"
+              [editedLead]="a.id === 'offensive' ? (energyEdit()?.offensiveLead ?? null) : null" />
             @if (a.sections.length > 0) {
               <sc-codex-hardpoint-layout
                 [calm]="true"
