@@ -53,8 +53,14 @@ export const SILHOUETTE_CACHE_DIR = 'silhouette-cache';
  * set of the current run.
  */
 export const PREVIEW_CACHE_DIR = 'preview-cache';
+/**
+ * Colour stills of item 3D models (`sc_extract/model_render.py`, #402): one
+ * WebP per content-addressed part plus `index.json` (class -> part). The 3D
+ * package build fills it, the NEXT catalog extract ships it as `renderImage`.
+ */
+export const MODEL_RENDER_DIR = 'model-renders';
 /** Content-keyed caches that outlive every extract and are never swept. */
-export const PERSISTENT_CACHE_DIRS: readonly string[] = [SILHOUETTE_CACHE_DIR, PREVIEW_CACHE_DIR];
+export const PERSISTENT_CACHE_DIRS: readonly string[] = [SILHOUETTE_CACHE_DIR, PREVIEW_CACHE_DIR, MODEL_RENDER_DIR];
 
 /**
  * Patch version behind a `skins-<version>` build cache, or null for a normal

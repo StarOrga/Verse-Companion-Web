@@ -91,7 +91,10 @@ class ExtractResult:
     # off the magazine entity behind `ammoContainerRecord`). Countermeasure
     # launchers and the ~50 ship guns whose round is not `<class>_AMMO` are
     # resolvable for the first time; the web no longer has to guess by name.
-    schema_version: int = 6
+    # v7 (feedback #402): an entity whose 3D package build left a model render
+    # gains `renderImage` — a WebP name in `previews/`, uploaded like
+    # `previewImage` (`model_render.RenderIndex`). Absent when there is none.
+    schema_version: int = 7
     quality_score: float = 0.0
     entity_counts: Dict[str, int] = field(default_factory=dict)
     warnings: List[str] = field(default_factory=list)

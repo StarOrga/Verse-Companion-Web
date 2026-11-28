@@ -131,6 +131,38 @@ are keyed by class name). Paints/livery lookup is by the `<root>/<MFR>/<Folder>/
 shape; a ground vehicle without a base material is simply "barren" and listed as
 skipped.
 
+### Model renders (`renderImage`, feedback #402)
+
+The catalog's only item art is `displayIcon` — the game's white 64×64 family
+glyph. While a part is built (`PartStore._publish`), `sc_extract/model_render.py`
+draws the RAW converter GLB once more — before `strip_to_geometry` drops its
+materials — into a 256 px transparent WebP: orthographic three-quarter view,
+Lambert shading, painter's algorithm in Pillow (no GPU, no new dependency).
+Colours are each material's `baseColorFactor` where the converter wrote a real
+one, otherwise the hull/glass/glow class colour; hidden materials are skipped.
+
+| Path (`.sc-companion-extracts/model-renders/`, never swept — `cleanup.ts` `MODEL_RENDER_DIR`) | What |
+|---|---|
+| `<part sha256>.webp` | one render per distinct part, written on a cache MISS only |
+| `index.json` | `{version, classes: {className: partSha256}}` — written after each `--fps` / `--items` / `--armor` kind; a class whose root has no render is dropped |
+
+Rendering is on whenever any of `--fps` / `--items` / `--armor` is (settings →
+"3D models", off by default). The NEXT catalog extract reads the index
+(`model_render.RenderIndex`), copies each listed render into `previews/` as
+`model_<sha20>.webp` and sets `payload.renderImage` (extract `schema_version`
+7); it is uploaded by the same `preview` op as `previewImage`. The list files
+(`ingest-catalog/_list-snapshots.ts`) carry it for weapon / component / item.
+An item without a model, a failed conversion or a failed render simply has no
+field; the web keeps its icon.
+
+Known limits: no textures — the converter output references the `.mtl`'s
+`.dds` maps but the part pipeline never extracts them, and the game's layered
+HardSurface shader (wear masks, tint palettes) has no offline equivalent here;
+so a render is the shaded model in its material colours, not a final in-game
+picture. Parts already in the `_parts` cache are not re-rendered; the next
+patch (which rebuilds the skins cache) fills them. Order: catalog runs before
+the 3D stage, so renders from run N reach the site with run N+1's catalog.
+
 ### CLI
 
 ```

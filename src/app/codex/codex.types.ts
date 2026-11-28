@@ -117,6 +117,8 @@ export interface BaseEntityPayload {
   tags: string[];
   iconPath: null;
   previewImage: string | null; // WebP filename in the codex-previews bucket
+  /** Colour still of the item's 3D model, a WebP name in the same bucket (#402); absent when the build has none. */
+  renderImage?: string | null;
   source: ExtractSource;
   entityKind: EntityKind;
   /** Traverse of a turret / gimbal mount (#793); absent on every other entity and on older extracts. */
