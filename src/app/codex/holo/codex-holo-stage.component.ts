@@ -1754,17 +1754,19 @@ export class CodexHoloStageComponent implements DetailSlotSource {
     return chips;
   });
 
-  /** A deck filter chip; on Oben/Seite/Front or the Akte it brings Einfach back, where a deck shows. */
-  /** A plain mouse wheel over the one-row deck chips scrolls them sideways while they can still move; at either end the page scrolls. */
+  /** A plain mouse wheel over the one-row deck chips scrolls them sideways while they can still move; at either end the page
+   *  scrolls. A mostly vertical trackpad swipe stays the page's (deltaY must clearly dominate); line-mode wheels (Firefox) count 16px a line. */
   wheelSideways(e: WheelEvent): void {
     const row = e.currentTarget as HTMLElement;
-    if (e.shiftKey || e.ctrlKey || Math.abs(e.deltaX) >= Math.abs(e.deltaY) || row.scrollWidth <= row.clientWidth) return;
+    if (e.shiftKey || e.ctrlKey || e.deltaMode === 2 || Math.abs(e.deltaY) <= 2 * Math.abs(e.deltaX) || row.scrollWidth <= row.clientWidth) return;
+    const dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
     const max = row.scrollWidth - row.clientWidth;
-    if ((e.deltaY < 0 && row.scrollLeft <= 0) || (e.deltaY > 0 && row.scrollLeft >= max - 1)) return;
+    if ((dy < 0 && row.scrollLeft <= 0) || (dy > 0 && row.scrollLeft >= max - 1)) return;
     e.preventDefault();
-    row.scrollLeft += e.deltaY;
+    row.scrollLeft += dy;
   }
 
+  /** A deck filter chip; on Oben/Seite/Front or the Akte it brings Einfach back, where a deck shows. */
   pickDeckChip(c: DeckFilterChip): void {
     if (c.disabledKey || this.activeView() === 'akte') return;
     if (c.key !== null && this.surface() !== '3d' && this.surface() !== 'simple') this.pickSurface('simple');

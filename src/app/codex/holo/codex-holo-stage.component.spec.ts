@@ -121,6 +121,52 @@ function cell(key: KpiStripCell['key'], value: number | null): KpiStripCell {
 beforeEach(() => resetHoloArrivalSession());
 
 describe('CodexHoloStageComponent', () => {
+  describe('wheelSideways (deck chips on one row)', () => {
+    function row(scrollLeft = 0): HTMLElement {
+      const el = document.createElement('div');
+      Object.defineProperty(el, 'scrollWidth', { value: 900 });
+      Object.defineProperty(el, 'clientWidth', { value: 500 });
+      let left = scrollLeft;
+      Object.defineProperty(el, 'scrollLeft', { get: () => left, set: (v: number) => { left = v; } });
+      return el;
+    }
+    function wheel(target: HTMLElement, init: WheelEventInit): WheelEvent {
+      const e = new WheelEvent('wheel', { cancelable: true, ...init });
+      Object.defineProperty(e, 'currentTarget', { value: target });
+      return e;
+    }
+
+    it('turns a vertical wheel into a sideways scroll while the row can move', async () => {
+      const c = (await setup()).componentInstance;
+      const el = row();
+      const e = wheel(el, { deltaY: 100 });
+      c.wheelSideways(e);
+      expect(el.scrollLeft).toBe(100);
+      expect(e.defaultPrevented).toBe(true);
+    });
+
+    it('leaves the page its scroll at the row end, for a trackpad swipe and with Shift', async () => {
+      const c = (await setup()).componentInstance;
+      const end = row(400);
+      const atEnd = wheel(end, { deltaY: 100 });
+      c.wheelSideways(atEnd);
+      expect(atEnd.defaultPrevented).toBe(false);
+      const diagonal = wheel(row(), { deltaY: 30, deltaX: 20 });
+      c.wheelSideways(diagonal);
+      expect(diagonal.defaultPrevented).toBe(false);
+      const shifted = wheel(row(), { deltaY: 100, shiftKey: true });
+      c.wheelSideways(shifted);
+      expect(shifted.defaultPrevented).toBe(false);
+    });
+
+    it('counts a line-mode wheel (Firefox) as 16px a line', async () => {
+      const c = (await setup()).componentInstance;
+      const el = row();
+      c.wheelSideways(wheel(el, { deltaY: 3, deltaMode: 1 }));
+      expect(el.scrollLeft).toBe(48);
+    });
+  });
+
   it('renders the neutral placeholder when there is no silhouette', async () => {
     const fixture = await setup({ silhouette: null });
     const el: HTMLElement = fixture.nativeElement;

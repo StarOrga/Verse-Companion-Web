@@ -3,7 +3,7 @@ import { ItemPathService } from '../hq/data/item-path.service';
 import { fakeItemPath } from '../shared/item-path/item-path.testing';
 import { By } from '@angular/platform-browser';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
-import { CodexSwapPickerComponent, PREPARED_TTL_MS, SwapPick, SwapTarget } from './codex-swap-picker.component';
+import { CodexSwapPickerComponent, PREPARED_TTL_MS, SwapPick, SwapTarget, isLowPolyProxy } from './codex-swap-picker.component';
 import { CodexKind, CodexService, CompatibleItem, PortQuery } from './codex.service';
 import { SwapCandidate } from './swap-table';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
@@ -231,6 +231,13 @@ describe('CodexSwapPickerComponent', () => {
     } finally {
       COMPATIBLE.pop();
     }
+  });
+
+  it('names a Low Poly proxy only by a word boundary, never inside another word', () => {
+    expect(isLowPolyProxy({ classNameSlug: 'KLWE_MassDriver_S10_LowPoly', subType: null })).toBe(true);
+    expect(isLowPolyProxy({ classNameSlug: 'x', subType: 'Low Poly' })).toBe(true);
+    expect(isLowPolyProxy({ classNameSlug: 'ITEM_Yellow_Polymer_Plate', subType: 'Yellow Poly' })).toBe(false);
+    expect(isLowPolyProxy({ classNameSlug: 'GATS_BallisticGatling_S3', subType: 'Gun' })).toBe(false);
   });
 
   it('badges the installed item EQUIPPED', async () => {

@@ -196,7 +196,7 @@ function unitKeyFor(key: string, def: SwapValueDef): string | null {
 
 /** The Low Poly stand-in of a part (subType "Low Poly" or a `_LowPoly` class). Exported for the spec. */
 export function isLowPolyProxy(it: Pick<CompatibleItem, 'classNameSlug' | 'subType'>): boolean {
-  const re = /low[\s_-]?poly/i;
+  const re = /(^|[\s_-])low[\s_-]?poly/i;
   return re.test(it.subType ?? '') || re.test(it.classNameSlug);
 }
 

@@ -1197,9 +1197,8 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
     :host(.calm) .slot.located .slot-btn { border-left: 2px solid transparent; }
     :host(.calm) .slot.located.on .slot-btn { border-left-color: var(--sc-accent); background: color-mix(in srgb, var(--sc-accent) 8%, transparent); }
     /* U1: the column is a size container; below ~300px the headline figure drops under the name instead of
-       squeezing it (names never break mid-word). P2: off-screen blocks skip layout and paint until near. */
+       squeezing it (names never break mid-word). P2: the rows of a far block are built on viewport (@defer). */
     :host(.calm) { container-type: inline-size; container-name: hxcol; }
-    :host(.calm) .mod-sec { content-visibility: auto; contain-intrinsic-size: auto 180px; }
     :host(.calm) .slot-item { overflow-wrap: break-word; hyphens: none; word-break: normal; }
     @container hxcol (max-width: 300px) {
       :host(.calm) .slot-top { flex-wrap: wrap; row-gap: 4px; }
