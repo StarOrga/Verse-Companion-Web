@@ -164,7 +164,7 @@ describe('Codex landing pane', () => {
     );
     settle();
     expect(rowsShown()).toEqual(['Tool 0', 'Ship 0', 'Ship 1', 'Gun 0']);
-    const glyphs = Array.from(host.querySelectorAll('.new li .cat')).map((g) => g.textContent!.trim());
+    const glyphs = Array.from(host.querySelectorAll('.new li .cat path')).map((g) => g.getAttribute('d'));
     expect(new Set(glyphs).size, 'each row tagged with its category glyph').toBe(3);
     expect(host.querySelector('a.more'), 'armour has nothing new of its own').toBeNull();
     expect(host.querySelector('.ph')!.textContent).toContain('neu in');
