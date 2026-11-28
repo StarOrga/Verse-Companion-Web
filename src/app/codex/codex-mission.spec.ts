@@ -1,4 +1,5 @@
 import {
+  resolveShipCapabilities,
   MISSIONS,
   detectShipCapabilities,
   foldedSectionsFor,
@@ -108,5 +109,17 @@ describe('codex-mission', () => {
       localStorage.setItem(missionStorageKey(shipClass), 'not-a-mission');
       expect(loadStoredMission(shipClass)).toBeNull();
     });
+  });
+});
+
+describe('resolveShipCapabilities (schema 7 providesMission)', () => {
+  const detected = { hasCargo: true, hasQuantum: true, hasMining: true, hasSalvage: false };
+  it('keeps the regex result on an old extract without the key', () => {
+    expect(resolveShipCapabilities(detected, {}, [])).toBe(detected);
+  });
+  it('follows the ship and its fitted items: a mining module enables Bergbau', () => {
+    expect(resolveShipCapabilities(detected, { providesMission: [] }, [])).toEqual({ ...detected, hasMining: false, hasSalvage: false });
+    expect(resolveShipCapabilities(detected, { providesMission: [] }, [{ providesMission: ['mining'] }, null]).hasMining).toBe(true);
+    expect(resolveShipCapabilities(detected, { providesMission: ['salvage'] }, []).hasSalvage).toBe(true);
   });
 });

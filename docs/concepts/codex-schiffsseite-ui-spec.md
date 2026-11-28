@@ -818,3 +818,15 @@ item pages, in Klassisch and Holotisch alike.
 - The view toggle FAB has no `aria-pressed`: its label names the view a click leads to.
 - Klassisch shows the patch as a label, not a chooser: the patch comparison paints the
   Holotisch's KPI ghosts and port pins and has no classic counterpart.
+
+## 16. Holotisch columns by Einsatz (concept 20261123-2030)
+
+Source: `docs/concepts/20261123-2030-kategorien-nach-einsatz/` (rounds 1–3, implement brief `briefs/implement.md`).
+
+- The four columns (Offensive · Verteidigung · Bewegung · Signatur & Kühlung) stay edge on edge over the strip's four areas; only their content changes.
+- Each column is a value list chosen by the active Einsatz (`EINSATZ_COLUMNS` in `src/app/codex/holo/codex-holo-columns.ts`): Kampf DPS★/Schild HP★/SCM/IR · Transport DPS leise/Rumpf HP★/Fracht★/Querschnitt leise · Reisen Rumpf HP/Q-Reichweite★/Kühllast · Schleichen Schild HP/SCM/IR★ · Bergbau Bergbaulaser★/Kühllast★ · Bergung Bergungswerkzeug★/Fracht★ · Alles = Dauer-DPS, Schild HP, SCM, IR.
+- The page opens on the Einsatz of the ship class; the reader's choice per ship is remembered.
+- No rank inside the columns; the rank and the patch comparison live in the Einordnung tab only.
+- Every row compares against the factory loadout: a bar growing from a centre mark (right better / success, left worse / warning, never danger), the delta beside it. A saved configuration is a tick on the same bar, no Werk/Gespeichert switch. A row equal to Werk shows only its value.
+- „Alle Werte“ continues the list inside the column, grouped by topic; identical weapons as „N × name“; missing values as one „n Werte fehlen“ counter.
+- Einsätze a ship is not equipped for are disabled with their reason; mining/salvage availability follows `providesMission` of the hull and its fitted items (extract schema 7).

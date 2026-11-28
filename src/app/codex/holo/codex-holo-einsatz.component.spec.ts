@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideTranslateService } from '@ngx-translate/core';
 
 import { CodexHoloEinsatzComponent } from './codex-holo-einsatz.component';
+import { AnalyticsService } from '../../core/analytics.service';
 
 const MISSIONS = [
   { id: 'all' as const, labelKey: 'codex.mission.all', sub: '17 Ports', disabledKey: null },
@@ -72,5 +73,32 @@ describe('CodexHoloEinsatzComponent (head centre, concept holotisch-feinschliff 
     document.body.click();
     fixture.detectChanges();
     expect(el.querySelector('.mission-pop')).toBeNull();
+  });
+
+  it('a choice the ship is not equipped for names its reason in the row, for screen readers and as tooltip', async () => {
+    const fixture = await setup();
+    const el = fixture.nativeElement as HTMLElement;
+    el.querySelector<HTMLButtonElement>('button.einsatz')!.click();
+    fixture.detectChanges();
+    const off = el.querySelectorAll<HTMLButtonElement>('.mission-pop .mp')[2];
+    expect(off.classList).toContain('dis');
+    expect(off.querySelector('.why')!.textContent).toContain('codex.mission.disabled');
+    const id = off.getAttribute('aria-describedby')!;
+    expect(el.querySelector('#' + id)!.classList).toContain('sc-sr-only');
+    expect(el.querySelectorAll<HTMLButtonElement>('.mission-pop .mp')[0].getAttribute('aria-describedby')).toBeNull();
+  });
+
+  it('logs a picked Einsatz as source user, never a re-pick of the active one', async () => {
+    const fixture = await setup();
+    const track = vi.spyOn(TestBed.inject(AnalyticsService), 'track').mockImplementation(() => undefined);
+    const el = fixture.nativeElement as HTMLElement;
+    el.querySelector<HTMLButtonElement>('button.einsatz')!.click();
+    fixture.detectChanges();
+    el.querySelectorAll<HTMLButtonElement>('.mission-pop .mp')[1].click();
+    expect(track).not.toHaveBeenCalled();
+    el.querySelector<HTMLButtonElement>('button.einsatz')!.click();
+    fixture.detectChanges();
+    el.querySelectorAll<HTMLButtonElement>('.mission-pop .mp')[0].click();
+    expect(track).toHaveBeenCalledWith('codex:einsatz_select', { mission: 'all', source: 'user' });
   });
 });

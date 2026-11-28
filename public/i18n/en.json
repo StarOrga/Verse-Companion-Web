@@ -1485,6 +1485,47 @@
           "cell": "Cell door"
         }
       },
+      "col": {
+        "focusSr": "Lead column of this Einsatz",
+        "quietSr": "Secondary for this Einsatz",
+        "empty": "No values for this column",
+        "gapsOne": "{{n}} value missing",
+        "gapsMany": "{{n}} values missing",
+        "betterSr": "better than factory",
+        "worseSr": "worse than factory",
+        "was": "instead of {{was}}",
+        "saved": "Saved: {{v}}",
+        "topic": {
+          "weapons": "Weapons",
+          "tools": "Tools",
+          "missiles": "Missiles",
+          "damage": "Damage & range",
+          "shield": "Shield",
+          "hull": "Hull",
+          "flight": "Flight",
+          "rates": "Turn rates",
+          "quantum": "Quantum",
+          "cargo": "Cargo",
+          "mass": "Mass",
+          "signature": "Signature",
+          "cooling": "Cooling"
+        },
+        "metric": {
+          "coolingLoad": "Cooling load",
+          "miningTool": "Mining laser",
+          "salvageTool": "Salvage tool",
+          "beamPower": "Beam power",
+          "salvageRange": "Beam range",
+          "salvageScu": "Salvage hold",
+          "ore": "Ore",
+          "projectileSpeed": "Projectile speed",
+          "shieldGenerators": "Shield generators",
+          "coolant": "Cooling used"
+        },
+        "gap": {
+          "noCooling": "The game data gives no cooling output for these coolers."
+        }
+      },
       "energy": {
         "title": "Energy",
         "used": "{{used}} / {{total}} segments used",

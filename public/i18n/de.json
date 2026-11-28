@@ -1485,6 +1485,47 @@
           "cell": "Zellentür"
         }
       },
+      "col": {
+        "focusSr": "Leitspalte dieses Einsatzes",
+        "quietSr": "Für diesen Einsatz zweitrangig",
+        "empty": "Keine Werte für diese Spalte",
+        "gapsOne": "{{n}} Wert fehlt",
+        "gapsMany": "{{n}} Werte fehlen",
+        "betterSr": "besser als ab Werk",
+        "worseSr": "schlechter als ab Werk",
+        "was": "statt {{was}}",
+        "saved": "Gespeichert: {{v}}",
+        "topic": {
+          "weapons": "Waffen",
+          "tools": "Werkzeug",
+          "missiles": "Raketen",
+          "damage": "Schaden & Reichweite",
+          "shield": "Schild",
+          "hull": "Rumpf",
+          "flight": "Flug",
+          "rates": "Drehraten",
+          "quantum": "Quantum",
+          "cargo": "Fracht",
+          "mass": "Masse",
+          "signature": "Signatur",
+          "cooling": "Kühlung"
+        },
+        "metric": {
+          "coolingLoad": "Kühllast",
+          "miningTool": "Bergbaulaser",
+          "salvageTool": "Bergungswerkzeug",
+          "beamPower": "Strahlleistung",
+          "salvageRange": "Strahlreichweite",
+          "salvageScu": "Bergungsladung",
+          "ore": "Erz",
+          "projectileSpeed": "Geschosstempo",
+          "shieldGenerators": "Schildgeneratoren",
+          "coolant": "Kühlung belegt"
+        },
+        "gap": {
+          "noCooling": "Die Spieldaten nennen für diese Kühler keine Kühlleistung."
+        }
+      },
       "energy": {
         "title": "Energie",
         "used": "{{used}} / {{total}} Segmente belegt",

@@ -2006,6 +2006,30 @@
         ]
       }
     ],
+    ".claude/rules/devops.md › devops managed block › plugin-thread notice line": [
+      {
+        "ship": "claude/laughing-proskuriakova-df9d1a",
+        "by": "Claude",
+        "value": "keep the devops plugin 0.411.2 wording (scripts/cloud-rules.js:71; its tests assert the old Project-settings wording is gone) — the block is plugin-managed and rewritten by the plugin on every ship",
+        "decided": true,
+        "at": "2026-11-28T00:36:15.395Z",
+        "hunks": [
+          "c95e3cbb9d81"
+        ]
+      }
+    ],
+    "codex-detail.component.spec.ts › Holotable test › comment": [
+      {
+        "ship": "claude/laughing-proskuriakova-df9d1a",
+        "by": "Claude",
+        "value": "merged comment (dock opened, columns unfolded) — wording only, code from main kept",
+        "decided": true,
+        "at": "2026-11-28T00:36:15.395Z",
+        "hunks": [
+          "89e334c3774b"
+        ]
+      }
+    ],
     "data-uploader/python/sc_extract/silhouette_export.py›_stderr_tail›body": [
       {
         "ship": "#1106",
@@ -2114,6 +2138,18 @@
         "at": "2026-11-15T05:05:26.249Z",
         "hunks": [
           "d45b14a0c427"
+        ]
+      }
+    ],
+    "extract.py › ExtractResult › schema_version": [
+      {
+        "ship": "claude/laughing-proskuriakova-df9d1a",
+        "by": "Claude",
+        "value": "8 — both changes raise the schema (#1277 renderImage = v7, this branch mining/salvage = v8); comment keeps both entries",
+        "decided": true,
+        "at": "2026-11-28T00:36:15.395Z",
+        "hunks": [
+          "6185e9c196a8"
         ]
       }
     ],

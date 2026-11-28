@@ -230,7 +230,7 @@ describe('CodexHoloStageComponent', () => {
   });
 
   // The tiles read the FULL sheet: a combat Einsatz still fills "Bewegung".
-  it('fills every perspective tile from allKpiCells with formatted values', async () => {
+  it('fills every column from allKpiCells with formatted values, the Einsatz lead first', async () => {
     const fixture = await setup({
       allKpiCells: [cell('sustainedDps', 1944.58), cell('shieldHp', 6336), cell('boost', 520), cell('ir', 14520)],
     });
@@ -239,11 +239,25 @@ describe('CodexHoloStageComponent', () => {
     fixture.detectChanges();
     const tiles = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('.ptile'));
     expect(tiles.length).toBe(4);
-    const nums = tiles.map((t) => t.querySelector('.big .num')!.textContent!.trim());
+    const nums = tiles.map((t) => t.querySelector('.vr.first .v')!.textContent!.trim());
     expect(nums[0]).toBe('1,945');
     expect(nums[2]).toBe('520');
     expect(nums[3]).toBe('14,520');
     expect(nums.some((n) => n.includes('1944.58'))).toBe(false);
+  });
+});
+
+describe('CodexHoloStageComponent — column values (QA D2–D4)', () => {
+  it('prints the equipment mass in tonnes under its own name and EM as plain "EM"', async () => {
+    const fixture = await setup({ allKpiCells: [cell('mass', 1039397), cell('emLoad', 11200)] });
+    const el = fixture.nativeElement as HTMLElement;
+    el.querySelector<HTMLButtonElement>('.hs-toggle')!.click();
+    fixture.detectChanges();
+    const mass = el.querySelector('.ptile[data-p="movement"] .vr[data-key="mass"]')!;
+    expect(mass.querySelector('.v')!.textContent!.trim()).toBe('1,039 t');
+    expect(mass.querySelector('.k')!.textContent).toContain('codex.hull.equippedMass');
+    const em = el.querySelector('.ptile[data-p="signature"] .vr[data-key="emLoad"]')!;
+    expect(em.querySelector('.k')!.textContent).toContain('codex.kpi.short.em');
   });
 });
 

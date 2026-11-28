@@ -1292,18 +1292,22 @@ describe('CodexDetailComponent — Holotable (Nomad fixture)', () => {
     const fixture = renderOnFakeClock();
     arrive(fixture);
     const el: HTMLElement = fixture.nativeElement;
-    // The tiles live in the strip's dock: open it, then unfold every perspective tile — the ship panel is one of them.
+    // The columns live in the strip's dock: open it, then unfold every column ("Alle Werte"): the mass row sits in Bewegung.
     el.querySelector<HTMLButtonElement>('.hs-toggle')?.click();
     fixture.detectChanges();
     el.querySelectorAll<HTMLButtonElement>('.tile-expand').forEach((b) => b.click());
     fixture.detectChanges();
-    const massRows = Array.from(el.querySelectorAll('dt')).filter((dt) =>
-      dt.textContent?.includes('codex.hull.equippedMass'),
-    );
-    // Two perspective tiles unfold the same ship panel, so the row may show
-    // twice — but always from the one source (the draft), never two values.
-    expect(massRows.length).toBeGreaterThan(0);
-    const values = new Set(massRows.map((dt) => dt.nextElementSibling?.textContent?.trim()));
+    const massRows = Array.from(el.querySelectorAll('.ptile[data-p="movement"] .vr[data-key="mass"]'));
+    // The row stands in the page-end row and in the strip's dock — always
+    // from the one source (the draft), never two values.
+    if (massRows.length === 0) {
+      // No equipment mass in this fixture: the value is hidden and named behind the gap counter.
+      el.querySelectorAll<HTMLButtonElement>('.ptile[data-p="movement"] .gaps').forEach((b) => b.click());
+      fixture.detectChanges();
+      expect(el.querySelector('.ptile[data-p="movement"] .gap-list')?.textContent).toContain('codex.hull.equippedMass');
+      return;
+    }
+    const values = new Set(massRows.map((r) => r.querySelector('.v')?.textContent?.trim()));
     expect(values.size).toBe(1);
   }));
 

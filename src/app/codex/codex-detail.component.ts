@@ -12,6 +12,7 @@ import { noteOpenedPage } from '../shell/merkliste/merkliste-opened';
 import { CompareIconComponent } from './compare-icon.component';
 import { ingredientTokenOfCrate } from '../hq/stock/hq-stock-ref';
 import { logWarn } from '../core/log';
+import { defaultMissionForClass } from './holo/codex-holo-columns';
 import { AnalyticsService } from '../core/analytics.service';
 import { toErrorKey } from '../core/describe-error';
 import { AccountPrefsService } from '../core/account-prefs.service';
@@ -180,6 +181,7 @@ import {
   CapabilityPort,
   MissionId,
   detectShipCapabilities,
+  resolveShipCapabilities,
   foldedSectionsFor,
   loadStoredMission,
   missionById,
@@ -187,12 +189,14 @@ import {
 } from './codex-mission';
 import {
   KpiShipInput,
+  type KpiSheet,
   armorSignalMultipliers,
   buildDefensivePanel,
   buildOffensivePanel,
   computeKpiSheet,
   crossSectionAxes,
   findArmorPayload,
+  quantumRangeGm,
 } from './codex-loadout-stats';
 import { CodexKpiBandComponent } from './codex-kpi-band.component';
 import { ScTooltipDirective } from '../shared/tooltip/sc-tooltip.directive';
@@ -886,6 +890,11 @@ const PLACEHOLDER_ATTACH_TYPE = new Set(['undefined', 'unknown', 'none', 'other'
             [offensivePanel]="offensivePanel()"
             [defensivePanel]="defensivePanel()"
             [shipFactGroups]="shipFactGroups()"
+            [factoryOffensivePanel]="factoryOffensivePanel()"
+            [factoryDefensivePanel]="factoryDefensivePanel()"
+            [factoryOccupants]="factorySummaryOccupants()"
+            [savedOccupants]="savedSummaryOccupants()"
+            [savedKpiSheet]="savedKpiSheet()"
             [reducedMotion]="prefersReducedMotion()"
             [seenThisSession]="holoSeenThisSession()"
             [rankCohort]="rankCohort()"
@@ -2208,7 +2217,7 @@ export class CodexDetailComponent implements OnInit {
       const section = classifyShipModule(e.itemPortName, occ) as ShipModuleSection;
       summary.push({ section, kind: hit?.kind ?? null, payload: pl, ammoPayload: undefined, count: 1, passive: false });
     }
-    const kpiShipInput: KpiShipInput = { flight: payload.flight, stats: payload.stats ?? null };
+    const kpiShipInput: KpiShipInput = { flight: payload.flight, fuelQuantum: payload.fuel?.quantum ?? null, stats: payload.stats ?? null };
     return { kpiSheet: computeKpiSheet(summary, kpiShipInput), occupants };
   };
 
@@ -3463,7 +3472,12 @@ export class CodexDetailComponent implements OnInit {
         if (kind === 'ship') await Promise.race([silEarly, new Promise<void>((r) => setTimeout(r, SILHOUETTE_HOLD_MS))]);
         if (seq !== this.loadSeq) return;
         if (kind === 'ship') {
-          this.activeMissionId.set(loadStoredMission(d.classNameSlug) ?? 'all');
+          // The reader's choice per ship wins; else the Holotisch opens on the Einsatz of the
+          // ship's class (concept r2-d-default = role). The classic page keeps "Alles".
+          const stored = loadStoredMission(d.classNameSlug);
+          const derived = this.holoView() ? defaultMissionForClass(this.rankShipClass(), this.shipCapabilities()) : 'all';
+          this.activeMissionId.set(stored ?? derived);
+          if (!stored && this.holoView()) this.analytics.track('codex:einsatz_select', { mission: derived, source: 'default' });
         }
         if (kind === 'ship') {
           this.pinnedConfigId = null;
@@ -3670,8 +3684,14 @@ export class CodexDetailComponent implements OnInit {
           qdClassName = line.className;
         }
       }
+      // Range = the ship's quantum tank over this drive's fuel use (the extract's
+      // own jumpRange is FLT_MAX and stays only a fallback). Unit: km, see fmtGm.
+      const rangeGm = quantumRangeGm(
+        (d.payload as ShipPayload | undefined)?.fuel?.quantum ?? qtFuel,
+        stats.quantum.fuelCapacity,
+      );
       this.techStats.set({
-        quantum: stats.quantum,
+        quantum: rangeGm !== null ? { ...stats.quantum, jumpRangeMm: rangeGm * 1_000_000 } : stats.quantum,
         quantumDriveClassName: qdClassName,
         hydrogenCapacity: hydrogen,
         quantumFuelCapacity: qtFuel,
@@ -4536,10 +4556,35 @@ export class CodexDetailComponent implements OnInit {
    * feeds aggregate stats), so a swapped mount's own sub-slots are skipped —
    * the draft write path does not track them separately at this stage.
    */
-  readonly draftSummaryOccupants = computed<SummaryOccupant[]>(() =>
-    this.resolvedLoadout().flatMap((r) => {
+  readonly draftSummaryOccupants = computed<SummaryOccupant[]>(() => this.occupantsForDraft(this.draft()));
+
+  /** The saved configuration's occupants (Holotisch columns: the tick on each bar); null = none on the table. */
+  readonly savedSummaryOccupants = computed<SummaryOccupant[] | null>(() => {
+    const saved = this.draftStore.savedDraft();
+    if (!saved || this.kind() !== 'ship') return null;
+    return this.occupantsForDraft(saved);
+  });
+
+  /** The saved configuration's KPI sheet, same maths as the draft's. */
+  readonly savedKpiSheet = computed<KpiSheet | null>(() => {
+    const occ = this.savedSummaryOccupants();
+    return occ ? computeKpiSheet(occ, this.kpiShipInput()) : null;
+  });
+
+  /** The factory loadout's panels: the baseline of the Holotisch columns' "Alle Werte". */
+  readonly factoryOffensivePanel = computed(() => (this.kind() === 'ship' ? buildOffensivePanel(this.summaryOccupants()) : null));
+  readonly factoryDefensivePanel = computed(() => {
+    if (this.kind() !== 'ship') return null;
+    const hull = (this.detail()?.payload as ShipPayload | undefined)?.hull;
+    return buildDefensivePanel(this.summaryOccupants(), this.armorPayload(), hull?.hp ?? null);
+  });
+  /** Public alias of the stock occupants for the stage. */
+  readonly factorySummaryOccupants = computed(() => this.summaryOccupants());
+
+  private occupantsForDraft(draft: ReadonlyMap<string, string | null>): SummaryOccupant[] {
+    return this.resolvedLoadout().flatMap((r) => {
       const configurable = isConfigurableSection(r.section);
-      const draftEntry = configurable ? this.draft().get(r.item.port) : undefined;
+      const draftEntry = configurable ? draft.get(r.item.port) : undefined;
       const item = { kind: r.kind, payload: r.payload, ammoPayload: r.ammoPayload };
       const overlay = this.draftOverlayFor(r.item.port, draftEntry, item);
       const pending = overlay.state === 'pending';
@@ -4555,18 +4600,24 @@ export class CodexDetailComponent implements OnInit {
         },
       ];
       if (draftEntry === undefined) {
-        out.push(...this.carriedDraftOccupants(r.section, r.item.port, r.item.carried, r.item.nested ?? [], configurable));
+        out.push(...this.carriedDraftOccupants(r.section, r.item.port, r.item.carried, r.item.nested ?? [], configurable, draft));
       }
       return out;
-    }),
-  );
+    });
+  }
 
   /** What this hull can even attempt — drives the mission bar's disabled chips. */
   readonly shipCapabilities = computed(() => {
     const d = this.detail();
     const ports: CapabilityPort[] = (d?.ports ?? []).map((p) => ({ portName: p.portName, types: p.types }));
-    const classNames = this.loadoutAll().map((l) => l.className);
-    return detectShipCapabilities(ports, classNames);
+    // A modular hull follows the module it carries: the draft's classes count, not only the stock ones.
+    const draft = this.draft();
+    const fitted = [
+      ...this.loadoutAll().map((l) => (draft.has(l.port) ? draft.get(l.port) : l.className)),
+      ...[...draft.entries()].filter(([path]) => path.includes('.')).map(([, v]) => v),
+    ];
+    const detected = detectShipCapabilities(ports, fitted);
+    return resolveShipCapabilities(detected, d?.payload, this.draftSummaryOccupants().map((o) => o.payload));
   });
 
   /** The ship's own ARMR_ item payload, resolved from the STOCK loadout. */
@@ -5303,6 +5354,7 @@ export class CodexDetailComponent implements OnInit {
     carried: ReadonlyMap<string, string>,
     nested: readonly string[],
     configurable: boolean,
+    draft: ReadonlyMap<string, string | null> = this.draft(),
   ): SummaryOccupant[] {
     if (!configurable) return this.carriedOccupants(section, carried, nested);
     const ammo = this.ammoPayloads();
@@ -5310,7 +5362,7 @@ export class CodexDetailComponent implements OnInit {
     const items = carriedWithDraft(
       topPort,
       carried,
-      this.draft(),
+      draft,
       (className) => {
         const hit = payloads.get(className);
         return hit ? { kind: hit.kind, payload: hit.payload, ammoPayload: ammo.get(ammoClassNameFor(className, hit.payload) ?? '') } : null;

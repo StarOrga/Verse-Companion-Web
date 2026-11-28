@@ -4,6 +4,17 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.302.0] - 2026-11-28
+
+### Added
+- Holotisch columns follow the chosen Einsatz and compare every value against the factory loadout, with saved configurations marked on the same bar
+- Einsätze a ship is not equipped for are disabled with their reason
+- Data Uploader extracts mining laser, salvage head and salvage hold figures (extract schema 8)
+- Usage dashboard tiles for the Einsatz choice and „Alle Werte“
+
+### Fixed
+- Hull HP, armour, cargo and the quantum range now appear on the ship page
+
 ## [0.301.1] - 2026-11-28
 
 ### Changed

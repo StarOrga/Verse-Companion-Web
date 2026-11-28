@@ -1,0 +1,2424 @@
+{
+ "_source": "LIVE 4.10 Data/Game2.dcb, probed 2026-11-26 (mining / salvage figures); comps trimmed to what the extractor reads, loadouts pruned to mining / salvage / module entries",
+ "classes": {
+  "AEGS_Reclaimer_CargoGrid_Salvage_Front_TEMP": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "CargoGrid",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    }
+   ]
+  },
+  "AEGS_Reclaimer_CargoGrid_Salvage_Rear_TEMP": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "CargoGrid",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    }
+   ]
+  },
+  "AEGS_Reclaimer_SCItem_Remote_Salvage_Turret_Left": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "Turret",
+      "SubType": "Utility",
+      "Size": 5
+     }
+    }
+   ]
+  },
+  "AEGS_Reclaimer_SCItem_Remote_Salvage_Turret_Right": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "Turret",
+      "SubType": "Utility",
+      "Size": 5
+     }
+    }
+   ]
+  },
+  "AEGS_Reclaimer_Salvage_Arm": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "ToolArm",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    }
+   ]
+  },
+  "AEGS_Reclaimer_Salvage_Turret_Lighting": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "Room",
+      "SubType": "UNDEFINED",
+      "Size": 4
+     }
+    }
+   ]
+  },
+  "AIModule_Unmanned_PU_PDC": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "AIModule",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    }
+   ]
+  },
+  "Cargo_ShipMining_Pod_Hyun": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "Container",
+      "SubType": "Cargo",
+      "Size": 1
+     }
+    },
+    {
+     "_Type_": "ResourceContainer",
+     "capacity": {
+      "_Type_": "SStandardCargoUnit",
+      "standardCargoUnits": 8.0
+     }
+    }
+   ]
+  },
+  "Cargo_ShipMining_Pod_Prospector": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "Container",
+      "SubType": "Cargo",
+      "Size": 1
+     }
+    },
+    {
+     "_Type_": "ResourceContainer",
+     "capacity": {
+      "_Type_": "SStandardCargoUnit",
+      "standardCargoUnits": 8.0
+     }
+    }
+   ]
+  },
+  "Cargo_ShipMining_Pod_Prospector_Collapsed": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "Container",
+      "SubType": "Cargo",
+      "Size": 1
+     }
+    },
+    {
+     "_Type_": "ResourceContainer",
+     "capacity": {
+      "_Type_": "SStandardCargoUnit",
+      "standardCargoUnits": 0.0
+     }
+    }
+   ]
+  },
+  "Controller_Light": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "LightController",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    }
+   ]
+  },
+  "Controller_Mining": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "MiningController",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    }
+   ]
+  },
+  "Controller_Salvage": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "SalvageController",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    },
+    {
+     "_Type_": "SCItemSalvageControllerParams",
+     "structuralParams": {
+      "_Type_": "SSalvageStructuralParams"
+     }
+    }
+   ]
+  },
+  "Controller_Salvage_AEGS_Reclaimer_ArmOperator": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "SalvageController",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    },
+    {
+     "_Type_": "SCItemSalvageControllerParams",
+     "structuralParams": {
+      "numFieldSupportersRequired": 0,
+      "fractureTimePerRadiusMetre": 0.8640000224113464,
+      "minFracturableRadius": 1.0,
+      "maxFracturableRadius": 255.0,
+      "minDisintegratableRadius": 0.0,
+      "maxDisintegratableRadius": 255.0,
+      "disintegrationTimePerRadiusMetre": 1.5119999647140503,
+      "disintegrationSCUPerCubicMetre": 0.005249999929219484,
+      "fieldAlignmentSpeedMultiplierEnabledFracture": true,
+      "fieldAlignmentSpeedMultiplierEnabledDisintegration": true,
+      "fieldAlignmentYieldMultiplierEnabledDisintegration": true,
+      "fieldAlignmentFalloffDistanceForward": 200.0,
+      "fieldAlignmentFalloffDistanceRadial": 90.0,
+      "fieldAlignmentSweetSpotForwardFactor": 0.05000000074505806,
+      "fieldAlignmentMaxSpeedMultiplier": 7.0,
+      "fieldAlignmentMaxYieldMultiplier": 1.0,
+      "fieldAlignmentBaselineFactor": 0.5,
+      "_Type_": "SSalvageStructuralParams"
+     }
+    }
+   ]
+  },
+  "Controller_Salvage_AEGS_Reclaimer_Turret": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "SalvageController",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    },
+    {
+     "_Type_": "SCItemSalvageControllerParams",
+     "structuralParams": {
+      "_Type_": "SSalvageStructuralParams"
+     }
+    }
+   ]
+  },
+  "Controller_Salvage_Crus_C1": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "SalvageController",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    },
+    {
+     "_Type_": "SCItemSalvageControllerParams",
+     "structuralParams": {
+      "_Type_": "SSalvageStructuralParams"
+     }
+    }
+   ]
+  },
+  "Controller_Salvage_DRAK_Vulture": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "SalvageController",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    },
+    {
+     "_Type_": "SCItemSalvageControllerParams",
+     "structuralParams": {
+      "numFieldSupportersRequired": 2,
+      "fractureTimePerRadiusMetre": 2.496000051498413,
+      "minFracturableRadius": 1.0,
+      "maxFracturableRadius": 40.5,
+      "minDisintegratableRadius": 0.0,
+      "maxDisintegratableRadius": 44.54999923706055,
+      "disintegrationTimePerRadiusMetre": 4.368000030517578,
+      "disintegrationSCUPerCubicMetre": 0.0027000000700354576,
+      "fieldAlignmentSpeedMultiplierEnabledFracture": true,
+      "fieldAlignmentSpeedMultiplierEnabledDisintegration": true,
+      "fieldAlignmentYieldMultiplierEnabledDisintegration": true,
+      "fieldAlignmentFalloffDistanceForward": 70.0,
+      "fieldAlignmentFalloffDistanceRadial": 40.0,
+      "fieldAlignmentSweetSpotForwardFactor": 0.30000001192092896,
+      "fieldAlignmentMaxSpeedMultiplier": 3.0,
+      "fieldAlignmentMaxYieldMultiplier": 1.399999976158142,
+      "fieldAlignmentBaselineFactor": 0.5,
+      "_Type_": "SSalvageStructuralParams"
+     }
+    }
+   ]
+  },
+  "Controller_Salvage_GAMA_Hyun": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "SalvageController",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    },
+    {
+     "_Type_": "SCItemSalvageControllerParams",
+     "structuralParams": {
+      "numFieldSupportersRequired": 0,
+      "fractureTimePerRadiusMetre": 1.440000057220459,
+      "minFracturableRadius": 1.0,
+      "maxFracturableRadius": 87.75,
+      "minDisintegratableRadius": 0.0,
+      "maxDisintegratableRadius": 67.5,
+      "disintegrationTimePerRadiusMetre": 4.283999919891357,
+      "disintegrationSCUPerCubicMetre": 0.0038499999791383743,
+      "fieldAlignmentSpeedMultiplierEnabledFracture": true,
+      "fieldAlignmentSpeedMultiplierEnabledDisintegration": true,
+      "fieldAlignmentYieldMultiplierEnabledDisintegration": true,
+      "fieldAlignmentFalloffDistanceForward": 100.0,
+      "fieldAlignmentFalloffDistanceRadial": 50.0,
+      "fieldAlignmentSweetSpotForwardFactor": 0.5,
+      "fieldAlignmentMaxSpeedMultiplier": 7.0,
+      "fieldAlignmentMaxYieldMultiplier": 1.2999999523162842,
+      "fieldAlignmentBaselineFactor": 0.5,
+      "_Type_": "SSalvageStructuralParams"
+     }
+    }
+   ]
+  },
+  "Controller_Salvage_TractorBeamOnly": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "SalvageController",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    },
+    {
+     "_Type_": "SCItemSalvageControllerParams",
+     "structuralParams": {
+      "_Type_": "SSalvageStructuralParams"
+     }
+    }
+   ]
+  },
+  "Controller_Weapon": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "WeaponController",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    }
+   ]
+  },
+  "DRAK_Vulture_Salvage_Arm_Left": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "ToolArm",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    }
+   ]
+  },
+  "DRAK_Vulture_Salvage_Arm_Right": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "ToolArm",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    }
+   ]
+  },
+  "Door_Ship_Exterior_AEGS_Reclaimer_Salvage_Lift": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "Door",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    },
+    {
+     "_Type_": "SEntityComponentDefaultLoadoutParams",
+     "loadout": {
+      "_Type_": "SItemPortLoadoutXMLParams",
+      "WearRange": null,
+      "DirtRange": null,
+      "SkipInventoryItemsOnMissionEntities": false,
+      "InventoryItems": [],
+      "loadoutPath": "scripts/loadouts/objects/doors/doorloadoutnonothing.xml"
+     }
+    }
+   ]
+  },
+  "GAMA_Hyun_Mining_Arm": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "ToolArm",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    }
+   ]
+  },
+  "GAMA_Hyun_Salvage_Arm_Left": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "ToolArm",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    }
+   ]
+  },
+  "GAMA_Hyun_Salvage_Arm_Right": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "ToolArm",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    }
+   ]
+  },
+  "MISC_Prospector_Mining_Arm": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "ToolArm",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    }
+   ]
+  },
+  "Mining_Laser_DRAK_Golem_S1": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "WeaponMining",
+      "SubType": "Gun",
+      "Size": 1
+     }
+    },
+    {
+     "_Type_": "SCItemWeaponComponentParams",
+     "fireActions": [
+      {
+       "_Type_": "SWeaponActionFireBeamParams",
+       "mannequinTag": {
+        "_Type_": "SMannequinTagParams",
+        "tag": "laser"
+       },
+       "damagePerSecond": {
+        "_Type_": "DamageInfo",
+        "DamagePhysical": 0.0,
+        "DamageEnergy": 3900.0,
+        "DamageDistortion": 0.0,
+        "DamageThermal": 0.0,
+        "DamageBiochemical": 0.0,
+        "DamageStun": 0.0
+       },
+       "fullDamageRange": 40.0,
+       "zeroDamageRange": 45.0
+      },
+      {
+       "_Type_": "SWeaponActionFireBeamParams",
+       "mannequinTag": {
+        "_Type_": "SMannequinTagParams",
+        "tag": "tractor"
+       },
+       "damagePerSecond": {
+        "_Type_": "DamageInfo",
+        "DamagePhysical": 0.0,
+        "DamageEnergy": 1295.0,
+        "DamageDistortion": 0.0,
+        "DamageThermal": 0.0,
+        "DamageBiochemical": 0.0,
+        "DamageStun": 0.0
+       },
+       "fullDamageRange": 40.0,
+       "zeroDamageRange": 45.0
+      }
+     ]
+    },
+    {
+     "_Type_": "SEntityComponentDefaultLoadoutParams",
+     "loadout": {
+      "_Type_": "SItemPortLoadoutManualParams",
+      "WearRange": null,
+      "DirtRange": null,
+      "SkipInventoryItemsOnMissionEntities": false,
+      "InventoryItems": [],
+      "entries": []
+     }
+    },
+    {
+     "_Type_": "SEntityComponentMiningLaserParams",
+     "throttleLerpSpeed": 7.0,
+     "throttleMinimum": 0.20000000298023224,
+     "miningLaserModifiers": {
+      "_Type_": "MiningLaserModifiers",
+      "laserInstability": {
+       "_Type_": "FloatModifierMultiplicative",
+       "showInUI": true,
+       "value": 35.0
+      },
+      "optimalChargeWindowSizeModifier": {
+       "_Type_": "FloatModifierMultiplicative",
+       "showInUI": true,
+       "value": 40.0
+      },
+      "resistanceModifier": {
+       "_Type_": "FloatModifierMultiplicative",
+       "showInUI": true,
+       "value": 25.0
+      },
+      "shatterdamageModifier": null,
+      "clusterFactorModifier": null,
+      "optimalChargeWindowRateModifier": {
+       "_Type_": "FloatModifierMultiplicative",
+       "showInUI": true,
+       "value": -40.0
+      },
+      "isOptimalRateGood": true,
+      "catastrophicChargeWindowRateModifier": null
+     },
+     "filterParams": {
+      "_Type_": "MiningFilterParams",
+      "filterModifier": {
+       "_Type_": "FloatModifierMultiplicative",
+       "showInUI": true,
+       "value": 40.0
+      }
+     },
+     "usesPowerThrottle": false
+    }
+   ]
+  },
+  "Mining_Laser_GRIN_Arbor_S0": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "WeaponMining",
+      "SubType": "Gun",
+      "Size": 0
+     }
+    },
+    {
+     "_Type_": "SCItemWeaponComponentParams",
+     "fireActions": [
+      {
+       "_Type_": "SWeaponActionFireBeamParams",
+       "mannequinTag": {
+        "_Type_": "SMannequinTagParams",
+        "tag": "laser"
+       },
+       "damagePerSecond": {
+        "_Type_": "DamageInfo",
+        "DamagePhysical": 0.0,
+        "DamageEnergy": 0.800000011920929,
+        "DamageDistortion": 0.0,
+        "DamageThermal": 0.0,
+        "DamageBiochemical": 0.0,
+        "DamageStun": 0.0
+       },
+       "fullDamageRange": 5.0,
+       "zeroDamageRange": 15.0
+      }
+     ]
+    },
+    {
+     "_Type_": "SEntityComponentDefaultLoadoutParams",
+     "loadout": {
+      "_Type_": "SItemPortLoadoutManualParams",
+      "WearRange": null,
+      "DirtRange": null,
+      "SkipInventoryItemsOnMissionEntities": false,
+      "InventoryItems": [],
+      "entries": [
+       {
+        "_Type_": "SItemPortLoadoutEntryParams",
+        "itemPortName": "Mining_Modifier_ATLS",
+        "entityClassName": "",
+        "entityClassReference": {
+         "_RecordId_": "5e414e45-0ac0-361c-ef00-50e6185dabb3",
+         "_RecordName_": "EntityClassDefinition.Mining_Modules_VehicleMod_ARGOGeo",
+         "_RecordPath_": "libs/foundry/records/entities/scitem/ships/utility/mining/miningarm/mining_modules_vehiclemod_argogeo.xml"
+        },
+        "inventoryContainer": null,
+        "loadout": null
+       }
+      ]
+     }
+    },
+    {
+     "_Type_": "SEntityComponentMiningLaserParams",
+     "throttleLerpSpeed": 6.5,
+     "throttleMinimum": 0.20000000298023224,
+     "miningLaserModifiers": {
+      "_Type_": "MiningLaserModifiers",
+      "laserInstability": {
+       "_Type_": "FloatModifierMultiplicative",
+       "showInUI": true,
+       "value": -40.0
+      },
+      "optimalChargeWindowSizeModifier": null,
+      "resistanceModifier": null,
+      "shatterdamageModifier": null,
+      "clusterFactorModifier": null,
+      "optimalChargeWindowRateModifier": null,
+      "isOptimalRateGood": true,
+      "catastrophicChargeWindowRateModifier": null
+     },
+     "filterParams": {
+      "_Type_": "MiningFilterParams",
+      "filterModifier": null
+     },
+     "usesPowerThrottle": false
+    }
+   ]
+  },
+  "Mining_Laser_GRIN_Arbor_S1": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "WeaponMining",
+      "SubType": "Gun",
+      "Size": 1
+     }
+    },
+    {
+     "_Type_": "SCItemWeaponComponentParams",
+     "fireActions": [
+      {
+       "_Type_": "SWeaponActionFireBeamParams",
+       "mannequinTag": {
+        "_Type_": "SMannequinTagParams",
+        "tag": "laser"
+       },
+       "damagePerSecond": {
+        "_Type_": "DamageInfo",
+        "DamagePhysical": 0.0,
+        "DamageEnergy": 2340.0,
+        "DamageDistortion": 0.0,
+        "DamageThermal": 0.0,
+        "DamageBiochemical": 0.0,
+        "DamageStun": 0.0
+       },
+       "fullDamageRange": 60.0,
+       "zeroDamageRange": 180.0
+      },
+      {
+       "_Type_": "SWeaponActionFireBeamParams",
+       "mannequinTag": {
+        "_Type_": "SMannequinTagParams",
+        "tag": "tractor"
+       },
+       "damagePerSecond": {
+        "_Type_": "DamageInfo",
+        "DamagePhysical": 0.0,
+        "DamageEnergy": 1850.0,
+        "DamageDistortion": 0.0,
+        "DamageThermal": 0.0,
+        "DamageBiochemical": 0.0,
+        "DamageStun": 0.0
+       },
+       "fullDamageRange": 60.0,
+       "zeroDamageRange": 180.0
+      }
+     ]
+    },
+    {
+     "_Type_": "SEntityComponentDefaultLoadoutParams",
+     "loadout": {
+      "_Type_": "SItemPortLoadoutManualParams",
+      "WearRange": null,
+      "DirtRange": null,
+      "SkipInventoryItemsOnMissionEntities": false,
+      "InventoryItems": [],
+      "entries": []
+     }
+    },
+    {
+     "_Type_": "SEntityComponentMiningLaserParams",
+     "throttleLerpSpeed": 6.5,
+     "throttleMinimum": 0.05000000074505806,
+     "miningLaserModifiers": {
+      "_Type_": "MiningLaserModifiers",
+      "laserInstability": {
+       "_Type_": "FloatModifierMultiplicative",
+       "showInUI": true,
+       "value": -35.0
+      },
+      "optimalChargeWindowSizeModifier": {
+       "_Type_": "FloatModifierMultiplicative",
+       "showInUI": true,
+       "value": 40.0
+      },
+      "resistanceModifier": {
+       "_Type_": "FloatModifierMultiplicative",
+       "showInUI": true,
+       "value": 25.0
+      },
+      "shatterdamageModifier": null,
+      "clusterFactorModifier": null,
+      "optimalChargeWindowRateModifier": null,
+      "isOptimalRateGood": true,
+      "catastrophicChargeWindowRateModifier": null
+     },
+     "filterParams": {
+      "_Type_": "MiningFilterParams",
+      "filterModifier": {
+       "_Type_": "FloatModifierMultiplicative",
+       "showInUI": true,
+       "value": 30.0
+      }
+     },
+     "usesPowerThrottle": false
+    }
+   ]
+  },
+  "Mining_Laser_SHIN_Hofstede_S2": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "WeaponMining",
+      "SubType": "Gun",
+      "Size": 2
+     }
+    },
+    {
+     "_Type_": "SCItemWeaponComponentParams",
+     "fireActions": [
+      {
+       "_Type_": "SWeaponActionFireBeamParams",
+       "mannequinTag": {
+        "_Type_": "SMannequinTagParams",
+        "tag": "laser"
+       },
+       "damagePerSecond": {
+        "_Type_": "DamageInfo",
+        "DamagePhysical": 0.0,
+        "DamageEnergy": 4060.0,
+        "DamageDistortion": 0.0,
+        "DamageThermal": 0.0,
+        "DamageBiochemical": 0.0,
+        "DamageStun": 0.0
+       },
+       "fullDamageRange": 60.0,
+       "zeroDamageRange": 180.0
+      },
+      {
+       "_Type_": "SWeaponActionFireBeamParams",
+       "mannequinTag": {
+        "_Type_": "SMannequinTagParams",
+        "tag": "tractor"
+       },
+       "damagePerSecond": {
+        "_Type_": "DamageInfo",
+        "DamagePhysical": 0.0,
+        "DamageEnergy": 1295.0,
+        "DamageDistortion": 0.0,
+        "DamageThermal": 0.0,
+        "DamageBiochemical": 0.0,
+        "DamageStun": 0.0
+       },
+       "fullDamageRange": 60.0,
+       "zeroDamageRange": 180.0
+      }
+     ]
+    },
+    {
+     "_Type_": "SEntityComponentDefaultLoadoutParams",
+     "loadout": {
+      "_Type_": "SItemPortLoadoutManualParams",
+      "WearRange": null,
+      "DirtRange": null,
+      "SkipInventoryItemsOnMissionEntities": false,
+      "InventoryItems": [],
+      "entries": []
+     }
+    },
+    {
+     "_Type_": "SEntityComponentMiningLaserParams",
+     "throttleLerpSpeed": 6.5,
+     "throttleMinimum": 0.10000000149011612,
+     "miningLaserModifiers": {
+      "_Type_": "MiningLaserModifiers",
+      "laserInstability": {
+       "_Type_": "FloatModifierMultiplicative",
+       "showInUI": true,
+       "value": 10.0
+      },
+      "optimalChargeWindowSizeModifier": {
+       "_Type_": "FloatModifierMultiplicative",
+       "showInUI": true,
+       "value": 60.0
+      },
+      "resistanceModifier": {
+       "_Type_": "FloatModifierMultiplicative",
+       "showInUI": true,
+       "value": -30.0
+      },
+      "shatterdamageModifier": null,
+      "clusterFactorModifier": null,
+      "optimalChargeWindowRateModifier": {
+       "_Type_": "FloatModifierMultiplicative",
+       "showInUI": true,
+       "value": 20.0
+      },
+      "isOptimalRateGood": true,
+      "catastrophicChargeWindowRateModifier": null
+     },
+     "filterParams": {
+      "_Type_": "MiningFilterParams",
+      "filterModifier": {
+       "_Type_": "FloatModifierMultiplicative",
+       "showInUI": true,
+       "value": 40.0
+      }
+     },
+     "usesPowerThrottle": false
+    }
+   ]
+  },
+  "Mount_Gimbal_Mining": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "UtilityTurret",
+      "SubType": "GunTurret",
+      "Size": 1
+     }
+    }
+   ]
+  },
+  "Projector_HUD_StructuralSalvage_Reclaimer": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "Display",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    }
+   ]
+  },
+  "RSI_Galaxy_CargoGrid_Module": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "CargoGrid",
+      "SubType": "Cargo",
+      "Size": 1
+     }
+    }
+   ]
+  },
+  "RSI_Galaxy_Module_Cargo": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "Module",
+      "SubType": "UNDEFINED",
+      "Size": 3
+     }
+    },
+    {
+     "_Type_": "SEntityComponentDefaultLoadoutParams",
+     "loadout": {
+      "_Type_": "SItemPortLoadoutManualParams",
+      "WearRange": null,
+      "DirtRange": null,
+      "SkipInventoryItemsOnMissionEntities": false,
+      "InventoryItems": [],
+      "entries": [
+       {
+        "_Type_": "SItemPortLoadoutEntryParams",
+        "itemPortName": "hardpoint_module_oc",
+        "entityClassName": "",
+        "entityClassReference": {
+         "_RecordId_": "0ef6438f-7a0a-36f2-36f4-28e87004ce98",
+         "_RecordName_": "EntityClassDefinition.RSI_Galaxy_Module_OC_Cargo",
+         "_RecordPath_": "libs/foundry/records/entities/scitem/ships/objectcontainers/rsi_galaxy_module_oc_cargo.xml"
+        },
+        "inventoryContainer": null,
+        "loadout": null
+       },
+       {
+        "_Type_": "SItemPortLoadoutEntryParams",
+        "itemPortName": "hardpoint_lift",
+        "entityClassName": "",
+        "entityClassReference": {
+         "_RecordId_": "7cbb4291-6d06-95d7-d03b-019751351db9",
+         "_RecordName_": "EntityClassDefinition.Door_RN_RoomConnector_Exterior_RSI_Galaxy_CargoLift",
+         "_RecordPath_": "libs/foundry/records/entities/scitem/doors/door_rn_roomconnector_exterior_rsi_galaxy_cargolift.xml"
+        },
+        "inventoryContainer": null,
+        "loadout": null
+       },
+       {
+        "_Type_": "SItemPortLoadoutEntryParams",
+        "itemPortName": "hardpoint_exterior_surround",
+        "entityClassName": "",
+        "entityClassReference": {
+         "_RecordId_": "574840e1-5e93-9f5a-4595-53b38f84708e",
+         "_RecordName_": "EntityClassDefinition.RSI_Galaxy_Module_Cargo_Surround",
+         "_RecordPath_": "libs/foundry/records/entities/scitem/ships/module/rsi/rsi_galaxy_module_cargo_surround.xml"
+        },
+        "inventoryContainer": null,
+        "loadout": null
+       },
+       {
+        "_Type_": "SItemPortLoadoutEntryParams",
+        "itemPortName": "hardpoint_cargo_grid_left",
+        "entityClassName": "",
+        "entityClassReference": {
+         "_RecordId_": "8fc5431f-2b4b-a227-952d-cfca2e67e0ba",
+         "_RecordName_": "EntityClassDefinition.RSI_Galaxy_CargoGrid_Module",
+         "_RecordPath_": "libs/foundry/records/entities/scitem/ships/cargogrid/rsi/perseus/rsi_galaxy_cargogrid_module.xml"
+        },
+        "inventoryContainer": null,
+        "loadout": null
+       },
+       {
+        "_Type_": "SItemPortLoadoutEntryParams",
+        "itemPortName": "hardpoint_cargo_grid_right",
+        "entityClassName": "",
+        "entityClassReference": {
+         "_RecordId_": "8fc5431f-2b4b-a227-952d-cfca2e67e0ba",
+         "_RecordName_": "EntityClassDefinition.RSI_Galaxy_CargoGrid_Module",
+         "_RecordPath_": "libs/foundry/records/entities/scitem/ships/cargogrid/rsi/perseus/rsi_galaxy_cargogrid_module.xml"
+        },
+        "inventoryContainer": null,
+        "loadout": null
+       },
+       {
+        "_Type_": "SItemPortLoadoutEntryParams",
+        "itemPortName": "hardpoint_console_left",
+        "entityClassName": "",
+        "entityClassReference": {
+         "_RecordId_": "62324d22-43b5-bfed-ebe4-618e62de3f9e",
+         "_RecordName_": "EntityClassDefinition.RSI_Galaxy_Cargo_Standing_Console",
+         "_RecordPath_": "libs/foundry/records/entities/scitem/ships/seat/rsi_galaxy_cargo_standing_console.xml"
+        },
+        "inventoryContainer": null,
+        "loadout": {
+         "_Type_": "SItemPortLoadoutManualParams",
+         "WearRange": null,
+         "DirtRange": null,
+         "SkipInventoryItemsOnMissionEntities": false,
+         "InventoryItems": [],
+         "entries": [
+          {
+           "_Type_": "SItemPortLoadoutEntryParams",
+           "itemPortName": "screen_rtt",
+           "entityClassName": "",
+           "entityClassReference": {
+            "_RecordId_": "fafc4ea6-edfa-c08c-1015-4bebfa593797",
+            "_RecordName_": "EntityClassDefinition.Vehicle_Screen_MFD",
+            "_RecordPath_": "libs/foundry/records/entities/scitem/ships/displays/vehicle_screen_mfd.xml"
+           },
+           "inventoryContainer": null,
+           "loadout": null
+          }
+         ]
+        }
+       },
+       {
+        "_Type_": "SItemPortLoadoutEntryParams",
+        "itemPortName": "hardpoint_tractor_left",
+        "entityClassName": "",
+        "entityClassReference": {
+         "_RecordId_": "107e40e1-939c-0e54-ca44-b6498d60118a",
+         "_RecordName_": "EntityClassDefinition.RSI_Galaxy_Cargo_Tractor_Turret",
+         "_RecordPath_": "libs/foundry/records/entities/scitem/ships/turret/rsi_galaxy_cargo_tractor_turret.xml"
+        },
+        "inventoryContainer": null,
+        "loadout": null
+       },
+       {
+        "_Type_": "SItemPortLoadoutEntryParams",
+        "itemPortName": "hardpoint_console_access_left",
+        "entityClassName": "",
+        "entityClassReference": {
+         "_RecordId_": "ddce41bf-feab-eb25-fba2-6f9be30da6be",
+         "_RecordName_": "EntityClassDefinition.RSI_Galaxy_Seat_Access_Cargo_Console",
+         "_RecordPath_": "libs/foundry/records/entities/scitem/ships/seataccess/rsi_galaxy_seat_access_cargo_console.xml"
+        },
+        "inventoryContainer": null,
+        "loadout": null
+       },
+       {
+        "_Type_": "SItemPortLoadoutEntryParams",
+        "itemPortName": "hardpoint_controller_salvage_left",
+        "entityClassName": "",
+        "entityClassReference": {
+         "_RecordId_": "338f4373-5644-b7cc-2946-34950332cbb6",
+         "_RecordName_": "EntityClassDefinition.Controller_Salvage",
+         "_RecordPath_": "libs/foundry/records/entities/scitem/ships/controller/controller_salvage.xml"
+        },
+        "inventoryContainer": null,
+        "loadout": null
+       },
+       {
+        "_Type_": "SItemPortLoadoutEntryParams",
+        "itemPortName": "hardpoint_controller_weapon_left",
+        "entityClassName": "",
+        "entityClassReference": {
+         "_RecordId_": "ded84e8d-51f1-c788-5e07-ae3d5e90ec91",
+         "_RecordName_": "EntityClassDefinition.Controller_Weapon",
+         "_RecordPath_": "libs/foundry/records/entities/scitem/ships/controller/controller_weapon.xml"
+        },
+        "inventoryContainer": null,
+        "loadout": null
+       },
+       {
+        "_Type_": "SItemPortLoadoutEntryParams",
+        "itemPortName": "hardpoint_console_right",
+        "entityClassName": "",
+        "entityClassReference": {
+         "_RecordId_": "62324d22-43b5-bfed-ebe4-618e62de3f9e",
+         "_RecordName_": "EntityClassDefinition.RSI_Galaxy_Cargo_Standing_Console",
+         "_RecordPath_": "libs/foundry/records/entities/scitem/ships/seat/rsi_galaxy_cargo_standing_console.xml"
+        },
+        "inventoryContainer": null,
+        "loadout": {
+         "_Type_": "SItemPortLoadoutManualParams",
+         "WearRange": null,
+         "DirtRange": null,
+         "SkipInventoryItemsOnMissionEntities": false,
+         "InventoryItems": [],
+         "entries": [
+          {
+           "_Type_": "SItemPortLoadoutEntryParams",
+           "itemPortName": "screen_rtt",
+           "entityClassName": "",
+           "entityClassReference": {
+            "_RecordId_": "fafc4ea6-edfa-c08c-1015-4bebfa593797",
+            "_RecordName_": "EntityClassDefinition.Vehicle_Screen_MFD",
+            "_RecordPath_": "libs/foundry/records/entities/scitem/ships/displays/vehicle_screen_mfd.xml"
+           },
+           "inventoryContainer": null,
+           "loadout": null
+          }
+         ]
+        }
+       },
+       {
+        "_Type_": "SItemPortLoadoutEntryParams",
+        "itemPortName": "hardpoint_tractor_right",
+        "entityClassName": "",
+        "entityClassReference": {
+         "_RecordId_": "107e40e1-939c-0e54-ca44-b6498d60118a",
+         "_RecordName_": "EntityClassDefinition.RSI_Galaxy_Cargo_Tractor_Turret",
+         "_RecordPath_": "libs/foundry/records/entities/scitem/ships/turret/rsi_galaxy_cargo_tractor_turret.xml"
+        },
+        "inventoryContainer": null,
+        "loadout": null
+       },
+       {
+        "_Type_": "SItemPortLoadoutEntryParams",
+        "itemPortName": "hardpoint_console_access_right",
+        "entityClassName": "",
+        "entityClassReference": {
+         "_RecordId_": "fd9c4f84-1937-6328-50cb-601e674cb49f",
+         "_RecordName_": "EntityClassDefinition.RSI_Galaxy_Seat_Access_Cargo_Console_Right",
+         "_RecordPath_": "libs/foundry/records/entities/scitem/ships/seataccess/rsi_galaxy_seat_access_cargo_console_right.xml"
+        },
+        "inventoryContainer": null,
+        "loadout": null
+       },
+       {
+        "_Type_": "SItemPortLoadoutEntryParams",
+        "itemPortName": "hardpoint_controller_salvage_right",
+        "entityClassName": "",
+        "entityClassReference": {
+         "_RecordId_": "338f4373-5644-b7cc-2946-34950332cbb6",
+         "_RecordName_": "EntityClassDefinition.Controller_Salvage",
+         "_RecordPath_": "libs/foundry/records/entities/scitem/ships/controller/controller_salvage.xml"
+        },
+        "inventoryContainer": null,
+        "loadout": null
+       },
+       {
+        "_Type_": "SItemPortLoadoutEntryParams",
+        "itemPortName": "hardpoint_controller_weapon_right",
+        "entityClassName": "",
+        "entityClassReference": {
+         "_RecordId_": "ded84e8d-51f1-c788-5e07-ae3d5e90ec91",
+         "_RecordName_": "EntityClassDefinition.Controller_Weapon",
+         "_RecordPath_": "libs/foundry/records/entities/scitem/ships/controller/controller_weapon.xml"
+        },
+        "inventoryContainer": null,
+        "loadout": null
+       },
+       {
+        "_Type_": "SItemPortLoadoutEntryParams",
+        "itemPortName": "hardpoint_sign",
+        "entityClassName": "",
+        "entityClassReference": {
+         "_RecordId_": "482a4ac5-fbfc-42f6-791c-8f45099a7eb5",
+         "_RecordName_": "EntityClassDefinition.RSI_Door_Decal_Galaxy_Cargo_Module",
+         "_RecordPath_": "libs/foundry/records/entities/scitem/decals/rsi_door_decal_galaxy_cargo_module.xml"
+        },
+        "inventoryContainer": null,
+        "loadout": null
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "SalvageDisintegrationArea": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "SalvageFieldEmitter",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    }
+   ]
+  },
+  "SalvageFieldSupporter": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "SalvageFieldSupporter",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    }
+   ]
+  },
+  "SalvageFillerStation_AEGS_Reclaimer": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "SalvageFillerStation",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    },
+    {
+     "_Type_": "SEntityComponentDefaultLoadoutParams",
+     "loadout": {
+      "_Type_": "SItemPortLoadoutManualParams",
+      "WearRange": null,
+      "DirtRange": null,
+      "SkipInventoryItemsOnMissionEntities": false,
+      "InventoryItems": [],
+      "entries": [
+       {
+        "_Type_": "SItemPortLoadoutEntryParams",
+        "itemPortName": "hardpoint_control_compacter",
+        "entityClassName": "Salvage_Fillerstation_Screen_Template",
+        "entityClassReference": null,
+        "inventoryContainer": null,
+        "loadout": null
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "SalvageFillerStation_DRAK_Vulture": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "SalvageFillerStation",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    },
+    {
+     "_Type_": "SEntityComponentDefaultLoadoutParams",
+     "loadout": {
+      "_Type_": "SItemPortLoadoutManualParams",
+      "WearRange": null,
+      "DirtRange": null,
+      "SkipInventoryItemsOnMissionEntities": false,
+      "InventoryItems": [],
+      "entries": [
+       {
+        "_Type_": "SItemPortLoadoutEntryParams",
+        "itemPortName": "port_controls_screen",
+        "entityClassName": "Salvage_Fillerstation_Screen_Template",
+        "entityClassReference": null,
+        "inventoryContainer": null,
+        "loadout": null
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "SalvageFillerStation_GAMA_Hyun": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "SalvageFillerStation",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    },
+    {
+     "_Type_": "SEntityComponentDefaultLoadoutParams",
+     "loadout": {
+      "_Type_": "SItemPortLoadoutManualParams",
+      "WearRange": null,
+      "DirtRange": null,
+      "SkipInventoryItemsOnMissionEntities": false,
+      "InventoryItems": [],
+      "entries": [
+       {
+        "_Type_": "SItemPortLoadoutEntryParams",
+        "itemPortName": "port_controls_screen",
+        "entityClassName": "",
+        "entityClassReference": {
+         "_RecordId_": "b1c64bf0-df38-d2c0-e113-189a690047b0",
+         "_RecordName_": "EntityClassDefinition.Salvage_Fillerstation_Screen_Hyun",
+         "_RecordPath_": "libs/foundry/records/entities/scitem/ships/utility/salvage/fillerstation/salvage_fillerstation_screen_hyun.xml"
+        },
+        "inventoryContainer": null,
+        "loadout": null
+       },
+       {
+        "_Type_": "SItemPortLoadoutEntryParams",
+        "itemPortName": "hardpoint_cargo_grid",
+        "entityClassName": "",
+        "entityClassReference": {
+         "_RecordId_": "d38c4386-d864-9654-225b-970c19b1fc8b",
+         "_RecordName_": "EntityClassDefinition.GAMA_Hyun_CargoGrid",
+         "_RecordPath_": "libs/foundry/records/entities/scitem/ships/cargogrid/gama/gama_hyun_cargogrid.xml"
+        },
+        "inventoryContainer": null,
+        "loadout": null
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "SalvageInternalStorage_AEGS_Reclaimer": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "SalvageInternalStorage",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    },
+    {
+     "_Type_": "ResourceContainer",
+     "capacity": {
+      "_Type_": "SStandardCargoUnit",
+      "standardCargoUnits": 448.0
+     }
+    }
+   ]
+  },
+  "SalvageInternalStorage_DRAK_Vulture": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "SalvageInternalStorage",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    },
+    {
+     "_Type_": "ResourceContainer",
+     "capacity": {
+      "_Type_": "SStandardCargoUnit",
+      "standardCargoUnits": 16.0
+     }
+    }
+   ]
+  },
+  "SalvageInternalStorage_GAMA_Hyun": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "SalvageInternalStorage",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    },
+    {
+     "_Type_": "ResourceContainer",
+     "capacity": {
+      "_Type_": "SStandardCargoUnit",
+      "standardCargoUnits": 40.0
+     }
+    }
+   ]
+  },
+  "Salvage_Buff_Modifier_Hyun": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "UNDEFINED",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    }
+   ]
+  },
+  "Salvage_Buff_Modifier_Reclaimer": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "UNDEFINED",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    }
+   ]
+  },
+  "Salvage_Buff_Modifier_Vulture": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "UNDEFINED",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    }
+   ]
+  },
+  "Salvage_Head_Salvation": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "SalvageHead",
+      "SubType": "UNDEFINED",
+      "Size": 2
+     }
+    },
+    {
+     "_Type_": "SCItemWeaponComponentParams",
+     "fireActions": [
+      {
+       "_Type_": "SWeaponActionFireSalvageRepairParams",
+       "name": "Beam",
+       "localisedName": "@LOC_PLACEHOLDER",
+       "entityTag": null,
+       "uiBindingsTag": null,
+       "aiShootingMode": "Rapid",
+       "selectableCondition": null,
+       "hasReloadModesOnUI": false,
+       "localisedFunctionalityName": "@LOC_INVALID",
+       "functionalityTag": null,
+       "salvageRepairMode": "Salvage",
+       "fireHelper": "muzzle_out",
+       "toggle": false,
+       "salvageCanFireOnFull": true,
+       "salvageRepairAmmoType": "Salvage",
+       "batteryAmmoType": "Primary",
+       "minEnergyDraw": 0.0,
+       "maxEnergyDraw": 0.0,
+       "materialEfficiency": 1.0,
+       "maxVehicleDamageRatio": 0.8999999761581421,
+       "repairedMaterialRatio": 1.0,
+       "maxHealthRepairRate": 10.0,
+       "maxDamageMapRepairRate": 10.0,
+       "healthToAmmoRatio": 0.5,
+       "rangeParams": {
+        "maxBeamDistance": 150.0,
+        "maxSensorDistance": 150.0,
+        "aimPointSensorRadius": 0.8999999761581421,
+        "aimPointIntegritySmoothTime": 0.30000001192092896,
+        "_Type_": "SSalvageRepairRangeParams"
+       },
+       "heatPerSecond": 0.0,
+       "wearPerSecond": 0.0,
+       "hitRadius": 0.0,
+       "materialGatheringGracePeriod": 0.44999998807907104,
+       "aimPointThicknessDamageThreshold": 1.0,
+       "rampUpTime": 1.0,
+       "rampDownTime": 2.0,
+       "damageThreshold": 0.0,
+       "hitType": "ElectricArc",
+       "ignoreSkiplist": false,
+       "shouldDryFireInGreenZones": true,
+       "recoil": null,
+       "recoilInterval": 0.5,
+       "beamGroupOnlyHealthTypeItemRepair": null,
+       "updateCondition": null,
+       "highlightTargetPart": false,
+       "enableProximityCheck": false,
+       "signatureEmitterParams": null
+      }
+     ]
+    }
+   ]
+  },
+  "Salvage_Head_standard": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "SalvageHead",
+      "SubType": "UNDEFINED",
+      "Size": 2
+     }
+    },
+    {
+     "_Type_": "SCItemWeaponComponentParams",
+     "fireActions": [
+      {
+       "_Type_": "SWeaponActionFireSalvageRepairParams",
+       "name": "Beam",
+       "localisedName": "@LOC_PLACEHOLDER",
+       "entityTag": null,
+       "uiBindingsTag": null,
+       "aiShootingMode": "Rapid",
+       "selectableCondition": null,
+       "hasReloadModesOnUI": false,
+       "localisedFunctionalityName": "@LOC_INVALID",
+       "functionalityTag": null,
+       "salvageRepairMode": "Salvage",
+       "fireHelper": "muzzle_out",
+       "toggle": false,
+       "salvageCanFireOnFull": true,
+       "salvageRepairAmmoType": "Salvage",
+       "batteryAmmoType": "Primary",
+       "minEnergyDraw": 0.0,
+       "maxEnergyDraw": 0.0,
+       "materialEfficiency": 1.0,
+       "maxVehicleDamageRatio": 0.8999999761581421,
+       "repairedMaterialRatio": 1.0,
+       "maxHealthRepairRate": 10.0,
+       "maxDamageMapRepairRate": 10.0,
+       "healthToAmmoRatio": 0.5,
+       "rangeParams": {
+        "maxBeamDistance": 150.0,
+        "maxSensorDistance": 150.0,
+        "aimPointSensorRadius": 0.8999999761581421,
+        "aimPointIntegritySmoothTime": 0.30000001192092896,
+        "_Type_": "SSalvageRepairRangeParams"
+       },
+       "heatPerSecond": 0.0,
+       "wearPerSecond": 0.0,
+       "hitRadius": 0.0,
+       "materialGatheringGracePeriod": 0.44999998807907104,
+       "aimPointThicknessDamageThreshold": 1.0,
+       "rampUpTime": 1.0,
+       "rampDownTime": 2.0,
+       "damageThreshold": 0.0,
+       "hitType": "ElectricArc",
+       "ignoreSkiplist": false,
+       "shouldDryFireInGreenZones": true,
+       "recoil": null,
+       "recoilInterval": 0.5,
+       "beamGroupOnlyHealthTypeItemRepair": null,
+       "updateCondition": null,
+       "highlightTargetPart": false,
+       "enableProximityCheck": false,
+       "signatureEmitterParams": null
+      }
+     ]
+    }
+   ]
+  },
+  "Salvage_Modifier_Scraper_Large": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "SalvageModifier",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    }
+   ]
+  },
+  "Salvage_Modifier_Scraper_Medium": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "SalvageModifier",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    }
+   ]
+  },
+  "Salvage_Modifier_Scraper_Small": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "SalvageModifier",
+      "SubType": "UNDEFINED",
+      "Size": 1
+     }
+    }
+   ]
+  },
+  "Salvage_Modifier_Tractor_Small": {
+   "comps": [
+    {
+     "_Type_": "SAttachableComponentParams",
+     "AttachDef": {
+      "Type": "SalvageModifier",
+      "SubType": "SalvageModifier_TractorBeam",
+      "Size": 1
+     }
+    }
+   ]
+  }
+ },
+ "loadouts": {
+  "MISC_Prospector": [
+   {
+    "itemPortName": "hardpoint_mining_arm",
+    "entityClassName": "MISC_Prospector_Mining_Arm",
+    "entries": [
+     {
+      "itemPortName": "hardpoint_mining_laser",
+      "entityClassName": "Mount_Gimbal_Mining",
+      "entries": [
+       {
+        "itemPortName": "hardpoint_mining_laser",
+        "entityClassName": "Mining_Laser_GRIN_Arbor_S1"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "itemPortName": "hardpoint_controller_mining",
+    "entityClassName": "Controller_Mining"
+   },
+   {
+    "itemPortName": "hardpoint_mining_pod_1",
+    "entityClassName": "Cargo_ShipMining_Pod_Prospector"
+   },
+   {
+    "itemPortName": "hardpoint_mining_pod_2",
+    "entityClassName": "Cargo_ShipMining_Pod_Prospector"
+   },
+   {
+    "itemPortName": "hardpoint_mining_pod_3",
+    "entityClassName": "Cargo_ShipMining_Pod_Prospector"
+   },
+   {
+    "itemPortName": "hardpoint_mining_pod_4",
+    "entityClassName": "Cargo_ShipMining_Pod_Prospector"
+   },
+   {
+    "itemPortName": "hardpoint_stored_pod_1",
+    "entityClassName": "Cargo_ShipMining_Pod_Prospector_Collapsed"
+   },
+   {
+    "itemPortName": "hardpoint_stored_pod_2",
+    "entityClassName": "Cargo_ShipMining_Pod_Prospector_Collapsed"
+   },
+   {
+    "itemPortName": "hardpoint_stored_pod_3",
+    "entityClassName": "Cargo_ShipMining_Pod_Prospector_Collapsed"
+   },
+   {
+    "itemPortName": "hardpoint_stored_pod_4",
+    "entityClassName": "Cargo_ShipMining_Pod_Prospector_Collapsed"
+   }
+  ],
+  "DRAK_Vulture": [
+   {
+    "itemPortName": "hardpoint_controller_salvage",
+    "entityClassName": "Controller_Salvage_DRAK_Vulture"
+   },
+   {
+    "itemPortName": "hardpoint_salvage_arm_left",
+    "entityClassName": "DRAK_Vulture_Salvage_Arm_Left",
+    "entries": [
+     {
+      "itemPortName": "hardpoint_salvage_laser",
+      "entityClassName": "Salvage_Head_standard",
+      "entries": [
+       {
+        "itemPortName": "hardpoint_salvage_subItem01",
+        "entityClassName": "Salvage_Modifier_Scraper_Small"
+       },
+       {
+        "itemPortName": "hardpoint_salvage_subItem02",
+        "entityClassName": "Salvage_Modifier_Tractor_Small"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "itemPortName": "hardpoint_salvage_arm_right",
+    "entityClassName": "DRAK_Vulture_Salvage_Arm_Right",
+    "entries": [
+     {
+      "itemPortName": "hardpoint_salvage_laser",
+      "entityClassName": "Salvage_Head_standard",
+      "entries": [
+       {
+        "itemPortName": "hardpoint_salvage_subItem01",
+        "entityClassName": "Salvage_Modifier_Scraper_Small"
+       },
+       {
+        "itemPortName": "hardpoint_salvage_subItem02",
+        "entityClassName": "Salvage_Modifier_Scraper_Medium"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "itemPortName": "hardpoint_refill_station",
+    "entityClassName": "SalvageFillerStation_DRAK_Vulture"
+   },
+   {
+    "itemPortName": "hardpoint_attachable_buff",
+    "entityClassName": "Salvage_Buff_Modifier_Vulture"
+   },
+   {
+    "itemPortName": "hardpoint_disintegration_area",
+    "entityClassName": "SalvageDisintegrationArea"
+   },
+   {
+    "itemPortName": "hardpoint_internal_storage",
+    "entityClassName": "SalvageInternalStorage_DRAK_Vulture"
+   },
+   {
+    "itemPortName": "hardpoint_salvage_dummy_left",
+    "entityClassName": "SalvageFieldSupporter"
+   },
+   {
+    "itemPortName": "hardpoint_salvage_dummy_right",
+    "entityClassName": "SalvageFieldSupporter"
+   }
+  ],
+  "GAMA_Hyun": [
+   {
+    "itemPortName": "hardpoint_attachable_buff",
+    "entityClassName": "Salvage_Buff_Modifier_Hyun"
+   },
+   {
+    "itemPortName": "hardpoint_controller_mining",
+    "entityClassName": "Controller_Mining"
+   },
+   {
+    "itemPortName": "hardpoint_controller_salvage",
+    "entityClassName": "Controller_Salvage_GAMA_Hyun"
+   },
+   {
+    "itemPortName": "hardpoint_disintegration_intake",
+    "entityClassName": "SalvageDisintegrationArea"
+   },
+   {
+    "itemPortName": "hardpoint_filler_station",
+    "entityClassName": "SalvageFillerStation_GAMA_Hyun"
+   },
+   {
+    "itemPortName": "hardpoint_internal_storage",
+    "entityClassName": "SalvageInternalStorage_GAMA_Hyun"
+   },
+   {
+    "itemPortName": "hardpoint_mining_arm",
+    "entityClassName": "GAMA_Hyun_Mining_Arm",
+    "entries": [
+     {
+      "itemPortName": "hardpoint_mining_laser",
+      "entityClassName": "Mount_Gimbal_Mining",
+      "entries": [
+       {
+        "itemPortName": "hardpoint_mining_laser",
+        "entityClassName": "Mining_Laser_GRIN_Arbor_S1"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "itemPortName": "hardpoint_miningpod_01",
+    "entityClassName": "Cargo_ShipMining_Pod_Hyun"
+   },
+   {
+    "itemPortName": "hardpoint_miningpod_02",
+    "entityClassName": "Cargo_ShipMining_Pod_Hyun"
+   },
+   {
+    "itemPortName": "hardpoint_miningpod_03",
+    "entityClassName": "Cargo_ShipMining_Pod_Hyun"
+   },
+   {
+    "itemPortName": "hardpoint_miningpod_04",
+    "entityClassName": "Cargo_ShipMining_Pod_Hyun"
+   },
+   {
+    "itemPortName": "hardpoint_salvage_arm_left",
+    "entityClassName": "GAMA_Hyun_Salvage_Arm_Left",
+    "entries": [
+     {
+      "itemPortName": "hardpoint_salvage_head_left",
+      "entityClassName": "Salvage_Head_standard",
+      "entries": [
+       {
+        "itemPortName": "hardpoint_salvage_subItem01",
+        "entityClassName": "Salvage_Modifier_Scraper_Medium"
+       },
+       {
+        "itemPortName": "hardpoint_salvage_subItem02",
+        "entityClassName": null
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "itemPortName": "hardpoint_salvage_arm_right",
+    "entityClassName": "GAMA_Hyun_Salvage_Arm_Right",
+    "entries": [
+     {
+      "itemPortName": "hardpoint_salvage_head_right",
+      "entityClassName": "Salvage_Head_standard",
+      "entries": [
+       {
+        "itemPortName": "hardpoint_salvage_subItem01",
+        "entityClassName": "Salvage_Modifier_Scraper_Medium"
+       },
+       {
+        "itemPortName": "hardpoint_salvage_subItem02",
+        "entityClassName": null
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "DRAK_Cutlass_Black": [
+   {
+    "itemPortName": "hardpoint_controller_salvage",
+    "entityClassName": "Controller_Salvage_Crus_C1"
+   }
+  ],
+  "AEGS_Reclaimer": [
+   {
+    "itemPortName": "hardpoint_dashboard_copilot",
+    "entityClassName": "AEGS_Reclaimer_Dashboard_CoPilot",
+    "entries": [
+     {
+      "itemPortName": "Structural_HUD",
+      "entityClassName": "Projector_HUD_StructuralSalvage_Reclaimer"
+     }
+    ]
+   },
+   {
+    "itemPortName": "hardpoint_remote_turret_salvage_left",
+    "entityClassName": "AEGS_Reclaimer_SCItem_Remote_Salvage_Turret_Left",
+    "entries": [
+     {
+      "itemPortName": "hardpoint_interior",
+      "entityClassName": "AEGS_Reclaimer_Salvage_Turret_Lighting"
+     },
+     {
+      "itemPortName": "hardpoint_weapon_salvage",
+      "entityClassName": "Salvage_Head_standard",
+      "entries": [
+       {
+        "itemPortName": "hardpoint_salvage_subItem01",
+        "entityClassName": "Salvage_Modifier_Tractor_Small"
+       },
+       {
+        "itemPortName": "hardpoint_salvage_subItem02",
+        "entityClassName": "Salvage_Modifier_Scraper_Large"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "itemPortName": "hardpoint_remote_turret_salvage_right",
+    "entityClassName": "AEGS_Reclaimer_SCItem_Remote_Salvage_Turret_Right",
+    "entries": [
+     {
+      "itemPortName": "hardpoint_interior",
+      "entityClassName": "AEGS_Reclaimer_Salvage_Turret_Lighting"
+     },
+     {
+      "itemPortName": "hardpoint_weapon_salvage",
+      "entityClassName": "Salvage_Head_standard",
+      "entries": [
+       {
+        "itemPortName": "hardpoint_salvage_subItem01",
+        "entityClassName": "Salvage_Modifier_Tractor_Small"
+       },
+       {
+        "itemPortName": "hardpoint_salvage_subItem02",
+        "entityClassName": "Salvage_Modifier_Scraper_Large"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "itemPortName": "hardpoint_controller_salvage_left",
+    "entityClassName": "Controller_Salvage_AEGS_Reclaimer_Turret"
+   },
+   {
+    "itemPortName": "hardpoint_controller_salvage_right",
+    "entityClassName": "Controller_Salvage_AEGS_Reclaimer_Turret"
+   },
+   {
+    "itemPortName": "hardpoint_controller_weapon_salvage_left",
+    "entityClassName": "Controller_Weapon"
+   },
+   {
+    "itemPortName": "hardpoint_controller_weapon_salvage_right",
+    "entityClassName": "Controller_Weapon"
+   },
+   {
+    "itemPortName": "hardpoint_controller_light_left_salvage",
+    "entityClassName": "Controller_Light"
+   },
+   {
+    "itemPortName": "hardpoint_controller_light_right_salvage",
+    "entityClassName": "Controller_Light"
+   },
+   {
+    "itemPortName": "hardpoint_refill_station_left",
+    "entityClassName": "SalvageFillerStation_AEGS_Reclaimer"
+   },
+   {
+    "itemPortName": "hardpoint_refill_station_right",
+    "entityClassName": "SalvageFillerStation_AEGS_Reclaimer"
+   },
+   {
+    "itemPortName": "hardpoint_attachable_buff",
+    "entityClassName": "Salvage_Buff_Modifier_Reclaimer"
+   },
+   {
+    "itemPortName": "hardpoint_cargogrid_salvage_room_left_front_TEMP",
+    "entityClassName": "AEGS_Reclaimer_CargoGrid_Salvage_Front_TEMP"
+   },
+   {
+    "itemPortName": "hardpoint_cargogrid_salvage_room_right_front_TEMP",
+    "entityClassName": "AEGS_Reclaimer_CargoGrid_Salvage_Front_TEMP"
+   },
+   {
+    "itemPortName": "hardpoint_cargogrid_salvage_room_left_rear_TEMP",
+    "entityClassName": "AEGS_Reclaimer_CargoGrid_Salvage_Rear_TEMP"
+   },
+   {
+    "itemPortName": "hardpoint_cargogrid_salvage_room_right_rear_TEMP",
+    "entityClassName": "AEGS_Reclaimer_CargoGrid_Salvage_Rear_TEMP"
+   },
+   {
+    "itemPortName": "hardpoint_door_salvage",
+    "entityClassName": "Door_Ship_Exterior_AEGS_Reclaimer_Salvage_Lift"
+   },
+   {
+    "itemPortName": "hardpoint_controller_salvage_arm",
+    "entityClassName": "Controller_Salvage_AEGS_Reclaimer_ArmOperator"
+   },
+   {
+    "itemPortName": "hardpoint_internal_storage",
+    "entityClassName": "SalvageInternalStorage_AEGS_Reclaimer"
+   },
+   {
+    "itemPortName": "hardpoint_claw",
+    "entityClassName": "AEGS_Reclaimer_Salvage_Arm",
+    "entries": [
+     {
+      "itemPortName": "disintegration_intake",
+      "entityClassName": "SalvageDisintegrationArea"
+     }
+    ]
+   },
+   {
+    "itemPortName": "hardpoint_pdc_aimodule_top_01",
+    "entityClassName": "AIModule_Unmanned_PU_PDC"
+   },
+   {
+    "itemPortName": "hardpoint_pdc_aimodule_top_02",
+    "entityClassName": "AIModule_Unmanned_PU_PDC"
+   },
+   {
+    "itemPortName": "hardpoint_pdc_aimodule_top_03",
+    "entityClassName": "AIModule_Unmanned_PU_PDC"
+   },
+   {
+    "itemPortName": "hardpoint_pdc_aimodule_bottom_01",
+    "entityClassName": "AIModule_Unmanned_PU_PDC"
+   },
+   {
+    "itemPortName": "hardpoint_pdc_aimodule_bottom_02",
+    "entityClassName": "AIModule_Unmanned_PU_PDC"
+   },
+   {
+    "itemPortName": "hardpoint_pdc_aimodule_bottom_03",
+    "entityClassName": "AIModule_Unmanned_PU_PDC"
+   },
+   {
+    "itemPortName": "hardpoint_pdc_aimodule_bottom_04",
+    "entityClassName": "AIModule_Unmanned_PU_PDC"
+   }
+  ]
+ },
+ "expected": {
+  "items": {
+   "AEGS_Reclaimer_CargoGrid_Salvage_Front_TEMP": {
+    "type": "CargoGrid",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "AEGS_Reclaimer_CargoGrid_Salvage_Rear_TEMP": {
+    "type": "CargoGrid",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "AEGS_Reclaimer_SCItem_Remote_Salvage_Turret_Left": {
+    "type": "Turret",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "AEGS_Reclaimer_SCItem_Remote_Salvage_Turret_Right": {
+    "type": "Turret",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "AEGS_Reclaimer_Salvage_Arm": {
+    "type": "ToolArm",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "AEGS_Reclaimer_Salvage_Turret_Lighting": {
+    "type": "Room",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "AIModule_Unmanned_PU_PDC": {
+    "type": "AIModule",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "Cargo_ShipMining_Pod_Hyun": {
+    "type": "Container",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "Cargo_ShipMining_Pod_Prospector": {
+    "type": "Container",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "Cargo_ShipMining_Pod_Prospector_Collapsed": {
+    "type": "Container",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "Controller_Light": {
+    "type": "LightController",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "Controller_Mining": {
+    "type": "MiningController",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "Controller_Salvage": {
+    "type": "SalvageController",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {},
+    "controller": {}
+   },
+   "Controller_Salvage_AEGS_Reclaimer_ArmOperator": {
+    "type": "SalvageController",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {},
+    "controller": {
+     "fractureTimePerRadiusMetre": 0.8640000224113464,
+     "minFracturableRadius": 1.0,
+     "maxFracturableRadius": 255.0,
+     "minDisintegratableRadius": 0.0,
+     "maxDisintegratableRadius": 255.0,
+     "disintegrationTimePerRadiusMetre": 1.5119999647140503,
+     "disintegrationSCUPerCubicMetre": 0.005249999929219484,
+     "numFieldSupportersRequired": 0.0,
+     "fieldAlignmentMaxSpeedMultiplier": 7.0,
+     "fieldAlignmentMaxYieldMultiplier": 1.0,
+     "fieldAlignmentBaselineFactor": 0.5,
+     "fieldAlignmentFalloffDistanceForward": 200.0,
+     "fieldAlignmentFalloffDistanceRadial": 90.0
+    }
+   },
+   "Controller_Salvage_AEGS_Reclaimer_Turret": {
+    "type": "SalvageController",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {},
+    "controller": {}
+   },
+   "Controller_Salvage_Crus_C1": {
+    "type": "SalvageController",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {},
+    "controller": {}
+   },
+   "Controller_Salvage_DRAK_Vulture": {
+    "type": "SalvageController",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {},
+    "controller": {
+     "fractureTimePerRadiusMetre": 2.496000051498413,
+     "minFracturableRadius": 1.0,
+     "maxFracturableRadius": 40.5,
+     "minDisintegratableRadius": 0.0,
+     "maxDisintegratableRadius": 44.54999923706055,
+     "disintegrationTimePerRadiusMetre": 4.368000030517578,
+     "disintegrationSCUPerCubicMetre": 0.0027000000700354576,
+     "numFieldSupportersRequired": 2.0,
+     "fieldAlignmentMaxSpeedMultiplier": 3.0,
+     "fieldAlignmentMaxYieldMultiplier": 1.399999976158142,
+     "fieldAlignmentBaselineFactor": 0.5,
+     "fieldAlignmentFalloffDistanceForward": 70.0,
+     "fieldAlignmentFalloffDistanceRadial": 40.0
+    }
+   },
+   "Controller_Salvage_GAMA_Hyun": {
+    "type": "SalvageController",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {},
+    "controller": {
+     "fractureTimePerRadiusMetre": 1.440000057220459,
+     "minFracturableRadius": 1.0,
+     "maxFracturableRadius": 87.75,
+     "minDisintegratableRadius": 0.0,
+     "maxDisintegratableRadius": 67.5,
+     "disintegrationTimePerRadiusMetre": 4.283999919891357,
+     "disintegrationSCUPerCubicMetre": 0.0038499999791383743,
+     "numFieldSupportersRequired": 0.0,
+     "fieldAlignmentMaxSpeedMultiplier": 7.0,
+     "fieldAlignmentMaxYieldMultiplier": 1.2999999523162842,
+     "fieldAlignmentBaselineFactor": 0.5,
+     "fieldAlignmentFalloffDistanceForward": 100.0,
+     "fieldAlignmentFalloffDistanceRadial": 50.0
+    }
+   },
+   "Controller_Salvage_TractorBeamOnly": {
+    "type": "SalvageController",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {},
+    "controller": {}
+   },
+   "Controller_Weapon": {
+    "type": "WeaponController",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "DRAK_Vulture_Salvage_Arm_Left": {
+    "type": "ToolArm",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "DRAK_Vulture_Salvage_Arm_Right": {
+    "type": "ToolArm",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "Door_Ship_Exterior_AEGS_Reclaimer_Salvage_Lift": {
+    "type": "Door",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "GAMA_Hyun_Mining_Arm": {
+    "type": "ToolArm",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "GAMA_Hyun_Salvage_Arm_Left": {
+    "type": "ToolArm",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "GAMA_Hyun_Salvage_Arm_Right": {
+    "type": "ToolArm",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "MISC_Prospector_Mining_Arm": {
+    "type": "ToolArm",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "Mining_Laser_DRAK_Golem_S1": {
+    "type": "WeaponMining",
+    "providesMission": [
+     "mining"
+    ],
+    "mining": {
+     "mining.laserInstability": 35.0,
+     "mining.optimalChargeWindowSize": 40.0,
+     "mining.optimalChargeWindowRate": -40.0,
+     "mining.resistance": 25.0,
+     "mining.filter": 40.0,
+     "mining.throttleMinimum": 0.20000000298023224,
+     "mining.throttleLerpSpeed": 7.0,
+     "mining.beamPower": 3900.0,
+     "mining.optimalRangeM": 40.0,
+     "mining.maxRangeM": 45.0
+    },
+    "salvage": {}
+   },
+   "Mining_Laser_GRIN_Arbor_S0": {
+    "type": "WeaponMining",
+    "providesMission": [
+     "mining"
+    ],
+    "mining": {
+     "mining.laserInstability": -40.0,
+     "mining.throttleMinimum": 0.20000000298023224,
+     "mining.throttleLerpSpeed": 6.5,
+     "mining.beamPower": 0.800000011920929,
+     "mining.optimalRangeM": 5.0,
+     "mining.maxRangeM": 15.0
+    },
+    "salvage": {}
+   },
+   "Mining_Laser_GRIN_Arbor_S1": {
+    "type": "WeaponMining",
+    "providesMission": [
+     "mining"
+    ],
+    "mining": {
+     "mining.laserInstability": -35.0,
+     "mining.optimalChargeWindowSize": 40.0,
+     "mining.resistance": 25.0,
+     "mining.filter": 30.0,
+     "mining.throttleMinimum": 0.05000000074505806,
+     "mining.throttleLerpSpeed": 6.5,
+     "mining.beamPower": 2340.0,
+     "mining.optimalRangeM": 60.0,
+     "mining.maxRangeM": 180.0
+    },
+    "salvage": {}
+   },
+   "Mining_Laser_SHIN_Hofstede_S2": {
+    "type": "WeaponMining",
+    "providesMission": [
+     "mining"
+    ],
+    "mining": {
+     "mining.laserInstability": 10.0,
+     "mining.optimalChargeWindowSize": 60.0,
+     "mining.optimalChargeWindowRate": 20.0,
+     "mining.resistance": -30.0,
+     "mining.filter": 40.0,
+     "mining.throttleMinimum": 0.10000000149011612,
+     "mining.throttleLerpSpeed": 6.5,
+     "mining.beamPower": 4060.0,
+     "mining.optimalRangeM": 60.0,
+     "mining.maxRangeM": 180.0
+    },
+    "salvage": {}
+   },
+   "Mount_Gimbal_Mining": {
+    "type": "UtilityTurret",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "Projector_HUD_StructuralSalvage_Reclaimer": {
+    "type": "Display",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "RSI_Galaxy_CargoGrid_Module": {
+    "type": "CargoGrid",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "RSI_Galaxy_Module_Cargo": {
+    "type": "Module",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "SalvageDisintegrationArea": {
+    "type": "SalvageFieldEmitter",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "SalvageFieldSupporter": {
+    "type": "SalvageFieldSupporter",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "SalvageFillerStation_AEGS_Reclaimer": {
+    "type": "SalvageFillerStation",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "SalvageFillerStation_DRAK_Vulture": {
+    "type": "SalvageFillerStation",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "SalvageFillerStation_GAMA_Hyun": {
+    "type": "SalvageFillerStation",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "SalvageInternalStorage_AEGS_Reclaimer": {
+    "type": "SalvageInternalStorage",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {},
+    "scu": 448.0
+   },
+   "SalvageInternalStorage_DRAK_Vulture": {
+    "type": "SalvageInternalStorage",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {},
+    "scu": 16.0
+   },
+   "SalvageInternalStorage_GAMA_Hyun": {
+    "type": "SalvageInternalStorage",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {},
+    "scu": 40.0
+   },
+   "Salvage_Buff_Modifier_Hyun": {
+    "type": "UNDEFINED",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "Salvage_Buff_Modifier_Reclaimer": {
+    "type": "UNDEFINED",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "Salvage_Buff_Modifier_Vulture": {
+    "type": "UNDEFINED",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "Salvage_Head_Salvation": {
+    "type": "SalvageHead",
+    "providesMission": [
+     "salvage"
+    ],
+    "mining": {},
+    "salvage": {
+     "salvage.mode": "Salvage",
+     "salvage.materialEfficiency": 1.0,
+     "salvage.maxVehicleDamageRatio": 0.8999999761581421,
+     "salvage.maxHealthRepairRate": 10.0,
+     "salvage.maxDamageMapRepairRate": 10.0,
+     "salvage.healthToAmmoRatio": 0.5,
+     "salvage.repairedMaterialRatio": 1.0,
+     "salvage.rampUpTime": 1.0,
+     "salvage.rampDownTime": 2.0,
+     "salvage.hitRadius": 0.0,
+     "salvage.maxBeamDistance": 150.0,
+     "salvage.maxSensorDistance": 150.0,
+     "salvage.aimPointSensorRadius": 0.8999999761581421
+    }
+   },
+   "Salvage_Head_standard": {
+    "type": "SalvageHead",
+    "providesMission": [
+     "salvage"
+    ],
+    "mining": {},
+    "salvage": {
+     "salvage.mode": "Salvage",
+     "salvage.materialEfficiency": 1.0,
+     "salvage.maxVehicleDamageRatio": 0.8999999761581421,
+     "salvage.maxHealthRepairRate": 10.0,
+     "salvage.maxDamageMapRepairRate": 10.0,
+     "salvage.healthToAmmoRatio": 0.5,
+     "salvage.repairedMaterialRatio": 1.0,
+     "salvage.rampUpTime": 1.0,
+     "salvage.rampDownTime": 2.0,
+     "salvage.hitRadius": 0.0,
+     "salvage.maxBeamDistance": 150.0,
+     "salvage.maxSensorDistance": 150.0,
+     "salvage.aimPointSensorRadius": 0.8999999761581421
+    }
+   },
+   "Salvage_Modifier_Scraper_Large": {
+    "type": "SalvageModifier",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "Salvage_Modifier_Scraper_Medium": {
+    "type": "SalvageModifier",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "Salvage_Modifier_Scraper_Small": {
+    "type": "SalvageModifier",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   },
+   "Salvage_Modifier_Tractor_Small": {
+    "type": "SalvageModifier",
+    "providesMission": [],
+    "mining": {},
+    "salvage": {}
+   }
+  },
+  "ships": {
+   "MISC_Prospector": {
+    "providesMission": [
+     "mining"
+    ],
+    "salvageScu": null
+   },
+   "DRAK_Vulture": {
+    "providesMission": [
+     "salvage"
+    ],
+    "salvageScu": 16.0
+   },
+   "GAMA_Hyun": {
+    "providesMission": [
+     "mining",
+     "salvage"
+    ],
+    "salvageScu": 40.0
+   },
+   "DRAK_Cutlass_Black": {
+    "providesMission": [],
+    "salvageScu": null
+   },
+   "AEGS_Reclaimer": {
+    "providesMission": [
+     "salvage"
+    ],
+    "salvageScu": 448.0
+   }
+  }
+ }
+}

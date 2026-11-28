@@ -9,6 +9,7 @@ import {
   computeKpiSheet,
   crossSectionAxes,
   findArmorPayload,
+  quantumRangeGm,
 } from './codex-loadout-stats';
 
 function gun(opts: {
@@ -463,5 +464,55 @@ describe('codex-loadout-stats — buildDefensivePanel', () => {
     };
     expect(findArmorPayload([occ])).toEqual(occ.payload);
     expect(findArmorPayload([])).toBeNull();
+  });
+});
+
+const FLT_MAX = 3.4028230607370965e38;
+
+function drive(fuelRequirement: number, jumpRange: number = FLT_MAX): SummaryOccupant {
+  return {
+    section: 'quantum',
+    kind: 'component',
+    payload: {
+      entityKind: 'component',
+      kind: 'QuantumDrive',
+      className: 'QDRV_TEST',
+      stats: { quantum: { 'params.quantumFuelRequirement': fuelRequirement, 'params.driveSpeed': 392090592, jumpRange } },
+    },
+    ammoPayload: undefined,
+    count: 1,
+  };
+}
+
+describe('codex-loadout-stats — quantum range from fuel and drive use', () => {
+  it('reproduces the published 4.10 ranges (SCU ÷ SCU per Gm)', () => {
+    // C2 Hercules, 20.9 SCU, stock Kama 0.03864 -> 541 Gm; Gladius, 0.6 SCU, Beacon 0.01862 -> 32 Gm.
+    expect(quantumRangeGm(20.9, 0.03864)!).toBeCloseTo(541, -1);
+    expect(quantumRangeGm(0.6, 0.01862)!).toBeCloseTo(32, 0);
+  });
+
+  it('is a gap, never a guess, without both inputs', () => {
+    expect(quantumRangeGm(null, 0.03864)).toBeNull();
+    expect(quantumRangeGm(20.9, undefined)).toBeNull();
+    expect(quantumRangeGm(0, 0.03864)).toBeNull();
+    expect(quantumRangeGm(20.9, 0)).toBeNull();
+    expect(quantumRangeGm(Number.NaN, 0.03864)).toBeNull();
+  });
+
+  it('fills the KPI sheet in the km unit the Gm formatter expects, ignoring the FLT_MAX jumpRange', () => {
+    const sheet = computeKpiSheet([drive(0.03864)], { fuelQuantum: 20.9 });
+    expect(sheet.quantumRange! / 1_000_000).toBeCloseTo(541, -1);
+  });
+
+  it('follows a swapped drive (the Werk comparison)', () => {
+    const stock = computeKpiSheet([drive(0.03864)], { fuelQuantum: 20.9 }).quantumRange!;
+    const swapped = computeKpiSheet([drive(0.12236)], { fuelQuantum: 20.9 }).quantumRange!;
+    expect(swapped).toBeLessThan(stock);
+    expect(swapped / 1_000_000).toBeCloseTo(170.8, 0);
+  });
+
+  it('stays empty without a tank, and falls back to a real finite jumpRange only', () => {
+    expect(computeKpiSheet([drive(0.03864)], {}).quantumRange).toBeNull();
+    expect(computeKpiSheet([drive(0.03864, 583_000_000)], {}).quantumRange).toBe(583_000_000);
   });
 });

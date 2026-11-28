@@ -2975,6 +2975,7 @@ export class CodexService {
       hull: payload.hull ?? null,
       armorHp: payload.armorHp ?? null,
       cargoScu: payload.cargoScu ?? null,
+      fuelQuantum: payload.fuel?.quantum ?? null,
       stats: payload.stats ?? null,
     };
   }
