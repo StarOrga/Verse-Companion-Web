@@ -2539,16 +2539,13 @@
       "coolers": "Coolers",
       "lifeSupport": "Life support",
       "structure": "Airframe & fixed systems",
+      "fixedSystems": "Fixed systems",
       "systems": "Propulsion & systems",
       "fixedTag": "not configurable",
       "countermeasures": "Countermeasures",
       "shieldsNote": "Every bay in this block is a swappable shield generator, including the ones that ship empty. The shield control module sits with the fixed systems: it is not a shield of its own and cannot be swapped in game.",
       "countermeasuresNote": "Launchers cannot be changed in game, so this block is for reference only. Decoys pull heat-seeking missiles away, noise (chaff) blinds radar-guided ones. How many you need is on a launcher's info sheet (ⓘ): it sets the signature per launch against the ship's own.",
       "infoLabel": "About this block",
-      "splitRows": "Individually",
-      "groupRows": "Group",
-      "splitRowsHint": "List every hardpoint on its own row so you can change them one by one",
-      "groupRowsHint": "Fold identical hardpoints back into a single row",
       "unfold": "Show",
       "foldAway": "Hide"
     },
@@ -2566,7 +2563,7 @@
         "passive": "Passive · off the grid",
         "pool": "Pool"
       },
-      "shieldNote": "All {{count}} are shield generators and each can be swapped on its own — identical ones are stacked here, “Individually” lists them bay by bay.",
+      "shieldNote": "All {{count}} are shield generators and each can be swapped on its own — identical ones are stacked here in one row.",
       "shieldPassiveNote": "The passive one costs no power and still counts fully towards the pool — but it hangs off the active ones: if they fail, the backup goes with them.",
       "peek": {
         "sustainedDpsTotal": "Total sustained DPS",

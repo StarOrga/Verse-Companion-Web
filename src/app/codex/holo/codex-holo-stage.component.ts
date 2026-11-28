@@ -20,6 +20,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
+import { fixedSystemArea } from './fixed-system-area';
 import { ShipSkinsService } from '../ship-skins.service';
 import { RouterLink } from '@angular/router';
 import { TranslateService, TranslatePipe } from '@ngx-translate/core';
@@ -207,7 +208,7 @@ const VIEW_ICONS: Readonly<Record<HoloView, { box: string; paths: readonly strin
 /** Which column of "Bauteile im Detail" a section stands in: the strip area it moves. */
 const PART_AREAS: readonly { id: Perspective; sections: readonly ShipModuleSection[] }[] = [
   { id: 'offensive', sections: ['weapons', 'remoteTurrets', 'mannedTurrets', 'missiles', 'pod'] },
-  { id: 'defensive', sections: ['shields', 'countermeasures', 'structure'] },
+  { id: 'defensive', sections: ['shields', 'countermeasures'] },
   { id: 'movement', sections: ['quantum', 'powerPlants'] },
   { id: 'signature', sections: ['coolers', 'radar', 'lifeSupport'] },
 ];
@@ -2479,14 +2480,34 @@ export class CodexHoloStageComponent implements DetailSlotSource {
   /** The layout component wants a mutable array type; same content. */
   readonly allSectionsMutable = computed<LayoutSection[]>(() => [...this.allSections()]);
 
-  /** The parts in four columns over the strip's four areas (concept r1 d2), each section where it counts. */
-  readonly partAreas = computed(() =>
-    PART_AREAS.map((a) => ({
-      id: a.id,
-      labelKey: `codex.holo.strip.${a.id}`,
-      sections: this.allSections().filter((s) => a.sections.includes(s.section)),
-    })),
-  );
+  /**
+   * The parts in four columns over the strip's four areas (concept r1 d2), each section where it counts.
+   * The fixed systems (`structure`) are not one airframe block any more: each part joins the column
+   * its job belongs to — thrusters and tanks under Bewegung, the fire-group controller under
+   * Offensive … (#411, `fixedSystemArea`) — as that column's last block.
+   */
+  readonly partAreas = computed(() => {
+    const all = this.allSections();
+    const fixed = new Map<Perspective, LayoutSection>();
+    for (const sec of all) {
+      if (sec.section !== 'structure') continue;
+      for (const slot of sec.slots) {
+        const area = fixedSystemArea(slot);
+        const hit = fixed.get(area);
+        if (hit) hit.slots.push(slot);
+        else fixed.set(area, { section: 'structure', slots: [slot], notes: sec.notes });
+      }
+    }
+    return PART_AREAS.map((a) => {
+      const own = all.filter((s) => a.sections.includes(s.section));
+      const rest = fixed.get(a.id);
+      return {
+        id: a.id,
+        labelKey: `codex.holo.strip.${a.id}`,
+        sections: rest ? [...own, rest] : own,
+      };
+    });
+  });
 
   /** rawPort → slot, in ports-list order — the pin numbering source. Only
    * the configurable blocks (weapons … countermeasures) pin the table; the
