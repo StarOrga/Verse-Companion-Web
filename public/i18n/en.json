@@ -1508,16 +1508,24 @@
         "thin": "Only {{n}} ships in this class – too few for a rank",
         "betterThan": "better than {{n}} % of the class",
         "quieterThan": "quieter than {{n}} % of the class",
-        "median": "Median",
+        "median": "Class median",
         "firstReveals": "gives you away first",
         "emKm": "EM detected from",
         "irKm": "IR detected from",
-        "csKm": "Cross-section",
-        "maxSpeed": "Maximum"
+        "csKm": "Cross section",
+        "maxSpeed": "Max speed"
       },
       "part": {
         "grade": "Grade {{grade}}",
-        "share": "{{pct}} % of {{total}}"
+        "share": "{{pct}} % of {{total}}",
+        "shareOnly": "{{pct}} %",
+        "of": {
+          "shieldHp": "{{n}} shield HP",
+          "driveSpeed": "{{n}} km/s quantum speed",
+          "plantEm": "{{n}} EM (power plant)",
+          "coolerRate": "{{n}} cooling rate",
+          "radarEm": "{{n}} EM (radar)"
+        }
       },
       "panel": {
         "close": "Close overview",
@@ -1574,7 +1582,7 @@
           "title": "Speed and agility",
           "scm": "SCM",
           "boost": "Boost",
-          "max": "Top speed",
+          "max": "Max speed",
           "pitch": "Pitch",
           "yaw": "Yaw",
           "roll": "Roll",

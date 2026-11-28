@@ -78,7 +78,7 @@ describe('CodexHoloCategoryPanelComponent', () => {
     const { el } = render('signature');
     const bars = Array.from(el.querySelectorAll('.bar')).map((b) => b.textContent!);
     expect(bars.some((t) => t.includes('Infrarot') && t.includes('km'))).toBe(true);
-    expect(el.textContent).toContain('Kühlauslastung');
+    expect(el.textContent).toContain('Kühllast');
     expect(el.textContent).toContain('Woher kommt das EM-Signal');
     expect(el.textContent).toContain('Kürzere Distanz ist besser.');
   });
@@ -91,5 +91,13 @@ describe('CodexHoloCategoryPanelComponent', () => {
     }
     const { el } = render('offensive', { occupants: [], cohort: null });
     expect(el.querySelector('.gap')!.textContent).toContain('Keine Waffen');
+  });
+
+  it('Offensive without any missile data: a gap row, never an empty bar with "0"', () => {
+    const { el } = render('offensive');
+    const sep = el.querySelector('.bar.sep')!;
+    expect(sep.classList.contains('is-gap')).toBe(true);
+    expect(sep.querySelector('.v')!.textContent!.trim()).toBe('—');
+    expect(el.querySelectorAll('.track[aria-hidden="true"]').length).toBe(el.querySelectorAll('.track').length);
   });
 });
