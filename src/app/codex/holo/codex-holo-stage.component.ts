@@ -107,7 +107,7 @@ import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import { AreaSymbolComponent } from '../../shared/area-symbol/area-symbol.component';
 import { CodexHoloEnergyComponent } from './codex-holo-energy.component';
 import { CodexHoloCategoryHeadComponent } from './codex-holo-category-head.component';
-import { EnergyConsequences, buildHoloCategoryModels } from './holo-category-model';
+import { EnergyConsequences, HoloCategoryId, buildHoloCategoryModels } from './holo-category-model';
 import { KpiShipInput } from '../codex-loadout-stats';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { ScSegmentedComponent, ScSegmentOption } from '../../shared/segmented-control.component';
@@ -710,8 +710,8 @@ const PERSPECTIVE_LEAD: Readonly<Record<Perspective, readonly KpiStripCell['key'
             @if (a.sections.length > 0) {
               <sc-codex-hardpoint-layout
                 [calm]="true"
-                [partShares]="a.id === 'offensive' ? offensiveShares() : emptyShares"
-                [partShareOf]="a.id === 'offensive' ? offensiveShareOf() : null"
+                [partShares]="areaShares()[a.id]"
+                [partShareOf]="areaShareOf()[a.id]"
                 [nestGroups]="false"
                 [sections]="a.sections"
                 [foldedSections]="foldedModuleSections()"
@@ -1313,7 +1313,6 @@ export class CodexHoloStageComponent implements DetailSlotSource {
   readonly holoCohort = input<readonly RankShipInput[] | null>(null);
   /** The ship's own sheet input (hull, armour, flight, stats) the category model reads. */
   readonly kpiShip = input<KpiShipInput | null>(null);
-  protected readonly emptyShares: ReadonlyMap<string, number> = new Map();
   /** What the energy zone's what-if currently does (null = untouched). */
   protected readonly energyEdit = signal<EnergyConsequences | null>(null);
   protected readonly weaponsOff = computed(() => this.energyEdit()?.energy.sheet.weaponsCut === true);
@@ -1337,6 +1336,27 @@ export class CodexHoloStageComponent implements DetailSlotSource {
   protected readonly offensiveShareOf = computed<string | null>(() => {
     const v = this.categoryModels().offensive.detail.weapons.reduce((s, w) => s + w.burstDps, 0);
     return v > 0 ? formatEquippedStat({ labelKey: '', value: v, format: 'perSec' }) : null;
+  });
+  /** Every column's row shares by className: Offensive from its guns, the others from the per-row model. */
+  protected readonly areaShares = computed<Record<HoloCategoryId, ReadonlyMap<string, number>>>(() => {
+    const out: Record<HoloCategoryId, Map<string, number>> = {
+      offensive: new Map(this.offensiveShares()), defensive: new Map(), movement: new Map(), signature: new Map(),
+    };
+    for (const g of this.categoryModels().rowShares) {
+      for (const p of g.parts) if (p.share !== null) out[g.category].set(p.id, (out[g.category].get(p.id) ?? 0) + p.share);
+    }
+    return out;
+  });
+  /** What each column's bars refer to, in words ("211.200 Schild-HP"); several kinds in one column are joined. */
+  protected readonly areaShareOf = computed<Record<HoloCategoryId, string | null>>(() => {
+    const out: Record<HoloCategoryId, string[]> = { offensive: [], defensive: [], movement: [], signature: [] };
+    const off = this.offensiveShareOf();
+    if (off) out.offensive.push(off);
+    for (const g of this.categoryModels().rowShares) {
+      out[g.category].push(this.t.instant(`codex.holo.part.of.${g.kind}`, { n: formatEquippedStatNumber({ labelKey: '', value: g.total, format: g.kind === 'driveSpeed' ? 'kms' : 'int' }) }));
+    }
+    const text = (ids: string[]): string | null => (ids.length > 0 ? ids.join(' · ') : null);
+    return { offensive: text(out.offensive), defensive: text(out.defensive), movement: text(out.movement), signature: text(out.signature) };
   });
   readonly recentlyViewedShips = input<readonly string[]>([]);
 

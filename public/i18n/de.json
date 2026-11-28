@@ -1517,7 +1517,14 @@
       },
       "part": {
         "grade": "Güte {{grade}}",
-        "share": "{{pct}} % von {{total}}"
+        "share": "{{pct}} % von {{total}}",
+        "of": {
+          "shieldHp": "{{n}} Schild-HP",
+          "driveSpeed": "{{n}} km/s Quantum-Geschwindigkeit",
+          "plantEm": "{{n}} EM (Kraftwerk)",
+          "coolerRate": "{{n}} Kühlleistung",
+          "radarEm": "{{n}} EM (Radar)"
+        }
       },
       "panel": {
         "close": "Übersicht schließen",

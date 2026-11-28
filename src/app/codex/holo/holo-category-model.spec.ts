@@ -58,6 +58,7 @@ function weapon(partial: Partial<HoloWeapon>): HoloWeapon {
     fireTime: 10,
     downtime: 10,
     cycles: [],
+    ballistic: false,
     ...partial,
   };
 }
@@ -235,11 +236,27 @@ describe('energy', () => {
     expect(r.energy.generator.used).toBeLessThan(buildEnergy(base).generator.used);
   });
 
-  it('a pinned level keeps the Offensive lead and never mutates the input', () => {
+  it('a partial weapon cut scales the lead of energy weapons by assigned / max and never mutates the input', () => {
     const cut = new Set<never>();
-    const r = recomputeEnergy({ ...base, cutGroups: cut }, 'weapons', 1, 506);
-    expect(r.offensiveLead).toBe(506);
+    const row = buildEnergy(base).segments.find((s) => s.key === 'weapons')!;
+    expect(row.max).toBeGreaterThan(1);
+    const r = recomputeEnergy({ ...base, cutGroups: cut }, 'weapons', 1, 500);
+    const kept = r.energy.segments.find((s) => s.key === 'weapons')!;
+    expect(r.offensiveLead).toBe(Math.round(500 * (kept.used / kept.max) * 10) / 10);
+    expect(r.offensiveLead).toBeLessThan(500);
+    expect(r.delta.offensiveLead).toBe(Math.round((r.offensiveLead! - 500) * 10) / 10);
     expect(cut.size).toBe(0);
+  });
+
+  it('ballistic weapons keep their DPS on a partial cut; 0 segments still gives 0', () => {
+    const mixed = { ...base, occupants: [...occupants, gun({ className: 'MAG', cycle: MAG }), gun({ className: 'HOT', cycle: HEAT })] };
+    const energyOnly = recomputeEnergy({ ...base, occupants: [...occupants, gun({ className: 'HOT', cycle: HEAT })] }, 'weapons', 1, 500).offensiveLead!;
+    const withBallistic = recomputeEnergy(mixed, 'weapons', 1, 500).offensiveLead!;
+    expect(withBallistic).toBeGreaterThan(energyOnly);
+    expect(withBallistic).toBeLessThan(500);
+    const ballisticOnly = { ...base, occupants: [...occupants.filter((o) => o.section !== 'weapons'), gun({ className: 'MAG', cycle: MAG })] };
+    expect(recomputeEnergy(ballisticOnly, 'weapons', 1, 500).offensiveLead).toBe(500);
+    expect(recomputeEnergy(mixed, 'weapons', 0, 500).offensiveLead).toBe(0);
   });
 
   it('keeps a missing lead missing', () => {
@@ -265,6 +282,20 @@ describe('buildHoloCategoryModels', () => {
     expect(model.defensive.detail.effectiveHp).toHaveLength(3);
     expect(model.movement.detail).toMatchObject({ scm: 200, pitch: 60, acceleration: null });
     expect(model.signature.detail.fuel).toBeNull();
+  });
+
+  it('gives per-row shares for the defensive, movement and signature rows, none for rows without data', () => {
+    const groups = model.rowShares;
+    const byKind = (k: string) => groups.find((g) => g.kind === k);
+    const shields = byKind('shieldHp')!;
+    expect(shields.category).toBe('defensive');
+    expect(shields.parts.length).toBeGreaterThan(0);
+    expect(shields.parts.reduce((s, p) => s + (p.share ?? 0), 0)).toBeCloseTo(1, 1);
+    expect(byKind('coolerRate')?.category).toBe('signature');
+    expect(byKind('plantEm')?.category).toBe('movement');
+    for (const g of groups) for (const p of g.parts) expect(p.value).toBeGreaterThan(0);
+    // life support has no per-row number
+    expect(groups.flatMap((g) => g.parts.map((p) => p.id))).not.toContain('LFSP_RSIN_S01_LifeSupport');
   });
 
   it('passes hull HP through to the sheet', () => {
