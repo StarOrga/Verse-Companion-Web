@@ -77,10 +77,10 @@ export interface StripMission {
       .einsatz:hover, .einsatz[aria-expanded='true'] { border-color: var(--sc-accent); background: color-mix(in srgb, var(--holo-e, var(--sc-accent)) 12%, transparent); }
       .einsatz:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
       .lab { display: var(--hb-pill-meta, inline); padding-inline-end: 8px; border-inline-end: 1px solid color-mix(in srgb, var(--sc-accent) 22%, transparent);
-        font-family: var(--sc-font-display); font-size: max(9.5px, var(--sc-fs-floor)); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-fg-2); }
+        font-family: var(--sc-font-display); font-size: max(13px, var(--sc-fs-floor)); letter-spacing: 0.14em; text-transform: uppercase; color: var(--sc-fg-2); }
       .val { display: inline-flex; align-items: center; gap: 6px; font-family: var(--sc-font-display); font-size: max(13px, var(--sc-fs-floor)); font-weight: 600; letter-spacing: 0.04em;
         color: var(--holo-e, var(--sc-fg-0)); white-space: nowrap; transition: color var(--holo-t-base, 200ms) ease; }
-      .sub { display: var(--hb-pill-meta, inline); min-inline-size: 0; font-size: max(11px, var(--sc-fs-floor)); color: var(--sc-fg-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .sub { display: var(--hb-pill-meta, inline); min-inline-size: 0; font-size: max(13px, var(--sc-fs-floor)); color: var(--sc-fg-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .vt { display: var(--hb-pill-text, inline); }
       .caret { color: var(--sc-accent); font-size: 0.75em; }
       .gapv { color: var(--sc-fg-2); }
