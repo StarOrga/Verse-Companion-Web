@@ -4300,6 +4300,13 @@
         "label": "Nicht nutzbare Gegenstände anzeigen",
         "descOn": "Türen, Sitze, Displays und andere Spielobjekte stehen unter „Nicht nutzbar“ und erscheinen in der Suche nach allen nutzbaren Treffern.",
         "descOff": "Türen, Sitze, Displays und andere Spielobjekte, die du nicht benutzen kannst, sind ausgeblendet — im Bereichsbaum, in den Listen und in der Suche."
+      },
+      "itemArt": {
+        "label": "Bilder in Suche & Item-Seiten",
+        "renders": "Originalbilder",
+        "icons": "Icons",
+        "descRenders": "Gegenstände, Waffen und Komponenten zeigen ein farbiges Bild ihres 3D-Modells, wo es eines gibt — sonst ihr Icon.",
+        "descIcons": "Gegenstände, Waffen und Komponenten zeigen überall ihr Icon. Schiffe behalten ihre Bilder."
       }
     },
     "feedbackFab": {

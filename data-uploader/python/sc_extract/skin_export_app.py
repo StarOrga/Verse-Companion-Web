@@ -99,6 +99,9 @@ class _PackageBuilder:
                                index_name=f"index.{worker.strip('_')}.json" if worker
                                else "index.json",
                                pipeline=getattr(args, "pipeline_tag", "") or "")
+        if getattr(args, "fps", False) or getattr(args, "items", False)                 or getattr(args, "armor", False):
+            from . import model_render
+            self.store.render_dir = model_render.renders_dir_for(self.out) or self.out / "_renders"
         self.source = DataCoreSource(load_datacore(self.reader), self.reader,
                                      node_helpers=self.store.helpers)
         self.rows: list[dict] = []
@@ -252,6 +255,14 @@ class _PackageBuilder:
         self.store.flush()
         if skipped:
             log("warn", skipped_summary(kind, skipped))
+        if self.store.render_dir is not None:
+            from . import model_render
+            try:
+                listed = model_render.update_index(
+                    self.store.render_dir, [(r["className"], r["rootSha256"]) for r in rows])
+                log("info", f"{kind}: model renders indexed ({listed} class(es) in total)")
+            except OSError as exc:
+                log("warn", f"{kind}: model render index not written: {exc}")
         return rows
 
     def summary(self) -> dict:

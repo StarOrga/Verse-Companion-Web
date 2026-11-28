@@ -540,6 +540,18 @@ class CodexExtractor:
                                               cache_dir=preview_cache_dir(out_dir))
             except Exception as exc:  # noqa: BLE001
                 on_log("warn", f"asset extractor unavailable: {exc}")
+        # Model renders (#402): colour stills the 3D-package build left in
+        # `.sc-companion-extracts/model-renders`, shipped as `renderImage`.
+        self._renders = None
+        if extract_assets:
+            try:
+                from .model_render import RenderIndex, renders_dir_for
+                self._renders = RenderIndex(renders_dir_for(out_dir), out_dir / "previews",
+                                            on_log=on_log)
+                if len(self._renders):
+                    on_log("info", f"model renders available for {len(self._renders)} class(es)")
+            except Exception as exc:  # noqa: BLE001
+                on_log("warn", f"model renders unavailable: {exc}")
         self._dim_cache: Dict[str, Optional[Dict[str, Any]]] = {}
         # mesh path -> named helper-node transforms (hardpoint positions). Same
         # .cga as the dimensions, parsed once per hull and shared by variants.
@@ -1757,6 +1769,11 @@ class CodexExtractor:
             "previewImage": self._preview_image(resolved),  # WebP filename or null
             "source": self.source,
         }
+        # Colour still of the item's 3D model (#402); absent when none exists.
+        renders = getattr(self, "_renders", None)  # a bare instance (specs) has none
+        render = renders.resolve(base["className"]) if renders else None
+        if render:
+            base["renderImage"] = render
         # Turret / gimbal mounts land in weapons/, components/ or items/
         # depending on their AttachDef.Type — the traverse rides on the shared
         # base so every projection carries it. Absent for non-turrets.
