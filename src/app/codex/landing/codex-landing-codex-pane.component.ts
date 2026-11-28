@@ -6,7 +6,7 @@ import { isPlainLeftClick } from '../../core/modified-click.util';
 import { ScTooltipDirective } from '../../shared/tooltip/sc-tooltip.directive';
 import { ScActionDirective } from '../../shared/action/sc-action.directive';
 import { comparePatchVersion } from '../codex-format';
-import { CATEGORY_GLYPH } from './codex-landing-holotable.component';
+import { ICON_PATHS } from '../codex-category-icon.component';
 import { LANDING_CATEGORIES, LandingCategory, LandingCodex, LandingCodexEntry, LandingItem } from './codex-landing-data.types';
 
 /** Index filter per category: "Alle <Kategorie>" and, outside ships, the search link. */
@@ -22,6 +22,22 @@ export const CATEGORY_INDEX_QUERY: Record<LandingCategory, Params> = {
 export function searchQueryFor(category: LandingCategory): Params {
   return { ...CATEGORY_INDEX_QUERY[category], fresh: '1' };
 }
+
+/**
+ * Line icon per category (24-unit grid, stroked in `currentColor`; decorative, the name carries
+ * the meaning). The codex's own category glyphs (`ICON_PATHS`, the list cards and detail heroes),
+ * so a ship reads as the same ship silhouette here as everywhere else (admin feedback #412: the
+ * old Unicode glyphs - a gear for ships, a star for weapons - were not recognisable).
+ */
+export const CATEGORY_ICON: Record<LandingCategory, string> = {
+  ship: ICON_PATHS['ship'],
+  // ds-new: a pistol silhouette - the codex's crosshair glyph means "shoots", not "hand weapon".
+  fpsWeapon: 'M3 6.5h17v4H3z M20 6.5V5 M8 10.5L6.3 19h4.2l1.2-5.5h3.3v-3 M12.8 10.5v1.6',
+  armor: ICON_PATHS['helmet'],
+  component: ICON_PATHS['component'],
+  // Ship utility (mining, tractor, salvage heads): the codex's tool wrench.
+  tool: ICON_PATHS['gadget'],
+};
 
 /** Rows shown before the pane has been measured, and on a phone (the pane there grows with its content). */
 export const DEFAULT_ROWS = 5;
@@ -125,7 +141,7 @@ export function groupByCategory(
  * edge facing the hologram. A horizontal category bar on top (d-tabs `active`:
  * icons, the active one with its name, the others name in a tooltip); below it
  * every new and updated item of the current patch — ships, FPS weapons, armour,
- * components, tools, each row tagged with its category glyph (admin feedback #318) —
+ * components, tools, each row tagged with its category icon (admin feedback #318, #412) —
  * stands in one fixed list, the completely new ones first (tagged "neu"), then the updated
  * ones (#328), the active category first in each group: no wheel, the mouse wheel stays
  * with the page, as many rows as the pane's height holds (the entry on the table always
@@ -185,7 +201,7 @@ export function groupByCategory(
                 @if (e.head) {
                   <li class="grp" [class.grp-cat]="e.headKind === 'category'" [class.cut]="i >= visibleRows()" [attr.aria-hidden]="i >= visibleRows() ? 'true' : null">
                     @if (e.headKind === 'category') {
-                      <i class="grp-gl" aria-hidden="true">{{ glyph(e.category) }}</i>
+                      <svg class="grp-gl" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path [attr.d]="glyph(e.category)" /></svg>
                       <span class="grp-nm">{{ 'codex.landing.categories.' + e.category | translate }}</span>
                     } @else {
                       <span class="grp-nm">{{ 'codex.landing.codex.patchGroup' | translate: { patch: e.head } }}</span>
@@ -196,7 +212,7 @@ export function groupByCategory(
                     [class.cut]="i >= visibleRows()" [attr.aria-hidden]="i >= visibleRows() ? 'true' : null">
                   <a class="ent" [href]="href(e.route)" [attr.aria-current]="e.onTable ? 'true' : null"
                      [scTooltip]="e.name" scTooltipTier="label" (click)="onEntry($event, e)">
-                    <i class="cat" aria-hidden="true">{{ glyph(e.category) }}</i>
+                    <svg class="cat" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path [attr.d]="glyph(e.category)" /></svg>
                     <span class="sc-sr-only">{{ 'codex.landing.categories.' + e.category | translate }}:</span>
                     <span class="nm">{{ e.name }}</span>
                     @if (e.announced) { <em class="soon">{{ 'codex.landing.codex.announced' | translate }}</em> }
@@ -237,7 +253,7 @@ export function groupByCategory(
       </div>
     </nav>
     <ng-template #head let-r let-on="on" let-name="name">
-      <i class="gl" aria-hidden="true">{{ glyph(r.category) }}</i>
+      <svg class="gl" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path [attr.d]="glyph(r.category)" /></svg>
       @if (on) { <span class="nm" aria-hidden="true">{{ name }}</span> }
     </ng-template>
   `,
@@ -383,7 +399,7 @@ export class CodexLandingCodexPaneComponent {
   }
 
   glyph(cat: LandingCategory): string {
-    return CATEGORY_GLYPH[cat];
+    return CATEGORY_ICON[cat];
   }
   searchQuery(cat: LandingCategory): Params {
     return searchQueryFor(cat);

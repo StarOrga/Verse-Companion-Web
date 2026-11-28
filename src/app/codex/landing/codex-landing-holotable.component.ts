@@ -29,15 +29,6 @@ import { DeferErrorComponent } from '../../shared/defer-error/defer-error.compon
 /** How long a "no hull" answer of the viewer is doubted: its first emit precedes the skin catalog read. */
 const NO_HULL_GRACE_MS = 3000;
 
-/** Tiny etched glyph per rotation category (decorative, the label carries the meaning). */
-export const CATEGORY_GLYPH: Record<LandingCategory, string> = {
-  ship: '⛭',
-  fpsWeapon: '✶',
-  armor: '⛨',
-  component: '◈',
-  tool: '⚒',
-};
-
 /**
  * The figure area inside the hologram box (% of the box): the silhouette or
  * icon stands fitted into it, centred, so it is never clipped by the box, the

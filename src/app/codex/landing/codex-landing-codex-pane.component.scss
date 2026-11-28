@@ -45,7 +45,9 @@
 .tab.idle { cursor: default; opacity: 0.45; }
 .tab:hover, .tab:focus-visible { color: var(--sc-fg-0); background: rgba(82, 193, 230, 0.06); }
 .tab:focus-visible { outline: 1px solid transparent; outline-offset: 0; box-shadow: var(--sc-focus-ring); }
-.gl { flex: 0 0 auto; font-style: normal; font-size: 14px; text-align: center; color: var(--holo, #8fe3ff); opacity: 0.75; }
+// The category icons (#412): line icons of the codex's set, one stroke style in every size.
+.gl, .cat, .grp-gl { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.gl { flex: 0 0 auto; width: 16px; height: 16px; color: var(--holo, #8fe3ff); opacity: 0.75; }
 .nm { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tab.on .nm { overflow: visible; text-overflow: clip; }
 .tab.on { justify-content: flex-start; color: #fff; text-shadow: 0 0 10px rgba(130, 220, 255, 0.6); }
@@ -54,7 +56,7 @@
   .tab.on { justify-content: center; }
   .tab.on .nm { display: none; }
 }
-.tab.on .gl { opacity: 1; text-shadow: 0 0 8px #8fe3ff; }
+.tab.on .gl { opacity: 1; filter: drop-shadow(0 0 4px #8fe3ff); }
 .tab-li.flashing > .tab { animation: row-flash 1.4s ease-out 0.9s both; }
 .tab.held { animation: breathe 2.4s ease-in-out infinite; }
 // Rotation progress under the active tab (paused with the rotation).
@@ -80,7 +82,7 @@
 .new li.grp:hover { background: none; }
 // A category block's header (#360): its glyph before the name, so the rows under it read as that category.
 .new li.grp-cat { align-items: center; gap: 6px; padding-bottom: 0; }
-.grp-gl { font-style: normal; font-size: 11px; color: var(--sc-fg-2); }
+.grp-gl { flex: 0 0 auto; width: 12px; height: 12px; color: var(--sc-fg-2); }
 .grp-nm {
   font: 600 max(9.5px, 0.58rem) / 1.2 var(--sc-font-display); letter-spacing: 0.18em; text-transform: uppercase;
   color: var(--sc-fg-2); white-space: nowrap;
@@ -99,7 +101,7 @@
 // One line per row: a row's height never depends on a name.
 .new a .nm { flex: 1 1 auto; }
 // Every row names its category with the tab's glyph; the active category's rows stand brighter.
-.new .cat { flex: 0 0 14px; font-style: normal; font-size: 12px; text-align: center; color: var(--holo, #8fe3ff); opacity: 0.45; }
+.new .cat { flex: 0 0 14px; width: 14px; height: 14px; color: var(--holo, #8fe3ff); opacity: 0.55; }
 .new li.own .cat { opacity: 0.9; }
 .new a.ent:hover, .new a:focus-visible { color: var(--sc-fg-0); background: rgba(82, 193, 230, 0.08); }
 // Inside the row: the list's box clips what stands outside it.
