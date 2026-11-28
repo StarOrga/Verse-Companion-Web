@@ -1,6 +1,6 @@
 # Verse Companion
 
-**Version: 0.300.5**
+**Version: 0.301.0**
 
 > Verse Companion – unofficial fan tool for Star Citizen. Your terminal to the verse: Verse News, codex, hangar and loadout tools.
 > Built with Angular 22 PWA · Supabase (Auth + Postgres + Storage + Edge Functions) · Vercel.
