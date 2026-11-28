@@ -55,7 +55,7 @@ import {
 import { KpiKey } from '../codex-mission';
 import type { SummaryOccupant } from '../ship-summary-panels';
 import { STANDARD_UNITS_PER_SEGMENT } from '../codex.types';
-import { toFiniteNumber } from '../../hangar/loadout-stats';
+import { findStat, toFiniteNumber } from '../../hangar/loadout-stats';
 
 export type HoloCategoryId = 'offensive' | 'defensive' | 'movement' | 'signature';
 export const HOLO_CATEGORY_IDS: readonly HoloCategoryId[] = ['offensive', 'defensive', 'movement', 'signature'];
@@ -68,7 +68,11 @@ export const HOLO_LEAD_KEY: Readonly<Record<HoloCategoryId, KpiKey>> = {
   signature: 'emLoad',
 };
 
-/** Model units per km of detection distance (see the header — an assumption). */
+/**
+ * Model units per km of detection distance (see the header — an assumption).
+ * The live stats strip (`codex-holo-strip.component.ts` `fmtKm`) divides by the
+ * same 1000, so both places show the same km.
+ */
 export const SIGNATURE_UNITS_PER_KM = 1000;
 
 // ── generic helpers ──────────────────────────────────────────────────────────
@@ -174,6 +178,8 @@ export interface HoloWeapon {
   downtime: number | null;
   /** All limit cycles, shortest burst first. */
   cycles: SustainedCycleInfo[];
+  /** true when the gun carries a magazine / ammo count (ballistic); energy guns have none. */
+  ballistic: boolean;
 }
 
 /** One step of the timeline: fire at `dps` until `untilSec`, then the next phase. */
@@ -262,6 +268,9 @@ export function holoWeapons(occupants: readonly SummaryOccupant[]): HoloWeapon[]
       fireTime: sus.fireTime,
       downtime: sus.downtime,
       cycles: sustainedCycles(dps, fireRate, params),
+      ballistic:
+        (toFiniteNumber(params?.['ammoCapacity'] ?? null) ?? 0) > 0 ||
+        sustainedCycles(dps, fireRate, params).some((c) => c.limit === 'magazine'),
     });
   }
   return out;
@@ -390,6 +399,80 @@ export function buildDefensive(
     armorHp,
     parts: partShares(parts),
   };
+}
+
+// ── per-row shares (the calm part cards' bars) ──────────────────────────────
+
+/**
+ * The value a part row's bar is measured in. Each kind is normalised on its own
+ * (shield generators among shield generators), because HP, speed and EM do not add.
+ */
+export type RowShareKind = 'shieldHp' | 'driveSpeed' | 'plantEm' | 'coolerRate' | 'radarEm';
+
+export interface RowShareGroup {
+  kind: RowShareKind;
+  category: HoloCategoryId;
+  /** Σ of the rows' values — what the bars refer to. */
+  total: number;
+  /** One part per className with a positive value; a row without data is absent (no bar, never 0 %). */
+  parts: HoloPart[];
+}
+
+const classNameOf = (o: SummaryOccupant): string => (o.payload as { className?: string } | null | undefined)?.className ?? '';
+
+function rowGroup(category: HoloCategoryId, kind: RowShareKind, rows: { id: string; value: number }[]): RowShareGroup | null {
+  const m = new Map<string, number>();
+  for (const r of rows) if (r.id && r.value > 0 && Number.isFinite(r.value)) m.set(r.id, (m.get(r.id) ?? 0) + r.value);
+  if (m.size === 0) return null;
+  const parts = partShares([...m].map(([id, value]) => ({ id, value })));
+  return { kind, category, total: parts.reduce((t, x) => t + x.value, 0), parts };
+}
+
+/**
+ * Per-row shares for Verteidigung, Bewegung and Signatur & Kühlung:
+ *  * shield generators — shield HP × count;
+ *  * quantum drive — drive speed (the one number the data offers);
+ *  * power plant — its EM emission (`em.nominal`);
+ *  * coolers — coolant generated (cooling rate);
+ *  * radar — EM emission.
+ * Armour, countermeasures, structure, life support: no per-row number, no bar.
+ */
+export function buildRowShareGroups(occupants: readonly SummaryOccupant[]): RowShareGroup[] {
+  const shield: { id: string; value: number }[] = [];
+  const drive: { id: string; value: number }[] = [];
+  const plant: { id: string; value: number }[] = [];
+  const cooler: { id: string; value: number }[] = [];
+  const radar: { id: string; value: number }[] = [];
+  for (const o of occupants) {
+    if (!o.payload) continue;
+    const id = classNameOf(o);
+    const kind = ((o.payload as { kind?: string }).kind ?? '').trim();
+    const stats = (o.payload as { stats?: Record<string, Record<string, unknown>> }).stats;
+    const stat = (cat: string, keys: string[]): number | null => {
+      const n = toFiniteNumber((stats ? findStat(stats, cat, keys) : null) ?? null);
+      return n !== null && n > 0 && n < 1e30 ? n : null;
+    };
+    if (kind === 'Shield') {
+      const hp = stat('shield', ['MaxShieldHealth']);
+      if (hp !== null) shield.push({ id, value: hp * Math.max(1, o.count) });
+    } else if (kind === 'QuantumDrive') {
+      const v = stat('quantum', ['params.driveSpeed', 'driveSpeed']);
+      if (v !== null) drive.push({ id, value: v });
+    } else {
+      const d = occupantDraw(o);
+      if (d.missing) continue;
+      if (d.generateSegments > 0) plant.push({ id, value: d.emNominal });
+      else if (d.group === 'coolers') cooler.push({ id, value: d.coolantGenerate });
+      else if (d.group === 'radar') radar.push({ id, value: d.emNominal });
+    }
+  }
+  return [
+    rowGroup('defensive', 'shieldHp', shield),
+    rowGroup('movement', 'driveSpeed', drive),
+    rowGroup('movement', 'plantEm', plant),
+    rowGroup('signature', 'coolerRate', cooler),
+    rowGroup('signature', 'radarEm', radar),
+  ].filter((g): g is RowShareGroup => g !== null);
 }
 
 // ── movement ─────────────────────────────────────────────────────────────────
@@ -630,17 +713,37 @@ export interface EnergyConsequences {
   emKm: number | null;
   irKm: number | null;
   coolingLoadPct: number | null;
-  /** The Offensive lead number after the change: 0 when weapons are cut, else the unchanged `baseLead`. */
+  /** The Offensive lead number after the change: scaled with the weapons column, 0 when cut. */
   offensiveLead: number | null;
   /** New − old, null where either side is a gap. */
   delta: { emKm: number | null; irKm: number | null; coolingLoadPct: number | null; offensiveLead: number | null };
 }
 
 /**
+ * The Offensive lead after the weapons column changed: 0 segments → 0.
+ * Approximation, not the game's exact curve: energy weapons (no magazine in
+ * their data) scale their DPS with assigned / max weapon segments, ballistic
+ * weapons (with ammo) keep their DPS until the column is at 0. The lead is
+ * split by each gun's share of the DPS; without any weapon data everything
+ * scales linearly.
+ */
+export function scaledOffensiveLead(occupants: readonly SummaryOccupant[], sheet: PowerSheet, baseLead: number): number {
+  if (sheet.weaponsCut) return 0;
+  const row = sheet.groups.find((g) => g.group === 'weapons' && g.key === 'weapons');
+  if (!row || !(row.capacity > 0)) return baseLead;
+  const ratio = Math.max(0, Math.min(1, row.allocated / row.capacity));
+  const weapons = holoWeapons(occupants);
+  const dps = (w: HoloWeapon): number => w.sustainedDps ?? w.burstDps;
+  const total = weapons.reduce((s, w) => s + dps(w), 0);
+  if (total <= 0) return round1(baseLead * ratio);
+  const ballistic = weapons.filter((w) => w.ballistic).reduce((s, w) => s + dps(w), 0) / total;
+  return round1(baseLead * (ballistic + (1 - ballistic) * ratio));
+}
+
+/**
  * Recomputes signature (EM km, IR km), cooling load and the Offensive lead
  * number when one group's segments change (e.g. weapons set to 0).
- * Offensive lead: weapons at 0 → 0; any other level keeps `baseLead` (the
- * data has no DPS-per-segment curve, so nothing is scaled or guessed).
+ * Offensive lead: see {@link scaledOffensiveLead}.
  */
 export function recomputeEnergy(
   base: HoloEnergyInput,
@@ -650,8 +753,7 @@ export function recomputeEnergy(
 ): EnergyConsequences {
   const before = buildEnergy(base);
   const energy = buildEnergy(withGroupSegments(base, key, segments), before.sheet);
-  const weaponsOff = energy.sheet.weaponsCut;
-  const offensiveLead = baseLead === null ? null : weaponsOff ? 0 : baseLead;
+  const offensiveLead = baseLead === null ? null : scaledOffensiveLead(base.occupants, energy.sheet, baseLead);
   const diff = (a: number | null, b: number | null): number | null =>
     a === null || b === null || a === b ? null : round1(a - b);
   return {
@@ -690,6 +792,8 @@ export interface HoloCategoryModel {
   movement: HoloMovementModel;
   signature: HoloSignatureModel;
   energy: HoloEnergy;
+  /** Per-row shares of the Verteidigung / Bewegung / Signatur columns (Offensive uses `offensive.parts`). */
+  rowShares: RowShareGroup[];
   /** The full sheet (hull, armour, cargo, signature included) the numbers come from. */
   sheet: KpiSheet;
 }
@@ -762,6 +866,7 @@ export function buildHoloCategoryModels(input: HoloCategoryInput): HoloCategoryM
     movement: { id: 'movement', lead: lead('movement'), parts: [], detail: movement },
     signature: { id: 'signature', lead: lead('signature'), parts: signature.parts, detail: signature },
     energy,
+    rowShares: buildRowShareGroups(occupants),
     sheet,
   };
 }

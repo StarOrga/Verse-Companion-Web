@@ -4,6 +4,18 @@ All notable changes to SC Companion are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.301.0] - 2026-11-28
+
+### Added
+- Ship page, Holotisch view: part cards in every column (defence, movement, signature) show their share of the column, e.g. a shield generator's share of the shield HP.
+
+### Changed
+- Ship page, Holotisch view: lowering the weapons column in the energy zone lowers the firepower figure step by step for energy weapons, in the chip and in the column head; ballistic weapons keep firing until the column is off.
+- Ship page, Holotisch view: one wording per value in German and English (e.g. "Klassenmitte", "Kühllast").
+
+### Fixed
+- Ship page, Holotisch view: a class without ships reads "Kein Klassenrang" instead of "only 0 ships"; missing missiles and tiny shares no longer show as "0"; long German labels in the energy columns no longer break mid-word; screen readers hear energy changes.
+
 ## [0.300.6] - 2026-11-28
 
 ### Added

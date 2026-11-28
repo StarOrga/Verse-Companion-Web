@@ -1233,9 +1233,33 @@ describe('CodexHardpointLayoutComponent', () => {
       expect(el.querySelector('.meta-txt')?.textContent?.trim()).toBe('KLA');
     });
 
+    it('a sliver reads 1 %, and a share without a total uses the bare phrase (no dangling "of")', () => {
+      fixture.componentRef.setInput('calm', true);
+      fixture.componentRef.setInput('partShares', new Map([['KLWE_LaserRepeater_S3', 0.002]]));
+      fixture.componentRef.setInput('partShareOf', null);
+      const el = render([{ section: 'weapons', slots: [calmSlot] }]);
+      expect(el.querySelector('[data-testid="part-share"]')!.textContent).toContain('codex.holo.part.shareOnly');
+      expect(el.querySelector('[data-testid="part-share"] .hx-share-b i')!.getAttribute('style')).toContain('1%');
+    });
+
     it('carries the row\'s share of the category total as a bar', () => {
       const el = renderCalm();
       expect(el.querySelector('[data-testid="part-share"] .hx-share-b i')?.getAttribute('style')).toContain('12%');
+    });
+
+    it('draws bars in the other columns\' sections too, and none on a row without a share', () => {
+      fixture.componentRef.setInput('calm', true);
+      fixture.componentRef.setInput('partShares', new Map([['SHLD_A', 0.6], ['COOL_A', 0.25]]));
+      fixture.componentRef.setInput('partShareOf', '211.200 Schild-HP');
+      const mk = (className: string, port: string) => ({ ...calmSlot, className, rawPort: port, portName: port });
+      const el = render([
+        { section: 'shields', slots: [mk('SHLD_A', 'hardpoint_shield_a'), mk('SHLD_B', 'hardpoint_shield_b')] },
+        { section: 'coolers', slots: [mk('COOL_A', 'hardpoint_cooler_a')] },
+      ]);
+      const bars = [...el.querySelectorAll('[data-testid="part-share"] .hx-share-b i')].map((i) => i.getAttribute('style'));
+      expect(bars.length).toBe(2);
+      expect(bars[0]).toContain('60%');
+      expect(bars[1]).toContain('25%');
     });
 
     it('leaves the classic row as it was', () => {

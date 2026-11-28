@@ -526,7 +526,7 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
                       @if (calm() && rowShare(row); as sh) {
                         <!-- ds-new: Anteilsbalken — the row's share of the category total -->
                         <span class="hx-share" data-testid="part-share">
-                          <span>{{ 'codex.holo.part.share' | translate: { pct: sh.pct, total: partShareOf() ?? '' } }}</span>
+                          <span>{{ (partShareOf() ? 'codex.holo.part.share' : 'codex.holo.part.shareOnly') | translate: { pct: sh.pct, total: partShareOf() } }}</span>
                           <span class="hx-share-b" aria-hidden="true"><i [style.width.%]="sh.pct"></i></span>
                         </span>
                       }
@@ -1177,7 +1177,7 @@ const FOLDABLE_SECTIONS: ReadonlySet<ShipModuleSection> = new Set<ShipModuleSect
     :host(.calm) .slot-item { color: var(--sc-fg-0); font-weight: 500; }
     :host(.calm) .slot.on .slot-item { color: var(--sc-accent); }
     :host(.calm) .fig .n { font-family: var(--font-monospace, monospace); font-size: 14px; color: var(--sc-accent); }
-    :host(.calm) .fig .u, :host(.calm) .fig .fig-l { font-family: var(--sc-font-display); font-size: max(7.5px, var(--sc-fs-floor)); }
+    :host(.calm) .fig .u, :host(.calm) .fig .fig-l { font-family: var(--sc-font-display); font-size: max(13px, var(--sc-fs-floor)); }
     :host(.calm) .size-tag { font-family: var(--font-monospace, monospace); color: var(--sc-fg-2); }
     :host(.calm) .slot-swap, :host(.calm) .slot-swap-action, :host(.calm) .slot-revert { background: transparent; border-color: transparent; opacity: 0.55; }
     :host(.calm) .slot:hover .slot-swap, :host(.calm) .slot:hover .slot-swap-action, :host(.calm) .slot:hover .slot-revert,
@@ -1238,7 +1238,7 @@ export class CodexHardpointLayoutComponent {
       const v = shares.get(n);
       if (v !== undefined && !seen.has(n)) { seen.add(n); sum += v; }
     }
-    return seen.size > 0 ? { pct: Math.round(sum * 100) } : null;
+    return seen.size > 0 && sum > 0 ? { pct: Math.max(1, Math.min(100, Math.round(sum * 100))) } : null;
   }
   /** Merged groups ("Antrieb & Systeme") nest their sections; false = every section stands as its own block (the Holotable's area columns). */
   readonly nestGroups = input(true);

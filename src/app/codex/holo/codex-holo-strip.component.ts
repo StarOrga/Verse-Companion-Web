@@ -252,7 +252,7 @@ let uidSeq = 0;
       <div class="hs-row">
         @for (tile of perspectiveTiles(); track tile.perspective) {
           <button type="button" class="seg tile" [attr.data-p]="tile.perspective" [class.sel]="openArea() === tile.perspective"
-                  [attr.aria-expanded]="openArea() === tile.perspective" [attr.aria-controls]="catPanelId"
+                  [attr.aria-expanded]="openArea() === tile.perspective" [attr.aria-controls]="openArea() === tile.perspective ? catPanelId : null"
                   (click)="toggleArea(tile.perspective, $event)">
             <span class="lab"><sc-area-symbol class="area-sym" [area]="tile.perspective" /><span class="lt">{{ tile.labelKey | translate }}</span></span>
             <div class="tile-vals">
@@ -276,7 +276,7 @@ let uidSeq = 0;
         }
 
         <button type="button" class="seg tile sig" data-p="signature" [class.sel]="openArea() === 'signature'"
-                [attr.aria-expanded]="openArea() === 'signature'" [attr.aria-controls]="catPanelId"
+                [attr.aria-expanded]="openArea() === 'signature'" [attr.aria-controls]="openArea() === 'signature' ? catPanelId : null"
                 (click)="toggleArea('signature', $event)">
           <span class="lab"><sc-area-symbol class="area-sym" area="signature" /><span class="lt">{{ 'codex.holo.strip.signature' | translate }}</span></span>
           <div class="tile-vals">
